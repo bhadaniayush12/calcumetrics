@@ -21,6 +21,7 @@
  */
 
 import type { HTMLAttributes } from 'astro/types';
+import AdSlot from '../ui/AdSlot.astro';
 
 interface Props {
   toolName: string;
@@ -93,6 +94,13 @@ const {
   <!-- Below the fold: formula, example, FAQ, related (full width) -->
   <div class="mt-10 space-y-10">
     <slot name="below" />
+  </div>
+
+  <!-- Reserved ad slot (§9 & §21): ≥24px below content, ≥24px from any button.
+       Desktop leaderboard 90px min-height. Renders live ad only when ADS_ENABLED=true.
+       Per AdSense policy: NO ads on homepage, 404, legal pages, Contact, About. -->
+  <div class="mt-10 pt-6 border-t border-border">
+    <AdSlot format="leaderboard" />
   </div>
 </div>
 

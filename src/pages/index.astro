@@ -1,9 +1,16 @@
 ---
 /**
  * Homepage — / (Section 26.4)
- * Pre-rendered SIP preview inside WindowFrame linking to /sip-calculator
+ * Pre-rendered SIP preview inside WindowFrame linking to /sip-calculator.
  * Most Popular Tools, Browse by Category, Why Calcumetrics, closing CTA.
- * No ads at launch. No email capture.
+ * No ads at launch (Section 21). No email capture (Section 26.4).
+ *
+ * Competitor improvements applied:
+ * - Trust stats bar (total tools, categories, client-side, formula-verified)
+ * - Popular tool badges ("Most Popular" chip label)
+ * - Category cards enriched with descriptions
+ * - "Why Calcumetrics" rewritten to differentiate from India-only competitors
+ * - Competitive differentiator callout strip
  */
 import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
@@ -17,9 +24,28 @@ const fmt = (n: number) => '₹' + formatIndian(n);
 const allTools = getPublishedTools();
 const totalCount = getToolCount();
 
-// Most popular — hand-picked 6 for the homepage
-const popularSlugs = ['sip-calculator', 'emi-calculator', 'fd-calculator', 'cagr-calculator', 'wacc-calculator', 'break-even-calculator'];
-const popularTools = popularSlugs.map((s) => allTools.find((t) => t.slug === s)).filter(Boolean);
+// Most popular — hand-picked 6 for the homepage with badge labels
+const popularConfig: Record<string, string> = {
+  'sip-calculator':       'Most Popular',
+  'emi-calculator':       'Most Popular',
+  'fd-calculator':        'Investments',
+  'cagr-calculator':      'Investments',
+  'wacc-calculator':      'Corporate Finance',
+  'break-even-calculator':'Business',
+};
+const popularSlugs = Object.keys(popularConfig);
+const popularTools = popularSlugs
+  .map((s) => allTools.find((t) => t.slug === s))
+  .filter(Boolean);
+
+// Category descriptions for richer cards (vs. competitor's bare lists)
+const categoryDescriptions: Record<string, string> = {
+  Investments: 'SIP, compound interest, CAGR, XIRR, FD, PPF, 401(k) and more.',
+  Loans: 'EMI, home loan, car loan and prepayment impact calculators.',
+  Taxes: 'GST and HRA for India. More jurisdictions coming.',
+  Business: 'Break-even, profit margins, markup vs margin, ROI.',
+  'Corporate Finance': 'WACC, NPV, IRR, payback period, DCF — global formulas.',
+};
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -108,7 +134,7 @@ const jsonld = {
                 <!-- Output side preview -->
                 <div class="flex-1 bg-dark-bg rounded-card p-4">
                   <p class="text-xs text-dark-muted mb-1 uppercase tracking-wider font-medium">Estimated Maturity</p>
-                  <p class="text-3xl font-bold tabular-nums text-dark-text mb-4">{fmt(result.maturity)}</p>
+                  <p class="text-3xl font-bold tabular-nums text-dark-text mb-4" aria-live="polite">{fmt(result.maturity)}</p>
                   <div class="space-y-2 text-xs border-t border-dark-border pt-3">
                     <div class="flex justify-between">
                       <span class="text-dark-muted">Invested</span>
@@ -133,43 +159,75 @@ const jsonld = {
     </div>
   </section>
 
-  <!-- Most Popular Tools -->
-  <section class="py-14 bg-surface border-b border-border" aria-labelledby="popular-heading">
+  <!-- Trust Stats Bar -->
+  <section class="bg-surface border-b border-border py-5" aria-label="Platform highlights">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 id="popular-heading" class="text-2xl font-bold text-text-primary mb-2">Most popular calculators</h2>
-      <p class="text-sm text-text-muted mb-8">Start with these tools used most frequently by finance professionals, CAs, and retail investors.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {popularTools.map((tool) => tool && (
-          <a
-            href={tool.path}
-            class="group block bg-canvas border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
-          >
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
-            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h3>
-            <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
-          </a>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 sm:divide-x sm:divide-border">
+        {[
+          { stat: String(totalCount), label: 'Free calculators' },
+          { stat: '5',               label: 'Finance categories' },
+          { stat: '100%',            label: 'Client-side — no data sent' },
+          { stat: 'Every',           label: 'Formula shown & tested' },
+        ].map((item) => (
+          <div class="flex flex-col items-center text-center px-4 py-1">
+            <span class="text-xl font-bold tabular-nums text-text-primary tracking-tight">{item.stat}</span>
+            <span class="text-xs text-text-muted mt-0.5">{item.label}</span>
+          </div>
         ))}
       </div>
     </div>
   </section>
 
+  <!-- Most Popular Tools -->
+  <section class="py-14 bg-canvas border-b border-border" aria-labelledby="popular-heading">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="popular-heading" class="text-2xl font-bold text-text-primary mb-2">Most popular calculators</h2>
+      <p class="text-sm text-text-muted mb-8">Start with these tools used most frequently by finance professionals, CAs, analysts and retail investors.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {popularTools.map((tool) => tool && (
+          <a
+            href={tool.path}
+            class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
+          >
+            <div class="flex items-start justify-between mb-2">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider">{tool.category}</span>
+              {popularConfig[tool.slug] === 'Most Popular' && (
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded-chip bg-disabled-bg border border-border text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                  Popular
+                </span>
+              )}
+            </div>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h3>
+            <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
+          </a>
+        ))}
+      </div>
+      <div class="mt-6 text-center">
+        <a href="/calculators" class="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover transition-standard focus-visible:outline-accent">
+          View all {totalCount} calculators →
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Browse by Category -->
-  <section class="py-14 bg-canvas border-b border-border" aria-labelledby="categories-heading">
+  <section class="py-14 bg-surface border-b border-border" aria-labelledby="categories-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <h2 id="categories-heading" class="text-2xl font-bold text-text-primary mb-2">Browse by category</h2>
-      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories.</p>
+      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories — global tools included.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {CATEGORIES.map((cat) => {
           const catTools = allTools.filter((t) => t.category === cat.name);
           return (
             <a
               href={cat.href}
-              class="group block bg-surface border border-border rounded-card p-5 hover:border-accent transition-standard focus-visible:outline-accent"
+              class="group block bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard focus-visible:outline-accent"
             >
-              <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center justify-between mb-2">
                 <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{cat.name}</h3>
                 <span class="text-xs text-text-muted">{catTools.length} tools</span>
               </div>
+              <p class="text-xs text-text-muted leading-relaxed mb-3">{categoryDescriptions[cat.name]}</p>
               <ul class="space-y-1">
                 {catTools.slice(0, 3).map((tool) => (
                   <li class="text-xs text-text-muted truncate">· {tool.name}</li>
@@ -184,7 +242,7 @@ const jsonld = {
         <!-- View all card -->
         <a
           href="/calculators"
-          class="group block bg-surface border border-dashed border-border rounded-card p-5 hover:border-accent hover:bg-canvas transition-standard focus-visible:outline-accent flex flex-col items-center justify-center text-center min-h-[120px]"
+          class="group block bg-canvas border border-border rounded-card p-5 hover:border-accent hover:bg-surface transition-standard focus-visible:outline-accent flex flex-col items-center justify-center text-center min-h-[140px]"
         >
           <span class="text-2xl font-bold text-accent mb-1">{totalCount}</span>
           <span class="text-sm font-medium text-text-primary group-hover:text-accent transition-standard">View all calculators</span>
@@ -194,33 +252,64 @@ const jsonld = {
     </div>
   </section>
 
-  <!-- Why Calcumetrics (true factual claims only — Section 26.5) -->
-  <section class="py-14 bg-surface border-b border-border" aria-labelledby="why-heading">
+  <!-- Why Calcumetrics — competitive differentiators vs. India-only sites (Section 26.5) -->
+  <section class="py-14 bg-canvas border-b border-border" aria-labelledby="why-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <h2 id="why-heading" class="text-2xl font-bold text-text-primary mb-2">Why Calcumetrics</h2>
-      <p class="text-sm text-text-muted mb-10">Built for professionals, students, and retail investors who want transparent tools.</p>
+      <p class="text-sm text-text-muted mb-10">Built for finance professionals, CAs, analysts, students and retail investors who need transparent, global tools.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
+          {
+            title: 'Global scope',
+            body: "WACC, IRR, NPV, DCF, CAGR, 401(k) and more. Not limited to one country's tax rules.",
+          },
           {
             title: 'Every formula shown',
             body: 'The formula, variable legend, and a worked example appear on every calculator page. No black boxes.',
           },
           {
             title: 'No login required',
-            body: 'All calculations run in your browser. We do not store or transmit your financial inputs.',
+            body: 'All calculations run in your browser. We do not store or transmit your financial inputs to any server.',
           },
           {
             title: 'Test-driven accuracy',
-            body: 'Each calculator is validated against published test fixtures before it goes live. Results are estimates, not guarantees.',
-          },
-          {
-            title: 'Accessible design',
-            body: 'Every input has a label, every interactive element has a keyboard shortcut, every error message names the fix.',
+            body: 'Each calculator is validated against published test fixtures before launch. Results are estimates, not guarantees.',
           },
         ].map((item) => (
-          <div class="bg-canvas border border-border rounded-card p-5">
+          <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="font-bold text-sm text-text-primary mb-2">{item.title}</h3>
             <p class="text-xs text-text-muted leading-relaxed">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Differentiator strip vs. India-only competitors -->
+  <section class="py-10 bg-surface border-b border-border" aria-label="Platform comparison">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+        {[
+          {
+            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+            label: 'Global financial tools',
+            sub: 'WACC · IRR · NPV · DCF · CAGR · 401(k)',
+          },
+          {
+            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+            label: 'Your data stays with you',
+            sub: 'No server. No account. No tracking of inputs.',
+          },
+          {
+            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
+            label: 'Transparent methodology',
+            sub: 'Formula · assumptions · worked example on every page.',
+          },
+        ].map((item) => (
+          <div class="flex flex-col items-center px-4 py-5 bg-canvas border border-border rounded-card">
+            <Fragment set:html={item.icon} />
+            <span class="text-sm font-bold text-text-primary mb-1">{item.label}</span>
+            <span class="text-xs text-text-muted">{item.sub}</span>
           </div>
         ))}
       </div>

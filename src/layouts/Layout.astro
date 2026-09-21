@@ -35,8 +35,9 @@ const canonicalUrl = canonical || `${domain}${currentPath === '/' ? '/' : curren
 
     <!-- Favicon & Icons per Section 16 -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.ico" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
 
     <!-- Open Graph / Social per Section 16 -->
     <meta property="og:type" content="website" />
@@ -44,7 +45,27 @@ const canonicalUrl = canonical || `${domain}${currentPath === '/' ? '/' : curren
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={`${domain}/og/default.png`} />
     <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      Section 19 — Google Consent Mode defaults (Step 1 of the CMP order).
+      Defaulted to denied for EEA/UK/CH; granted elsewhere unless local law requires otherwise.
+      Replace this block with your CMP's built-in Consent Mode integration when ready.
+    -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500
+      });
+    </script>
+    <!-- CMP script placeholder — insert Google Privacy & Messaging or a certified CMP here -->
+    <!-- AdSense script placeholder — insert after CMP, async, with data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" -->
 
     <!-- Section 11: Self-host Inter (preload regular + medium weight woff2) -->
     <link

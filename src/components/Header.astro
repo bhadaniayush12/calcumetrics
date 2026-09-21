@@ -1,20 +1,23 @@
 ---
+import { getPublishedTools, getToolCount } from '../config/site';
+
 interface Props {
   currentPath?: string;
 }
 
 const { currentPath = Astro.url.pathname } = Astro.props;
 
-// Category links for the Tools dropdown
+// Dynamic category links — counts come from the published tool registry
+const allTools = getPublishedTools();
 const toolCategories = [
-  { label: 'Investments', href: '/investments', count: '9' },
-  { label: 'Loans', href: '/loans', count: '4' },
-  { label: 'Taxes', href: '/taxes', count: '2' },
-  { label: 'Business', href: '/business', count: '4' },
-  { label: 'Corporate Finance', href: '/corporate-finance', count: '5' },
+  { label: 'Investments', href: '/investments', count: String(allTools.filter(t => t.category === 'Investments').length) },
+  { label: 'Loans', href: '/loans', count: String(allTools.filter(t => t.category === 'Loans').length) },
+  { label: 'Taxes', href: '/taxes', count: String(allTools.filter(t => t.category === 'Taxes').length) },
+  { label: 'Business', href: '/business', count: String(allTools.filter(t => t.category === 'Business').length) },
+  { label: 'Corporate Finance', href: '/corporate-finance', count: String(allTools.filter(t => t.category === 'Corporate Finance').length) },
 ];
 
-const totalToolsCount = 24;
+const totalToolsCount = getToolCount();
 ---
 
 <header class="w-full bg-canvas border-b border-border sticky top-0 z-50 select-none">
@@ -93,7 +96,7 @@ const totalToolsCount = 24;
           ))}
           <div class="border-t border-border my-1"></div>
           <a
-            href="/"
+            href="/calculators"
             role="menuitem"
             class="flex items-center justify-between px-3 py-2 text-[13px] rounded font-semibold text-accent hover:bg-canvas transition-standard focus-visible:outline-accent"
           >
@@ -128,17 +131,19 @@ const totalToolsCount = 24;
 
     <!-- Block 3: Right cluster (Search | ₹ INR | EN | Dark mode toggle) -->
     <div class="hidden lg:flex items-center gap-3 text-[13px] text-text-muted">
-      <!-- Search Icon Button -->
+      <!-- Search Icon Button with keyboard shortcut hint -->
       <button
         type="button"
         id="header-search-btn"
-        aria-label="Search calculators"
-        class="p-2 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
+        aria-label="Search calculators (press / or Ctrl+K)"
+        title="Search (/ or ⌘K)"
+        class="flex items-center gap-1.5 px-2 py-1.5 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
       >
         <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
+        <span class="text-[11px] text-text-muted font-medium hidden xl:inline">/</span>
       </button>
 
       <!-- Divider line subtle -->
@@ -310,7 +315,7 @@ const totalToolsCount = 24;
               <span class="text-xs text-text-muted">{cat.count}</span>
             </a>
           ))}
-          <a href="/" class="h-11 flex items-center px-8 text-sm font-semibold text-accent hover:underline">
+          <a href="/calculators" class="h-11 flex items-center px-8 text-sm font-semibold text-accent hover:underline">
             View All {totalToolsCount} Calculators &rarr;
           </a>
         </div>

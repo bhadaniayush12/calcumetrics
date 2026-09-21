@@ -1,0 +1,83 @@
+---
+/**
+ * AdSlot.astro — Section 9 & 21 (Handoff v2)
+ *
+ * Reserved ad container.
+ * - Always reserves the correct height so CLS stays at 0 when ads load/unload.
+ * - Shows the "Advertisement" label per Google AdSense placement policy §2.
+ * - Renders the actual <ins> tag only when ADS_ENABLED=true AND an adSlotId is provided.
+ * - NEVER adjacent to Calculate, login, or navigation elements (enforced by callers).
+ * - Mobile format: 250px tall rectangle. Desktop: 90px leaderboard.
+ * - Min 24px gap from any input/button — enforced in calling layout/page.
+ *
+ * Usage:
+ *   <AdSlot format="leaderboard" adSlotId="1234567890" />      ← desktop above-fold
+ *   <AdSlot format="rectangle"   adSlotId="0987654321" />      ← mobile / below-fold
+ *
+ * AdSlotId = the 10-digit data-ad-slot value from the AdSense dashboard.
+ * Leave adSlotId empty (or omit) during development / before approval.
+ */
+
+import { ADS_ENABLED } from '../../config/site';
+
+interface Props {
+  /** 'leaderboard' = 728×90 (desktop); 'rectangle' = 336×280 (below-fold) */
+  format?: 'leaderboard' | 'rectangle';
+  /** AdSense data-ad-slot ID — required to show a live ad */
+  adSlotId?: string;
+  /** Extra wrapper classes if needed for spacing */
+  class?: string;
+}
+
+const {
+  format = 'leaderboard',
+  adSlotId,
+  class: extraClass = '',
+} = Astro.props;
+
+// Reserved heights per §9: desktop leaderboard min 90px; rectangle 250px
+const reservedHeight = format === 'rectangle' ? '250px' : '90px';
+const shouldShowAd = ADS_ENABLED && !!adSlotId;
+---
+
+<div
+  class={`ad-slot-wrapper relative w-full overflow-hidden ${extraClass}`}
+  style={`min-height: ${reservedHeight};`}
+  data-ad-format={format}
+>
+  {/* "Advertisement" label — per §9 & §03_AD_PLACEMENT: "ADVERTISEMENT" or "Sponsored Links" only */}
+  <p class="text-[10px] font-medium text-text-muted uppercase tracking-wider text-center mb-1 select-none" aria-hidden="true">
+    Advertisement
+  </p>
+
+  {/* Reserved container — 1px border, #F7F7F4 bg per §9 */}
+  <div
+    class="w-full bg-canvas border border-border rounded-card flex items-center justify-center"
+    style={`min-height: calc(${reservedHeight} - 16px);`}
+  >
+    {shouldShowAd ? (
+      /**
+       * Live ad — rendered only when ADS_ENABLED=true and adSlotId is provided.
+       * data-ad-client must be replaced with your publisher ID (ca-pub-XXXXXXXXXXXXXXXX).
+       * Load AdSense script async, after consent, in Layout.astro head.
+       */
+      <ins
+        class="adsbygoogle"
+        style="display:block; width:100%;"
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+        data-ad-slot={adSlotId}
+        data-ad-format={format === 'leaderboard' ? 'horizontal' : 'rectangle'}
+        data-full-width-responsive="true"
+      ></ins>
+    ) : (
+      /* Placeholder shown when ads not yet enabled — invisible to users in production (no ads) */
+      <span class="text-[10px] text-text-muted select-none" aria-hidden="true">
+        {ADS_ENABLED ? 'Ad slot — no ID provided' : ''}
+      </span>
+    )}
+  </div>
+</div>
+
+{shouldShowAd && (
+  <script is:inline>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+)}

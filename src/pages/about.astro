@@ -1,19 +1,52 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { SITE_EMAIL } from '../config/site';
 const canonicalUrl = 'https://calcumetrics.com/about';
 ---
-<Layout title="About Calcumetrics | Calcumetrics" description="Learn about Calcumetrics — who runs it, our mission, how we make money, and our approach to formula accuracy." canonical={canonicalUrl}>
+<Layout
+  title="About Calcumetrics | Calcumetrics"
+  description="Learn about Calcumetrics — who runs it, our mission, what the tools are, how we make money, and our approach to formula accuracy."
+  canonical={canonicalUrl}
+>
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">About Calcumetrics</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server.</p>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">The site is built and maintained by an independent developer. Our mission is to provide accurate, transparent financial tools with every formula documented and every assumption stated clearly.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">What we offer</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Financial calculators across five categories: investments, loans, taxes, business, and corporate finance. Each tool shows the formula used, states its assumptions, and provides a worked example.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">How this site makes money</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality requirements. Ads will appear only on calculator and category pages, never on legal or policy pages. A consent management platform will be installed before ads are served to users in the EU, UK, and Switzerland.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Accuracy and corrections</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">We validate every calculator against published test fixtures before launch. If you find an error, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the &ldquo;Last updated&rdquo; date.</p>
-      <p class="text-sm text-text-muted leading-relaxed">See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, and data sources.</p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Who runs this site</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Calcumetrics is operated by an independent developer based in India.
+      <!-- TODO (owner): Replace the above sentence with your real name/entity and country before launching.
+           Example: "Calcumetrics is operated by [Your Full Name / Company Name], based in [City, Country]."
+           This is required for AdSense eligibility (publisher identity must be verifiable). -->
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">What Calcumetrics is</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server. There is no sign-up, no account, and no data stored about you.
+    </p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      The site covers five categories: investments, loans, taxes, business and corporate finance. Tools include both global financial calculators (WACC, IRR, NPV, DCF, SIP, CAGR) and jurisdiction-specific tools for India and the US.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Our mission</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      To give finance professionals, CAs, analysts, students and retail investors accurate, transparent tools — with every formula documented, every assumption stated, and every result validated against published test fixtures.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">How this site makes money</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality and policy requirements. Ads will appear only on calculator and category pages — never on the homepage, legal pages, policy pages, or error pages. A Google-certified consent management platform (CMP) will be installed before any ads are served to users in the EU, UK, and Switzerland.
+    </p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      No sponsored content, paid placements, or affiliate links are currently on the site.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Accuracy and corrections</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      We validate every calculator against published test fixtures before launch. Tax rates and law-dependent data are stored in a versioned data file with a "Rates last verified" date on each relevant tool. If you find an error in a formula, a rate, or any page content, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the "Last updated" date and schema <code>dateModified</code>.
+    </p>
+    <p class="text-sm text-text-muted leading-relaxed">
+      See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, rate sources, and the correction policy.
+    </p>
   </div>
 </Layout>

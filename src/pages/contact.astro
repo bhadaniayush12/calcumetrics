@@ -2,16 +2,38 @@
 import Layout from '../layouts/Layout.astro';
 const canonicalUrl = 'https://calcumetrics.com/contact';
 ---
-<Layout title="Contact Calcumetrics | Calcumetrics" description="Contact us to report a calculation error, ask a question, or provide feedback." canonical={canonicalUrl}>
+<Layout
+  title="Contact Calcumetrics | Calcumetrics"
+  description="Contact us to report a calculation error, ask a question, or provide feedback. We respond within 2–3 business days."
+  canonical={canonicalUrl}
+>
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Contact</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-6">We are a small team. We respond to all messages, typically within 2-3 business days.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Email</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4"><a href="mailto:hello@calcumetrics.com" class="text-accent hover:underline focus-visible:outline-accent">hello@calcumetrics.com</a></p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Reporting a calculation error</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Please include: the calculator name, the exact inputs you used, the result you got, and the result you expected (with your source or working). This helps us reproduce and verify the issue quickly.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Other enquiries</h2>
-      <p class="text-sm text-text-muted leading-relaxed">For general feedback, partnership enquiries, or anything else, use the same email address. We do not offer one-to-one financial advice.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-6">
+      This inbox is monitored. We respond to all messages, typically within 2–3 business days.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Email</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      <a href="mailto:hello@calcumetrics.com" class="text-accent hover:underline focus-visible:outline-accent">hello@calcumetrics.com</a>
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Reporting a calculation error</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-2">Please include:</p>
+    <ul class="list-disc list-inside space-y-1 text-sm text-text-muted mb-4 pl-2">
+      <li>The calculator name and URL</li>
+      <li>The exact inputs you used</li>
+      <li>The result you got from Calcumetrics</li>
+      <li>The result you expected, with your source or working</li>
+    </ul>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      This helps us reproduce and verify the issue quickly. Verified errors are corrected and the "Last updated" date on the page is changed.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Other enquiries</h2>
+    <p class="text-sm text-text-muted leading-relaxed">
+      For general feedback, suggestions for new calculators, or anything else, use the same email address. We do not offer one-to-one financial, tax, or legal advice.
+    </p>
   </div>
 </Layout>
