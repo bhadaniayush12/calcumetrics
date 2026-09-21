@@ -281,7 +281,7 @@ export const TOOLS: Tool[] = [
   {
     name: 'UPI MDR Calculator',
     slug: 'upi-mdr-calculator',
-    path: '/upi-mdr-calculator',
+    path: '/in/upi-mdr-calculator',
     category: 'Business',
     region: 'IN',
     description: 'Calculate UPI merchant fees, interchange rates on PPI wallets and RuPay credit cards, and net settlement.',
