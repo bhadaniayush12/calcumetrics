@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 Branch: development
-Status: 50-tool target locked; individual overlap candidates remain gated by keyword/intention research before page build.
+Status: superseded by Phase 0.4 scope lock; historical audit retained for traceability.
 
 ## 1. Current repository inventory
 
@@ -54,7 +54,7 @@ Category breakdown:
 | 33 | DCF Calculator | dcf-calculator | /dcf-calculator | Corporate Finance | Global | yes | corporate.ts |
 
 ### Immediate registry inconsistencies found
-- The UPI MDR tool is region=IN but its current route is root-level `/upi-mdr-calculator`; final scope should review whether it belongs under `/in/`.
+- The UPI MDR tool is region=IN and the locked architecture target is `/in/upi-mdr-calculator`; the physical page migration remains a separate implementation task.
 - Current Profit Margin is one combined tool. Final 50 scope calls for separate Gross Profit & Margin and Net & Operating Profit Margin tools.
 - Current Break-even tool must expand to include Target Profit and Contribution Margin.
 - Current Income Tax copy/engine is tied to older tax-year assumptions and must be rebuilt before production publication.
@@ -191,7 +191,7 @@ Status: **KEEP + EXPAND**
 - **US**: US-specific products/rules such as 401(k).
 - Jurisdiction-specific products should use jurisdiction-prefixed routes.
 - A mathematical formula being universal is not enough to make the whole tool “Global” if the product/legal context is jurisdiction-specific.
-- Current UPI MDR route requires correction to `/in/upi-mdr-calculator` unless a later research decision establishes a genuinely global version.
+- UPI MDR is locked as India-specific with target route `/in/upi-mdr-calculator`; physical migration is deferred to its own route task.
 
 ## 5. Scope decision
 
@@ -224,21 +224,8 @@ The 50-count remains fixed; if a research gate later proves two candidates are n
 - Research evidence belongs in the registry metadata so the decision is traceable.
 
 
-## 6. Recommended next micro-task
+## 6. Historical phase note
 
-**Phase 0.2 — Registry architecture only.**
+Phase 0.2 was the registry architecture task and has been completed and validated.
 
-Refactor the single tool registry so that future 50-tool metadata can drive:
-- header
-- Tools dropdown
-- directory
-- category hubs
-- footer
-- search
-- sitemap
-- counts
-- region tags
-
-Do not build the new calculators in Phase 0.2.
-Do not change visual UI in Phase 0.2.
-Do not add tax logic in Phase 0.2.
+The next task after the scope audit was Phase 0.2 registry architecture; that implementation is now recorded in `docs/phase-0.2-registry-architecture.md`.
