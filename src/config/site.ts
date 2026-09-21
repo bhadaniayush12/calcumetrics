@@ -14,10 +14,27 @@ export const PUBLISH_DRAFTS = false;   // Exclude draft pages from nav, counts, 
 
 // ── Tool registry (Section 7 + 13) ────────────────────────────────────────────
 // Single source of truth. Used by: directory, hubs, footer, nav counts, sitemap, search index.
-// Only list tools that are fully built. status:'draft' tools are excluded at build.
+// Published tools are live. Draft tools are built but intentionally hidden. Planned tools are scope candidates only
+// and must stay out of all production surfaces until their market-demand research is verified.
+// New additions must use the workflow: Research -> Approve -> Draft -> Build -> Test -> Publish.
 
-export type ToolStatus = 'published' | 'draft';
+export type ToolStatus = 'published' | 'draft' | 'planned';
 export type Region = 'Global' | 'IN' | 'US' | 'UK';
+
+export type ResearchStatus = 'pending' | 'verified';
+export type ResearchBasis =
+  | 'founder-audit'
+  | 'google-data'
+  | 'keyword-serp'
+  | 'official-source'
+  | 'scope-only';
+
+export interface ToolResearch {
+  status: ResearchStatus;
+  basis: ResearchBasis;
+  source?: string;
+  checkedAt?: string;         // ISO 8601 date of the demand/intent check
+}
 
 export interface Tool {
   name: string;
@@ -28,6 +45,7 @@ export interface Tool {
   description: string;        // Used in directory cards and meta descriptions
   status: ToolStatus;
   dateModified: string;       // ISO 8601, updated only when content/logic changes
+  research?: ToolResearch;    // Required for planned additions; must be verified before promotion
 }
 
 export type Category =
@@ -376,14 +394,227 @@ export const TOOLS: Tool[] = [
     description: 'Calculate the intrinsic value of an investment using the Discounted Cash Flow method.',
     status: 'published',
     dateModified: '2026-09-20',
+  },,
+  // ── Planned candidates — research gate required before any build ─────────────
+  // These are part of the locked 50-tool target, but none may be promoted until
+  // demand/intent evidence is recorded. Current policy: use Google demand data
+  // (and keyword/SERP validation where overlap risk exists).
+  {
+    name: 'Inflation Calculator',
+    slug: 'inflation-calculator',
+    path: '/inflation-calculator',
+    category: 'Investments',
+    region: 'Global',
+    description: 'Calculate the future purchasing-power impact of inflation over time.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Savings Goal Calculator',
+    slug: 'savings-goal-calculator',
+    path: '/savings-goal-calculator',
+    category: 'Investments',
+    region: 'Global',
+    description: 'Calculate the amount to save regularly to reach a target savings goal.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Mortgage Calculator',
+    slug: 'mortgage-calculator',
+    path: '/mortgage-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Estimate mortgage payments, total interest, and repayment over the loan term.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'keyword-serp' },
+  },
+  {
+    name: 'Loan Affordability Calculator',
+    slug: 'loan-affordability-calculator',
+    path: '/loan-affordability-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Estimate the loan amount that may fit within a chosen repayment budget.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Debt-to-Income Ratio Calculator',
+    slug: 'debt-to-income-ratio-calculator',
+    path: '/debt-to-income-ratio-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Calculate debt-to-income ratio from monthly debt obligations and income.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Credit Card Payoff Calculator',
+    slug: 'credit-card-payoff-calculator',
+    path: '/credit-card-payoff-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Estimate payoff time, interest cost, and payment requirements for credit card balances.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Loan Amortization Calculator',
+    slug: 'loan-amortization-calculator',
+    path: '/loan-amortization-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Generate a loan amortization schedule showing principal, interest, and remaining balance.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'keyword-serp' },
+  },
+  {
+    name: 'Interest Rate Calculator',
+    slug: 'interest-rate-calculator',
+    path: '/interest-rate-calculator',
+    category: 'Loans',
+    region: 'Global',
+    description: 'Solve for the implied interest rate from principal, payment, time, and repayment inputs.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'TDS Calculator',
+    slug: 'tds-calculator',
+    path: '/in/tds-calculator',
+    category: 'Taxes',
+    region: 'IN',
+    description: 'Calculate tax deducted at source for supported India income and payment scenarios.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Capital Gains Tax Calculator',
+    slug: 'capital-gains-tax-calculator',
+    path: '/in/capital-gains-tax-calculator',
+    category: 'Taxes',
+    region: 'IN',
+    description: 'Estimate Indian capital gains tax for supported asset types, holding periods, and tax rules.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Advance Tax Calculator',
+    slug: 'advance-tax-calculator',
+    path: '/in/advance-tax-calculator',
+    category: 'Taxes',
+    region: 'IN',
+    description: 'Estimate advance income-tax instalments under applicable Indian tax rules.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Salary / CTC Calculator',
+    slug: 'salary-ctc-calculator',
+    path: '/in/salary-ctc-calculator',
+    category: 'Taxes',
+    region: 'IN',
+    description: 'Break down salary and CTC components for an India employment package.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Cash Conversion Cycle Calculator',
+    slug: 'cash-conversion-cycle-calculator',
+    path: '/cash-conversion-cycle-calculator',
+    category: 'Business',
+    region: 'Global',
+    description: 'Calculate the cash conversion cycle from inventory, receivables, and payables days.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Debt Service Coverage Ratio (DSCR) Calculator',
+    slug: 'dscr-calculator',
+    path: '/dscr-calculator',
+    category: 'Business',
+    region: 'Global',
+    description: 'Calculate debt service coverage ratio from operating cash flow and debt service.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Discounted Payback Period Calculator',
+    slug: 'discounted-payback-period-calculator',
+    path: '/discounted-payback-period-calculator',
+    category: 'Corporate Finance',
+    region: 'Global',
+    description: 'Calculate the time required to recover an investment using discounted cash flows.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
+  },
+  {
+    name: 'Present Value Calculator',
+    slug: 'present-value-calculator',
+    path: '/present-value-calculator',
+    category: 'Corporate Finance',
+    region: 'Global',
+    description: 'Calculate the present value of a future cash flow using a chosen discount rate.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'keyword-serp' },
+  },
+  {
+    name: 'Future Value Calculator',
+    slug: 'future-value-calculator',
+    path: '/future-value-calculator',
+    category: 'Corporate Finance',
+    region: 'Global',
+    description: 'Calculate the future value of a present amount or cash-flow series at a chosen growth rate.',
+    status: 'planned',
+    dateModified: '2026-09-22',
+    research: { status: 'pending', basis: 'google-data' },
   },
 ];
 
 // ── Derived helpers ────────────────────────────────────────────────────────────
 
-/** Returns only published tools (respects PUBLISH_DRAFTS flag) */
+/** Returns production-visible tools. Planned candidates are never production-visible. */
 export function getPublishedTools(): Tool[] {
-  return TOOLS.filter((t) => PUBLISH_DRAFTS || t.status === 'published');
+  return TOOLS.filter(
+    (t) => t.status === 'published' || (PUBLISH_DRAFTS && t.status === 'draft')
+  );
+}
+
+/** Returns scope candidates that still require research/build work. */
+export function getPlannedTools(): Tool[] {
+  return TOOLS.filter((t) => t.status === 'planned');
+}
+
+/** Returns the complete catalog, including published, draft, and planned entries. */
+export function getToolCatalog(): Tool[] {
+  return TOOLS;
+}
+
+/** Returns the complete catalog count (published + draft + planned). */
+export function getToolCatalogCount(): number {
+  return TOOLS.length;
+}
+
+/** Whether a tool has explicitly verified research evidence. */
+export function isResearchVerified(tool: Tool): boolean {
+  return tool.research?.status === 'verified';
 }
 
 /** Tools grouped by category (published only) */
