@@ -5,23 +5,43 @@ import { getPublishedTools } from '../../config/site';
 
 const tools = getPublishedTools();
 const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corporate Finance'] as const;
+
+const popularSearches = [
+  'SIP Calculator',
+  'GST Calculator',
+  'Income Tax Calculator',
+  'NPV Calculator',
+  'WACC Calculator',
+  'Break-Even Calculator',
+] as const;
 ---
 
+<!--
+  Overlay: starts below the 64px header (top-16), restrained black/40 backdrop,
+  no blur, no heavy shadow. Flex column: search row full-width, results panel centered.
+-->
 <div
   id="search-palette-backdrop"
-  class="fixed inset-0 bg-black/60 z-[100] items-start justify-center p-3 sm:p-6 md:pt-20 overflow-y-auto hidden"
+  class="fixed inset-x-0 bottom-0 bg-black/40 z-[100] hidden flex-col"
+  style="top: 64px;"
   role="dialog"
   aria-modal="true"
   aria-label="Search Calculators"
 >
-  <div
-    id="search-palette-container"
-    class="bg-surface border border-border rounded-card w-full max-w-xl overflow-hidden my-auto sm:my-0 transition-standard"
-  >
-    <!-- Search Input Bar -->
-    <div class="p-3.5 border-b border-border flex items-center gap-3">
+  <!-- Full-width 64px search row -->
+  <div class="w-full bg-surface border-b border-border shrink-0" style="height: 64px;">
+    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center gap-3">
       <!-- Search Icon -->
-      <svg class="w-5 h-5 text-text-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg
+        class="w-5 h-5 text-text-muted shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
         <circle cx="11" cy="11" r="8" />
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
       </svg>
@@ -32,7 +52,7 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
         placeholder="Search 24+ calculators (e.g. SIP, EMI, GST, NPV)..."
         autocomplete="off"
         spellcheck="false"
-        class="w-full bg-transparent border-none text-[15px] text-text-primary placeholder:text-text-muted focus:outline-none"
+        class="flex-1 bg-transparent border-none text-[18px] text-text-primary placeholder:text-text-muted focus:outline-none min-w-0"
         aria-label="Search all calculators"
       />
 
@@ -40,7 +60,7 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       <button
         type="button"
         id="search-palette-clear"
-        class="hidden text-text-muted hover:text-text-primary p-1 rounded transition-standard cursor-pointer"
+        class="hidden text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer shrink-0"
         aria-label="Clear search"
       >
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -49,8 +69,8 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
         </svg>
       </button>
 
-      <!-- ESC pill -->
-      <kbd class="hidden sm:inline-block text-[11px] font-medium text-text-muted bg-canvas border border-border px-1.5 py-0.5 rounded select-none">
+      <!-- ESC pill (desktop) -->
+      <kbd class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-text-muted bg-canvas border border-border px-1.5 py-0.5 rounded-chip select-none shrink-0">
         ESC
       </kbd>
 
@@ -58,8 +78,8 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       <button
         type="button"
         id="search-palette-close-btn"
-        class="sm:hidden text-text-muted hover:text-text-primary p-1 rounded transition-standard cursor-pointer"
-        aria-label="Close search modal"
+        class="sm:hidden text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer shrink-0"
+        aria-label="Close search"
       >
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="18" y1="6" x2="6" y2="18" />
@@ -67,101 +87,177 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
         </svg>
       </button>
     </div>
+  </div>
 
-    <!-- Category filter chips strip -->
-    <div class="px-3 py-2 border-b border-border bg-canvas flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
-      {categories.map((cat) => (
-        <button
-          type="button"
-          data-filter-category={cat}
-          class:list={[
-            'search-category-btn px-2.5 py-1 rounded-chip font-medium whitespace-nowrap transition-standard cursor-pointer',
-            cat === 'All'
-              ? 'bg-accent text-surface'
-              : 'text-text-muted hover:text-text-primary hover:bg-surface border border-transparent',
-          ]}
-        >
-          {cat}
-        </button>
-      ))}
-    </div>
+  <!-- Results panel: centered ~640px, bg-surface, border, rounded bottom corners -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="mx-auto w-full max-w-[640px] px-4 sm:px-0 pb-6">
+      <div
+        id="search-palette-container"
+        class="bg-surface border border-t-0 border-border rounded-b-card overflow-hidden"
+      >
+        <!-- Category filter chips strip -->
+        <div class="px-3 py-2 border-b border-border bg-canvas flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+          {categories.map((cat) => (
+            <button
+              type="button"
+              data-filter-category={cat}
+              class:list={[
+                'search-category-btn px-2.5 py-1 rounded-chip font-medium whitespace-nowrap transition-standard cursor-pointer',
+                cat === 'All'
+                  ? 'bg-accent text-surface'
+                  : 'text-text-muted hover:text-text-primary hover:bg-surface border border-transparent',
+              ]}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-    <!-- Results List -->
-    <div
-      id="search-palette-results"
-      role="listbox"
-      aria-label="Calculators search results"
-      class="max-h-[380px] overflow-y-auto divide-y divide-border p-1"
-    >
-      {tools.map((tool, idx) => (
-        <a
-          href={tool.path}
-          role="option"
-          data-search-item
-          data-tool-name={tool.name.toLowerCase()}
-          data-tool-category={tool.category}
-          data-tool-desc={tool.description.toLowerCase()}
-          data-tool-slug={tool.slug.toLowerCase()}
-          data-tool-region={tool.region}
-          class:list={[
-            'search-result-item flex items-start justify-between gap-3 p-3 rounded-control text-text-primary hover:bg-canvas transition-standard group focus-visible:outline-accent cursor-pointer',
-            idx === 0 ? 'bg-canvas' : '',
-          ]}
+        <!-- Popular Searches (shown when input is empty) -->
+        <div
+          id="search-palette-popular"
+          role="listbox"
+          aria-label="Popular searches"
+          class="divide-y divide-border"
         >
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1 flex-wrap">
-              <span class="font-semibold text-sm group-hover:text-accent transition-standard">
-                {tool.name}
-              </span>
-              <span class="text-[11px] font-medium px-1.5 py-0.5 rounded-chip bg-surface border border-border text-text-muted">
-                {tool.category}
-              </span>
-              {tool.region !== 'Global' && (
-                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-chip bg-disabled-bg text-text-muted">
-                  {tool.region}
+          <div class="px-4 pt-3 pb-1">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-text-muted select-none">
+              Popular
+            </span>
+          </div>
+          {popularSearches.map((name) => (
+            <button
+              type="button"
+              data-popular-search={name}
+              class="popular-search-item w-full flex items-center gap-3 px-4 text-text-primary hover:bg-canvas transition-standard cursor-pointer focus-visible:outline-accent text-left"
+              style="height: 40px;"
+            >
+              <svg
+                class="w-4 h-4 text-text-muted shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <span class="flex-1 text-sm font-medium">{name}</span>
+              <svg
+                class="w-4 h-4 text-text-muted shrink-0"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 12L10 8L6 4" />
+              </svg>
+            </button>
+          ))}
+        </div>
+
+        <!-- Results List -->
+        <div
+          id="search-palette-results"
+          role="listbox"
+          aria-label="Calculators search results"
+          class="hidden divide-y divide-border"
+        >
+          {tools.map((tool, idx) => (
+            <a
+              href={tool.path}
+              role="option"
+              data-search-item
+              data-tool-name={tool.name.toLowerCase()}
+              data-tool-category={tool.category}
+              data-tool-desc={tool.description.toLowerCase()}
+              data-tool-slug={tool.slug.toLowerCase()}
+              data-tool-region={tool.region}
+              class:list={[
+                'search-result-item flex items-center gap-3 px-4 text-text-primary hover:bg-canvas transition-standard group focus-visible:outline-accent cursor-pointer',
+                idx === 0 ? 'bg-canvas' : '',
+              ]}
+              style="height: 40px;"
+            >
+              <svg
+                class="w-4 h-4 text-text-muted shrink-0"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <div class="flex-1 min-w-0 flex items-center gap-2">
+                <span class="font-medium text-sm text-text-primary group-hover:text-accent transition-standard truncate">
+                  {tool.name}
                 </span>
-              )}
-            </div>
-            <p class="text-xs text-text-muted line-clamp-1">
-              {tool.description}
+                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded-chip bg-canvas border border-border text-text-muted shrink-0">
+                  {tool.category}
+                </span>
+                {tool.region !== 'Global' && (
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-chip bg-disabled-bg text-text-muted shrink-0">
+                    {tool.region}
+                  </span>
+                )}
+              </div>
+              <svg
+                class="w-4 h-4 text-text-muted group-hover:text-accent transition-standard shrink-0"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M6 12L10 8L6 4" />
+              </svg>
+            </a>
+          ))}
+
+          <!-- Empty State Container -->
+          <div id="search-palette-empty" class="hidden p-8 text-center flex-col items-center justify-center">
+            <svg class="w-8 h-8 text-text-muted mb-2 stroke-current fill-none opacity-50" viewBox="0 0 24 24" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <p class="text-sm font-semibold text-text-primary mb-1">No matching calculators</p>
+            <p class="text-xs text-text-muted max-w-xs">
+              Try searching for general terms like <button type="button" class="underline hover:text-accent" data-quick-fill="loan">loan</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="tax">tax</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="investment">investment</button>, or <button type="button" class="underline hover:text-accent" data-quick-fill="SIP">SIP</button>.
             </p>
           </div>
+        </div>
 
-          <svg class="w-4 h-4 text-text-muted group-hover:text-accent group-hover:translate-x-0.5 transition-standard shrink-0 mt-1" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M6 12L10 8L6 4" />
-          </svg>
-        </a>
-      ))}
-
-      <!-- Empty State Container -->
-      <div id="search-palette-empty" class="hidden p-8 text-center flex-col items-center justify-center">
-        <svg class="w-8 h-8 text-text-muted mb-2 stroke-current fill-none opacity-50" viewBox="0 0 24 24" stroke-width="1.5">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-        <p class="text-sm font-semibold text-text-primary mb-1">No matching calculators</p>
-        <p class="text-xs text-text-muted max-w-xs">
-          Try searching for general terms like <button type="button" class="underline hover:text-accent" data-quick-fill="loan">loan</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="tax">tax</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="investment">investment</button>, or <button type="button" class="underline hover:text-accent" data-quick-fill="SIP">SIP</button>.
-        </p>
-      </div>
-    </div>
-
-    <!-- Modal Footer with Keyboard Navigation hints -->
-    <div class="px-4 py-2.5 bg-canvas border-t border-border flex items-center justify-between text-[11px] text-text-muted select-none">
-      <div class="flex items-center gap-3">
-        <span class="hidden sm:inline-flex items-center gap-1">
-          <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↑</kbd>
-          <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↓</kbd>
-          Navigate
-        </span>
-        <span class="hidden sm:inline-flex items-center gap-1">
-          <kbd class="px-1.5 py-0.5 rounded border border-border bg-surface font-mono">↵</kbd>
-          Select
-        </span>
-        <span class="sm:hidden">Tap any tool to open</span>
-      </div>
-      <div id="search-palette-count" class="font-medium text-text-primary">
-        {tools.length} calculators
+        <!-- Modal Footer with Keyboard Navigation hints -->
+        <div class="px-4 py-2.5 bg-canvas border-t border-border flex items-center justify-between text-[11px] text-text-muted select-none">
+          <div class="flex items-center gap-3">
+            <span class="hidden sm:inline-flex items-center gap-1">
+              <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↑</kbd>
+              <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↓</kbd>
+              Navigate
+            </span>
+            <span class="hidden sm:inline-flex items-center gap-1">
+              <kbd class="px-1.5 py-0.5 rounded border border-border bg-surface font-mono">↵</kbd>
+              Select
+            </span>
+            <span class="sm:hidden">Tap any tool to open</span>
+          </div>
+          <div id="search-palette-count" class="font-medium text-text-primary">
+            {tools.length} calculators
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -170,16 +266,17 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
 <script>
   function initSearchPalette() {
     const backdrop = document.getElementById('search-palette-backdrop');
-    const container = document.getElementById('search-palette-container');
     const input = document.getElementById('search-palette-input') as HTMLInputElement | null;
     const clearBtn = document.getElementById('search-palette-clear');
     const closeBtn = document.getElementById('search-palette-close-btn');
     const emptyState = document.getElementById('search-palette-empty');
     const countEl = document.getElementById('search-palette-count');
     const resultsContainer = document.getElementById('search-palette-results');
+    const popularContainer = document.getElementById('search-palette-popular');
     const items = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-search-item]'));
     const categoryBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter-category]'));
     const quickFills = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-quick-fill]'));
+    const popularBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-popular-search]'));
 
     if (!backdrop || !input) return;
 
@@ -197,7 +294,7 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       clearBtn?.classList.add('hidden');
       activeCategory = 'All';
       updateCategoryButtons();
-      filterResults();
+      showPopular();
     }
 
     function closeModal() {
@@ -206,6 +303,27 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       document.body.style.overflow = '';
       if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
         lastActiveElement.focus();
+      }
+    }
+
+    function showPopular() {
+      if (popularContainer) {
+        popularContainer.classList.remove('hidden');
+      }
+      if (resultsContainer) {
+        resultsContainer.classList.add('hidden');
+      }
+      if (countEl) {
+        countEl.textContent = `${items.length} calculators`;
+      }
+    }
+
+    function showResults() {
+      if (popularContainer) {
+        popularContainer.classList.add('hidden');
+      }
+      if (resultsContainer) {
+        resultsContainer.classList.remove('hidden');
       }
     }
 
@@ -242,6 +360,14 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       if (clearBtn) {
         clearBtn.classList.toggle('hidden', q.length === 0);
       }
+
+      // Show popular when input is empty
+      if (q.length === 0) {
+        showPopular();
+        return;
+      }
+
+      showResults();
 
       let visibleCount = 0;
 
@@ -298,6 +424,18 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
 
     closeBtn?.addEventListener('click', closeModal);
 
+    // Popular search buttons: fill input and trigger filter
+    popularBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-popular-search') || '';
+        if (input) {
+          input.value = val;
+          input.focus();
+          filterResults();
+        }
+      });
+    });
+
     quickFills.forEach((btn) => {
       btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-quick-fill') || '';
@@ -344,9 +482,11 @@ const categories = ['All', 'Investments', 'Loans', 'Taxes', 'Business', 'Corpora
       }
     });
 
-    // Click outside container to close
+    // Click on the backdrop area (outside the results container and outside the search row) to close
     backdrop.addEventListener('click', (e) => {
-      if (container && !container.contains(e.target as Node)) {
+      const container = document.getElementById('search-palette-container');
+      const searchRow = (e.target as HTMLElement)?.closest?.('[id="search-palette-backdrop"] > div');
+      if (container && !container.contains(e.target as Node) && !searchRow) {
         closeModal();
       }
     });
