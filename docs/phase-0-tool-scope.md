@@ -215,6 +215,15 @@ The following pairs need keyword/SERP research before final page-content separat
 
 The 50-count remains fixed; if a research gate later proves two candidates are not distinct enough to warrant separate pages, the replacement must be another researched tool of equal strategic fit rather than changing the total target.
 
+### New-tool market research rule 🔒
+- The original 21–22 tools personally audited by the founder form the validated starting set.
+- Any additional tool must **not** be added randomly just to reach the 50 count.
+- Every new candidate must have documented demand/intent evidence before it can move from **planned** to **draft** or **published**.
+- Default demand evidence for remaining additions: **Google data** (with keyword/SERP validation when the intent is ambiguous or overlapping).
+- A tool with missing demand evidence stays `status: 'planned'` and is excluded from every production surface.
+- Research evidence belongs in the registry metadata so the decision is traceable.
+
+
 ## 6. Recommended next micro-task
 
 **Phase 0.2 — Registry architecture only.**
