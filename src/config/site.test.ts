@@ -16,7 +16,7 @@ describe('Phase 0.4 scope invariants', () => {
 
   it('keeps the five locked primary categories', () => {
     expect(CATEGORIES).toHaveLength(5);
-    expect(new Set(CATEGORIES.map((category) => category.name))).toHaveLength(5);
+    expect(new Set(CATEGORIES.map((category) => category.name)).size).toBe(5);
   });
 
   it('keeps routes valid and unique', () => {
