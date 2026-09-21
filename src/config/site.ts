@@ -439,7 +439,7 @@ export const TOOLS: Tool[] = [
     description: 'Calculate the intrinsic value of an investment using the Discounted Cash Flow method.',
     status: 'published',
     dateModified: '2026-09-20',
-  },,
+  },
   // ── Planned candidates — research gate required before any build ─────────────
   // These are part of the locked 50-tool target, but none may be promoted until
   // demand/intent evidence is recorded. Current policy: use Google demand data
