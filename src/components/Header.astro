@@ -1,0 +1,529 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+
+// Category links for the Tools dropdown
+const toolCategories = [
+  { label: 'Investments', href: '/investments', count: '9' },
+  { label: 'Loans', href: '/loans', count: '4' },
+  { label: 'Taxes', href: '/taxes', count: '2' },
+  { label: 'Business', href: '/business', count: '4' },
+  { label: 'Corporate Finance', href: '/corporate-finance', count: '5' },
+];
+
+const totalToolsCount = 24;
+---
+
+<header class="w-full bg-canvas border-b border-border sticky top-0 z-50 select-none">
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    
+    <!-- Block 1: BrandIdentity (Left) -->
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-3 group focus-visible:outline-accent rounded-control py-1">
+        <img
+          src="/logo.svg"
+          alt="Calcumetrics Logo"
+          width="32"
+          height="32"
+          class="w-8 h-8 rounded-control shrink-0 transition-standard"
+        />
+        <span class="text-[17px] font-bold tracking-[-0.015em] text-text-primary group-hover:text-accent transition-standard">
+          Calcumetrics
+        </span>
+      </a>
+    </div>
+
+    <!-- Block 2: Center-left nav (Home | Tools dropdown | Blog | About) -->
+    <nav class="hidden lg:flex items-center gap-1 sm:gap-2 md:gap-6 text-[14px] font-medium text-text-primary" aria-label="Main Navigation">
+      <!-- Home -->
+      <a
+        href="/"
+        class:list={[
+          'px-2.5 py-1.5 rounded-control transition-standard focus-visible:outline-accent',
+          currentPath === '/' ? 'text-accent font-semibold' : 'hover:text-accent',
+        ]}
+      >
+        Home
+      </a>
+
+      <!-- Tools with dropdown chevron -->
+      <div class="relative" data-nav-dropdown>
+        <button
+          type="button"
+          id="tools-menu-button"
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-controls="tools-menu-dropdown"
+          class="group px-2.5 py-1.5 rounded-control flex items-center gap-1.5 text-text-primary hover:text-accent transition-standard focus-visible:outline-accent cursor-pointer"
+        >
+          <span>Tools</span>
+          <!-- 1.5px stroke chevron -->
+          <svg
+            class="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-standard"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 6L8 10L12 6" />
+          </svg>
+        </button>
+
+        <!-- Tools Dropdown Menu (Strictly flat, 1px border, 8px radius, no shadow, no blur) -->
+        <div
+          id="tools-menu-dropdown"
+          role="menu"
+          aria-labelledby="tools-menu-button"
+          class="hidden absolute left-0 top-full mt-1.5 w-60 bg-surface border border-border rounded-control p-1.5 z-50 flex-col transition-standard"
+        >
+          {toolCategories.map((cat) => (
+            <a
+              href={cat.href}
+              role="menuitem"
+              class="flex items-center justify-between px-3 py-2 text-[13px] rounded font-medium text-text-primary hover:bg-canvas hover:text-accent transition-standard focus-visible:outline-accent"
+            >
+              <span>{cat.label}</span>
+              <span class="text-xs text-text-muted">{cat.count}</span>
+            </a>
+          ))}
+          <div class="border-t border-border my-1"></div>
+          <a
+            href="/"
+            role="menuitem"
+            class="flex items-center justify-between px-3 py-2 text-[13px] rounded font-semibold text-accent hover:bg-canvas transition-standard focus-visible:outline-accent"
+          >
+            <span>View All {totalToolsCount} Calculators</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Blog -->
+      <a
+        href="/blog"
+        class:list={[
+          'px-2.5 py-1.5 rounded-control transition-standard focus-visible:outline-accent',
+          currentPath.startsWith('/blog') ? 'text-accent font-semibold' : 'hover:text-accent',
+        ]}
+      >
+        Blog
+      </a>
+
+      <!-- About -->
+      <a
+        href="/about"
+        class:list={[
+          'px-2.5 py-1.5 rounded-control transition-standard focus-visible:outline-accent',
+          currentPath.startsWith('/about') ? 'text-accent font-semibold' : 'hover:text-accent',
+        ]}
+      >
+        About
+      </a>
+    </nav>
+
+    <!-- Block 3: Right cluster (Search | ₹ INR | EN | Dark mode toggle) -->
+    <div class="hidden lg:flex items-center gap-3 text-[13px] text-text-muted">
+      <!-- Search Icon Button -->
+      <button
+        type="button"
+        id="header-search-btn"
+        aria-label="Search calculators"
+        class="p-2 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
+      >
+        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+
+      <!-- Divider line subtle -->
+      <div class="h-3.5 w-[1px] bg-border" aria-hidden="true"></div>
+
+      <!-- Currency Selector: '₹ INR' -->
+      <div class="relative" data-currency-dropdown>
+        <button
+          type="button"
+          id="header-currency-btn"
+          aria-label="Select Currency (currently INR)"
+          aria-expanded="false"
+          aria-haspopup="true"
+          class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
+        >
+          <span id="current-currency-label">₹ INR</span>
+          <svg class="w-3 h-3 text-text-muted group-hover:text-accent transition-standard" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 4.5L6 7.5L9 4.5" />
+          </svg>
+        </button>
+
+        <div
+          id="header-currency-menu"
+          class="hidden absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
+        >
+          <button type="button" data-currency-val="₹ INR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">₹ INR (India)</button>
+          <button type="button" data-currency-val="$ USD" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">$ USD (US)</button>
+          <button type="button" data-currency-val="€ EUR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">€ EUR (Europe)</button>
+          <button type="button" data-currency-val="£ GBP" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">£ GBP (UK)</button>
+        </div>
+      </div>
+
+      <!-- Language Selector: 'EN' -->
+      <div class="relative" data-lang-dropdown>
+        <button
+          type="button"
+          id="header-lang-btn"
+          aria-label="Select Language (currently English)"
+          aria-expanded="false"
+          aria-haspopup="true"
+          class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
+        >
+          <span>EN</span>
+          <svg class="w-3 h-3 text-text-muted group-hover:text-accent transition-standard" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 4.5L6 7.5L9 4.5" />
+          </svg>
+        </button>
+
+        <div
+          id="header-lang-menu"
+          class="hidden absolute right-0 top-full mt-1 w-32 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
+        >
+          <button type="button" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold">EN (English)</button>
+          <button type="button" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary">HI (Hindi)</button>
+        </div>
+      </div>
+
+      <!-- Divider line subtle -->
+      <div class="h-3.5 w-[1px] bg-border" aria-hidden="true"></div>
+
+      <!-- Dark Mode Toggle -->
+      <button
+        type="button"
+        id="theme-toggle-button"
+        aria-label="Toggle theme mode"
+        class="p-2 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
+      >
+        <!-- Moon icon (for light mode) -->
+        <svg id="theme-icon-moon" class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+
+        <!-- Sun icon (for dark mode) -->
+        <svg id="theme-icon-sun" class="w-4 h-4 stroke-current fill-none hidden" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Header Right: Compact cluster + Menu Button -->
+    <div class="flex lg:hidden items-center gap-2">
+      <!-- Dark mode toggle on mobile -->
+      <button
+        type="button"
+        id="mobile-theme-toggle"
+        aria-label="Toggle theme"
+        class="w-10 h-10 flex items-center justify-center rounded-control text-text-primary hover:text-accent transition-standard focus-visible:outline-accent"
+      >
+        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      </button>
+
+      <!-- Mobile Menu Button: >=44px touch target -->
+      <button
+        type="button"
+        id="mobile-menu-button"
+        aria-expanded="false"
+        aria-controls="mobile-nav-panel"
+        aria-label="Toggle navigation menu"
+        class="w-11 h-11 flex items-center justify-center rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent focus-visible:outline-accent transition-standard cursor-pointer"
+      >
+        <svg
+          id="menu-icon-bars"
+          class="w-5 h-5 stroke-current fill-none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+
+        <svg
+          id="menu-icon-close"
+          class="w-5 h-5 stroke-current fill-none hidden"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Mobile Nav: Flat full-width panel (#FFFFFF bg, 1px #D8DDD9 border, 48px rows, no shadow, no blur) -->
+  <div
+    id="mobile-nav-panel"
+    class="hidden w-full bg-surface border-b border-border flex-col transition-standard"
+    aria-label="Mobile Navigation"
+  >
+    <div class="max-w-[1440px] mx-auto w-full">
+      <a href="/" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
+        Home
+      </a>
+
+      <!-- Tools accordion section in mobile -->
+      <div class="border-b border-border">
+        <button
+          type="button"
+          id="mobile-tools-toggle"
+          aria-expanded="false"
+          class="w-full h-12 flex items-center justify-between px-6 text-[15px] font-medium text-text-primary hover:text-accent hover:bg-canvas transition-standard cursor-pointer"
+        >
+          <span>Tools</span>
+          <svg id="mobile-tools-chevron" class="w-4 h-4 text-text-muted transition-standard" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 6L8 10L12 6" />
+          </svg>
+        </button>
+
+        <div id="mobile-tools-subpanel" class="hidden bg-canvas border-t border-border flex-col">
+          {toolCategories.map((cat) => (
+            <a href={cat.href} class="h-11 flex items-center justify-between px-8 text-sm text-text-primary hover:text-accent border-b border-border last:border-b-0 transition-standard">
+              <span>{cat.label}</span>
+              <span class="text-xs text-text-muted">{cat.count}</span>
+            </a>
+          ))}
+          <a href="/" class="h-11 flex items-center px-8 text-sm font-semibold text-accent hover:underline">
+            View All {totalToolsCount} Calculators &rarr;
+          </a>
+        </div>
+      </div>
+
+      <a href="/blog" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
+        Blog
+      </a>
+
+      <a href="/about" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
+        About
+      </a>
+
+      <!-- Mobile utility row: Currency & Language -->
+      <div class="p-4 flex items-center justify-between text-xs text-text-muted bg-canvas">
+        <div class="flex items-center gap-3">
+          <span class="font-medium text-text-primary">Currency:</span>
+          <select id="mobile-currency-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary">
+            <option value="₹ INR" selected>₹ INR</option>
+            <option value="$ USD">$ USD</option>
+            <option value="€ EUR">€ EUR</option>
+            <option value="£ GBP">£ GBP</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <span class="font-medium text-text-primary">Lang:</span>
+          <select id="mobile-lang-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary">
+            <option value="EN" selected>EN</option>
+            <option value="HI">HI</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  function initHeaderScripts() {
+    // 1. Desktop Tools dropdown
+    const toolsBtn = document.getElementById('tools-menu-button');
+    const toolsDropdown = document.getElementById('tools-menu-dropdown');
+
+    if (toolsBtn && toolsDropdown) {
+      const toggleTools = (show?: boolean) => {
+        const isShown = !toolsDropdown.classList.contains('hidden');
+        const nextState = typeof show === 'boolean' ? show : !isShown;
+        if (nextState) {
+          toolsDropdown.classList.remove('hidden');
+          toolsDropdown.classList.add('flex');
+          toolsBtn.setAttribute('aria-expanded', 'true');
+        } else {
+          toolsDropdown.classList.add('hidden');
+          toolsDropdown.classList.remove('flex');
+          toolsBtn.setAttribute('aria-expanded', 'false');
+        }
+      };
+
+      toolsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleTools();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!toolsDropdown.contains(e.target as Node) && !toolsBtn.contains(e.target as Node)) {
+          toggleTools(false);
+        }
+      });
+    }
+
+    // 2. Currency dropdown
+    const currencyBtn = document.getElementById('header-currency-btn');
+    const currencyMenu = document.getElementById('header-currency-menu');
+    const currencyLabel = document.getElementById('current-currency-label');
+
+    if (currencyBtn && currencyMenu && currencyLabel) {
+      currencyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currencyMenu.classList.toggle('hidden');
+        currencyMenu.classList.toggle('flex');
+        currencyBtn.setAttribute('aria-expanded', currencyMenu.classList.contains('flex') ? 'true' : 'false');
+      });
+
+      currencyMenu.querySelectorAll('[data-currency-val]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const val = btn.getAttribute('data-currency-val') || '₹ INR';
+          currencyLabel.textContent = val;
+          currencyMenu.classList.add('hidden');
+          currencyMenu.classList.remove('flex');
+          currencyBtn.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!currencyMenu.contains(e.target as Node) && !currencyBtn.contains(e.target as Node)) {
+          currencyMenu.classList.add('hidden');
+          currencyMenu.classList.remove('flex');
+          currencyBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // 3. Language dropdown
+    const langBtn = document.getElementById('header-lang-btn');
+    const langMenu = document.getElementById('header-lang-menu');
+
+    if (langBtn && langMenu) {
+      langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenu.classList.toggle('hidden');
+        langMenu.classList.toggle('flex');
+        langBtn.setAttribute('aria-expanded', langMenu.classList.contains('flex') ? 'true' : 'false');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!langMenu.contains(e.target as Node) && !langBtn.contains(e.target as Node)) {
+          langMenu.classList.add('hidden');
+          langMenu.classList.remove('flex');
+          langBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // 4. Dark mode toggle
+    const themeBtn = document.getElementById('theme-toggle-button');
+    const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
+    const iconMoon = document.getElementById('theme-icon-moon');
+    const iconSun = document.getElementById('theme-icon-sun');
+
+    const toggleTheme = () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      if (iconMoon && iconSun) {
+        iconMoon.classList.toggle('hidden', isDark);
+        iconSun.classList.toggle('hidden', !isDark);
+      }
+    };
+
+    themeBtn?.addEventListener('click', toggleTheme);
+    mobileThemeBtn?.addEventListener('click', toggleTheme);
+
+    // 5. Mobile Navigation
+    const mobileMenuBtn = document.getElementById('mobile-menu-button');
+    const mobileNavPanel = document.getElementById('mobile-nav-panel');
+    const iconBars = document.getElementById('menu-icon-bars');
+    const iconClose = document.getElementById('menu-icon-close');
+
+    if (mobileMenuBtn && mobileNavPanel && iconBars && iconClose) {
+      const toggleMobileMenu = (open?: boolean) => {
+        const isExpanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+        const shouldOpen = typeof open === 'boolean' ? open : !isExpanded;
+
+        mobileMenuBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+        if (shouldOpen) {
+          mobileNavPanel.classList.remove('hidden');
+          mobileNavPanel.classList.add('flex');
+          iconBars.classList.add('hidden');
+          iconClose.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+        } else {
+          mobileNavPanel.classList.add('hidden');
+          mobileNavPanel.classList.remove('flex');
+          iconBars.classList.remove('hidden');
+          iconClose.classList.add('hidden');
+          document.body.style.overflow = '';
+        }
+      };
+
+      mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMobileMenu();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && mobileMenuBtn.getAttribute('aria-expanded') === 'true') {
+          toggleMobileMenu(false);
+          mobileMenuBtn.focus();
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (
+          mobileMenuBtn.getAttribute('aria-expanded') === 'true' &&
+          !mobileNavPanel.contains(e.target as Node) &&
+          !mobileMenuBtn.contains(e.target as Node)
+        ) {
+          toggleMobileMenu(false);
+        }
+      });
+    }
+
+    // 6. Mobile Tools Accordion
+    const mobileToolsToggle = document.getElementById('mobile-tools-toggle');
+    const mobileToolsSubpanel = document.getElementById('mobile-tools-subpanel');
+    const mobileToolsChevron = document.getElementById('mobile-tools-chevron');
+
+    if (mobileToolsToggle && mobileToolsSubpanel && mobileToolsChevron) {
+      mobileToolsToggle.addEventListener('click', () => {
+        const isOpen = !mobileToolsSubpanel.classList.contains('hidden');
+        if (isOpen) {
+          mobileToolsSubpanel.classList.add('hidden');
+          mobileToolsSubpanel.classList.remove('flex');
+          mobileToolsChevron.classList.remove('rotate-180');
+          mobileToolsToggle.setAttribute('aria-expanded', 'false');
+        } else {
+          mobileToolsSubpanel.classList.remove('hidden');
+          mobileToolsSubpanel.classList.add('flex');
+          mobileToolsChevron.classList.add('rotate-180');
+          mobileToolsToggle.setAttribute('aria-expanded', 'true');
+        }
+      });
+    }
+  }
+
+  initHeaderScripts();
+  document.addEventListener('astro:page-load', initHeaderScripts);
+</script>

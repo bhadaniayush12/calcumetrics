@@ -1,0 +1,204 @@
+---
+interface Props {
+  id: string;
+  name?: string;
+  label?: string;
+  value?: string | number;
+  placeholder?: string;
+  helperText?: string;
+  errorMessage?: string;
+  prefix?: string;
+  suffix?: string;
+  type?: 'text' | 'number' | 'email' | 'search';
+  inputmode?: 'decimal' | 'numeric' | 'text' | 'search' | 'email';
+  isNumeric?: boolean;
+  localeFormat?: 'indian' | 'international' | 'none';
+  min?: number;
+  max?: number;
+  step?: number | string;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  class?: string;
+  'aria-label'?: string;
+}
+
+const {
+  id,
+  name = id,
+  label,
+  value = '',
+  placeholder = '',
+  helperText,
+  errorMessage,
+  prefix,
+  suffix,
+  type = 'text',
+  isNumeric = false,
+  localeFormat = 'none',
+  inputmode,
+  min,
+  max,
+  step,
+  disabled = false,
+  readonly = false,
+  required = false,
+  class: className = '',
+  'aria-label': ariaLabel,
+  ...rest
+} = Astro.props;
+
+const resolvedInputMode = inputmode || (isNumeric || localeFormat !== 'none' ? 'decimal' : undefined);
+
+const isError = Boolean(errorMessage);
+const helperId = helperText ? `${id}-helper` : undefined;
+const errorId = isError ? `${id}-error` : undefined;
+const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
+
+// Section 5:
+// Inputs: 44px high, 8px radius (rounded-control), label 13px/500 above, helper 12px below.
+// States: default, hover (border darkens), focus, filled, error, disabled, read-only.
+---
+
+<div class={`w-full flex flex-col gap-1.5 ${className}`}>
+  {label && (
+    <label for={id} class="text-[13px] font-medium text-text-primary select-none flex items-center justify-between">
+      <span>{label}</span>
+      {required && <span class="text-xs text-text-muted">(Required)</span>}
+    </label>
+  )}
+
+  <div
+    class:list={[
+      'h-11 w-full rounded-control border bg-surface flex items-center px-3 transition-standard relative',
+      isError
+        ? 'border-error-border bg-error-bg text-error-text focus-within:border-error'
+        : disabled
+        ? 'border-border bg-disabled-bg text-disabled-text cursor-not-allowed'
+        : readonly
+        ? 'border-border bg-canvas text-text-primary cursor-default'
+        : 'border-border hover:border-text-muted focus-within:border-accent focus-within:outline-2 focus-within:outline-accent focus-within:outline-offset-2',
+    ]}
+  >
+    {prefix && (
+      <span
+        class:list={[
+          'text-[14px] select-none pr-1.5 shrink-0 font-medium',
+          isError ? 'text-error-text' : disabled ? 'text-disabled-text' : 'text-text-muted',
+        ]}
+      >
+        {prefix}
+      </span>
+    )}
+
+    <input
+      id={id}
+      name={name}
+      type={type}
+      inputmode={resolvedInputMode}
+      value={value}
+      placeholder={placeholder}
+      min={min}
+      max={max}
+      step={step}
+      disabled={disabled}
+      readonly={readonly}
+      required={required}
+      aria-invalid={isError ? 'true' : undefined}
+      aria-describedby={describedBy}
+      aria-label={!label ? ariaLabel || placeholder || id : undefined}
+      data-numeric={isNumeric ? 'true' : undefined}
+      data-digit-grouping={localeFormat}
+      class:list={[
+        'w-full bg-transparent border-0 p-0 text-[15px] leading-none focus:outline-none placeholder:text-text-muted/60',
+        isNumeric || localeFormat !== 'none' ? 'text-right tabular-nums font-normal' : 'text-left',
+        isError ? 'text-error-text' : disabled ? 'text-disabled-text cursor-not-allowed' : 'text-text-primary',
+      ]}
+      {...rest}
+    />
+
+    {suffix && (
+      <span
+        class:list={[
+          'text-[14px] select-none pl-1.5 shrink-0 font-medium',
+          isError ? 'text-error-text' : disabled ? 'text-disabled-text' : 'text-text-muted',
+        ]}
+      >
+        {suffix}
+      </span>
+    )}
+  </div>
+
+  {isError && (
+    <p id={errorId} class="text-[12px] text-error-text leading-tight mt-0.5" role="alert">
+      {errorMessage}
+    </p>
+  )}
+
+  {!isError && helperText && (
+    <p id={helperId} class="text-[12px] text-text-muted leading-tight mt-0.5">
+      {helperText}
+    </p>
+  )}
+</div>
+
+<script>
+  // Section 5: Live digit grouping while typing (not on blur), locale-aware
+  function initDigitGrouping() {
+    const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"]');
+
+    inputs.forEach((input) => {
+      const mode = input.getAttribute('data-digit-grouping');
+
+      input.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const rawValue = target.value;
+        const cursorPosition = target.selectionStart || 0;
+
+        // Count commas before cursor in raw input
+        const commasBeforeCursor = (rawValue.slice(0, cursorPosition).match(/,/g) || []).length;
+
+        // Strip non-digits and preserve at most one decimal point
+        const clean = rawValue.replace(/[^\d.]/g, '');
+        const parts = clean.split('.');
+        let integerPart = parts[0] || '';
+        const decimalPart = parts.length > 1 ? '.' + parts.slice(1).join('') : '';
+
+        if (!integerPart && !decimalPart) {
+          target.value = '';
+          return;
+        }
+
+        let formattedInteger = '';
+        if (mode === 'indian') {
+          // Indian format: last 3 digits, then groups of 2
+          if (integerPart.length <= 3) {
+            formattedInteger = integerPart;
+          } else {
+            const lastThree = integerPart.substring(integerPart.length - 3);
+            const otherDigits = integerPart.substring(0, integerPart.length - 3);
+            formattedInteger = otherDigits.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + lastThree;
+          }
+        } else if (mode === 'international') {
+          // International format: groups of 3
+          formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        } else {
+          formattedInteger = integerPart;
+        }
+
+        const newValue = formattedInteger + decimalPart;
+        target.value = newValue;
+
+        // Restore cursor position correctly
+        const newCommasBeforeCursor = (newValue.slice(0, cursorPosition).match(/,/g) || []).length;
+        const diff = newCommasBeforeCursor - commasBeforeCursor;
+        const newCursorPos = Math.max(0, Math.min(newValue.length, cursorPosition + diff));
+        target.setSelectionRange(newCursorPos, newCursorPos);
+      });
+    });
+  }
+
+  // Run on initial load and after view transitions if any
+  initDigitGrouping();
+  document.addEventListener('astro:page-load', initDigitGrouping);
+</script>

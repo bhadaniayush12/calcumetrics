@@ -1,46 +1,42 @@
-# Astro Starter Kit: Basics
+# Calcumetrics
 
-```sh
-npm create astro@latest -- --template basics
+Calcumetrics is a modern, fast, and comprehensive suite of financial calculators and decision-making tools built with Astro and Tailwind CSS.
+
+## 🚀 Features
+
+- **Personal Finance & Investments**: SIP, Lump Sum, CAGR, FD, RD, Compound Interest, ROI.
+- **Loans & Mortgages**: EMI Calculator, Home Loan, Car Loan, Loan Prepayment.
+- **Business & Valuation**: Break-Even, Profit Margin, Markup vs Margin, NPV, IRR, XIRR, DCF, WACC, Payback Period.
+- **Global & Regional Support**: US and India localized tools.
+- **Blazing Fast**: Static generation with Astro v7 and Tailwind CSS v4.
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js >= 22.12.0
+- npm
+
+### Installation
+
+```bash
+npm install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### Development
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+npm run dev
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+### Build
 
-## 🧞 Commands
+```bash
+npm run build
+```
 
-All commands are run from the root of the project, from a terminal:
+### Run Tests
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```bash
+npm test
+```

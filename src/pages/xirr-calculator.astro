@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'xirr-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/xirr-calculator';
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'XIRR Calculator', url: canonicalUrl, description: 'Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'XIRR Calculator' }] }] };
+---
+<Layout title="XIRR Calculator: Extended IRR for Irregular Cash Flows | Calcumetrics" description="Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="XIRR Calculator" category="Investments" categoryHref="/investments" heroValue="Enter cash flows" heroLabel="XIRR">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">XIRR Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">XIRR</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Enter cash flows</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="xirr-calculator-how">
+        <h2 id="xirr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted">XIRR finds the discount rate r such that NPV = Σ CF_t / (1+r)^((d_t − d_0)/365) = 0. Solved numerically via Newton-Raphson iteration. Requires at least one negative (outflow) and one positive (inflow) cash flow.</p>
+        </div>
+      </section>
+      <section aria-labelledby="xirr-calculator-faq">
+        <h2 id="xirr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between IRR and XIRR?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">IRR assumes cash flows occur at regular intervals (e.g. annually or monthly). XIRR handles arbitrary dates, making it suitable for SIP investments with irregular purchase dates, or any investment where cash flows do not fall at equal intervals. XIRR is the industry standard for calculating SIP returns in India.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why does XIRR sometimes fail to converge?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">XIRR uses numerical iteration (Newton-Raphson). Convergence may fail if there are multiple sign changes in the cash flows (leading to multiple valid IRRs) or if the initial guess is far from the solution. In those cases, try a different initial guess or verify that cash flows have exactly one negative-to-positive sign change.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="xirr-calculator-related">
+        <h2 id="xirr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

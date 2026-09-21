@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'roi-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/roi-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'ROI Calculator', url: canonicalUrl, description: 'Calculate return on investment as a percentage and annualised rate for any investment or business decision.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'ROI Calculator' }] }] };
+---
+<Layout title="ROI Calculator: Return on Investment & Annualised Rate | Calcumetrics" description="Calculate return on investment as a percentage and annualised rate for any investment or business decision." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="ROI Calculator" category="Business" categoryHref="/business" heroValue="Calculate to see" heroLabel="ROI">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">ROI Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate return on investment as a percentage and annualised rate for any investment or business decision.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">ROI</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="roi-calculator-how">
+        <h2 id="roi-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate return on investment as a percentage and annualised rate for any investment or business decision.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">ROI = (Final Value − Initial Investment) / Initial Investment × 100. Annualised ROI = (Final Value / Initial Investment)^(1/years) − 1. Unlike CAGR, ROI does not account for intermediate cash flows.</p>
+        </div>
+      </section>
+      <section aria-labelledby="roi-calculator-faq">
+        <h2 id="roi-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between ROI and CAGR?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">ROI is a simple percentage return over the entire holding period, without regard to time. CAGR annualises the return, making it comparable across investments of different durations. A 100% ROI over 10 years sounds impressive but equals only ~7.2% p.a. CAGR — context matters.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can ROI be negative?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes. A negative ROI means your final value is less than your initial investment — you have made a loss. ROI = (FV − PV) / PV × 100; if FV < PV, ROI is negative. Tracking ROI across multiple investments helps prioritise where to allocate future capital.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="roi-calculator-related">
+        <h2 id="roi-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

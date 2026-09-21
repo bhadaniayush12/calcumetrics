@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'loan-prepayment-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/loan-prepayment-calculator';
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Loan Prepayment Calculator', url: canonicalUrl, description: 'Calculate how much interest you save and how many months you save by making a partial prepayment on your loan.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' }, { '@type': 'ListItem', position: 3, name: 'Loan Prepayment Calculator' }] }] };
+---
+<Layout title="Loan Prepayment Calculator: Interest Savings | Calcumetrics" description="Calculate how much interest you save and how many months you save by making a partial prepayment on your loan." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="Loan Prepayment Calculator" category="Loans" categoryHref="/loans" heroValue="Calculate to see" heroLabel="Interest Saved">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Loan Prepayment Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate how much interest you save and how many months you save by making a partial prepayment on your loan.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Interest Saved</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="loan-prepayment-calculator-how">
+        <h2 id="loan-prepayment-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate how much interest you save and how many months you save by making a partial prepayment on your loan.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted">After prepayment, new balance = outstanding principal − prepayment. With the same EMI and new balance, find new months: n = −ln(1 − r×P_new/EMI) / ln(1+r). Interest saved = original remaining interest − new remaining interest.</p>
+        </div>
+      </section>
+      <section aria-labelledby="loan-prepayment-calculator-faq">
+        <h2 id="loan-prepayment-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When is the best time to prepay a loan?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Prepayment is most effective in the early years of a loan when the outstanding principal is highest and future interest charges are largest. Prepaying in the first quarter of a 20-year home loan can save significantly more than the same prepayment made in year 15.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Reduce EMI or reduce tenure — which is better?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Reducing tenure saves more total interest because you exit the loan sooner. Reducing EMI improves monthly cash flow. If you can maintain the existing EMI, choose to reduce tenure. If financial flexibility is the priority, reducing EMI may be more suitable.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="loan-prepayment-calculator-related">
+        <h2 id="loan-prepayment-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

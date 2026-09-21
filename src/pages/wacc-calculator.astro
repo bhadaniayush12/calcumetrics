@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'wacc-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/wacc-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'WACC Calculator', url: canonicalUrl, description: 'Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'WACC Calculator' }] }] };
+---
+<Layout title="WACC Calculator: Weighted Average Cost of Capital | Calcumetrics" description="Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="WACC Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="11.8525%" heroLabel="WACC">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">WACC Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">WACC</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">11.8525%</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="wacc-calculator-how">
+        <h2 id="wacc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">WACC = (E/V) × Re + (D/V) × Rd × (1 − Tc). E=equity value, D=debt value, V=E+D, Re=cost of equity, Rd=cost of debt, Tc=corporate tax rate. The tax shield on debt reduces its effective cost.</p>
+        </div>
+      </section>
+      <section aria-labelledby="wacc-calculator-faq">
+        <h2 id="wacc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is WACC used for?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">WACC is the minimum rate of return a company must earn on its investments to satisfy all its capital providers (equity holders and debt holders). It is used as the discount rate in DCF valuations and NPV analysis. Projects with returns above WACC create value; those below WACC destroy it.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How do I calculate the cost of equity?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The most common approach is the Capital Asset Pricing Model (CAPM): Re = Rf + β × (Rm − Rf), where Rf is the risk-free rate, β is the stock's beta, and (Rm − Rf) is the equity risk premium. In India, Rf is typically the 10-year G-sec yield. Our WACC calculator accepts the cost of equity directly.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="wacc-calculator-related">
+        <h2 id="wacc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

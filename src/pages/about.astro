@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+const canonicalUrl = 'https://calcumetrics.com/about';
+---
+<Layout title="About Calcumetrics | Calcumetrics" description="Learn about Calcumetrics — who runs it, our mission, how we make money, and our approach to formula accuracy." canonical={canonicalUrl}>
+  <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">About Calcumetrics</h1>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server.</p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">The site is built and maintained by an independent developer. Our mission is to provide accurate, transparent financial tools with every formula documented and every assumption stated clearly.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">What we offer</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Financial calculators across five categories: investments, loans, taxes, business, and corporate finance. Each tool shows the formula used, states its assumptions, and provides a worked example.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">How this site makes money</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality requirements. Ads will appear only on calculator and category pages, never on legal or policy pages. A consent management platform will be installed before ads are served to users in the EU, UK, and Switzerland.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Accuracy and corrections</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">We validate every calculator against published test fixtures before launch. If you find an error, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the &ldquo;Last updated&rdquo; date.</p>
+      <p class="text-sm text-text-muted leading-relaxed">See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, and data sources.</p>
+  </div>
+</Layout>

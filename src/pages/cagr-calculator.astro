@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'cagr-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/cagr-calculator';
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'CAGR Calculator', url: canonicalUrl, description: 'Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'CAGR Calculator' }] }] };
+---
+<Layout title="CAGR Calculator: Compound Annual Growth Rate | Calcumetrics" description="Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="CAGR Calculator" category="Investments" categoryHref="/investments" heroValue="20.11%" heroLabel="CAGR">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">CAGR Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">CAGR</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">20.11%</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="cagr-calculator-how">
+        <h2 id="cagr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted">CAGR = (FV / PV)^(1/n) − 1. FV=future value, PV=present value, n=years. For ₹1,00,000 → ₹2,50,000 in 5 years: CAGR = (2.5)^(0.2) − 1 = 20.11%.</p>
+        </div>
+      </section>
+      <section aria-labelledby="cagr-calculator-faq">
+        <h2 id="cagr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is CAGR and when should I use it?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">CAGR (Compound Annual Growth Rate) is the rate at which an investment would have grown if it grew at a constant rate each year. It is used to compare the historical performance of investments, funds, or businesses over different time periods on an equal footing. It smooths out volatility to give a single comparable number.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is a higher CAGR always better?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Not necessarily. CAGR ignores volatility — two investments with the same CAGR can have very different risk profiles. A fund that returned 100% in year 1 and −50% in year 2 has a CAGR of 0%, same as one that returned 0% both years. Always consider standard deviation or maximum drawdown alongside CAGR.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="cagr-calculator-related">
+        <h2 id="cagr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

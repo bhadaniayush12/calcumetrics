@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { TOOLS } from '../../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'hra-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/in/hra-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'HRA Calculator (India)', url: canonicalUrl, description: 'Calculate your HRA tax exemption amount under India\'s income tax rules. Minimum of three limits determines the tax-free portion.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' }, { '@type': 'ListItem', position: 3, name: 'HRA Calculator (India)' }] }] };
+---
+<Layout title="HRA Calculator India: Tax Exemption on House Rent Allowance | Calcumetrics" description="Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="HRA Calculator (India)" category="Taxes" categoryHref="/taxes" heroValue="Calculate to see" heroLabel="HRA Exemption">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">HRA Calculator (India)</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">HRA Exemption</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="hra-calculator-how">
+        <h2 id="hra-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">Exemption = min(1. Actual HRA received, 2. Rent paid − 10% of basic salary, 3. 50% of basic salary for metro / 40% for non-metro). Taxable HRA = HRA received − exemption.</p>
+        </div>
+      </section>
+      <section aria-labelledby="hra-calculator-faq">
+        <h2 id="hra-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Which cities are considered metro for HRA purposes?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Under India's income tax rules, four cities qualify as metro for HRA: Delhi, Mumbai, Kolkata, and Chennai. Residents of these cities can claim 50% of basic salary as the third HRA limit. All other cities use 40% of basic salary.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I claim HRA if I live in a rented house owned by a relative?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">You can claim HRA if you pay actual rent to a relative (e.g. parent), provided the transaction is genuine — the relative declares the rental income in their tax return. However, rent paid to a spouse is generally not eligible as they share economic resources. Consult a tax professional for your specific situation.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="hra-calculator-related">
+        <h2 id="hra-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

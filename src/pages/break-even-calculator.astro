@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'break-even-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/break-even-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Break-even Calculator', url: canonicalUrl, description: 'Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'Break-even Calculator' }] }] };
+---
+<Layout title="Break-even Calculator: Units & Revenue | Calcumetrics" description="Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="Break-even Calculator" category="Business" categoryHref="/business" heroValue="2,500 units" heroLabel="Break-even Units">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Break-even Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Break-even Units</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">2,500 units</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="break-even-calculator-how">
+        <h2 id="break-even-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">BEP (units) = Fixed Costs / (Price per unit − Variable cost per unit). Revenue BEP = BEP units × Price. Contribution margin = Price − Variable cost. CM ratio = CM / Price.</p>
+        </div>
+      </section>
+      <section aria-labelledby="break-even-calculator-faq">
+        <h2 id="break-even-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does break-even mean for a business?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The break-even point is the level of sales at which total revenue exactly equals total costs — the business neither profits nor loses. Sales below this point result in a loss; sales above it generate profit. Understanding your break-even point is essential for pricing, budgeting, and investment decisions.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is contribution margin and why does it matter?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Contribution margin (CM) = selling price − variable cost per unit. It represents how much each unit sold contributes to covering fixed costs and generating profit. A higher CM means you reach break-even faster. CM ratio = CM / price, useful for comparing products with different price points.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="break-even-calculator-related">
+        <h2 id="break-even-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

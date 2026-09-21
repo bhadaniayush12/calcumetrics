@@ -1,0 +1,146 @@
+---
+// Section 7: Locked 6-column layout: Taxes / Investments / Business / Corporate Finance / Loans / Company+Legal merged
+// With a "Cookie settings" text link in the Company+Legal column.
+const columns = [
+  {
+    title: 'Investments',
+    href: '/investments',
+    links: [
+      { label: 'SIP Calculator', href: '/sip-calculator' },
+      { label: 'Lump Sum Calculator', href: '/lump-sum-calculator' },
+      { label: 'Compound Interest', href: '/compound-interest-calculator' },
+      { label: 'CAGR Calculator', href: '/cagr-calculator' },
+      { label: 'XIRR Calculator', href: '/xirr-calculator' },
+      { label: 'Fixed Deposit (FD)', href: '/fd-calculator' },
+      { label: 'Recurring Deposit (RD)', href: '/rd-calculator' },
+      { label: 'PPF Calculator (IN)', href: '/in/ppf-calculator' },
+      { label: '401(k) Calculator (US)', href: '/us/401k-calculator' },
+    ],
+  },
+  {
+    title: 'Loans',
+    href: '/loans',
+    links: [
+      { label: 'EMI Calculator', href: '/emi-calculator' },
+      { label: 'Home Loan Calculator', href: '/home-loan-calculator' },
+      { label: 'Car Loan Calculator', href: '/car-loan-calculator' },
+      { label: 'Loan Prepayment', href: '/loan-prepayment-calculator' },
+    ],
+  },
+  {
+    title: 'Taxes',
+    href: '/taxes',
+    links: [
+      { label: 'GST Calculator (IN)', href: '/in/gst-calculator' },
+      { label: 'HRA Calculator (IN)', href: '/in/hra-calculator' },
+    ],
+  },
+  {
+    title: 'Business',
+    href: '/business',
+    links: [
+      { label: 'Break-even Calculator', href: '/break-even-calculator' },
+      { label: 'Profit Margin', href: '/profit-margin-calculator' },
+      { label: 'Markup vs Margin', href: '/markup-vs-margin-calculator' },
+      { label: 'ROI Calculator', href: '/roi-calculator' },
+    ],
+  },
+  {
+    title: 'Corporate Finance',
+    href: '/corporate-finance',
+    links: [
+      { label: 'WACC Calculator', href: '/wacc-calculator' },
+      { label: 'NPV Calculator', href: '/npv-calculator' },
+      { label: 'IRR Calculator', href: '/irr-calculator' },
+      { label: 'Payback Period', href: '/payback-period-calculator' },
+      { label: 'DCF Calculator', href: '/dcf-calculator' },
+    ],
+  },
+  {
+    title: 'Company & Legal',
+    links: [
+      { label: 'About', href: '/about' },
+      { label: 'Contact', href: '/contact' },
+      { label: 'Methodology', href: '/methodology' },
+      { label: 'Privacy Policy', href: '/privacy-policy' },
+      { label: 'Terms of Use', href: '/terms' },
+      { label: 'Disclaimer', href: '/disclaimer' },
+      { label: 'Cookie Policy', href: '/cookie-policy' },
+      { label: 'Cookie settings', href: '#cookie-settings', isCookieSettings: true },
+    ],
+  },
+];
+---
+
+<footer class="w-full bg-canvas border-t border-border mt-auto select-none">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <!-- 6 Columns Layout per Section 7 -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
+      {columns.map((col) => (
+        <div class="flex flex-col gap-3">
+          <h3 class="text-[13px] font-semibold tracking-wider uppercase text-text-primary">
+            {col.href ? (
+              <a href={col.href} class="hover:text-accent transition-standard">
+                {col.title}
+              </a>
+            ) : (
+              col.title
+            )}
+          </h3>
+          <ul class="flex flex-col gap-2 text-[13px] text-text-muted">
+            {col.links.map((link) => (
+              <li>
+                {link.isCookieSettings ? (
+                  <button
+                    type="button"
+                    id="cookie-settings-button"
+                    class="text-left text-text-muted hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <a
+                    href={link.href}
+                    class="hover:text-accent transition-standard focus-visible:outline-accent"
+                  >
+                    {link.label}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <!-- Bottom Bar: Branding, Disclaimer & Copyright per Section 6 & 16 -->
+    <div class="pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-text-muted">
+      <div class="flex items-center gap-2.5">
+        <img
+          src="/logo.svg"
+          alt="Calcumetrics"
+          width="20"
+          height="20"
+          class="w-5 h-5 rounded"
+        />
+        <span class="font-semibold text-text-primary">Calcumetrics</span>
+        <span>— Free, 100% client-side financial calculations.</span>
+      </div>
+
+      <p class="leading-relaxed">
+        For information only. Not financial advice. Results are estimates; returns are not guaranteed.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Section 7 & 19: "Cookie settings" reopens the consent dialog
+  const cookieSettingsBtn = document.getElementById('cookie-settings-button');
+  if (cookieSettingsBtn) {
+    cookieSettingsBtn.addEventListener('click', () => {
+      // Trigger CMP modal or custom event for CMP integration
+      window.dispatchEvent(new CustomEvent('calcumetrics:open-cookie-settings'));
+    });
+  }
+</script>

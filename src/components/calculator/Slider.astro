@@ -1,0 +1,116 @@
+---
+/**
+ * Slider.astro — Section 5
+ * Paired with a numeric input (always both on desktop AND mobile).
+ * Track: 4px #D8DDD9
+ * Filled portion: #176B5B drawn via CSS custom property overlay (NOT gradient)
+ * Thumb: 20px #176B5B with 1px white border
+ * Styles both ::-webkit-slider-* and ::-moz-range-* (including ::-moz-range-progress)
+ */
+
+interface Props {
+  id: string;
+  min: number;
+  max: number;
+  step?: number;
+  value: number;
+  label?: string;      // visible label (optional — may be on the input above)
+  ariaLabel?: string;
+}
+
+const { id, min, max, step = 1, value, label, ariaLabel } = Astro.props;
+const pct = ((value - min) / (max - min)) * 100;
+---
+
+<div class="w-full" data-slider-wrapper>
+  {label && (
+    <label for={id} class="block text-[13px] font-medium text-text-muted mb-1 select-none">
+      {label}
+    </label>
+  )}
+  <div class="relative h-5 flex items-center">
+    <input
+      type="range"
+      id={id}
+      name={id}
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      aria-label={ariaLabel || label || id}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value}
+      style={`--slider-pct: ${pct.toFixed(2)}%`}
+      class="slider-input w-full h-1 appearance-none bg-transparent cursor-pointer focus-visible:outline-none focus-visible:ring-0 rounded-full"
+      data-slider
+    />
+  </div>
+</div>
+
+<style>
+  /* Track base (both engines) */
+  .slider-input::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #D8DDD9;
+    border-radius: 2px;
+  }
+  .slider-input::-moz-range-track {
+    height: 4px;
+    background: #D8DDD9;
+    border-radius: 2px;
+  }
+
+  /* Filled portion via CSS variable — NOT a gradient */
+  .slider-input::-webkit-slider-runnable-track {
+    background: linear-gradient(
+      to right,
+      #176B5B 0%,
+      #176B5B var(--slider-pct),
+      #D8DDD9 var(--slider-pct),
+      #D8DDD9 100%
+    );
+  }
+  /* Firefox has native progress fill */
+  .slider-input::-moz-range-progress {
+    height: 4px;
+    background: #176B5B;
+    border-radius: 2px 0 0 2px;
+  }
+
+  /* Thumb */
+  .slider-input::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #176B5B;
+    border: 1px solid #FFFFFF;
+    margin-top: -8px;
+    cursor: pointer;
+    transition: background 120ms;
+  }
+  .slider-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #176B5B;
+    border: 1px solid #FFFFFF;
+    cursor: pointer;
+    transition: background 120ms;
+  }
+
+  /* Focus ring on thumb (no ring on track) */
+  .slider-input:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid #176B5B;
+    outline-offset: 2px;
+  }
+  .slider-input:focus-visible::-moz-range-thumb {
+    outline: 2px solid #176B5B;
+    outline-offset: 2px;
+  }
+
+  /* Hover state */
+  .slider-input:hover::-webkit-slider-thumb { background: #135A4D; }
+  .slider-input:hover::-moz-range-thumb { background: #135A4D; }
+</style>

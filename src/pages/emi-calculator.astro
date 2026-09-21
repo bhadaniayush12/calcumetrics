@@ -1,0 +1,232 @@
+---
+/**
+ * EMI Calculator — /emi-calculator
+ * Section 12 fixture: ₹10,00,000, 8.5% p.a., 20 yrs → EMI ₹8,678; total interest ₹10,82,776
+ */
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcEMI, calcEMIAmortization } from '../lib/calculators/emi';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { principal: 1000000, rate: 8.5, years: 20 };
+const result = calcEMI(DEFAULT.principal, DEFAULT.rate, DEFAULT.years);
+const amort = calcEMIAmortization(DEFAULT.principal, DEFAULT.rate, DEFAULT.years);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'emi-calculator' && t.status === 'published').slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/emi-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebApplication', name: 'EMI Calculator', url: canonicalUrl, description: 'Calculate monthly EMI, total interest, and repayment schedule for any loan.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } },
+    { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' }, { '@type': 'ListItem', position: 3, name: 'EMI Calculator' }] },
+  ],
+};
+---
+
+<Layout title="EMI Calculator: Monthly Instalment & Total Interest | Calcumetrics" description="Calculate your loan EMI, total interest paid, and year-by-year amortization. Works for home loans, car loans, and personal loans. 100% client-side." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="EMI Calculator" category="Loans" categoryHref="/loans" heroValue={fmt(result.emiRounded)} heroLabel="Monthly EMI">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">EMI Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate your Equated Monthly Instalment, total interest paid, and view an amortization schedule.</p>
+      <div class="mb-6"><Dropdown id="emi-currency" label="Currency" options={[{value:'INR',label:'₹ Indian Rupee (INR)'},{value:'USD',label:'$ US Dollar (USD)'}]} value="INR" /></div>
+      <div class="mb-5">
+        <Input id="emi-principal" label="Loan Amount" prefix="₹" value="10,00,000" isNumeric={true} localeFormat="indian" helperText="Total loan principal" inputmode="decimal" />
+        <div class="mt-2"><Slider id="emi-principal-slider" min={10000} max={10000000} step={10000} value={1000000} ariaLabel="Loan amount slider" /></div>
+      </div>
+      <div class="mb-5">
+        <Input id="emi-rate" label="Annual Interest Rate" suffix="%" value="8.5" isNumeric={true} helperText="Nominal annual rate" inputmode="decimal" />
+        <div class="mt-2"><Slider id="emi-rate-slider" min={1} max={30} step={0.25} value={8.5} ariaLabel="Interest rate slider" /></div>
+      </div>
+      <div class="mb-6">
+        <Input id="emi-years" label="Loan Tenure" suffix="Yrs" value="20" isNumeric={true} helperText="Duration in years" inputmode="decimal" />
+        <div class="mt-2"><Slider id="emi-years-slider" min={1} max={30} step={1} value={20} ariaLabel="Loan tenure slider" /></div>
+      </div>
+      <Alert variant="info" title="Assumption">Computed using standard EMI formula. Internal computation uses unrounded EMI; displayed EMI is rounded to the nearest rupee. Total interest may differ slightly from multiplying rounded EMI × months.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" id="emi-calculate" type="button">Calculate</Button><Button variant="ghost" id="emi-reset" type="button">Reset</Button></div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly EMI</span>
+        <div id="emi-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite" aria-atomic="true">{fmt(result.emiRounded)}</div>
+      </div>
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Principal Amount</span>
+          <span id="emi-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.principal)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest</span>
+          <span id="emi-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Payment</span>
+          <span id="emi-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalPayment)}</span>
+        </div>
+      </div>
+      <div class="mb-5" id="emi-composition-wrapper">
+        <CompositionBar principalFraction={result.principalFraction} gainFraction={result.interestFraction} principalLabel="Principal" gainLabel="Interest" principalValue={fmt(DEFAULT.principal)} gainValue={fmt(result.totalInterest)} />
+      </div>
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="emi-copy-btn" aria-live="polite" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer">Copy Result</button>
+        <button type="button" id="emi-share-btn" aria-live="polite" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer">Share Link</button>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="emi-how">
+        <h2 id="emi-how" class="text-xl font-bold text-text-primary mb-4">How the EMI calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">An Equated Monthly Instalment (EMI) is a fixed amount paid every month to repay a loan over a set tenure. The EMI covers both the principal and the interest, calculated so the loan is fully repaid by the final month.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">This calculator uses the standard EMI formula used by all major Indian banks and financial institutions:</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">EMI = P × r × (1 + r)ⁿ / ((1 + r)ⁿ − 1)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">P</strong> — Principal loan amount</li>
+            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = annual rate / 12 / 100</li>
+            <li><strong class="text-text-primary">n</strong> — Total months = years × 12</li>
+          </ul>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The internal calculation uses the unrounded EMI (full float precision) to compute the exact total interest. The displayed EMI is rounded to the nearest rupee. This matches the convention of Indian banks and avoids accumulation of rounding errors over a 20-year amortization.</p>
+        <p class="text-sm text-text-muted leading-relaxed">For ₹10,00,000 at 8.5% p.a. over 20 years: monthly EMI = ₹8,678; total interest = ₹10,82,776; total payment = ₹20,82,776. The interest amount exceeds the principal — a common outcome for long-tenure home loans.</p>
+      </section>
+
+      <section aria-labelledby="emi-example">
+        <h2 id="emi-example" class="text-xl font-bold text-text-primary mb-4">Year-by-year amortization</h2>
+        <details>
+          <summary class="cursor-pointer text-sm font-medium text-accent hover:text-accent-hover transition-standard mb-3 focus-visible:outline-accent rounded">Show / hide full schedule</summary>
+          <div class="overflow-x-auto mt-3">
+            <table class="w-full text-sm border-collapse">
+              <thead><tr class="border-b border-border"><th class="text-left py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Year</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Principal</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Interest</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th></tr></thead>
+              <tbody>
+                {amort.map((row) => (
+                  <tr class="border-b border-border hover:bg-canvas transition-standard">
+                    <td class="py-2 px-3 text-text-primary">{row.year}</td>
+                    <td class="py-2 px-3 text-right tabular-nums text-text-primary font-medium">{fmt(row.principal)}</td>
+                    <td class="py-2 px-3 text-right tabular-nums text-accent">{fmt(row.interest)}</td>
+                    <td class="py-2 px-3 text-right tabular-nums text-text-muted">{fmt(row.balance)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section aria-labelledby="emi-faq">
+        <h2 id="emi-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is EMI and how is it structured?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Each EMI payment consists of an interest component and a principal component. In the early months, most of the EMI goes toward interest; as the loan matures, a greater portion pays down the principal. This is called an amortizing loan.</div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Does a higher tenure mean lower EMI?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes — a longer tenure reduces your monthly EMI, but increases your total interest paid significantly. For ₹10 lakh at 8.5% p.a., a 10-year tenure gives an EMI of ₹12,399 with ₹4.88 lakh total interest, while a 20-year tenure gives ₹8,678 EMI but ₹10.83 lakh total interest.</div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I save interest by prepaying?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes. Making a partial prepayment reduces your outstanding principal, which reduces future interest charges. Use our Loan Prepayment Calculator to estimate how much interest you can save and by how many months your tenure could reduce.</div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="emi-related">
+        <h2 id="emi-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  function calcEMIClient(p: number, rate: number, years: number) {
+    const n = years * 12;
+    const r = rate / (12 * 100);
+    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const totalPayment = emi * n;
+    const totalInterest = totalPayment - p;
+    return { emi, emiRounded: Math.round(emi), totalPayment, totalInterest, principalFraction: totalPayment > 0 ? p / totalPayment : 0, interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0 };
+  }
+  function fmtIndian(n: number) { return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n)); }
+  function fmtLiveIndian(raw: string) { const num = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num); }
+
+  function initEMICalc() {
+    const principalInput = document.getElementById('emi-principal') as HTMLInputElement | null;
+    const rateInput = document.getElementById('emi-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('emi-years') as HTMLInputElement | null;
+    const pSlider = document.getElementById('emi-principal-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('emi-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('emi-years-slider') as HTMLInputElement | null;
+    const resEMI = document.getElementById('emi-result-emi');
+    const resPrincipal = document.getElementById('emi-result-principal');
+    const resInterest = document.getElementById('emi-result-interest');
+    const resTotal = document.getElementById('emi-result-total');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+    if (!principalInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { principal: 1000000, rate: 8.5, years: 20 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parseRaw(s: string) { return parseFloat(s.replace(/[^0-9.]/g, '')) || 0; }
+
+    function recalc() {
+      const p = parseRaw(principalInput.value);
+      const r = parseFloat(rateInput.value) || 0;
+      const y = parseInt(yearsInput.value) || 0;
+      if (p <= 0 || r <= 0 || y <= 0) return;
+      const res = calcEMIClient(p, r, y);
+      if (resEMI) resEMI.textContent = fmtIndian(res.emiRounded);
+      if (resPrincipal) resPrincipal.textContent = fmtIndian(p);
+      if (resInterest) resInterest.textContent = fmtIndian(res.totalInterest);
+      if (resTotal) resTotal.textContent = fmtIndian(res.totalPayment);
+      if (mobileHero) mobileHero.textContent = fmtIndian(res.emiRounded);
+      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}`);
+    }
+
+    function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 100); }
+
+    function syncPair(slider: HTMLInputElement | null, input: HTMLInputElement, isIndian: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => { input.value = isIndian ? fmtLiveIndian(slider.value) : slider.value; const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100; slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`); debounce(); });
+      input.addEventListener('input', () => { const raw = input.value.replace(/[^0-9.]/g, ''); const num = parseFloat(raw); if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) { slider.value = String(num); const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100; slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`); } if (isIndian) input.value = fmtLiveIndian(raw); debounce(); });
+    }
+
+    syncPair(pSlider, principalInput, true);
+    syncPair(rSlider, rateInput, false);
+    syncPair(ySlider, yearsInput, false);
+
+    document.getElementById('emi-calculate')?.addEventListener('click', recalc);
+    document.getElementById('emi-reset')?.addEventListener('click', () => {
+      principalInput.value = fmtLiveIndian(String(DEFAULTS.principal));
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+      if (pSlider) { pSlider.value = String(DEFAULTS.principal); pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal-10000)/(10000000-10000)*100).toFixed(2)}%`); }
+      if (rSlider) { rSlider.value = String(DEFAULTS.rate); rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate-1)/(30-1)*100).toFixed(2)}%`); }
+      if (ySlider) { ySlider.value = String(DEFAULTS.years); ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years-1)/(30-1)*100).toFixed(2)}%`); }
+      recalc(); principalInput.focus();
+    });
+    [principalInput, rateInput, yearsInput].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
+  }
+  initEMICalc();
+  document.addEventListener('astro:page-load', initEMICalc);
+</script>

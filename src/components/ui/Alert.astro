@@ -1,0 +1,57 @@
+---
+interface Props {
+  variant?: 'info' | 'error';
+  title?: string;
+  class?: string;
+  id?: string;
+}
+
+const {
+  variant = 'info',
+  title,
+  class: className = '',
+  id,
+  ...rest
+} = Astro.props;
+
+// Section 5:
+// info: #F7F7F4 bg, 1px #D8DDD9
+// error: #FEF3F2 bg, 1px #FECDCA (text #B42318)
+const isError = variant === 'error';
+---
+
+<div
+  id={id}
+  role={isError ? 'alert' : 'status'}
+  class:list={[
+    'w-full rounded-control border p-3 flex items-start gap-3 text-sm leading-relaxed',
+    isError
+      ? 'bg-error-bg border-error-border text-error-text'
+      : 'bg-canvas border-border text-text-primary',
+    className,
+  ]}
+  {...rest}
+>
+  <div class="shrink-0 mt-0.5">
+    {isError ? (
+      <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+      </svg>
+    ) : (
+      <svg class="w-4 h-4 stroke-accent fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+    )}
+  </div>
+
+  <div class="flex-1">
+    {title && <h4 class="font-semibold text-[13px] mb-0.5">{title}</h4>}
+    <div class="text-[13px] leading-normal">
+      <slot />
+    </div>
+  </div>
+</div>

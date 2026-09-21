@@ -1,11 +1,249 @@
 ---
-import Welcome from '../components/Welcome.astro';
+/**
+ * Homepage — / (Section 26.4)
+ * Pre-rendered SIP preview inside WindowFrame linking to /sip-calculator
+ * Most Popular Tools, Browse by Category, Why Calcumetrics, closing CTA.
+ * No ads at launch. No email capture.
+ */
 import Layout from '../layouts/Layout.astro';
+import WindowFrame from '../components/calculator/WindowFrame.astro';
+import { calcSIP } from '../lib/calculators/sip';
+import { formatIndian } from '../lib/formatters';
+import { getPublishedTools, getToolCount, CATEGORIES, SITE_NAME } from '../config/site';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const result = calcSIP(25000, 12, 15);
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const allTools = getPublishedTools();
+const totalCount = getToolCount();
+
+// Most popular — hand-picked 6 for the homepage
+const popularSlugs = ['sip-calculator', 'emi-calculator', 'fd-calculator', 'cagr-calculator', 'wacc-calculator', 'break-even-calculator'];
+const popularTools = popularSlugs.map((s) => allTools.find((t) => t.slug === s)).filter(Boolean);
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://calcumetrics.com/#org',
+      name: 'Calcumetrics',
+      url: 'https://calcumetrics.com/',
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://calcumetrics.com/#website',
+      url: 'https://calcumetrics.com/',
+      name: 'Calcumetrics',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      inLanguage: 'en',
+    },
+  ],
+};
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+  title="Free Online Financial Calculators | Calcumetrics"
+  description={`${totalCount} free financial calculators for investments, loans, taxes, business and corporate finance. No sign-up, 100% client-side. Runs in your browser.`}
+  canonical="https://calcumetrics.com/"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
+
+  <!-- Hero Section -->
+  <section class="bg-canvas border-b border-border py-16 sm:py-20" aria-labelledby="hero-heading">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
+
+        <!-- Left: Copy -->
+        <div class="lg:col-span-5 mb-10 lg:mb-0">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-chip border border-border bg-disabled-bg text-xs font-medium text-text-muted mb-4">
+            {totalCount} calculators · 100% free
+          </div>
+          <h1 id="hero-heading" class="text-4xl sm:text-5xl font-bold tracking-[-0.02em] text-text-primary mb-5 leading-tight">
+            Precision Financial<br />Calculators
+          </h1>
+          <p class="text-base text-text-muted leading-relaxed mb-8 max-w-md">
+            Investments, loans, taxes, business and corporate finance. Every formula shown and tested. No sign-up. Runs entirely in your browser.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="/calculators" class="inline-flex items-center h-12 px-6 rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent">
+              Browse all calculators
+            </a>
+            <a href="/methodology" class="inline-flex items-center h-12 px-6 rounded-control border border-border text-sm font-medium text-text-primary hover:text-accent hover:border-accent transition-standard focus-visible:outline-accent">
+              How it works
+            </a>
+          </div>
+        </div>
+
+        <!-- Right: SIP preview in WindowFrame -->
+        <div class="lg:col-span-7">
+          <WindowFrame urlPill="calcumetrics.com/sip-calculator" class="w-full">
+            <div class="p-6">
+              <div class="flex flex-col sm:flex-row gap-4">
+                <!-- Input side preview -->
+                <div class="flex-1 space-y-3">
+                  <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">SIP Calculator</p>
+                  <div class="space-y-2">
+                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
+                      <span class="text-text-muted mr-2">₹</span>
+                      <span class="tabular-nums">25,000</span>
+                      <span class="text-text-muted text-xs ml-auto">/month</span>
+                    </div>
+                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
+                      <span class="tabular-nums">12.0</span>
+                      <span class="text-text-muted text-xs ml-auto">% p.a.</span>
+                    </div>
+                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
+                      <span class="tabular-nums">15</span>
+                      <span class="text-text-muted text-xs ml-auto">years</span>
+                    </div>
+                  </div>
+                  <a href="/sip-calculator" class="block w-full h-10 flex items-center justify-center rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent">
+                    Calculate →
+                  </a>
+                </div>
+
+                <!-- Output side preview -->
+                <div class="flex-1 bg-dark-bg rounded-card p-4">
+                  <p class="text-xs text-dark-muted mb-1 uppercase tracking-wider font-medium">Estimated Maturity</p>
+                  <p class="text-3xl font-bold tabular-nums text-dark-text mb-4">{fmt(result.maturity)}</p>
+                  <div class="space-y-2 text-xs border-t border-dark-border pt-3">
+                    <div class="flex justify-between">
+                      <span class="text-dark-muted">Invested</span>
+                      <span class="tabular-nums text-dark-text">{fmt(result.invested)}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-dark-muted">Gain</span>
+                      <span class="tabular-nums text-dark-accent font-semibold">+{fmt(result.gain)}</span>
+                    </div>
+                  </div>
+                  <div class="mt-3 h-2 w-full flex overflow-hidden rounded-sm">
+                    <div class="h-full bg-dark-muted" style={`width: ${(result.principalFraction * 100).toFixed(1)}%`}></div>
+                    <div class="h-full bg-dark-accent" style={`width: ${(result.gainFraction * 100).toFixed(1)}%`}></div>
+                  </div>
+                  <p class="text-[10px] text-dark-muted mt-3 leading-relaxed">For information only. Not financial advice. Returns are estimates.</p>
+                </div>
+              </div>
+            </div>
+          </WindowFrame>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Most Popular Tools -->
+  <section class="py-14 bg-surface border-b border-border" aria-labelledby="popular-heading">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="popular-heading" class="text-2xl font-bold text-text-primary mb-2">Most popular calculators</h2>
+      <p class="text-sm text-text-muted mb-8">Start with these tools used most frequently by finance professionals, CAs, and retail investors.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {popularTools.map((tool) => tool && (
+          <a
+            href={tool.path}
+            class="group block bg-canvas border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
+          >
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h3>
+            <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse by Category -->
+  <section class="py-14 bg-canvas border-b border-border" aria-labelledby="categories-heading">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="categories-heading" class="text-2xl font-bold text-text-primary mb-2">Browse by category</h2>
+      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {CATEGORIES.map((cat) => {
+          const catTools = allTools.filter((t) => t.category === cat.name);
+          return (
+            <a
+              href={cat.href}
+              class="group block bg-surface border border-border rounded-card p-5 hover:border-accent transition-standard focus-visible:outline-accent"
+            >
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{cat.name}</h3>
+                <span class="text-xs text-text-muted">{catTools.length} tools</span>
+              </div>
+              <ul class="space-y-1">
+                {catTools.slice(0, 3).map((tool) => (
+                  <li class="text-xs text-text-muted truncate">· {tool.name}</li>
+                ))}
+                {catTools.length > 3 && (
+                  <li class="text-xs text-accent">+ {catTools.length - 3} more →</li>
+                )}
+              </ul>
+            </a>
+          );
+        })}
+        <!-- View all card -->
+        <a
+          href="/calculators"
+          class="group block bg-surface border border-dashed border-border rounded-card p-5 hover:border-accent hover:bg-canvas transition-standard focus-visible:outline-accent flex flex-col items-center justify-center text-center min-h-[120px]"
+        >
+          <span class="text-2xl font-bold text-accent mb-1">{totalCount}</span>
+          <span class="text-sm font-medium text-text-primary group-hover:text-accent transition-standard">View all calculators</span>
+          <span class="text-xs text-text-muted mt-1">Search, filter, browse →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Calcumetrics (true factual claims only — Section 26.5) -->
+  <section class="py-14 bg-surface border-b border-border" aria-labelledby="why-heading">
+    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 id="why-heading" class="text-2xl font-bold text-text-primary mb-2">Why Calcumetrics</h2>
+      <p class="text-sm text-text-muted mb-10">Built for professionals, students, and retail investors who want transparent tools.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          {
+            title: 'Every formula shown',
+            body: 'The formula, variable legend, and a worked example appear on every calculator page. No black boxes.',
+          },
+          {
+            title: 'No login required',
+            body: 'All calculations run in your browser. We do not store or transmit your financial inputs.',
+          },
+          {
+            title: 'Test-driven accuracy',
+            body: 'Each calculator is validated against published test fixtures before it goes live. Results are estimates, not guarantees.',
+          },
+          {
+            title: 'Accessible design',
+            body: 'Every input has a label, every interactive element has a keyboard shortcut, every error message names the fix.',
+          },
+        ].map((item) => (
+          <div class="bg-canvas border border-border rounded-card p-5">
+            <h3 class="font-bold text-sm text-text-primary mb-2">{item.title}</h3>
+            <p class="text-xs text-text-muted leading-relaxed">{item.body}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing CTA (dark background) -->
+  <section class="py-16 bg-dark-bg" aria-labelledby="cta-heading">
+    <div class="max-w-[800px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 id="cta-heading" class="text-3xl font-bold tracking-tight text-dark-text mb-4">
+        Every formula. Shown and tested.
+      </h2>
+      <p class="text-sm text-dark-muted mb-8 leading-relaxed">
+        {totalCount} free financial calculators for investments, loans, taxes, business and corporate finance. No sign-up. No ads on this page.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="/calculators" class="inline-flex items-center h-12 px-6 rounded-control bg-dark-accent text-dark-bg text-sm font-semibold hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2">
+          Browse all {totalCount} calculators
+        </a>
+        <a href="/methodology" class="inline-flex items-center h-12 px-6 rounded-control border border-dark-border text-dark-text text-sm font-medium hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2">
+          How it works
+        </a>
+      </div>
+    </div>
+  </section>
 </Layout>

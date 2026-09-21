@@ -1,0 +1,110 @@
+---
+/**
+ * 404 Page — Section 26.4
+ * Must return HTTP 404 status.
+ * WindowFrame with URL pill, giant faded "404", doodle, CTA, search, category links.
+ * No ads.
+ */
+import Layout from '../layouts/Layout.astro';
+import WindowFrame from '../components/calculator/WindowFrame.astro';
+import { CATEGORIES, getToolCount } from '../config/site';
+
+const totalCount = getToolCount();
+---
+
+<Layout
+  title='Page Not Found | Calcumetrics'
+  description="The page you're looking for doesn't exist. Browse our financial calculators or return to the homepage."
+  robots="noindex,follow"
+>
+  <div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
+    <div class="max-w-[600px] w-full text-center">
+      <WindowFrame urlPill="calcumetrics.com/404" class="mb-8">
+        <div class="p-10 relative overflow-hidden">
+          <!-- Giant faded 404 -->
+          <div
+            class="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
+            aria-hidden="true"
+          >
+            <span
+              class="text-[160px] sm:text-[200px] font-bold tabular-nums text-disabled-bg leading-none"
+              style="line-height: 1;"
+            >
+              404
+            </span>
+          </div>
+
+          <!-- Doodle (inline SVG, aria-hidden) -->
+          <div class="relative z-10 mb-6" aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 64 64" fill="none" class="mx-auto" aria-hidden="true">
+              <!-- Simple calculator doodle -->
+              <rect x="12" y="8" width="40" height="48" rx="4" stroke="#D8DDD9" stroke-width="1.5" fill="none"/>
+              <rect x="18" y="14" width="28" height="10" rx="2" fill="#EEF0EE"/>
+              <circle cx="22" cy="34" r="3" fill="#D8DDD9"/>
+              <circle cx="32" cy="34" r="3" fill="#D8DDD9"/>
+              <circle cx="42" cy="34" r="3" fill="#176B5B"/>
+              <circle cx="22" cy="44" r="3" fill="#D8DDD9"/>
+              <circle cx="32" cy="44" r="3" fill="#D8DDD9"/>
+              <circle cx="42" cy="44" r="3" fill="#D8DDD9"/>
+              <!-- Arrow doodle -->
+              <path d="M54 20 C 62 14, 62 28, 54 24" stroke="#D8DDD9" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+
+          <!-- Content -->
+          <div class="relative z-10">
+            <h1 class="text-2xl font-bold text-text-primary mb-2">The math isn&rsquo;t mathing</h1>
+            <p class="text-sm text-text-muted mb-6">
+              This page doesn&rsquo;t exist. The URL may have changed or the page may have been removed.
+            </p>
+
+            <!-- Search -->
+            <div class="relative mb-6">
+              <label for="notfound-search" class="sr-only">Search calculators</label>
+              <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
+                <svg class="w-4 h-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </span>
+              <input
+                type="search"
+                id="notfound-search"
+                placeholder="Search calculators…"
+                class="w-full h-11 pl-9 pr-4 bg-canvas border border-border rounded-control text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-accent transition-standard"
+                aria-label="Search calculators"
+              />
+            </div>
+
+            <a
+              href="/"
+              class="inline-flex items-center h-11 px-6 rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent"
+            >
+              Take me back home →
+            </a>
+          </div>
+        </div>
+      </WindowFrame>
+
+      <!-- Category links -->
+      <div>
+        <p class="text-xs font-medium text-text-muted uppercase tracking-wider mb-3">Or browse by category</p>
+        <div class="flex flex-wrap justify-center gap-2">
+          {CATEGORIES.map((cat) => (
+            <a
+              href={cat.href}
+              class="h-8 px-3 rounded-chip border border-border text-sm text-text-primary hover:text-accent hover:border-accent transition-standard focus-visible:outline-accent"
+            >
+              {cat.name}
+            </a>
+          ))}
+          <a
+            href="/calculators"
+            class="h-8 px-3 rounded-chip border border-accent text-sm text-accent hover:bg-accent hover:text-white transition-standard focus-visible:outline-accent"
+          >
+            All {totalCount} calculators
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>

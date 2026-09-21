@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'fd-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/fd-calculator';
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Fixed Deposit (FD) Calculator', url: canonicalUrl, description: 'Calculate fixed deposit maturity value and interest earned. Fixture: ₹1,00,000 @ 7% for 5 years quarterly = ₹1,41,477.82.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'Fixed Deposit (FD) Calculator' }] }] };
+---
+<Layout title="FD Calculator: Fixed Deposit Maturity Value | Calcumetrics" description="Calculate fixed deposit maturity value and interest earned. Fixture: ₹1,00,000 @ 7% for 5 years quarterly = ₹1,41,477.82." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="Fixed Deposit (FD) Calculator" category="Investments" categoryHref="/investments" heroValue="₹1,41,477" heroLabel="Maturity Value">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Fixed Deposit (FD) Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate fixed deposit maturity value and interest earned. Fixture: ₹1,00,000 @ 7% for 5 years quarterly = ₹1,41,477.82.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">₹1,41,477</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="fd-calculator-how">
+        <h2 id="fd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate fixed deposit maturity value and interest earned. Fixture: ₹1,00,000 @ 7% for 5 years quarterly = ₹1,41,477.82.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted">A = P × (1 + r/n)^(n×t). For quarterly compounding: n=4. For ₹1,00,000 @ 7% over 5 years: A = 1,00,000 × (1.0175)²⁰ = ₹1,41,477.82.</p>
+        </div>
+      </section>
+      <section aria-labelledby="fd-calculator-faq">
+        <h2 id="fd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is FD interest calculated?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Indian banks compound FD interest quarterly by default (though some offer monthly or annual compounding). The maturity value uses A = P × (1 + r/n)^(n×t) where r is the annual rate and n is the compounding frequency per year. The interest earned is A − P.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is FD interest taxable?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes, FD interest is taxable as 'income from other sources' at your applicable income tax slab rate in India. Banks deduct TDS at 10% if interest exceeds ₹40,000 per year (₹50,000 for senior citizens) under the Income Tax Act, 2025. Consult a tax professional for your specific situation.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="fd-calculator-related">
+        <h2 id="fd-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

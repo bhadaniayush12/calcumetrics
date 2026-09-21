@@ -1,0 +1,53 @@
+---
+/**
+ * CompositionBar.astro — Section 6 + Section 5
+ * Flat horizontal bar showing principal vs gain split.
+ * - Principal: #A8B0AB (dark-muted token)
+ * - Gain: #5FCDB6 (dark-accent token)
+ * - NO gradients, NO border-radius on segments, NO box-shadow
+ * - Total bar height 8px
+ */
+
+interface Props {
+  principalFraction: number;   // 0-1
+  gainFraction: number;        // 0-1
+  principalLabel?: string;     // e.g. "Total Invested"
+  gainLabel?: string;          // e.g. "Total Gain"
+  principalValue?: string;     // formatted display string
+  gainValue?: string;          // formatted display string
+}
+
+const {
+  principalFraction,
+  gainFraction,
+  principalLabel = 'Principal',
+  gainLabel = 'Gain',
+  principalValue = '',
+  gainValue = '',
+} = Astro.props;
+
+const pPct = Math.min(100, Math.max(0, principalFraction * 100)).toFixed(2);
+const gPct = Math.min(100, Math.max(0, gainFraction * 100)).toFixed(2);
+---
+
+<div class="w-full" aria-hidden="true">
+  <!-- Bar -->
+  <div class="h-2 w-full flex overflow-hidden rounded-sm">
+    <div class="h-full bg-dark-muted transition-[width] duration-[120ms]" style={`width: ${pPct}%`}></div>
+    <div class="h-full bg-dark-accent transition-[width] duration-[120ms]" style={`width: ${gPct}%`}></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="flex items-center justify-between mt-2 text-xs text-dark-muted">
+    <div class="flex items-center gap-1.5">
+      <span class="w-2 h-2 rounded-sm bg-dark-muted flex-shrink-0"></span>
+      <span>{principalLabel}</span>
+      {principalValue && <span class="font-medium text-dark-text tabular-nums ml-1">{principalValue}</span>}
+    </div>
+    <div class="flex items-center gap-1.5">
+      {gainValue && <span class="font-medium text-dark-accent tabular-nums mr-1">{gainValue}</span>}
+      <span>{gainLabel}</span>
+      <span class="w-2 h-2 rounded-sm bg-dark-accent flex-shrink-0"></span>
+    </div>
+  </div>
+</div>

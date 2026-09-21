@@ -1,0 +1,51 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'rd-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/rd-calculator';
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Recurring Deposit (RD) Calculator', url: canonicalUrl, description: 'Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'Recurring Deposit (RD) Calculator' }] }] };
+---
+<Layout title="RD Calculator: Recurring Deposit Maturity Value | Calcumetrics" description="Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="Recurring Deposit (RD) Calculator" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Maturity Value">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Recurring Deposit (RD) Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="rd-calculator-how">
+        <h2 id="rd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted">Standard RD formula with quarterly compounding: each monthly instalment R compounds for the remaining quarters at i = r/400. M = Σ R × (1 + i)^(remaining quarters).</p>
+        </div>
+      </section>
+      <section aria-labelledby="rd-calculator-faq">
+        <h2 id="rd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is RD different from FD?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">An FD (Fixed Deposit) requires a one-time lump sum investment. An RD (Recurring Deposit) accepts fixed monthly contributions — similar to a SIP but with guaranteed returns from a bank. RD is lower risk (capital is protected) but the returns are fixed and typically lower than equity mutual funds.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is RD interest compounded?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Indian bank RDs are compounded quarterly. Each monthly instalment earns interest from its deposit date to maturity at the quarterly rate (annual rate / 4). The standard formula sums the future value of each instalment.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="rd-calculator-related">
+        <h2 id="rd-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

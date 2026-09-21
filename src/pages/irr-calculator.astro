@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'irr-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/irr-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'IRR Calculator', url: canonicalUrl, description: 'Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'IRR Calculator' }] }] };
+---
+<Layout title="IRR Calculator: Internal Rate of Return | Calcumetrics" description="Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="IRR Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="24.89%" heroLabel="IRR">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">IRR Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">IRR</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">24.89%</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="irr-calculator-how">
+        <h2 id="irr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">IRR is the discount rate r that makes NPV = 0: Σ CF_t / (1+r)^t = 0. Solved numerically. Requires at least one negative and one positive cash flow. If NPV > 0 at WACC, IRR > WACC — accept the project.</p>
+        </div>
+      </section>
+      <section aria-labelledby="irr-calculator-faq">
+        <h2 id="irr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between IRR and NPV for project selection?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Both methods use DCF principles, but NPV gives an absolute dollar value while IRR gives a percentage. NPV is generally preferred because: (1) IRR can be misleading when cash flows change sign multiple times (multiple IRRs), (2) IRR assumes reinvestment at the IRR rate, which may be unrealistic. Use both for a complete picture.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does it mean if IRR is higher than WACC?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">If IRR > WACC, the project returns more than its cost of capital — it creates value for shareholders. Accepting all projects where IRR > WACC (hurdle rate) is the standard decision rule. If you must choose between mutually exclusive projects, prefer the one with higher NPV, not higher IRR.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="irr-calculator-related">
+        <h2 id="irr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

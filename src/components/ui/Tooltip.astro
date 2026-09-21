@@ -1,0 +1,94 @@
+---
+interface Props {
+  text: string;
+  id?: string;
+  label?: string;
+  class?: string;
+}
+
+const {
+  text,
+  id = `tooltip-${Math.random().toString(36).substring(2, 9)}`,
+  label = 'Help information',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class={`relative inline-flex items-center group/tooltip ${className}`} data-tooltip-container>
+  <button
+    type="button"
+    aria-describedby={id}
+    aria-label={label}
+    aria-expanded="false"
+    class="w-4 h-4 rounded-full text-text-muted hover:text-accent focus-visible:outline-accent inline-flex items-center justify-center transition-standard select-none cursor-pointer"
+    data-tooltip-trigger
+  >
+    <!-- 1.5px stroke outline info icon per Section 25 -->
+    <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+  </button>
+
+  <!-- Tooltip bubble per Section 5: #171A18 bg, #F7F7F4 text, 12px, 8px radius, max-width 240px, flat arrow. No blur, no shadow. -->
+  <div
+    id={id}
+    role="tooltip"
+    class="pointer-events-none opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-standard absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[240px] p-2.5 rounded-control bg-dark-bg text-dark-text text-[12px] leading-relaxed border border-dark-border z-30 select-none data-[open=true]:opacity-100 data-[open=true]:visible data-[open=true]:pointer-events-auto"
+    data-tooltip-bubble
+  >
+    <span>{text}</span>
+    <!-- Flat arrow -->
+    <div
+      class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-dark-bg"
+      aria-hidden="true"
+    ></div>
+  </div>
+</div>
+
+<script>
+  // Touch support & keyboard escape for tooltips per Section 5 & 25
+  function setupTooltips() {
+    const containers = document.querySelectorAll<HTMLElement>('[data-tooltip-container]');
+
+    containers.forEach((container) => {
+      const trigger = container.querySelector<HTMLButtonElement>('[data-tooltip-trigger]');
+      const bubble = container.querySelector<HTMLElement>('[data-tooltip-bubble]');
+      if (!trigger || !bubble) return;
+
+      const toggleTooltip = (open?: boolean) => {
+        const isCurrentlyOpen = bubble.getAttribute('data-open') === 'true';
+        const nextState = typeof open === 'boolean' ? open : !isCurrentlyOpen;
+        bubble.setAttribute('data-open', nextState ? 'true' : 'false');
+        trigger.setAttribute('aria-expanded', nextState ? 'true' : 'false');
+      };
+
+      // Toggle on tap / click
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleTooltip();
+      });
+
+      // Close on Esc
+      container.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          toggleTooltip(false);
+          trigger.focus();
+        }
+      });
+    });
+
+    // Close on outside tap / click
+    document.addEventListener('click', () => {
+      document.querySelectorAll('[data-tooltip-bubble][data-open="true"]').forEach((bubble) => {
+        bubble.setAttribute('data-open', 'false');
+        const trigger = bubble.parentElement?.querySelector('[data-tooltip-trigger]');
+        trigger?.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  setupTooltips();
+  document.addEventListener('astro:page-load', setupTooltips);
+</script>

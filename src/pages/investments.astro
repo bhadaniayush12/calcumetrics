@@ -1,0 +1,32 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getPublishedTools } from '../config/site';
+const tools = getPublishedTools().filter((t) => t.category === 'Investments');
+const count = tools.length;
+const noindex = count < 4;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'CollectionPage', name: 'Investment Calculators', url: 'https://calcumetrics.com/investments', description: `${count} free investment calculators: SIP, lump sum, CAGR, XIRR, FD, RD, PPF, and more.` },
+    { '@type': 'ItemList', itemListElement: tools.map((t, i) => ({ '@type': 'ListItem', position: i + 1, url: `https://calcumetrics.com${t.path}`, name: t.name })) },
+    { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments' }] },
+  ],
+};
+---
+<Layout title={`Investment Calculators: ${count} Free Tools | Calcumetrics`} description={`${count} free investment calculators: SIP returns, lump sum growth, CAGR, XIRR, FD maturity, RD, PPF, and 401(k). 100% client-side.`} canonical="https://calcumetrics.com/investments" robots={noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large'}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <nav aria-label="Breadcrumb" class="mb-6"><ol class="flex items-center gap-1.5 text-xs text-text-muted"><li><a href="/" class="hover:text-accent transition-standard">Home</a></li><li aria-hidden="true">›</li><li class="text-text-primary font-medium" aria-current="page">Investments</li></ol></nav>
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">Investment Calculators</h1>
+    <p class="text-sm text-text-muted mb-8 max-w-xl">Plan and project your investments — SIP returns, lump sum growth, fixed deposits, and more. All calculations run in your browser.</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {tools.map((tool) => (
+        <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+          <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.region}</span>
+          <h2 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h2>
+          <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

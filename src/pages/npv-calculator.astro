@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'npv-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/npv-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'NPV Calculator', url: canonicalUrl, description: 'Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'NPV Calculator' }] }] };
+---
+<Layout title="NPV Calculator: Net Present Value of Cash Flows | Calcumetrics" description="Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="NPV Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="₹38,877" heroLabel="Net Present Value">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">NPV Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Present Value</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">₹38,877</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="npv-calculator-how">
+        <h2 id="npv-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">NPV = Σ CF_t / (1 + r)^t, summed from t=0 to n. A negative CF at t=0 is the initial investment. Positive NPV means the project creates value at the given discount rate.</p>
+        </div>
+      </section>
+      <section aria-labelledby="npv-calculator-faq">
+        <h2 id="npv-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does a positive NPV mean?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">A positive NPV means the present value of future cash inflows exceeds the initial investment and all costs — the project creates value at the specified discount rate. A negative NPV means the project destroys value. NPV is theoretically the best capital budgeting method because it considers both the time value of money and the scale of the investment.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What discount rate should I use for NPV?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The discount rate should reflect the risk of the project's cash flows. For corporate projects, WACC is the standard choice. For a project riskier than the firm's average, use a higher rate. For riskier real-estate projects, cap rates are sometimes used. The choice of discount rate significantly affects NPV — sensitivity analysis helps.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="npv-calculator-related">
+        <h2 id="npv-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

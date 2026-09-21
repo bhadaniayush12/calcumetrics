@@ -1,0 +1,20 @@
+{
+  "gst": {
+    "slabs": [0, 5, 12, 18, 28],
+    "verifiedOn": "2026-09-20",
+    "source": "https://www.cbic.gov.in/htdocs-cbec/gst/gst-rates.pdf",
+    "note": "India adopted 5%/18% as primary slabs in Sept 2025 GST Council revision. 12% and 28% slabs remain; verify current applicability before advising clients."
+  },
+  "ppf": {
+    "rate": 7.1,
+    "verifiedOn": "2026-09-20",
+    "source": "https://www.indiapost.gov.in/vas/Pages/IndiaPostHome.aspx",
+    "note": "PPF interest rate announced quarterly by Ministry of Finance. Rate is for Q2 FY2026-27; check official notification before display."
+  },
+  "rd": {
+    "defaultRate": 6.5,
+    "verifiedOn": "2026-09-20",
+    "source": "https://www.rbi.org.in/",
+    "note": "RD rates vary by bank. Default is illustrative only. Users should enter their bank's actual rate."
+  }
+}

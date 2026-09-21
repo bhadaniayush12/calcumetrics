@@ -1,0 +1,31 @@
+---
+import Layout from '../layouts/Layout.astro';
+const canonicalUrl = 'https://calcumetrics.com/methodology';
+---
+<Layout title="Methodology: Our Formulas & Conventions | Calcumetrics" description="Formulas, conventions, data sources, and our correction policy for all Calcumetrics calculators." canonical={canonicalUrl}>
+  <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Methodology</h1>
+    <p class="text-sm text-text-muted leading-relaxed mb-6">Calcumetrics uses standard mathematical formulas from widely accepted financial textbooks and official regulatory sources. This page documents our conventions, assumptions, and data sources.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Formulas and conventions</h2>
+      <div class="bg-surface border border-border rounded-card p-5 mb-6 space-y-3 text-sm text-text-muted">
+        <p><strong class="text-text-primary">SIP (annuity-due):</strong> M = P × [((1 + i)^n − 1) / i] × (1 + i). Contribution at start of month. i = r/12/100.</p>
+        <p><strong class="text-text-primary">EMI:</strong> E = P × r × (1+r)^n / ((1+r)^n − 1). Internal computation uses unrounded EMI. r = annual rate / 12 / 100.</p>
+        <p><strong class="text-text-primary">Compound interest:</strong> A = P × (1 + r/n)^(n×t). Nominal rate, specified compounding frequency.</p>
+        <p><strong class="text-text-primary">CAGR:</strong> CAGR = (FV/PV)^(1/n) − 1.</p>
+        <p><strong class="text-text-primary">WACC:</strong> WACC = (E/V) × Re + (D/V) × Rd × (1 − Tc).</p>
+        <p><strong class="text-text-primary">IRR/XIRR:</strong> Newton-Raphson numerical iteration. Requires at least one sign change in cash flows.</p>
+        <p><strong class="text-text-primary">NPV:</strong> NPV = Σ CF_t / (1+r)^t from t=0 to n.</p>
+      </div>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Interest rate conventions</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">All calculators use nominal annual rates unless labelled otherwise. We do not use effective annual rate (EAR) unless explicitly stated. This matches the convention of Indian mutual fund platforms, banks, and most retail financial products.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Tax and regulatory data</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Tax rates (GST slabs, PPF rates) are stored in a data file with a <strong>verifiedOn</strong> date and a link to the official source. We re-verify rates on a schedule. The <strong>verifiedOn</strong> date is displayed on each tax tool. Rates change; always verify against official government sources before making decisions.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Rounding</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">All internal computations use full floating-point precision. Values are rounded only when displayed to the user. This prevents accumulated rounding errors in multi-step calculations such as loan amortization.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Limitations</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Calculators assume constant rates for the entire period. Actual market returns, interest rates, and tax laws change. All results are estimates for information and planning purposes only. They are not financial, tax, or legal advice.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Correction policy</h2>
+      <p class="text-sm text-text-muted leading-relaxed">If you find a calculation error, <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a> with the input values and the discrepancy. We verify reported errors against published test fixtures and correct them promptly. The visible &ldquo;Last updated&rdquo; date changes only when logic, rates, or copy actually change.</p>
+  </div>
+</Layout>

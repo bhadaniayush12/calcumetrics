@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+const canonicalUrl = 'https://calcumetrics.com/cookie-policy';
+---
+<Layout title="Cookie Policy | Calcumetrics" description="What cookies and storage Calcumetrics uses, their purpose, and how to manage your preferences." canonical={canonicalUrl}>
+  <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Cookie Policy</h1>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">This policy explains the cookies and browser storage we use, their purpose, and how to manage them.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Strictly necessary storage</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">We use <code class="text-xs bg-disabled-bg px-1 py-0.5 rounded">localStorage</code> to remember your selected currency (key: <code class="text-xs bg-disabled-bg px-1 py-0.5 rounded">cm_currency</code>). This is functional storage — it keeps your preference between visits. It contains no personal data and is not shared with any third party.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Analytics cookies (planned)</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">We plan to add cookieless or consent-gated analytics in future. No analytics cookies are currently set. This policy will be updated when analytics are added.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Advertising cookies (planned)</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">When Google AdSense is enabled, Google sets cookies to serve relevant ads and measure performance. Before this occurs, we will install a consent management platform (CMP). You will be asked for consent before advertising cookies are set. You can change your consent at any time via the <button type="button" id="open-cookie-settings-btn" class="text-accent hover:underline cursor-pointer focus-visible:outline-accent">Cookie settings</button> link.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">How to manage cookies</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">You can delete all browser storage at any time in your browser&rsquo;s settings. For advertising preferences: <a href="https://optout.aboutads.info/" rel="noopener" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> | <a href="https://adssettings.google.com/" rel="noopener" class="text-accent hover:underline">Google Ad Settings</a>.</p>
+      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Changes</h2>
+      <p class="text-sm text-text-muted leading-relaxed">We update this policy when our storage practices change. The &ldquo;Last updated&rdquo; date below reflects the date of the last change.</p>
+  </div>
+</Layout>

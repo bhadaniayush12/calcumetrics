@@ -1,0 +1,67 @@
+---
+interface Props {
+  variant?: 'region' | 'filter' | 'tag';
+  active?: boolean;
+  class?: string;
+  id?: string;
+  'aria-controls'?: string;
+}
+
+const {
+  variant = 'tag',
+  active = false,
+  class: className = '',
+  id,
+  'aria-controls': ariaControls,
+  ...rest
+} = Astro.props;
+
+// Section 5 & 2: Chips / tags — 6px radius (rounded-chip). Region tag uses #EEF0EE bg (never opacity tints).
+const baseClasses = 'inline-flex items-center text-xs font-medium rounded-chip px-2.5 py-1 select-none transition-standard';
+---
+
+{
+  variant === 'filter' ? (
+    <button
+      type="button"
+      id={id}
+      aria-pressed={active ? 'true' : 'false'}
+      aria-controls={ariaControls}
+      class:list={[
+        baseClasses,
+        'cursor-pointer border py-1.5 px-3 font-medium focus-visible:outline-accent',
+        active
+          ? 'bg-accent text-surface border-accent'
+          : 'bg-surface text-text-muted border-border hover:border-text-muted hover:text-text-primary',
+        className,
+      ]}
+      {...rest}
+    >
+      <slot />
+    </button>
+  ) : variant === 'region' ? (
+    <span
+      id={id}
+      class:list={[
+        baseClasses,
+        'bg-disabled-bg text-text-primary border border-border/80 font-medium tracking-wide uppercase text-[11px]',
+        className,
+      ]}
+      {...rest}
+    >
+      <slot />
+    </span>
+  ) : (
+    <span
+      id={id}
+      class:list={[
+        baseClasses,
+        'bg-canvas text-text-muted border border-border',
+        className,
+      ]}
+      {...rest}
+    >
+      <slot />
+    </span>
+  )
+}

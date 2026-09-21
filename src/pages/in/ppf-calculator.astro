@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { TOOLS } from '../../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'ppf-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/in/ppf-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'PPF Calculator', url: canonicalUrl, description: 'Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'PPF Calculator' }] }] };
+---
+<Layout title="PPF Calculator (India): Public Provident Fund Maturity | Calcumetrics" description="Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="PPF Calculator" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Maturity Value">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">PPF Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="ppf-calculator-how">
+        <h2 id="ppf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">Annual compounding: balance = (balance + deposit) × (1 + rate). PPF rate is announced quarterly by Ministry of Finance. Lock-in: 15 years with partial withdrawal rules.</p>
+        </div>
+      </section>
+      <section aria-labelledby="ppf-calculator-faq">
+        <h2 id="ppf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the current PPF interest rate?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The PPF interest rate is announced quarterly by the Ministry of Finance. As of our last verification (see rates.json), the rate is 7.1% p.a. Rates change periodically — check the official India Post or RBI website for the current rate before making decisions.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I extend my PPF account after 15 years?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes, you can extend in blocks of 5 years, with or without contributions. Extensions with contributions continue to earn interest on the full balance plus new deposits. Extensions without contributions earn interest only on the existing balance.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="ppf-calculator-related">
+        <h2 id="ppf-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

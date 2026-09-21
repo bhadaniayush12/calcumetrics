@@ -1,0 +1,96 @@
+---
+interface Option {
+  value: string;
+  label: string;
+  selected?: boolean;
+}
+
+interface Props {
+  id: string;
+  name?: string;
+  label?: string;
+  options: Option[];
+  value?: string;
+  helperText?: string;
+  errorMessage?: string;
+  disabled?: boolean;
+  required?: boolean;
+  class?: string;
+  'aria-label'?: string;
+}
+
+const {
+  id,
+  name = id,
+  label,
+  options = [],
+  value,
+  helperText,
+  errorMessage,
+  disabled = false,
+  required = false,
+  class: className = '',
+  'aria-label': ariaLabel,
+  ...rest
+} = Astro.props;
+
+const isError = Boolean(errorMessage);
+const helperId = helperText ? `${id}-helper` : undefined;
+const errorId = isError ? `${id}-error` : undefined;
+const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
+---
+
+<div class={`w-full flex flex-col gap-1.5 ${className}`}>
+  {label && (
+    <label for={id} class="text-[13px] font-medium text-text-primary select-none flex items-center justify-between">
+      <span>{label}</span>
+      {required && <span class="text-xs text-text-muted">(Required)</span>}
+    </label>
+  )}
+
+  <div class="relative w-full">
+    <select
+      id={id}
+      name={name}
+      disabled={disabled}
+      required={required}
+      aria-invalid={isError ? 'true' : undefined}
+      aria-describedby={describedBy}
+      aria-label={!label ? ariaLabel || id : undefined}
+      class:list={[
+        'h-11 w-full rounded-control border px-3 pr-9 text-[15px] font-normal appearance-none transition-standard cursor-pointer',
+        isError
+          ? 'border-error-border bg-error-bg text-error-text focus:border-error focus-visible:outline-error'
+          : disabled
+          ? 'border-border bg-disabled-bg text-disabled-text cursor-not-allowed'
+          : 'border-border bg-surface text-text-primary hover:border-text-muted focus:border-accent focus-visible:outline-accent',
+      ]}
+      {...rest}
+    >
+      {options.map((opt) => (
+        <option value={opt.value} selected={value !== undefined ? opt.value === value : opt.selected}>
+          {opt.label}
+        </option>
+      ))}
+    </select>
+
+    <!-- Flat SVG chevron arrow (1.5px stroke outline per Section 25) -->
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-text-muted">
+      <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </div>
+  </div>
+
+  {isError && (
+    <p id={errorId} class="text-[12px] text-error-text leading-tight mt-0.5" role="alert">
+      {errorMessage}
+    </p>
+  )}
+
+  {!isError && helperText && (
+    <p id={helperId} class="text-[12px] text-text-muted leading-tight mt-0.5">
+      {helperText}
+    </p>
+  )}
+</div>

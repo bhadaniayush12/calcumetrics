@@ -1,23 +1,75 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  robots?: string;
+}
+
+const {
+  title = 'Calcumetrics — Free Online Financial Calculators',
+  description = 'Free, 100% client-side financial calculators for investments, loans, taxes, business, and corporate finance. Runs in your browser with zero sign-up.',
+  canonical,
+  robots = 'index,follow,max-image-preview:large',
+} = Astro.props;
+
+const domain = 'https://calcumetrics.com';
+const currentPath = Astro.url.pathname;
+const canonicalUrl = canonical || `${domain}${currentPath === '/' ? '/' : currentPath}`;
+---
+
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#F7F7F4" />
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+    <!-- Favicon & Icons per Section 16 -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Open Graph / Social per Section 16 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Calcumetrics" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Section 11: Self-host Inter (preload regular + medium weight woff2) -->
+    <link
+      rel="preload"
+      href="/fonts/inter/inter-latin-400-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/inter/inter-latin-500-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- Page-specific head content (JSON-LD, extra meta, etc.) -->
+    <slot name="head" />
+  </head>
+  <body class="min-h-screen flex flex-col bg-canvas text-text-primary antialiased">
+    <Header currentPath={currentPath} />
+    <main class="flex-1 w-full">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,224 @@
+---
+/**
+ * Full calculator directory — /calculators
+ * Section 26.4: Search, chips, grouped grid, counts computed.
+ * All tool links in static HTML (no unmounting, JS only toggles hidden class).
+ * Result count: aria-live="polite"
+ */
+import Layout from '../layouts/Layout.astro';
+import { getPublishedTools, getToolsByCategory, CATEGORIES, getToolCount } from '../config/site';
+import type { Category } from '../config/site';
+
+const allTools = getPublishedTools();
+const byCategory = getToolsByCategory();
+const totalCount = getToolCount();
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'CollectionPage',
+      name: 'Financial Calculator Directory',
+      url: 'https://calcumetrics.com/calculators',
+      description: `Browse all ${totalCount} free financial calculators on Calcumetrics — investments, loans, taxes, business, and corporate finance.`,
+    },
+    {
+      '@type': 'ItemList',
+      itemListElement: allTools.map((t, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `https://calcumetrics.com${t.path}`,
+        name: t.name,
+      })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'All Calculators' },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title={`Financial Calculators: ${totalCount} Free Tools | Calcumetrics`}
+  description={`Browse all ${totalCount} free online financial calculators. Investments, loans, taxes, business and corporate finance — 100% client-side, no sign-up.`}
+  canonical="https://calcumetrics.com/calculators"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
+
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Page header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">
+        Financial Calculator Directory
+      </h1>
+      <p class="text-sm text-text-muted max-w-xl">
+        {totalCount} free calculators — investments, loans, taxes, business and corporate finance. No sign-up. Runs entirely in your browser.
+      </p>
+    </div>
+
+    <!-- Search + filter controls -->
+    <div class="mb-6 space-y-4">
+      <!-- Search -->
+      <div class="relative max-w-md">
+        <label for="calc-search" class="sr-only">Search calculators</label>
+        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
+          <svg class="w-4 h-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </span>
+        <input
+          type="search"
+          id="calc-search"
+          placeholder="Search calculators…"
+          autocomplete="off"
+          class="w-full h-11 pl-9 pr-4 bg-surface border border-border rounded-control text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-accent transition-standard"
+          aria-label="Search calculators"
+          aria-controls="calc-grid"
+        />
+      </div>
+
+      <!-- Category filter chips -->
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
+        <button
+          type="button"
+          id="filter-all"
+          aria-pressed="true"
+          data-filter="all"
+          class="chip-filter h-8 px-3 rounded-chip text-sm font-medium border border-accent bg-accent text-white transition-standard focus-visible:outline-accent cursor-pointer"
+        >
+          All ({totalCount})
+        </button>
+        {CATEGORIES.map((cat) => {
+          const catTools = byCategory.get(cat.name) ?? [];
+          return (
+            <button
+              type="button"
+              aria-pressed="false"
+              data-filter={cat.name}
+              class="chip-filter h-8 px-3 rounded-chip text-sm font-medium border border-border text-text-primary hover:border-accent hover:text-accent transition-standard focus-visible:outline-accent cursor-pointer"
+            >
+              {cat.name} ({catTools.length})
+            </button>
+          );
+        })}
+      </div>
+
+      <!-- Result count -->
+      <p class="text-xs text-text-muted" id="calc-count" aria-live="polite">
+        Showing {totalCount} calculators
+      </p>
+    </div>
+
+    <!-- Grouped grid — all links in static HTML -->
+    <div id="calc-grid" class="space-y-10">
+      {CATEGORIES.map((cat) => {
+        const catTools = byCategory.get(cat.name) ?? [];
+        return (
+          <section data-category={cat.name} aria-labelledby={`cat-${cat.name.toLowerCase().replace(/\s+/g, '-')}`}>
+            <h2
+              id={`cat-${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
+              class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2"
+            >
+              <a href={cat.href} class="hover:text-accent transition-standard focus-visible:outline-accent">
+                {cat.name}
+              </a>
+              <span class="text-sm font-normal text-text-muted">({catTools.length})</span>
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {catTools.map((tool) => (
+                <a
+                  href={tool.path}
+                  data-tool-name={tool.name.toLowerCase()}
+                  data-tool-category={tool.category}
+                  class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
+                >
+                  <div class="flex items-start justify-between mb-2">
+                    <span class="text-xs font-semibold text-accent uppercase tracking-wider">{tool.region}</span>
+                  </div>
+                  <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">
+                    {tool.name}
+                  </h3>
+                  <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  </div>
+</Layout>
+
+<script>
+  function initDirectory() {
+    const searchInput = document.getElementById('calc-search') as HTMLInputElement | null;
+    const countEl = document.getElementById('calc-count');
+    const filterBtns = document.querySelectorAll<HTMLButtonElement>('.chip-filter');
+    const toolCards = document.querySelectorAll<HTMLAnchorElement>('[data-tool-name]');
+    const sections = document.querySelectorAll<HTMLElement>('[data-category]');
+
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    function updateUI() {
+      let visible = 0;
+      toolCards.forEach((card) => {
+        const name = card.dataset.toolName ?? '';
+        const cat = card.dataset.toolCategory ?? '';
+        const matchesFilter = activeFilter === 'all' || cat === activeFilter;
+        const matchesSearch = name.includes(searchQuery) || cat.toLowerCase().includes(searchQuery);
+        const show = matchesFilter && matchesSearch;
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+
+      // Hide section headers when all their tools are hidden
+      sections.forEach((section) => {
+        const catCards = section.querySelectorAll<HTMLAnchorElement>('[data-tool-name]');
+        const anyVisible = Array.from(catCards).some((c) => !c.classList.contains('hidden'));
+        section.classList.toggle('hidden', !anyVisible);
+      });
+
+      if (countEl) {
+        countEl.textContent = `Showing ${visible} calculator${visible !== 1 ? 's' : ''}`;
+      }
+    }
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter ?? 'all';
+        // Update aria-pressed
+        filterBtns.forEach((b) => {
+          const isActive = b.dataset.filter === activeFilter;
+          b.setAttribute('aria-pressed', String(isActive));
+          if (isActive) {
+            b.classList.remove('border-border', 'text-text-primary', 'hover:border-accent', 'hover:text-accent');
+            b.classList.add('border-accent', 'bg-accent', 'text-white');
+          } else {
+            b.classList.remove('border-accent', 'bg-accent', 'text-white');
+            b.classList.add('border-border', 'text-text-primary', 'hover:border-accent', 'hover:text-accent');
+          }
+        });
+        updateUI();
+      });
+    });
+
+    let searchTimer: ReturnType<typeof setTimeout>;
+    searchInput?.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        searchQuery = searchInput.value.toLowerCase().trim();
+        updateUI();
+      }, 150);
+    });
+  }
+
+  initDirectory();
+  document.addEventListener('astro:page-load', initDirectory);
+</script>

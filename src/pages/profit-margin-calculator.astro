@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'profit-margin-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/profit-margin-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Profit Margin Calculator', url: canonicalUrl, description: 'Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'Profit Margin Calculator' }] }] };
+---
+<Layout title="Profit Margin Calculator: Gross & Net Margin | Calcumetrics" description="Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="Profit Margin Calculator" category="Business" categoryHref="/business" heroValue="Calculate to see" heroLabel="Gross Margin">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Profit Margin Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Gross Margin</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="profit-margin-calculator-how">
+        <h2 id="profit-margin-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">Gross margin = (Revenue − COGS) / Revenue × 100. Net margin = (Revenue − COGS − Operating expenses − Taxes) / Revenue × 100. Operating margin sits between these two.</p>
+        </div>
+      </section>
+      <section aria-labelledby="profit-margin-calculator-faq">
+        <h2 id="profit-margin-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good profit margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Profit margins vary significantly by industry. Software businesses can achieve 70%+ gross margins; retail typically runs 20-30%. Net margins of 10%+ are generally considered healthy for most businesses. The key is benchmarking within your specific industry and tracking the trend over time.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between gross and net margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Gross margin measures profitability after only the direct costs of producing goods/services (COGS). Net margin deducts all operating expenses, interest, and taxes — it is the 'bottom line' profitability. A high gross margin with a low net margin suggests high overhead or operating costs.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="profit-margin-calculator-related">
+        <h2 id="profit-margin-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>

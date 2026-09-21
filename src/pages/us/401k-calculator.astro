@@ -1,0 +1,49 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { TOOLS } from '../../config/site';
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== '401k-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/us/401k-calculator' as string;
+const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: '401(k) Calculator (US)', url: canonicalUrl, description: 'Calculate 401(k) retirement savings growth with employer match and annual contribution limits.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: '401(k) Calculator (US)' }] }] };
+---
+<Layout title="401(k) Calculator: Retirement Savings Growth | Calcumetrics" description="Calculate 401(k) retirement savings growth with employer match and annual contribution limits." canonical={canonicalUrl}>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <CalculatorLayout toolName="401(k) Calculator (US)" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Retirement Balance">
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">401(k) Calculator (US)</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate 401(k) retirement savings growth with employer match and annual contribution limits.</p>
+      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
+      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+    </Fragment>
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Retirement Balance</span>
+        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+      </div>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+    <Fragment slot="below">
+      <section aria-labelledby="401k-calculator-how">
+        <h2 id="401k-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate 401(k) retirement savings growth with employer match and annual contribution limits.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">Each year: balance = (balance + employee_contribution + employer_match) × (1 + annual_return). Employer match = min(contribution%, match_up_to%) × salary × match_rate.</p>
+        </div>
+      </section>
+      <section aria-labelledby="401k-calculator-faq">
+        <h2 id="401k-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is employer match and how does it work?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Employer match is a contribution your employer makes to your 401(k) based on your own contributions. A common structure is '100% match up to 6% of salary' — meaning if you earn $100,000 and contribute 6% ($6,000), your employer adds another $6,000. This is effectively a 100% return on that portion of your contribution.</div></details>
+          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the 401(k) contribution limits?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Contribution limits are set by the IRS and adjusted for inflation each year. In 2025, the elective deferral limit is $23,500 for employees under 50, and $31,000 for those 50 and over (catch-up contribution). Verify current limits at irs.gov before making decisions.</div></details>
+        </div>
+      </section>
+      <section aria-labelledby="401k-calculator-related">
+        <h2 id="401k-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
