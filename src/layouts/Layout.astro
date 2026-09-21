@@ -84,26 +84,12 @@ const canonicalUrl = canonical || `${domain}${currentPath === '/' ? '/' : curren
     <!-- CMP script placeholder — insert Google Privacy & Messaging or a certified CMP here -->
     <!-- AdSense script placeholder — insert after CMP, async, with data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" -->
 
-    <!-- Section 11: Self-host Inter (preload regular + medium weight woff2) -->
-    <link
-      rel="preload"
-      href="/fonts/inter/inter-latin-400-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/inter/inter-latin-500-normal.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    <!-- Section 11: Self-host Inter via @font-face with font-display: swap -->
 
     <!-- Page-specific head content (JSON-LD, extra meta, etc.) -->
     <slot name="head" />
   </head>
-  <body class="min-h-screen flex flex-col bg-canvas text-text-primary antialiased">
+  <body class="font-sans min-h-screen flex flex-col bg-canvas text-text-primary antialiased">
     <Header currentPath={currentPath} />
     <main class="flex-1 w-full">
       <slot />

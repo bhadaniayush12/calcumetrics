@@ -1,5 +1,5 @@
 ---
-import { getPublishedTools, getToolCount } from '../config/site';
+import { getPublishedTools, getToolCount, SHOW_BLOG_NAV } from '../config/site';
 import SearchModal from './ui/SearchModal.astro';
 
 interface Props {
@@ -107,16 +107,18 @@ const totalToolsCount = getToolCount();
         </div>
       </div>
 
-      <!-- Blog -->
-      <a
-        href="/blog"
-        class:list={[
-          'px-2.5 py-1.5 rounded-control transition-standard focus-visible:outline-accent',
-          currentPath.startsWith('/blog') ? 'text-accent font-semibold' : 'hover:text-accent',
-        ]}
-      >
-        <span data-i18n="nav-blog">Blog</span>
-      </a>
+      <!-- Blog (rendered only when posts are published) -->
+      {SHOW_BLOG_NAV && (
+        <a
+          href="/blog"
+          class:list={[
+            'px-2.5 py-1.5 rounded-control transition-standard focus-visible:outline-accent',
+            currentPath.startsWith('/blog') ? 'text-accent font-semibold' : 'hover:text-accent',
+          ]}
+        >
+          <span data-i18n="nav-blog">Blog</span>
+        </a>
+      )}
 
       <!-- About -->
       <a
@@ -367,9 +369,11 @@ const totalToolsCount = getToolCount();
         </div>
       </div>
 
-      <a href="/blog" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        <span data-i18n="nav-blog">Blog</span>
-      </a>
+      {SHOW_BLOG_NAV && (
+        <a href="/blog" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
+          <span data-i18n="nav-blog">Blog</span>
+        </a>
+      )}
 
       <a href="/about" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
         <span data-i18n="nav-about">About</span>
