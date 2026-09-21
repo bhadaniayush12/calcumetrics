@@ -55,6 +55,51 @@ export type Category =
   | 'Business'
   | 'Corporate Finance';
 
+export const REGION_ROUTE_PREFIX: Record<Region, string | null> = {
+  Global: null,
+  IN: 'in',
+  US: 'us',
+  UK: 'uk',
+};
+
+/**
+ * Route rule:
+ * - Global tools use root-level routes: /<slug>
+ * - Jurisdiction-specific tools use /<region>/<slug>
+ * - The route slug must equal the registry slug.
+ */
+export function getExpectedToolPath(slug: string, region: Region): string {
+  const prefix = REGION_ROUTE_PREFIX[region];
+  return prefix ? `/${prefix}/${slug}` : `/${slug}`;
+}
+
+/** Returns route/category/region errors without mutating the registry. */
+export function validateToolRegistry(tools: Tool[] = TOOLS): string[] {
+  const errors: string[] = [];
+  const seenPaths = new Set<string>();
+
+  for (const tool of tools) {
+    if (!CATEGORIES.some((category) => category.name === tool.category)) {
+      errors.push(`Unknown category for ${tool.slug}: ${tool.category}`);
+    }
+
+    const expectedPath = getExpectedToolPath(tool.slug, tool.region);
+    if (tool.path !== expectedPath) {
+      errors.push(
+        `Invalid route for ${tool.slug}: expected ${expectedPath}, got ${tool.path}`
+      );
+    }
+
+    if (seenPaths.has(tool.path)) {
+      errors.push(`Duplicate route: ${tool.path}`);
+    } else {
+      seenPaths.add(tool.path);
+    }
+  }
+
+  return errors;
+}
+
 export const TOOLS: Tool[] = [
   // ── Investments ────────────────────────────────────────────────────────────
   {
