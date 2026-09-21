@@ -2,7 +2,7 @@
 
 Date: 2026-09-22
 Branch: development
-Status: LOCKED
+Status: implementation complete; local validation pending.
 
 ## Scope lock
 
