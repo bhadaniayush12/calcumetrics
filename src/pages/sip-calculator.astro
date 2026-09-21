@@ -462,12 +462,15 @@ const jsonld = {
     };
   }
 
-  function fmtIndian(n: number): string {
-    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+  let currentCurrencySymbol = '₹';
+  let currentNumberLocale = 'en-IN';
+
+  function fmtNumber(n: number): string {
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
 
   function fmtCurrency(n: number): string {
-    return '₹' + fmtIndian(n);
+    return currentCurrencySymbol + fmtNumber(n);
   }
 
   function initSIPCalc() {
@@ -635,7 +638,7 @@ const jsonld = {
       const rate = parseFloat(rateInput.value) || 0;
       const years = parseInt(yearsInput.value) || 0;
       const r = calcSIPClient(monthly, rate, years);
-      const text = `SIP Calculator: ₹${fmtIndian(monthly)}/month at ${rate}% p.a. for ${years} years gives ${fmtCurrency(r.maturity)} (estimate). ${location.href.split('#')[0]}`;
+      const text = `SIP Calculator: ${currentCurrencySymbol}${fmtNumber(monthly)}/month at ${rate}% p.a. for ${years} years gives ${fmtCurrency(r.maturity)} (estimate). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -671,6 +674,48 @@ const jsonld = {
       }
       flashBtn(shareBtn as HTMLButtonElement, 'Copied!');
     });
+
+    // ── Currency synchronization ─────────────────────────────────────────────
+    const currencyDropdown = document.getElementById('sip-currency') as HTMLSelectElement | null;
+
+    function setSIPCurrency(code: string, symbol: string) {
+      currentCurrencySymbol = symbol;
+      if (code === 'USD') currentNumberLocale = 'en-US';
+      else if (code === 'EUR') currentNumberLocale = 'de-DE';
+      else if (code === 'GBP') currentNumberLocale = 'en-GB';
+      else currentNumberLocale = 'en-IN';
+
+      if (currencyDropdown && currencyDropdown.value !== code) {
+        currencyDropdown.value = code;
+      }
+      recalc();
+    }
+
+    currencyDropdown?.addEventListener('change', () => {
+      const code = currencyDropdown.value;
+      const symbolMap: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+      const sym = symbolMap[code] || '₹';
+      setSIPCurrency(code, sym);
+      window.dispatchEvent(new CustomEvent('cm:currency-change', {
+        detail: { code, symbol: sym, label: `${sym} ${code}` }
+      }));
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.code && e.detail?.symbol) {
+        setSIPCurrency(e.detail.code, e.detail.symbol);
+      }
+    });
+
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        if (saved.includes('USD')) setSIPCurrency('USD', '$');
+        else if (saved.includes('EUR')) setSIPCurrency('EUR', '€');
+        else if (saved.includes('GBP')) setSIPCurrency('GBP', '£');
+        else setSIPCurrency('INR', '₹');
+      }
+    } catch (e) {}
   }
 
   initSIPCalc();

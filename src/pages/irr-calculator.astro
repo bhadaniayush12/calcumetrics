@@ -1,45 +1,219 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcIRR } from '../lib/calculators/corporate';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  initial: 100000,
+  hurdle: 12,
+  cfs: [30000, 40000, 50000, 60000],
+};
+
+const flows = [-DEFAULT.initial, ...DEFAULT.cfs];
+const result = calcIRR(flows);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'irr-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/irr-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'IRR Calculator', url: canonicalUrl, description: 'Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'IRR Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'IRR Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the Internal Rate of Return (IRR) for capital investments using Newton-Raphson numerical analysis. Fixture: 24.89% for standard project cash flows.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'IRR Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="IRR Calculator: Internal Rate of Return | Calcumetrics" description="Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000." canonical={canonicalUrl}>
+
+<Layout
+  title="IRR Calculator: Internal Rate of Return | Calcumetrics"
+  description="Calculate the Internal Rate of Return (IRR) for capital investments using Newton-Raphson numerical analysis. Fixture: 24.89% for standard project cash flows."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="IRR Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="24.89%" heroLabel="IRR">
+
+  <CalculatorLayout
+    toolName="IRR Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={result.irrPct.toFixed(2) + '%'}
+    heroLabel="Internal Rate of Return (IRR)"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">IRR Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Determine the annualized break-even return rate where the net present value equals zero.</p>
+
+      <!-- Initial Outlay -->
+      <div class="mb-5">
+        <Input
+          id="irr-initial"
+          label="Initial Investment (Year 0 Outflow)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Upfront capital spent on the investment"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="irr-initial-slider" min={10000} max={2000000} step={10000} value={100000} ariaLabel="Initial outlay slider" />
+        </div>
+      </div>
+
+      <!-- Hurdle Rate -->
+      <div class="mb-5">
+        <Input
+          id="irr-hurdle"
+          label="Hurdle Rate / Cost of Capital"
+          suffix="%"
+          value="12"
+          isNumeric={true}
+          helperText="Minimum acceptable rate of return (e.g. WACC)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="irr-hurdle-slider" min={1} max={30} step={0.25} value={12} ariaLabel="Hurdle rate slider" />
+        </div>
+      </div>
+
+      <!-- Cash Inflows -->
+      <div class="border-t border-border pt-4 mb-6">
+        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Inflows</div>
+        <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
+          <div>
+            <Input id="irr-cf1" label="Year 1" prefix="₹" value="30,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="irr-cf2" label="Year 2" prefix="₹" value="40,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="irr-cf3" label="Year 3" prefix="₹" value="50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="irr-cf4" label="Year 4" prefix="₹" value="60,000" isNumeric={true} localeFormat="indian" />
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" title="Hurdle Decision Rule">
+        If <strong>IRR &gt; Hurdle Rate</strong>, the project returns more than capital costs and creates shareholder value.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="irr-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="irr-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">IRR</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">24.89%</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Internal Rate of Return (IRR)</span>
+        <div id="irr-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.irrPct.toFixed(2)}%
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Cost of Capital (Hurdle Rate)</span>
+          <span id="irr-result-hurdle" class="text-sm font-medium tabular-nums text-dark-text">{DEFAULT.hurdle.toFixed(2)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Spread over Hurdle Rate</span>
+          <span id="irr-result-spread" class="text-sm font-semibold tabular-nums text-dark-accent">{(result.irrPct - DEFAULT.hurdle).toFixed(2)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Undiscounted Inflows</span>
+          <span id="irr-result-inflows" class="text-sm font-medium tabular-nums text-dark-text">{fmt(180000)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Feasibility Verdict</span>
+          <span id="irr-result-verdict" class="text-sm font-bold tabular-nums text-dark-accent">Economically Viable (IRR &gt; WACC)</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="irr-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.initial / 180000}
+          gainFraction={(180000 - DEFAULT.initial) / 180000}
+          principalLabel="Investment"
+          gainLabel="Net Profit"
+          principalValue={fmt(DEFAULT.initial)}
+          gainValue={fmt(80000)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="irr-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="irr-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Solved iteratively via the Newton-Raphson algorithm.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="irr-calculator-how">
-        <h2 id="irr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the Internal Rate of Return for a series of cash flows using Newton-Raphson iteration. Fixture: 24.89% for −1,00,000; 30,000; 40,000; 50,000; 60,000.</p>
+        <h2 id="irr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How IRR is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The Internal Rate of Return (IRR) is the discount rate <em>r</em> that satisfies the Net Present Value equation NPV = 0:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">IRR is the discount rate r that makes NPV = 0: Σ CF_t / (1+r)^t = 0. Solved numerically. Requires at least one negative and one positive cash flow. If NPV > 0 at WACC, IRR > WACC — accept the project.</p>
+          <p class="text-base font-mono text-text-primary mb-2">0 = &Sigma; [ CF<sub>t</sub> / (1 + IRR)<sup>t</sup> ]</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Since there is no analytical closed-form solution for <em>t &gt; 2</em>, the calculator uses the Newton-Raphson numerical algorithm to converge on the precise rate within tolerance 10<sup>-7</sup>.
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="irr-calculator-faq">
         <h2 id="irr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between IRR and NPV for project selection?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Both methods use DCF principles, but NPV gives an absolute dollar value while IRR gives a percentage. NPV is generally preferred because: (1) IRR can be misleading when cash flows change sign multiple times (multiple IRRs), (2) IRR assumes reinvestment at the IRR rate, which may be unrealistic. Use both for a complete picture.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does it mean if IRR is higher than WACC?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">If IRR > WACC, the project returns more than its cost of capital — it creates value for shareholders. Accepting all projects where IRR > WACC (hurdle rate) is the standard decision rule. If you must choose between mutually exclusive projects, prefer the one with higher NPV, not higher IRR.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What causes multiple IRRs?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              If cash flows switch signs more than once (e.g. negative initial cost, positive cash flows, and later a large negative decommissioning or environmental clean-up cost), Descartes' Rule of Signs dictates that there may be multiple internal rates of return. In such cases, use Modified IRR (MIRR) or NPV.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does IRR compare with CAGR?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              CAGR measures the compound growth of a single lump-sum investment over time without intermediate additions or withdrawals. IRR evaluates multiple periodic investments and distributions over irregular or recurring intervals.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="irr-calculator-related">
         <h2 id="irr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
@@ -47,3 +221,206 @@ const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApp
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcNPVLocal(discountPct: number, cashFlows: number[]) {
+    const r = discountPct / 100;
+    return cashFlows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t), 0);
+  }
+
+  function calcIRRClient(cashFlows: number[], maxIter = 1000, tol = 1e-7) {
+    const hasNeg = cashFlows.some((c) => c < 0);
+    const hasPos = cashFlows.some((c) => c > 0);
+    if (!hasNeg || !hasPos) {
+      return { irrPct: 0, valid: false };
+    }
+
+    let rate = 0.1;
+    for (let i = 0; i < maxIter; i++) {
+      const npv = calcNPVLocal(rate * 100, cashFlows);
+      const npvDelta = calcNPVLocal((rate + 1e-6) * 100, cashFlows);
+      const derivative = (npvDelta - npv) / 1e-6;
+      if (Math.abs(derivative) < 1e-12) break;
+      const newRate = rate - npv / derivative;
+      if (Math.abs(newRate - rate) < tol) {
+        return { irrPct: newRate * 100, valid: true };
+      }
+      rate = newRate;
+    }
+    return { irrPct: rate * 100, valid: true };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initIRRCalc() {
+    const initialInput = document.getElementById('irr-initial') as HTMLInputElement | null;
+    const hurdleInput = document.getElementById('irr-hurdle') as HTMLInputElement | null;
+    const initialSlider = document.getElementById('irr-initial-slider') as HTMLInputElement | null;
+    const hurdleSlider = document.getElementById('irr-hurdle-slider') as HTMLInputElement | null;
+
+    const cfInputs = [
+      document.getElementById('irr-cf1') as HTMLInputElement | null,
+      document.getElementById('irr-cf2') as HTMLInputElement | null,
+      document.getElementById('irr-cf3') as HTMLInputElement | null,
+      document.getElementById('irr-cf4') as HTMLInputElement | null,
+    ];
+
+    const resHero = document.getElementById('irr-result-hero');
+    const resHurdle = document.getElementById('irr-result-hurdle');
+    const resSpread = document.getElementById('irr-result-spread');
+    const resInflows = document.getElementById('irr-result-inflows');
+    const resVerdict = document.getElementById('irr-result-verdict');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!initialInput || !hurdleInput) return;
+
+    const DEFAULTS = { initial: 100000, hurdle: 12, cf: [30000, 40000, 50000, 60000] };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const initial = parse(initialInput.value);
+      const hurdle = parseFloat(hurdleInput.value) || 12;
+      const cfs = cfInputs.map((el) => (el ? parse(el.value) : 0));
+      const totalInflow = cfs.reduce((a, b) => a + b, 0);
+
+      if (initial <= 0) return;
+
+      const flows = [-initial, ...cfs];
+      const res = calcIRRClient(flows);
+
+      const irrText = res.valid ? res.irrPct.toFixed(2) + '%' : 'Invalid Flows';
+      const spread = res.valid ? (res.irrPct - hurdle).toFixed(2) + '%' : 'N/A';
+
+      if (resHero) resHero.textContent = irrText;
+      if (resHurdle) resHurdle.textContent = hurdle.toFixed(2) + '%';
+      if (resSpread) resSpread.textContent = spread;
+      if (resInflows) resInflows.textContent = fmtVal(totalInflow);
+      if (mobileHero) mobileHero.textContent = irrText;
+
+      if (resVerdict) {
+        if (res.valid && res.irrPct >= hurdle) {
+          resVerdict.textContent = 'Economically Viable (IRR \u2265 Hurdle)';
+          resVerdict.className = 'text-sm font-bold tabular-nums text-dark-accent';
+        } else {
+          resVerdict.textContent = 'Unfavorable (IRR < Hurdle)';
+          resVerdict.className = 'text-sm font-bold tabular-nums text-red-400';
+        }
+      }
+
+      history.replaceState(null, '', `#i=${initial}&h=${hurdle}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(initialSlider, initialInput, true);
+    sync(hurdleSlider, hurdleInput, false);
+
+    cfInputs.forEach((el) => {
+      el?.addEventListener('input', () => {
+        el.value = fmtLiveInput(el.value);
+        debounce();
+      });
+    });
+
+    document.getElementById('irr-calculate')?.addEventListener('click', recalc);
+    document.getElementById('irr-reset')?.addEventListener('click', () => {
+      initialInput.value = fmtLiveInput(String(DEFAULTS.initial));
+      hurdleInput.value = String(DEFAULTS.hurdle);
+      cfInputs.forEach((el, idx) => {
+        if (el) el.value = fmtLiveInput(String(DEFAULTS.cf[idx]));
+      });
+
+      if (initialSlider) {
+        initialSlider.value = String(DEFAULTS.initial);
+        initialSlider.style.setProperty('--slider-pct', `${((DEFAULTS.initial - 10000) / (2000000 - 10000)) * 100}%`);
+      }
+      if (hurdleSlider) {
+        hurdleSlider.value = String(DEFAULTS.hurdle);
+        hurdleSlider.style.setProperty('--slider-pct', `${((DEFAULTS.hurdle - 1) / (30 - 1)) * 100}%`);
+      }
+
+      recalc();
+      initialInput.focus();
+    });
+
+    // Copy & Share
+    document.getElementById('irr-copy-btn')?.addEventListener('click', async () => {
+      const initial = parse(initialInput.value);
+      const hurdle = parseFloat(hurdleInput.value) || 12;
+      const cfs = cfInputs.map((el) => (el ? parse(el.value) : 0));
+      const res = calcIRRClient([-initial, ...cfs]);
+      const text = `IRR Result: Outflow ${fmtVal(initial)}, Hurdle ${hurdle}% => IRR: ${res.irrPct.toFixed(2)}%. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('irr-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('irr-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('irr-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initIRRCalc();
+  document.addEventListener('astro:page-load', initIRRCalc);
+</script>

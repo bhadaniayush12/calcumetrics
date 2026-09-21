@@ -1,49 +1,457 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Dropdown from '../../components/ui/Dropdown.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
+import { calcGST } from '../../lib/calculators/taxes';
+import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+
+const DEFAULT = { amount: 10000, slab: 18, isInterState: false, direction: 'add' as const };
+const result = calcGST(DEFAULT.amount, DEFAULT.slab, DEFAULT.isInterState, DEFAULT.direction);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'gst-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/in/gst-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'GST Calculator (India)', url: canonicalUrl, description: 'Calculate GST amounts for any base price using India\'s current GST slabs (5%, 12%, 18%, 28%). Add or remove GST. Rates verified from official CBIC sources.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' }, { '@type': 'ListItem', position: 3, name: 'GST Calculator (India)' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'GST Calculator (India)',
+      url: canonicalUrl,
+      description: 'Calculate GST amounts for any base price using India\'s current GST slabs (5%, 12%, 18%, 28%). Add or remove GST with intra-state (CGST/SGST) and inter-state (IGST) splits.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'GST Calculator (India)' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="GST Calculator India: Compute GST at Current Slabs | Calcumetrics" description="Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST. Rates verified from official CBIC sources." canonical={canonicalUrl}>
+
+<Layout
+  title="GST Calculator India: Compute GST at Current Slabs | Calcumetrics"
+  description="Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST with intra-state and inter-state splits."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="GST Calculator (India)" category="Taxes" categoryHref="/taxes" heroValue="Calculate to see" heroLabel="GST Amount">
+
+  <CalculatorLayout
+    toolName="GST Calculator (India)"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={fmt(result.gstAmount)}
+    heroLabel="Total GST Amount"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">GST Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST. Rates verified from official CBIC sources.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate GST amounts, inclusive/exclusive pricing, and CGST/SGST/IGST breakdown.</p>
+
+      <!-- Amount -->
+      <div class="mb-5">
+        <Input
+          id="gst-amount"
+          label="Amount"
+          prefix="₹"
+          value="10,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Base price or total inclusive amount"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="gst-amount-slider" min={500} max={1000000} step={500} value={10000} ariaLabel="Amount slider" />
+        </div>
+      </div>
+
+      <!-- GST Slab -->
+      <div class="mb-5">
+        <Dropdown
+          id="gst-slab"
+          label="GST Slab Rate"
+          options={[
+            { value: '0', label: '0% (Exempt)' },
+            { value: '5', label: '5% (Essential Goods & Transport)' },
+            { value: '12', label: '12% (Standard Lower Rate)' },
+            { value: '18', label: '18% (Standard Rate - Most Services)' },
+            { value: '28', label: '28% (Luxury & Sin Goods)' },
+          ]}
+          value="18"
+          helperText="Applicable GST slab under Indian tax law"
+        />
+      </div>
+
+      <!-- GST Direction -->
+      <div class="mb-5">
+        <Dropdown
+          id="gst-direction"
+          label="GST Calculation Mode"
+          options={[
+            { value: 'add', label: 'Add GST (Exclusive - calculate tax on base amount)' },
+            { value: 'remove', label: 'Remove GST (Inclusive - extract tax from gross price)' },
+          ]}
+          value="add"
+          helperText="Select whether your initial price already includes GST or not"
+        />
+      </div>
+
+      <!-- Supply Type -->
+      <div class="mb-6">
+        <Dropdown
+          id="gst-supply-type"
+          label="Supply Type"
+          options={[
+            { value: 'intra', label: 'Intra-State (Within same State: CGST + SGST)' },
+            { value: 'inter', label: 'Inter-State (Across States: IGST)' },
+          ]}
+          value="intra"
+          helperText="Intra-state splits GST equally into CGST & SGST"
+        />
+      </div>
+
+      <Alert variant="info" title="Official GST Rates">
+        Updated in accordance with CBIC notifications. B2B invoices require detailed tax split between CGST and SGST or IGST.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="gst-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="gst-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">GST Amount</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Total GST Amount</span>
+        <div id="gst-result-tax" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.gstAmount)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net / Base Price</span>
+          <span id="gst-result-base" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.baseAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border" id="gst-row-cgst">
+          <span class="text-xs text-dark-muted">CGST (<span id="gst-cgst-pct">9</span>%)</span>
+          <span id="gst-result-cgst" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.cgst || 0)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border" id="gst-row-sgst">
+          <span class="text-xs text-dark-muted">SGST (<span id="gst-sgst-pct">9</span>%)</span>
+          <span id="gst-result-sgst" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.sgst || 0)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border hidden" id="gst-row-igst">
+          <span class="text-xs text-dark-muted">IGST (<span id="gst-igst-pct">18</span>%)</span>
+          <span id="gst-result-igst" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.igst || 0)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Gross Amount</span>
+          <span id="gst-result-total" class="text-sm font-bold tabular-nums text-dark-text">{fmt(result.totalAmount)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="gst-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.totalAmount > 0 ? result.baseAmount / result.totalAmount : 1}
+          gainFraction={result.totalAmount > 0 ? result.gstAmount / result.totalAmount : 0}
+          principalLabel="Net Price"
+          gainLabel="GST"
+          principalValue={fmt(result.baseAmount)}
+          gainValue={fmt(result.gstAmount)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="gst-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="gst-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Verified with CBIC guidelines.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="gst-calculator-how">
         <h2 id="gst-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST. Rates verified from official CBIC sources.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST with verified tax splits.
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Add GST: tax = base × slab%. Remove GST: base = total / (1 + slab/100). For intra-state: CGST = SGST = tax/2. For inter-state: IGST = full tax. Slabs: 5%, 12%, 18%, 28% (and 0% for exempt goods).</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Add GST (Exclusive):</strong> GST Amount = (Base Price × Slab Rate) ÷ 100. Total = Base Price + GST Amount.<br />
+            <strong>Remove GST (Inclusive):</strong> Base Price = (Total Gross Amount × 100) ÷ (100 + Slab Rate). GST Amount = Total Gross − Base Price.<br />
+            <strong>Intra-State:</strong> CGST = SGST = GST Amount ÷ 2.<br />
+            <strong>Inter-State:</strong> IGST = Full GST Amount.
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="gst-calculator-faq">
         <h2 id="gst-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the current GST slabs in India?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">As of our last verification, India's GST slabs are 0%, 5%, 12%, 18%, and 28%. The GST Council revised the structure in September 2025, making 5% and 18% the primary slabs with 12% and 28% retained for specific goods. The 28% slab applies mainly to luxury and sin goods. Always verify current rates at cbic.gov.in.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between CGST, SGST, and IGST?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">For transactions within the same state (intra-state): GST is split equally into CGST (Central GST) and SGST (State GST). For transactions between states (inter-state): IGST (Integrated GST) is levied instead, and it equals CGST + SGST combined. The split is handled by the tax system; the total rate is the same.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the current GST slabs in India?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              India's primary GST slabs are 0% (exempt essential food grains, fresh produce), 5% (processed food, transport), 12% (business supplies), 18% (standard rate on most manufactured goods and services), and 28% (automobiles, luxury goods, aerated beverages).
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between CGST, SGST, and IGST?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              For transactions within the same state (intra-state), GST is divided equally into CGST (Central GST) and SGST (State GST). For transactions between different states (inter-state), IGST (Integrated GST) is charged at the full rate to the Central government, which shares it with the destination state.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="gst-calculator-related">
         <h2 id="gst-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcGSTClient(amount: number, slab: number, isInterState: boolean, direction: 'add' | 'remove') {
+    let baseAmount: number;
+    let gstAmount: number;
+
+    if (direction === 'add') {
+      baseAmount = amount;
+      gstAmount = (amount * slab) / 100;
+    } else {
+      baseAmount = (amount * 100) / (100 + slab);
+      gstAmount = amount - baseAmount;
+    }
+
+    const totalAmount = baseAmount + gstAmount;
+    const halfGST = gstAmount / 2;
+
+    return {
+      baseAmount,
+      gstAmount,
+      totalAmount,
+      cgst: isInterState ? 0 : halfGST,
+      sgst: isInterState ? 0 : halfGST,
+      igst: isInterState ? gstAmount : 0,
+      isInterState,
+      slab,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initGSTCalc() {
+    const amtInput = document.getElementById('gst-amount') as HTMLInputElement | null;
+    const amtSlider = document.getElementById('gst-amount-slider') as HTMLInputElement | null;
+    const slabSelect = document.getElementById('gst-slab') as HTMLSelectElement | null;
+    const dirSelect = document.getElementById('gst-direction') as HTMLSelectElement | null;
+    const supplySelect = document.getElementById('gst-supply-type') as HTMLSelectElement | null;
+
+    const resTax = document.getElementById('gst-result-tax');
+    const resBase = document.getElementById('gst-result-base');
+    const resCgst = document.getElementById('gst-result-cgst');
+    const resSgst = document.getElementById('gst-result-sgst');
+    const resIgst = document.getElementById('gst-result-igst');
+    const resTotal = document.getElementById('gst-result-total');
+    const rowCgst = document.getElementById('gst-row-cgst');
+    const rowSgst = document.getElementById('gst-row-sgst');
+    const rowIgst = document.getElementById('gst-row-igst');
+    const cgstPct = document.getElementById('gst-cgst-pct');
+    const sgstPct = document.getElementById('gst-sgst-pct');
+    const igstPct = document.getElementById('gst-igst-pct');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!amtInput) return;
+
+    const DEFAULTS = { amount: 10000, slab: 18, direction: 'add', supply: 'intra' };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const amt = parse(amtInput.value);
+      const slab = parseFloat(slabSelect ? slabSelect.value : '18') || 0;
+      const direction = (dirSelect ? dirSelect.value : 'add') as 'add' | 'remove';
+      const isInter = supplySelect ? supplySelect.value === 'inter' : false;
+
+      if (amt <= 0) return;
+
+      const res = calcGSTClient(amt, slab, isInter, direction);
+
+      if (resTax) resTax.textContent = fmtVal(res.gstAmount);
+      if (resBase) resBase.textContent = fmtVal(res.baseAmount);
+      if (resTotal) resTotal.textContent = fmtVal(res.totalAmount);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.gstAmount);
+
+      if (isInter) {
+        if (rowCgst) rowCgst.classList.add('hidden');
+        if (rowSgst) rowSgst.classList.add('hidden');
+        if (rowIgst) {
+          rowIgst.classList.remove('hidden');
+          if (resIgst) resIgst.textContent = fmtVal(res.igst);
+          if (igstPct) igstPct.textContent = String(slab);
+        }
+      } else {
+        if (rowIgst) rowIgst.classList.add('hidden');
+        if (rowCgst) {
+          rowCgst.classList.remove('hidden');
+          if (resCgst) resCgst.textContent = fmtVal(res.cgst);
+          if (cgstPct) cgstPct.textContent = String(slab / 2);
+        }
+        if (rowSgst) {
+          rowSgst.classList.remove('hidden');
+          if (resSgst) resSgst.textContent = fmtVal(res.sgst);
+          if (sgstPct) sgstPct.textContent = String(slab / 2);
+        }
+      }
+
+      const wrapper = document.getElementById('gst-composition-wrapper');
+      if (wrapper) {
+        const baseFrac = res.totalAmount > 0 ? res.baseAmount / res.totalAmount : 1;
+        const taxFrac = res.totalAmount > 0 ? res.gstAmount / res.totalAmount : 0;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const taxBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(baseFrac * 100).toFixed(2)}%`;
+        if (taxBar) taxBar.style.width = `${(taxFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.baseAmount);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gstAmount);
+      }
+
+      history.replaceState(null, '', `#a=${amt}&s=${slab}&d=${direction}&sup=${isInter ? 'inter' : 'intra'}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    if (amtSlider) {
+      amtSlider.addEventListener('input', () => {
+        amtInput.value = fmtLiveInput(amtSlider.value);
+        const pct = ((parseFloat(amtSlider.value) - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
+        amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+    }
+    amtInput.addEventListener('input', () => {
+      const raw = amtInput.value.replace(/[^0-9.]/g, '');
+      const num = parseFloat(raw);
+      if (amtSlider && !isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
+        amtSlider.value = String(num);
+        const pct = ((num - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
+        amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+      }
+      amtInput.value = fmtLiveInput(raw);
+      debounce();
+    });
+
+    slabSelect?.addEventListener('change', recalc);
+    dirSelect?.addEventListener('change', recalc);
+    supplySelect?.addEventListener('change', recalc);
+
+    document.getElementById('gst-calculate')?.addEventListener('click', recalc);
+    document.getElementById('gst-reset')?.addEventListener('click', () => {
+      amtInput.value = fmtLiveInput(String(DEFAULTS.amount));
+      if (slabSelect) slabSelect.value = String(DEFAULTS.slab);
+      if (dirSelect) dirSelect.value = DEFAULTS.direction;
+      if (supplySelect) supplySelect.value = DEFAULTS.supply;
+      if (amtSlider) {
+        amtSlider.value = String(DEFAULTS.amount);
+        amtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.amount - 500) / (1000000 - 500)) * 100}%`);
+      }
+      recalc();
+      amtInput.focus();
+    });
+
+    amtInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') recalc();
+    });
+
+    // Copy & Share
+    document.getElementById('gst-copy-btn')?.addEventListener('click', async () => {
+      const amt = parse(amtInput.value);
+      const slab = parseFloat(slabSelect ? slabSelect.value : '18') || 0;
+      const dir = dirSelect ? dirSelect.value : 'add';
+      const isInter = supplySelect ? supplySelect.value === 'inter' : false;
+      const res = calcGSTClient(amt, slab, isInter, dir as any);
+      const text = `GST Calculation: Amount ${fmtVal(amt)} at ${slab}% (${dir}) = GST ${fmtVal(res.gstAmount)}, Total ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('gst-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('gst-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('gst-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initGSTCalc();
+  document.addEventListener('astro:page-load', initGSTCalc);
+</script>

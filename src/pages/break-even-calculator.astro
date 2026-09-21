@@ -1,49 +1,416 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcBreakEven } from '../lib/calculators/breakeven';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = { fixedCosts: 500000, price: 500, variableCost: 300 };
+const result = calcBreakEven(DEFAULT.fixedCosts, DEFAULT.price, DEFAULT.variableCost);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'break-even-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/break-even-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Break-even Calculator', url: canonicalUrl, description: 'Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'Break-even Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Break-even Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the break-even point in units and sales revenue from fixed costs, unit price, and variable costs.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Break-even Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Break-even Calculator: Units & Revenue | Calcumetrics" description="Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units." canonical={canonicalUrl}>
+
+<Layout
+  title="Break-even Calculator: Units & Revenue | Calcumetrics"
+  description="Calculate the break-even point in units and sales revenue from fixed costs, unit price, and variable costs."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Break-even Calculator" category="Business" categoryHref="/business" heroValue="2,500 units" heroLabel="Break-even Units">
+
+  <CalculatorLayout
+    toolName="Break-even Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={new Intl.NumberFormat('en-IN').format(Math.round(result.unitsBreakEven)) + ' Units'}
+    heroLabel="Break-Even Volume"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Break-even Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Determine the exact sales volume needed to cover all fixed and variable overheads.</p>
+
+      <!-- Fixed Costs -->
+      <div class="mb-5">
+        <Input
+          id="be-fixed"
+          label="Total Fixed Costs"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Rent, administrative salaries, insurance, and equipment depreciation"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="be-fixed-slider" min={10000} max={5000000} step={10000} value={500000} ariaLabel="Fixed costs slider" />
+        </div>
+      </div>
+
+      <!-- Price Per Unit -->
+      <div class="mb-5">
+        <Input
+          id="be-price"
+          label="Selling Price per Unit"
+          prefix="₹"
+          value="500"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Average sales price charged to customers"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="be-price-slider" min={10} max={25000} step={10} value={500} ariaLabel="Selling price slider" />
+        </div>
+      </div>
+
+      <!-- Variable Cost Per Unit -->
+      <div class="mb-6">
+        <Input
+          id="be-variable"
+          label="Variable Cost per Unit"
+          prefix="₹"
+          value="300"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Raw materials, packaging, and shipping incurred per item"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="be-variable-slider" min={5} max={20000} step={5} value={300} ariaLabel="Variable cost slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Contribution Margin">
+        Contribution margin per unit is Selling Price minus Variable Cost. It must be positive to ever reach break-even.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="be-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="be-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Break-even Units</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">2,500 units</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Break-Even Volume</span>
+        <div id="be-result-units" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {new Intl.NumberFormat('en-IN').format(Math.round(result.unitsBreakEven))} Units
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Break-Even Revenue</span>
+          <span id="be-result-revenue" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.revenueBreakEven)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Contribution Margin per Unit</span>
+          <span id="be-result-cm" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.contributionMargin)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Contribution Margin Ratio</span>
+          <span id="be-result-cmratio" class="text-sm font-medium tabular-nums text-dark-text">{(result.contributionMarginRatio * 100).toFixed(1)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Variable Cost Ratio</span>
+          <span id="be-result-vcratio" class="text-sm font-medium tabular-nums text-dark-text">{((1 - result.contributionMarginRatio) * 100).toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="be-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.price > 0 ? DEFAULT.variableCost / DEFAULT.price : 0}
+          gainFraction={DEFAULT.price > 0 ? result.contributionMargin / DEFAULT.price : 1}
+          principalLabel="Variable Cost"
+          gainLabel="Contribution Margin"
+          principalValue={fmt(DEFAULT.variableCost)}
+          gainValue={fmt(result.contributionMargin)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="be-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="be-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Units beyond this threshold generate pure operating profit.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="break-even-calculator-how">
-        <h2 id="break-even-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the break-even point in units and revenue. Fixture: fixed ₹5,00,000, price ₹500, variable ₹300 = 2,500 units.</p>
+        <h2 id="break-even-calculator-how" class="text-xl font-bold text-text-primary mb-4">How break-even analysis works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Break-even analysis identifies the exact unit and revenue volume where total revenue matches total expenses:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">BEP (units) = Fixed Costs / (Price per unit − Variable cost per unit). Revenue BEP = BEP units × Price. Contribution margin = Price − Variable cost. CM ratio = CM / Price.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Contribution Margin (CM) = </strong> Selling Price − Variable Cost per Unit<br />
+            <strong>Break-Even Units = </strong> Fixed Costs ÷ Contribution Margin per Unit<br />
+            <strong>Break-Even Revenue = </strong> Break-Even Units × Selling Price<br />
+            <strong>CM Ratio = </strong> Contribution Margin ÷ Selling Price
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="break-even-calculator-faq">
         <h2 id="break-even-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does break-even mean for a business?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The break-even point is the level of sales at which total revenue exactly equals total costs — the business neither profits nor loses. Sales below this point result in a loss; sales above it generate profit. Understanding your break-even point is essential for pricing, budgeting, and investment decisions.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is contribution margin and why does it matter?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Contribution margin (CM) = selling price − variable cost per unit. It represents how much each unit sold contributes to covering fixed costs and generating profit. A higher CM means you reach break-even faster. CM ratio = CM / price, useful for comparing products with different price points.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How can I lower my break-even point?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              You can lower your break-even point by: (1) raising prices if demand permits, (2) negotiating lower raw material or shipping rates to decrease variable costs, or (3) reducing fixed monthly overheads like rent and software subscriptions.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What happens if variable cost exceeds selling price?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              If variable costs exceed price, the contribution margin is negative. In this scenario, each unit sold increases your loss, and no amount of sales volume will ever achieve break-even. Pricing must be restructured immediately.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="break-even-calculator-related">
         <h2 id="break-even-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcBreakEvenClient(fixedCosts: number, price: number, variableCost: number) {
+    const cm = price - variableCost;
+    const units = cm > 0 ? fixedCosts / cm : Infinity;
+    const revenue = isFinite(units) ? units * price : Infinity;
+    const cmRatio = price > 0 ? cm / price : 0;
+    return {
+      unitsBreakEven: units,
+      revenueBreakEven: revenue,
+      contributionMargin: cm,
+      contributionMarginRatio: cmRatio,
+      varCostRatio: price > 0 ? variableCost / price : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    if (!isFinite(n)) return 'N/A';
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtUnits(n: number) {
+    if (!isFinite(n)) return 'Never';
+    return new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)) + ' Units';
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initBreakEvenCalc() {
+    const fixedInput = document.getElementById('be-fixed') as HTMLInputElement | null;
+    const priceInput = document.getElementById('be-price') as HTMLInputElement | null;
+    const varInput = document.getElementById('be-variable') as HTMLInputElement | null;
+
+    const fixedSlider = document.getElementById('be-fixed-slider') as HTMLInputElement | null;
+    const priceSlider = document.getElementById('be-price-slider') as HTMLInputElement | null;
+    const varSlider = document.getElementById('be-variable-slider') as HTMLInputElement | null;
+
+    const resUnits = document.getElementById('be-result-units');
+    const resRevenue = document.getElementById('be-result-revenue');
+    const resCm = document.getElementById('be-result-cm');
+    const resCmRatio = document.getElementById('be-result-cmratio');
+    const resVcRatio = document.getElementById('be-result-vcratio');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!fixedInput || !priceInput || !varInput) return;
+
+    const DEFAULTS = { fixed: 500000, price: 500, variable: 300 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const fixed = parse(fixedInput.value);
+      const price = parse(priceInput.value);
+      const variable = parse(varInput.value);
+
+      if (fixed <= 0 || price <= 0) return;
+
+      const res = calcBreakEvenClient(fixed, price, variable);
+
+      if (resUnits) resUnits.textContent = fmtUnits(res.unitsBreakEven);
+      if (resRevenue) resRevenue.textContent = fmtVal(res.revenueBreakEven);
+      if (resCm) resCm.textContent = fmtVal(res.contributionMargin);
+      if (resCmRatio) resCmRatio.textContent = (res.contributionMarginRatio * 100).toFixed(1) + '%';
+      if (resVcRatio) resVcRatio.textContent = (res.varCostRatio * 100).toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtUnits(res.unitsBreakEven);
+
+      const wrapper = document.getElementById('be-composition-wrapper');
+      if (wrapper && price > 0 && res.contributionMargin > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.varCostRatio * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.contributionMarginRatio * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(variable);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.contributionMargin);
+      }
+
+      history.replaceState(null, '', `#f=${fixed}&p=${price}&v=${variable}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(fixedSlider, fixedInput);
+    sync(priceSlider, priceInput);
+    sync(varSlider, varInput);
+
+    document.getElementById('be-calculate')?.addEventListener('click', recalc);
+    document.getElementById('be-reset')?.addEventListener('click', () => {
+      fixedInput.value = fmtLiveInput(String(DEFAULTS.fixed));
+      priceInput.value = fmtLiveInput(String(DEFAULTS.price));
+      varInput.value = fmtLiveInput(String(DEFAULTS.variable));
+
+      if (fixedSlider) {
+        fixedSlider.value = String(DEFAULTS.fixed);
+        fixedSlider.style.setProperty('--slider-pct', `${((DEFAULTS.fixed - 10000) / (5000000 - 10000)) * 100}%`);
+      }
+      if (priceSlider) {
+        priceSlider.value = String(DEFAULTS.price);
+        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.price - 10) / (25000 - 10)) * 100}%`);
+      }
+      if (varSlider) {
+        varSlider.value = String(DEFAULTS.variable);
+        varSlider.style.setProperty('--slider-pct', `${((DEFAULTS.variable - 5) / (20000 - 5)) * 100}%`);
+      }
+
+      recalc();
+      fixedInput.focus();
+    });
+
+    [fixedInput, priceInput, varInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('be-copy-btn')?.addEventListener('click', async () => {
+      const fixed = parse(fixedInput.value);
+      const price = parse(priceInput.value);
+      const variable = parse(varInput.value);
+      const res = calcBreakEvenClient(fixed, price, variable);
+      const text = `Break-Even: Fixed Costs ${fmtVal(fixed)}, Price ${fmtVal(price)}, Variable Cost ${fmtVal(variable)} => Break-even: ${fmtUnits(res.unitsBreakEven)} (${fmtVal(res.revenueBreakEven)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('be-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('be-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('be-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initBreakEvenCalc();
+  document.addEventListener('astro:page-load', initBreakEvenCalc);
+</script>

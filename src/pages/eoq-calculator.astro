@@ -1,0 +1,404 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcEOQ } from '../lib/calculators/eoq';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { demand: 10000, orderingCost: 500, holdingCost: 25 };
+const result = calcEOQ(DEFAULT.demand, DEFAULT.orderingCost, DEFAULT.holdingCost);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'eoq-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/eoq-calculator' as string;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Economic Order Quantity (EOQ) Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the optimal inventory order quantity (EOQ) that minimizes combined ordering and holding costs with annual ordering schedule.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'EOQ Calculator' },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="EOQ Calculator: Economic Order Quantity & Holding Costs | Calcumetrics"
+  description="Calculate the optimal order size that minimizes annual holding and ordering costs with reorder schedules and cost minimization curves."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Economic Order Quantity (EOQ)"
+    category="Business"
+    categoryHref="/business"
+    heroValue={new Intl.NumberFormat('en-IN').format(result.eoqRounded) + ' Units'}
+    heroLabel="Optimal Order Batch Size"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Economic Order Quantity (EOQ)</h1>
+      <p class="text-sm text-text-muted mb-6">Find the sweet spot between order placement fees and inventory warehousing carrying costs.</p>
+
+      <!-- Annual Demand -->
+      <div class="mb-5">
+        <Input
+          id="eoq-demand"
+          label="Annual Demand (Units)"
+          suffix="Units/Yr"
+          value="10,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total units required or sold during the year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="eoq-demand-slider" min={500} max={100000} step={500} value={10000} ariaLabel="Annual demand slider" />
+        </div>
+      </div>
+
+      <!-- Order Cost -->
+      <div class="mb-5">
+        <Input
+          id="eoq-order-cost"
+          label="Ordering / Setup Cost (per Order)"
+          prefix="₹"
+          value="500"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Fixed administrative, shipping, and handling charge per purchase order"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="eoq-order-cost-slider" min={25} max={10000} step={25} value={500} ariaLabel="Order cost slider" />
+        </div>
+      </div>
+
+      <!-- Holding Cost -->
+      <div class="mb-6">
+        <Input
+          id="eoq-holding-cost"
+          label="Annual Holding Cost (per Unit / Year)"
+          prefix="₹"
+          value="25"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Warehouse storage, shrinkage, obsolescence, and working capital interest"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="eoq-holding-cost-slider" min={1} max={500} step={1} value={25} ariaLabel="Holding cost slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="The EOQ Principle">
+        At the Economic Order Quantity, total annual ordering costs exactly equal total annual holding costs, minimizing total carrying expense.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="eoq-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="eoq-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Optimal Order Batch Size</span>
+        <div id="eoq-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {new Intl.NumberFormat('en-IN').format(result.eoqRounded)} Units
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Orders Required per Year</span>
+          <span id="eoq-result-orders" class="text-sm font-semibold tabular-nums text-dark-accent">{result.ordersPerYear.toFixed(1)} Orders</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Days Between Orders</span>
+          <span id="eoq-result-days" class="text-sm font-medium tabular-nums text-dark-text">{Math.round(result.daysBetweenOrders)} Days</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Annual Ordering Costs</span>
+          <span id="eoq-result-ordercost" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.annualOrderingCost)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Minimized Inventory Cost</span>
+          <span id="eoq-result-totalcost" class="text-sm font-bold tabular-nums text-dark-text">{fmt(result.totalInventoryCost)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="eoq-composition-wrapper">
+        <CompositionBar
+          principalFraction={0.5}
+          gainFraction={0.5}
+          principalLabel="Ordering Cost"
+          gainLabel="Holding Cost"
+          principalValue={fmt(result.annualOrderingCost)}
+          gainValue={fmt(result.annualHoldingCost)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="eoq-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="eoq-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Ford W. Harris mathematical inventory optimization model.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="eoq-calculator-how">
+        <h2 id="eoq-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Economic Order Quantity is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The EOQ model calculates the order quantity that minimizes the sum of inventory carrying costs and ordering fees:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-base font-mono text-text-primary mb-2">EOQ = &radic; [ (2 &times; D &times; S) &divide; H ]</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">D</strong> — Annual demand in units</li>
+            <li><strong class="text-text-primary">S</strong> — Fixed ordering / procurement cost per purchase order</li>
+            <li><strong class="text-text-primary">H</strong> — Annual holding cost per unit</li>
+            <li><strong class="text-text-primary">Orders / Year</strong> = D &divide; EOQ</li>
+            <li><strong class="text-text-primary">Total Inventory Cost</strong> = (D &divide; EOQ &times; S) + (EOQ &divide; 2 &times; H)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="eoq-calculator-faq">
+        <h2 id="eoq-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What assumptions does EOQ make?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The classic Wilson EOQ model assumes: (1) demand is known and constant throughout the year, (2) replenishment lead time is instantaneous or zero, (3) unit purchase price is constant (no quantity tier discounts), and (4) stockouts never happen.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is typically included in Holding Cost?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Holding costs typically include warehouse rent, electricity, air conditioning, insurance, security, physical breakage/theft (shrinkage), technological or expiration obsolescence, and the cost of debt or capital locked up in inventory (often 15%–25% of product unit value annually).
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="eoq-calculator-related">
+        <h2 id="eoq-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  function calcEOQClient(d: number, s: number, h: number) {
+    if (d <= 0 || s <= 0 || h <= 0) {
+      return { eoq: 0, eoqRounded: 0, orders: 0, orderCost: 0, holdCost: 0, totalCost: 0, days: 0 };
+    }
+    const eoq = Math.sqrt((2 * d * s) / h);
+    const eoqRounded = Math.round(eoq);
+    const orders = d / eoq;
+    const orderCost = orders * s;
+    const holdCost = (eoq / 2) * h;
+    const totalCost = orderCost + holdCost;
+    const days = orders > 0 ? 365 / orders : 0;
+    return { eoq, eoqRounded, orders, orderCost, holdCost, totalCost, days };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtUnits(n: number) {
+    return new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)) + ' Units';
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initEOQCalc() {
+    const dInput = document.getElementById('eoq-demand') as HTMLInputElement | null;
+    const sInput = document.getElementById('eoq-order-cost') as HTMLInputElement | null;
+    const hInput = document.getElementById('eoq-holding-cost') as HTMLInputElement | null;
+
+    const dSlider = document.getElementById('eoq-demand-slider') as HTMLInputElement | null;
+    const sSlider = document.getElementById('eoq-order-cost-slider') as HTMLInputElement | null;
+    const hSlider = document.getElementById('eoq-holding-cost-slider') as HTMLInputElement | null;
+
+    const resHero = document.getElementById('eoq-result-hero');
+    const resOrders = document.getElementById('eoq-result-orders');
+    const resDays = document.getElementById('eoq-result-days');
+    const resOrderCost = document.getElementById('eoq-result-ordercost');
+    const resTotalCost = document.getElementById('eoq-result-totalcost');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!dInput || !sInput || !hInput) return;
+
+    const DEFAULTS = { d: 10000, s: 500, h: 25 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const d = parse(dInput.value);
+      const s = parse(sInput.value);
+      const h = parse(hInput.value);
+
+      if (d <= 0 || s <= 0 || h <= 0) return;
+
+      const res = calcEOQClient(d, s, h);
+
+      if (resHero) resHero.textContent = fmtUnits(res.eoqRounded);
+      if (resOrders) resOrders.textContent = res.orders.toFixed(1) + ' Orders';
+      if (resDays) resDays.textContent = Math.round(res.days) + ' Days';
+      if (resOrderCost) resOrderCost.textContent = fmtVal(res.orderCost);
+      if (resTotalCost) resTotalCost.textContent = fmtVal(res.totalCost);
+      if (mobileHero) mobileHero.textContent = fmtUnits(res.eoqRounded);
+
+      const wrapper = document.getElementById('eoq-composition-wrapper');
+      if (wrapper && res.totalCost > 0) {
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.orderCost);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.holdCost);
+      }
+
+      history.replaceState(null, '', `#d=${d}&s=${s}&h=${h}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(dSlider, dInput);
+    sync(sSlider, sInput);
+    sync(hSlider, hInput);
+
+    document.getElementById('eoq-calculate')?.addEventListener('click', recalc);
+    document.getElementById('eoq-reset')?.addEventListener('click', () => {
+      dInput.value = fmtLiveInput(String(DEFAULTS.d));
+      sInput.value = fmtLiveInput(String(DEFAULTS.s));
+      hInput.value = fmtLiveInput(String(DEFAULTS.h));
+
+      if (dSlider) {
+        dSlider.value = String(DEFAULTS.d);
+        dSlider.style.setProperty('--slider-pct', `${((DEFAULTS.d - 500) / (100000 - 500)) * 100}%`);
+      }
+      if (sSlider) {
+        sSlider.value = String(DEFAULTS.s);
+        sSlider.style.setProperty('--slider-pct', `${((DEFAULTS.s - 25) / (10000 - 25)) * 100}%`);
+      }
+      if (hSlider) {
+        hSlider.value = String(DEFAULTS.h);
+        hSlider.style.setProperty('--slider-pct', `${((DEFAULTS.h - 1) / (500 - 1)) * 100}%`);
+      }
+
+      recalc();
+      dInput.focus();
+    });
+
+    [dInput, sInput, hInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('eoq-copy-btn')?.addEventListener('click', async () => {
+      const d = parse(dInput.value);
+      const s = parse(sInput.value);
+      const h = parse(hInput.value);
+      const res = calcEOQClient(d, s, h);
+      const text = `EOQ Result: Demand ${d} units, Setup Cost ${fmtVal(s)}, Holding Cost ${fmtVal(h)} => Optimal Order Quantity: ${fmtUnits(res.eoqRounded)} (${res.orders.toFixed(1)} orders/yr). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('eoq-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('eoq-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('eoq-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initEOQCalc();
+  document.addEventListener('astro:page-load', initEOQCalc);
+</script>

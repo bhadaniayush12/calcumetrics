@@ -1,51 +1,431 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcLumpSum } from '../lib/calculators/lumpsum';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'compound-interest-calculator' && t.status === 'published').slice(0, 3);
+const DEFAULT = { principal: 100000, rate: 8, years: 10, frequency: 'annually' as const };
+const result = calcLumpSum(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, DEFAULT.frequency);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Investments' && t.slug !== 'compound-interest-calculator' && t.status === 'published'
+).slice(0, 3);
+
 const canonicalUrl = 'https://calcumetrics.com/compound-interest-calculator';
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Compound Interest Calculator', url: canonicalUrl, description: 'Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'Compound Interest Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Compound Interest Calculator',
+      url: canonicalUrl,
+      description: 'Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'Compound Interest Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Compound Interest Calculator: Formula & Results | Calcumetrics" description="Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding." canonical={canonicalUrl}>
+
+<Layout
+  title="Compound Interest Calculator: Formula & Results | Calcumetrics"
+  description="Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Compound Interest Calculator" category="Investments" categoryHref="/investments" heroValue="₹2,15,892" heroLabel="Future Value">
+
+  <CalculatorLayout
+    toolName="Compound Interest Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmt(result.maturity)}
+    heroLabel="Future Value"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Compound Interest Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate the future value and interest earned with flexible compounding frequencies.</p>
+
+      <!-- Principal -->
+      <div class="mb-5">
+        <Input
+          id="ci-principal"
+          label="Initial Investment (Principal)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Starting investment amount"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ci-principal-slider" min={5000} max={10000000} step={5000} value={100000} ariaLabel="Principal amount slider" />
+        </div>
+      </div>
+
+      <!-- Annual Rate -->
+      <div class="mb-5">
+        <Input
+          id="ci-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="8"
+          isNumeric={true}
+          helperText="Nominal annual interest rate"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ci-rate-slider" min={1} max={30} step={0.25} value={8} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Tenure -->
+      <div class="mb-5">
+        <Input
+          id="ci-years"
+          label="Investment Tenure"
+          suffix="Years"
+          value="10"
+          isNumeric={true}
+          helperText="Duration of compounding"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ci-years-slider" min={1} max={40} step={1} value={10} ariaLabel="Investment tenure slider" />
+        </div>
+      </div>
+
+      <!-- Compounding Frequency -->
+      <div class="mb-6">
+        <Dropdown
+          id="ci-frequency"
+          label="Compounding Frequency"
+          options={[
+            { value: 'annually', label: 'Annually (Once a year)' },
+            { value: 'semi-annually', label: 'Semi-Annually (Twice a year)' },
+            { value: 'quarterly', label: 'Quarterly (4 times a year)' },
+            { value: 'monthly', label: 'Monthly (12 times a year)' },
+            { value: 'daily', label: 'Daily (365 times a year)' },
+          ]}
+          value="annually"
+          helperText="How often interest is compounded onto principal"
+        />
+      </div>
+
+      <Alert variant="info" title="Compounding Rule">
+        More frequent compounding increases the effective yield. For example, monthly compounding on 8% yields an effective annual rate of 8.30%.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="ci-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="ci-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Future Value</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">₹2,15,892</div>
+        <div id="ci-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.maturity)}
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Initial Principal</span>
+          <span id="ci-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.principal)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Earned</span>
+          <span id="ci-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.gain)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Return</span>
+          <span id="ci-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.gainPct.toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="ci-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.gainFraction}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmt(DEFAULT.principal)}
+          gainValue={fmt(result.gain)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="ci-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="ci-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="compound-interest-calculator-how">
         <h2 id="compound-interest-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate compound interest for any principal, rate, time, and compounding frequency. Works for annual, quarterly, or monthly compounding.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Compound interest is calculated using the exponential growth formula where interest earned in each period is added to the principal balance for the next period:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted">A = P × (1 + r/n)^(n×t) — same as lump sum. P=principal, r=annual rate, n=compounding periods/year, t=years.</p>
+          <p class="text-base font-mono text-text-primary mb-2">A = P × (1 + r / n)^(n × t)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">A</strong> — Final maturity amount</li>
+            <li><strong class="text-text-primary">P</strong> — Initial principal balance</li>
+            <li><strong class="text-text-primary">r</strong> — Annual nominal interest rate (decimal)</li>
+            <li><strong class="text-text-primary">n</strong> — Number of times interest is compounded per year</li>
+            <li><strong class="text-text-primary">t</strong> — Number of years</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="compound-interest-calculator-faq">
         <h2 id="compound-interest-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is compound interest?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Compound interest is interest calculated on both the initial principal and the accumulated interest from previous periods. Unlike simple interest (which is only on principal), compounding accelerates growth — especially over long horizons. Einstein reportedly called it the eighth wonder of the world, though that quote is apocryphal.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between nominal and effective annual rate?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The nominal rate is the stated annual rate (e.g. 8%). The effective annual rate (EAR) accounts for compounding frequency: EAR = (1 + r/n)^n − 1. For 8% compounded quarterly, EAR = (1.02)⁴ − 1 = 8.243%. This calculator uses the nominal rate and specified compounding frequency.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between simple and compound interest?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the effective annual rate (EAR)?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              EAR = (1 + r/n)^n − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="compound-interest-calculator-related">
         <h2 id="compound-interest-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcCIClient(p: number, r: number, y: number, freq: string) {
+    const freqMap: Record<string, number> = { annually: 1, 'semi-annually': 2, quarterly: 4, monthly: 12, daily: 365 };
+    const n = freqMap[freq] || 1;
+    const rateDec = r / 100;
+    const maturity = p * Math.pow(1 + rateDec / n, n * y);
+    const gain = maturity - p;
+    const gainPct = p > 0 ? (gain / p) * 100 : 0;
+    return {
+      maturity,
+      gain,
+      gainPct,
+      principalFraction: maturity > 0 ? p / maturity : 0,
+      gainFraction: maturity > 0 ? gain / maturity : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initCICalc() {
+    const pInput = document.getElementById('ci-principal') as HTMLInputElement | null;
+    const rInput = document.getElementById('ci-rate') as HTMLInputElement | null;
+    const yInput = document.getElementById('ci-years') as HTMLInputElement | null;
+    const fSelect = document.getElementById('ci-frequency') as HTMLSelectElement | null;
+    const pSlider = document.getElementById('ci-principal-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('ci-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('ci-years-slider') as HTMLInputElement | null;
+
+    const resMaturity = document.getElementById('ci-result-maturity');
+    const resPrincipal = document.getElementById('ci-result-principal');
+    const resGain = document.getElementById('ci-result-gain');
+    const resGainPct = document.getElementById('ci-result-gainpct');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!pInput || !rInput || !yInput) return;
+
+    const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const p = parse(pInput.value);
+      const r = parseFloat(rInput.value) || 0;
+      const y = parseInt(yInput.value) || 0;
+      const f = fSelect ? fSelect.value : 'annually';
+
+      if (p <= 0 || r <= 0 || y <= 0) return;
+
+      const res = calcCIClient(p, r, y, f);
+
+      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(p);
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+
+      const wrapper = document.getElementById('ci-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(p);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+      }
+
+      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}&f=${f}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(pSlider, pInput, true);
+    sync(rSlider, rInput, false);
+    sync(ySlider, yInput, false);
+    fSelect?.addEventListener('change', recalc);
+
+    document.getElementById('ci-calculate')?.addEventListener('click', recalc);
+    document.getElementById('ci-reset')?.addEventListener('click', () => {
+      pInput.value = fmtLiveInput(String(DEFAULTS.principal));
+      rInput.value = String(DEFAULTS.rate);
+      yInput.value = String(DEFAULTS.years);
+      if (fSelect) fSelect.value = DEFAULTS.frequency;
+      if (pSlider) {
+        pSlider.value = String(DEFAULTS.principal);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 5000) / (10000000 - 5000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (30 - 1)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.years);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1)) * 100}%`);
+      }
+      recalc();
+      pInput.focus();
+    });
+
+    [pInput, rInput, yInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('ci-copy-btn')?.addEventListener('click', async () => {
+      const p = parse(pInput.value);
+      const r = parseFloat(rInput.value) || 0;
+      const y = parseInt(yInput.value) || 0;
+      const f = fSelect ? fSelect.value : 'annually';
+      const res = calcCIClient(p, r, y, f);
+      const text = `Compound Interest: ${fmtVal(p)} at ${r}% for ${y} years (${f}) grows to ${fmtVal(res.maturity)} (gain: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('ci-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('ci-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('ci-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Currency synchronization
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initCICalc();
+  document.addEventListener('astro:page-load', initCICalc);
+</script>

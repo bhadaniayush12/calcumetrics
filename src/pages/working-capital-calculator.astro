@@ -1,0 +1,448 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcWorkingCapital } from '../lib/calculators/working-capital';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  cash: 250000,
+  receivables: 350000,
+  inventory: 400000,
+  payables: 300000,
+  debt: 150000,
+};
+
+const result = calcWorkingCapital(
+  DEFAULT.cash,
+  DEFAULT.receivables,
+  DEFAULT.inventory,
+  0,
+  DEFAULT.payables,
+  DEFAULT.debt,
+  0
+);
+
+const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'working-capital-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/working-capital-calculator' as string;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Working Capital & Net Working Capital Calculator',
+      url: canonicalUrl,
+      description: 'Calculate Net Working Capital (NWC), Current Ratio, and Quick Acid-Test Ratio to assess operational liquidity and solvency.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Working Capital Calculator' },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Working Capital Calculator: NWC, Current & Quick Ratio | Calcumetrics"
+  description="Calculate Net Working Capital (NWC), Current Ratio, and Quick Acid-Test Ratio to assess operational liquidity and short-term solvency."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Working Capital Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={fmt(result.netWorkingCapital)}
+    heroLabel="Net Working Capital (NWC)"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Working Capital Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Evaluate operating liquidity cushion: Current Assets minus Current Liabilities.</p>
+
+      <!-- Current Assets section -->
+      <div class="mb-4">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-text-primary mb-3">Current Assets</h2>
+        <div class="space-y-4">
+          <div>
+            <Input id="wc-cash" label="Cash & Bank Balances" prefix="₹" value="2,50,000" isNumeric={true} localeFormat="indian" />
+            <div class="mt-2">
+              <Slider id="wc-cash-slider" min={0} max={2500000} step={10000} value={250000} ariaLabel="Cash slider" />
+            </div>
+          </div>
+          <div>
+            <Input id="wc-receivables" label="Accounts Receivable (Debtors)" prefix="₹" value="3,50,000" isNumeric={true} localeFormat="indian" />
+            <div class="mt-2">
+              <Slider id="wc-receivables-slider" min={0} max={2500000} step={10000} value={350000} ariaLabel="Receivables slider" />
+            </div>
+          </div>
+          <div>
+            <Input id="wc-inventory" label="Inventory / Raw Stock" prefix="₹" value="4,00,000" isNumeric={true} localeFormat="indian" />
+            <div class="mt-2">
+              <Slider id="wc-inventory-slider" min={0} max={2500000} step={10000} value={400000} ariaLabel="Inventory slider" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Liabilities section -->
+      <div class="mb-6 border-t border-border pt-4">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-text-primary mb-3">Current Liabilities</h2>
+        <div class="space-y-4">
+          <div>
+            <Input id="wc-payables" label="Accounts Payable (Creditors)" prefix="₹" value="3,00,000" isNumeric={true} localeFormat="indian" />
+            <div class="mt-2">
+              <Slider id="wc-payables-slider" min={0} max={2500000} step={10000} value={300000} ariaLabel="Payables slider" />
+            </div>
+          </div>
+          <div>
+            <Input id="wc-debt" label="Short-Term Debt & Overdrafts" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+            <div class="mt-2">
+              <Slider id="wc-debt-slider" min={0} max={2500000} step={10000} value={150000} ariaLabel="Short-term debt slider" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" title="Healthy Liquidity Target">
+        A <strong>Current Ratio between 1.5 and 2.0</strong> and positive Net Working Capital indicates a comfortable cushion to meet short-term commitments without emergency financing.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="wc-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="wc-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Working Capital</span>
+        <div id="wc-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.netWorkingCapital)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Current Assets</span>
+          <span id="wc-result-assets" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalCurrentAssets)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Current Liabilities</span>
+          <span id="wc-result-liabilities" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalCurrentLiabilities)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Current Ratio</span>
+          <span id="wc-result-currentratio" class="text-sm font-bold tabular-nums text-dark-text">{result.currentRatio.toFixed(2)}x</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Quick (Acid-Test) Ratio</span>
+          <span id="wc-result-quickratio" class="text-sm font-medium tabular-nums text-dark-text">{result.quickRatio.toFixed(2)}x</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Liquidity Status</span>
+          <span id="wc-result-status" class="text-sm font-bold tabular-nums text-dark-accent">Strong Liquidity</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="wc-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.totalCurrentAssets > 0 ? Math.min(1, result.totalCurrentLiabilities / result.totalCurrentAssets) : 0.5}
+          gainFraction={result.totalCurrentAssets > 0 ? Math.max(0, result.netWorkingCapital / result.totalCurrentAssets) : 0.5}
+          principalLabel="Liabilities"
+          gainLabel="Net Cushion"
+          principalValue={fmt(result.totalCurrentLiabilities)}
+          gainValue={fmt(result.netWorkingCapital)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="wc-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="wc-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Core metric for corporate treasury, trade credit, and working capital loans.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="wc-calculator-how">
+        <h2 id="wc-calculator-how" class="text-xl font-bold text-text-primary mb-4">Working Capital formulas and definitions</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Working capital indicates whether a company can pay its short-term debt obligations within one fiscal year:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Net Working Capital (NWC) = </strong> Total Current Assets − Total Current Liabilities<br />
+            <strong>Current Ratio = </strong> Total Current Assets ÷ Total Current Liabilities<br />
+            <strong>Quick (Acid-Test) Ratio = </strong> (Current Assets − Inventory) ÷ Total Current Liabilities
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="wc-calculator-faq">
+        <h2 id="wc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can negative working capital ever be positive for a business?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes, in specific asset-light businesses with rapid cash cycles (like supermarkets or fast-food chains like McDonald's or Amazon). They receive immediate cash from customers while enjoying 30 to 90 days to pay suppliers, allowing them to fund growth on vendor float.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is inventory deducted from the Quick Ratio?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Inventory takes time to manufacture, market, and sell, and may only be liquidated at steep fire-sale discounts in an immediate cash crisis. The Quick Ratio tests pure near-cash liquidity.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="wc-calculator-related">
+        <h2 id="wc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  function calcWCClient(cash: number, rec: number, inv: number, pay: number, debt: number) {
+    const assets = cash + rec + inv;
+    const liabilities = pay + debt;
+    const nwc = assets - liabilities;
+    const curRatio = liabilities > 0 ? assets / liabilities : 99;
+    const quickRatio = liabilities > 0 ? (cash + rec) / liabilities : 99;
+    let status = 'Adequate';
+    if (curRatio >= 1.5 && nwc > 0) status = 'Strong';
+    else if (nwc < 0 || curRatio < 1.0) status = 'Deficit';
+
+    return { assets, liabilities, nwc, curRatio, quickRatio, status };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    const sign = n < 0 ? '-' : '';
+    return sign + currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.abs(Math.round(n)));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initWCCalc() {
+    const cashInput = document.getElementById('wc-cash') as HTMLInputElement | null;
+    const recInput = document.getElementById('wc-receivables') as HTMLInputElement | null;
+    const invInput = document.getElementById('wc-inventory') as HTMLInputElement | null;
+    const payInput = document.getElementById('wc-payables') as HTMLInputElement | null;
+    const debtInput = document.getElementById('wc-debt') as HTMLInputElement | null;
+
+    const cashSlider = document.getElementById('wc-cash-slider') as HTMLInputElement | null;
+    const recSlider = document.getElementById('wc-receivables-slider') as HTMLInputElement | null;
+    const invSlider = document.getElementById('wc-inventory-slider') as HTMLInputElement | null;
+    const paySlider = document.getElementById('wc-payables-slider') as HTMLInputElement | null;
+    const debtSlider = document.getElementById('wc-debt-slider') as HTMLInputElement | null;
+
+    const resHero = document.getElementById('wc-result-hero');
+    const resAssets = document.getElementById('wc-result-assets');
+    const resLiabilities = document.getElementById('wc-result-liabilities');
+    const resCurRatio = document.getElementById('wc-result-currentratio');
+    const resQuickRatio = document.getElementById('wc-result-quickratio');
+    const resStatus = document.getElementById('wc-result-status');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!cashInput || !recInput || !invInput) return;
+
+    const DEFAULTS = { cash: 250000, rec: 350000, inv: 400000, pay: 300000, debt: 150000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const cash = parse(cashInput.value);
+      const rec = parse(recInput.value);
+      const inv = parse(invInput.value);
+      const pay = parse(payInput ? payInput.value : '0');
+      const debt = parse(debtInput ? debtInput.value : '0');
+
+      const res = calcWCClient(cash, rec, inv, pay, debt);
+
+      if (resHero) resHero.textContent = fmtVal(res.nwc);
+      if (resAssets) resAssets.textContent = fmtVal(res.assets);
+      if (resLiabilities) resLiabilities.textContent = fmtVal(res.liabilities);
+      if (resCurRatio) resCurRatio.textContent = res.curRatio.toFixed(2) + 'x';
+      if (resQuickRatio) resQuickRatio.textContent = res.quickRatio.toFixed(2) + 'x';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.nwc);
+
+      if (resStatus) {
+        if (res.status === 'Strong') {
+          resStatus.textContent = 'Strong Liquidity';
+          resStatus.className = 'text-sm font-bold tabular-nums text-dark-accent';
+        } else if (res.status === 'Deficit') {
+          resStatus.textContent = 'Liquidity Deficit / Risk';
+          resStatus.className = 'text-sm font-bold tabular-nums text-red-400';
+        } else {
+          resStatus.textContent = 'Adequate Cushion';
+          resStatus.className = 'text-sm font-bold tabular-nums text-yellow-400';
+        }
+      }
+
+      const wrapper = document.getElementById('wc-composition-wrapper');
+      if (wrapper && res.assets > 0) {
+        const liabFrac = Math.min(1, res.liabilities / res.assets);
+        const cushionFrac = Math.max(0, res.nwc / res.assets);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.liabilities);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.nwc);
+      }
+
+      history.replaceState(null, '', `#c=${cash}&r=${rec}&i=${inv}&p=${pay}&d=${debt}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(cashSlider, cashInput);
+    sync(recSlider, recInput);
+    sync(invSlider, invInput);
+    sync(paySlider, payInput!);
+    sync(debtSlider, debtInput!);
+
+    document.getElementById('wc-calculate')?.addEventListener('click', recalc);
+    document.getElementById('wc-reset')?.addEventListener('click', () => {
+      cashInput.value = fmtLiveInput(String(DEFAULTS.cash));
+      recInput.value = fmtLiveInput(String(DEFAULTS.rec));
+      invInput.value = fmtLiveInput(String(DEFAULTS.inv));
+      if (payInput) payInput.value = fmtLiveInput(String(DEFAULTS.pay));
+      if (debtInput) debtInput.value = fmtLiveInput(String(DEFAULTS.debt));
+
+      if (cashSlider) {
+        cashSlider.value = String(DEFAULTS.cash);
+        cashSlider.style.setProperty('--slider-pct', `${(DEFAULTS.cash / 2500000) * 100}%`);
+      }
+      if (recSlider) {
+        recSlider.value = String(DEFAULTS.rec);
+        recSlider.style.setProperty('--slider-pct', `${(DEFAULTS.rec / 2500000) * 100}%`);
+      }
+      if (invSlider) {
+        invSlider.value = String(DEFAULTS.inv);
+        invSlider.style.setProperty('--slider-pct', `${(DEFAULTS.inv / 2500000) * 100}%`);
+      }
+      if (paySlider) {
+        paySlider.value = String(DEFAULTS.pay);
+        paySlider.style.setProperty('--slider-pct', `${(DEFAULTS.pay / 2500000) * 100}%`);
+      }
+      if (debtSlider) {
+        debtSlider.value = String(DEFAULTS.debt);
+        debtSlider.style.setProperty('--slider-pct', `${(DEFAULTS.debt / 2500000) * 100}%`);
+      }
+
+      recalc();
+      cashInput.focus();
+    });
+
+    [cashInput, recInput, invInput, payInput, debtInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('wc-copy-btn')?.addEventListener('click', async () => {
+      const cash = parse(cashInput.value);
+      const rec = parse(recInput.value);
+      const inv = parse(invInput.value);
+      const pay = parse(payInput ? payInput.value : '0');
+      const debt = parse(debtInput ? debtInput.value : '0');
+      const res = calcWCClient(cash, rec, inv, pay, debt);
+      const text = `Working Capital: Assets ${fmtVal(res.assets)}, Liabilities ${fmtVal(res.liabilities)} => NWC: ${fmtVal(res.nwc)}, Current Ratio: ${res.curRatio.toFixed(2)}x (${res.status}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('wc-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('wc-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('wc-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initWCCalc();
+  document.addEventListener('astro:page-load', initWCCalc);
+</script>

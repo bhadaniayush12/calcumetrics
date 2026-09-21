@@ -1,51 +1,373 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
-import Slider from '../components/calculator/Slider.astro';
-import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcXIRR } from '../lib/calculators/xirr';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'xirr-calculator' && t.status === 'published').slice(0, 3);
+const DEFAULT_FLOWS = [
+  { amount: -100000, date: '2023-01-01' },
+  { amount: -50000, date: '2023-07-01' },
+  { amount: 20000, date: '2024-01-01' },
+  { amount: 185000, date: '2025-01-01' },
+];
+
+const parsedFlows = DEFAULT_FLOWS.map((f) => ({ amount: f.amount, date: new Date(f.date) }));
+const initialResult = calcXIRR(parsedFlows);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Investments' && t.slug !== 'xirr-calculator' && t.status === 'published'
+).slice(0, 3);
+
 const canonicalUrl = 'https://calcumetrics.com/xirr-calculator';
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'XIRR Calculator', url: canonicalUrl, description: 'Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'XIRR Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'XIRR Calculator',
+      url: canonicalUrl,
+      description: 'Calculate Extended Internal Rate of Return for mutual fund SIPs, irregular cash flows, and investments with multiple dates.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'XIRR Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="XIRR Calculator: Extended IRR for Irregular Cash Flows | Calcumetrics" description="Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration." canonical={canonicalUrl}>
+
+<Layout
+  title="XIRR Calculator: Irregular Cash Flows & SIP Returns | Calcumetrics"
+  description="Calculate the exact annualized return (XIRR) for irregular mutual fund investments, multiple SIP installments, and partial redemptions."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="XIRR Calculator" category="Investments" categoryHref="/investments" heroValue="Enter cash flows" heroLabel="XIRR">
+
+  <CalculatorLayout
+    toolName="XIRR Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={initialResult.xirrPct.toFixed(2) + '%'}
+    heroLabel="Annualised XIRR"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">XIRR Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate the annualized return for irregular investments with dates. Use negative numbers for investments/outflows and positive numbers for redemptions/current value.</p>
+
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-text-muted">Cash Flows (Date & Amount)</span>
+          <button type="button" id="xirr-add-row" class="text-xs font-semibold text-accent hover:underline flex items-center gap-1 cursor-pointer">
+            + Add Cash Flow
+          </button>
+        </div>
+
+        <div id="xirr-rows-container" class="space-y-2.5">
+          {DEFAULT_FLOWS.map((cf, idx) => (
+            <div class="flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row" data-index={idx}>
+              <input
+                type="date"
+                class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent"
+                value={cf.date}
+                required
+              />
+              <div class="relative flex-1">
+                <input
+                  type="text"
+                  class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent"
+                  value={cf.amount}
+                  placeholder="e.g. -50000"
+                  required
+                />
+              </div>
+              <button
+                type="button"
+                class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer"
+                title="Remove cash flow"
+                aria-label="Remove cash flow"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Alert variant="info" title="Convention">
+        Enter cash outlays (investments) as <strong>negative numbers</strong> (e.g. -100000) and returns or current portfolio valuation as <strong>positive numbers</strong> (e.g. 185000).
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="xirr-calculate" type="button">Calculate XIRR</Button>
+        <Button variant="ghost" id="xirr-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">XIRR</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Enter cash flows</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Extended Internal Rate of Return</span>
+        <div id="xirr-result-pct" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {initialResult.xirrPct.toFixed(2)}%
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Invested (Outflows)</span>
+          <span id="xirr-result-outflow" class="text-sm font-medium tabular-nums text-dark-text">{fmt(150000)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Received/Value (Inflows)</span>
+          <span id="xirr-result-inflow" class="text-sm font-medium tabular-nums text-dark-text">{fmt(205000)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Absolute Profit</span>
+          <span id="xirr-result-profit" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(55000)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Cash Flows</span>
+          <span id="xirr-result-count" class="text-sm font-medium tabular-nums text-dark-text">4 events</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="xirr-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="xirr-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="xirr-calculator-how">
-        <h2 id="xirr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the Extended Internal Rate of Return (XIRR) for investments with irregular cash flow dates. Uses Newton-Raphson iteration.</p>
+        <h2 id="xirr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the XIRR calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          XIRR uses the Newton-Raphson numerical method to find the exact discount rate <em>r</em> that satisfies the net present value equation across irregular intervals:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted">XIRR finds the discount rate r such that NPV = Σ CF_t / (1+r)^((d_t − d_0)/365) = 0. Solved numerically via Newton-Raphson iteration. Requires at least one negative (outflow) and one positive (inflow) cash flow.</p>
+          <p class="text-base font-mono text-text-primary mb-2">NPV = Σ [ C_i / (1 + r)^((d_i - d_0) / 365) ] = 0</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">C_i</strong> — Cash flow amount at event <em>i</em></li>
+            <li><strong class="text-text-primary">d_i</strong> — Date of cash flow <em>i</em></li>
+            <li><strong class="text-text-primary">d_0</strong> — Starting date of the initial cash flow</li>
+            <li><strong class="text-text-primary">r</strong> — Annualized XIRR return rate</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="xirr-calculator-faq">
         <h2 id="xirr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between IRR and XIRR?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">IRR assumes cash flows occur at regular intervals (e.g. annually or monthly). XIRR handles arbitrary dates, making it suitable for SIP investments with irregular purchase dates, or any investment where cash flows do not fall at equal intervals. XIRR is the industry standard for calculating SIP returns in India.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why does XIRR sometimes fail to converge?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">XIRR uses numerical iteration (Newton-Raphson). Convergence may fail if there are multiple sign changes in the cash flows (leading to multiple valid IRRs) or if the initial guess is far from the solution. In those cases, try a different initial guess or verify that cash flows have exactly one negative-to-positive sign change.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When should I use XIRR instead of CAGR?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Use CAGR only for a single lump sum investment held from start to finish. For mutual fund SIPs, dividend reinvestments, STP, or sporadic investments, XIRR is mandatory because money is added or withdrawn at multiple different dates.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why did my calculation return an error?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              XIRR mathematically requires at least one negative cash flow (money going in) and at least one positive cash flow (money coming out or current market valuation).
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="xirr-calculator-related">
         <h2 id="xirr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function npvRate(flows: Array<{ amount: number; date: Date }>, rate: number): number {
+    const t0 = flows[0].date.getTime();
+    return flows.reduce((sum, cf) => {
+      const years = (cf.date.getTime() - t0) / (365.25 * 24 * 3600 * 1000);
+      return sum + cf.amount / Math.pow(1 + rate, years);
+    }, 0);
+  }
+
+  function calcXIRRClient(flows: Array<{ amount: number; date: Date }>) {
+    const hasNeg = flows.some((c) => c.amount < 0);
+    const hasPos = flows.some((c) => c.amount > 0);
+    if (!hasNeg || !hasPos) {
+      return { xirrPct: 0, valid: false, error: 'Need at least one negative and one positive cash flow' };
+    }
+
+    let rate = 0.1;
+    for (let i = 0; i < 1000; i++) {
+      const npv = npvRate(flows, rate);
+      const npvDelta = npvRate(flows, rate + 1e-6);
+      const derivative = (npvDelta - npv) / 1e-6;
+      if (Math.abs(derivative) < 1e-12) break;
+      const nextRate = rate - npv / derivative;
+      if (Math.abs(nextRate - rate) < 1e-7) {
+        return { xirrPct: nextRate * 100, valid: true };
+      }
+      rate = nextRate;
+    }
+    return { xirrPct: rate * 100, valid: true };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+
+  function initXIRRCalc() {
+    const container = document.getElementById('xirr-rows-container');
+    const addBtn = document.getElementById('xirr-add-row');
+    const calcBtn = document.getElementById('xirr-calculate');
+    const resetBtn = document.getElementById('xirr-reset');
+
+    const resPct = document.getElementById('xirr-result-pct');
+    const resOutflow = document.getElementById('xirr-result-outflow');
+    const resInflow = document.getElementById('xirr-result-inflow');
+    const resProfit = document.getElementById('xirr-result-profit');
+    const resCount = document.getElementById('xirr-result-count');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!container) return;
+
+    function getFlows(): Array<{ amount: number; date: Date }> {
+      const rows = Array.from(container.querySelectorAll<HTMLElement>('.xirr-row'));
+      const flows: Array<{ amount: number; date: Date }> = [];
+      rows.forEach((row) => {
+        const dateInput = row.querySelector<HTMLInputElement>('.xirr-date');
+        const amtInput = row.querySelector<HTMLInputElement>('.xirr-amount');
+        if (dateInput && amtInput && dateInput.value && amtInput.value) {
+          const amt = parseFloat(amtInput.value.replace(/,/g, ''));
+          const dt = new Date(dateInput.value);
+          if (!isNaN(amt) && !isNaN(dt.getTime())) {
+            flows.push({ amount: amt, date: dt });
+          }
+        }
+      });
+      return flows.sort((a, b) => a.date.getTime() - b.date.getTime());
+    }
+
+    function recalc() {
+      const flows = getFlows();
+      if (flows.length < 2) return;
+
+      let outflow = 0;
+      let inflow = 0;
+      flows.forEach((f) => {
+        if (f.amount < 0) outflow += Math.abs(f.amount);
+        else inflow += f.amount;
+      });
+
+      const res = calcXIRRClient(flows);
+
+      if (resPct) {
+        resPct.textContent = res.valid ? res.xirrPct.toFixed(2) + '%' : 'Invalid Flows';
+      }
+      if (resOutflow) resOutflow.textContent = fmtVal(outflow);
+      if (resInflow) resInflow.textContent = fmtVal(inflow);
+      if (resProfit) resProfit.textContent = fmtVal(inflow - outflow);
+      if (resCount) resCount.textContent = `${flows.length} events`;
+      if (mobileHero) mobileHero.textContent = res.valid ? res.xirrPct.toFixed(2) + '%' : 'N/A';
+    }
+
+    function wireRow(row: HTMLElement) {
+      row.querySelector('.xirr-remove-row')?.addEventListener('click', () => {
+        if (container.querySelectorAll('.xirr-row').length > 2) {
+          row.remove();
+          recalc();
+        }
+      });
+      row.querySelector('.xirr-date')?.addEventListener('change', recalc);
+      row.querySelector('.xirr-amount')?.addEventListener('input', recalc);
+    }
+
+    container.querySelectorAll<HTMLElement>('.xirr-row').forEach(wireRow);
+
+    addBtn?.addEventListener('click', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const newRow = document.createElement('div');
+      newRow.className = 'flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row';
+      newRow.innerHTML = `
+        <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${today}" required />
+        <div class="relative flex-1">
+          <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" placeholder="e.g. 50000" required />
+        </div>
+        <button type="button" class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer" title="Remove cash flow" aria-label="Remove cash flow">✕</button>
+      `;
+      container.appendChild(newRow);
+      wireRow(newRow);
+      newRow.querySelector<HTMLInputElement>('.xirr-amount')?.focus();
+    });
+
+    calcBtn?.addEventListener('click', recalc);
+    resetBtn?.addEventListener('click', () => {
+      location.reload();
+    });
+
+    document.getElementById('xirr-copy-btn')?.addEventListener('click', async () => {
+      const flows = getFlows();
+      const res = calcXIRRClient(flows);
+      const text = `XIRR: ${res.valid ? res.xirrPct.toFixed(2) + '%' : 'N/A'} across ${flows.length} cash flows. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('xirr-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('xirr-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('xirr-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+  }
+
+  initXIRRCalc();
+  document.addEventListener('astro:page-load', initXIRRCalc);
+</script>

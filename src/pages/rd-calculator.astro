@@ -1,51 +1,406 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcRD } from '../lib/calculators/rd';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'rd-calculator' && t.status === 'published').slice(0, 3);
+const DEFAULT = { monthly: 5000, rate: 7.0, months: 60 };
+const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Investments' && t.slug !== 'rd-calculator' && t.status === 'published'
+).slice(0, 3);
+
 const canonicalUrl = 'https://calcumetrics.com/rd-calculator';
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Recurring Deposit (RD) Calculator', url: canonicalUrl, description: 'Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'Recurring Deposit (RD) Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Recurring Deposit (RD) Calculator',
+      url: canonicalUrl,
+      description: 'Calculate maturity value and interest earned on recurring deposits with quarterly compounding.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'Recurring Deposit Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="RD Calculator: Recurring Deposit Maturity Value | Calcumetrics" description="Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits." canonical={canonicalUrl}>
+
+<Layout
+  title="Recurring Deposit (RD) Calculator: Maturity & Interest | Calcumetrics"
+  description="Calculate your Recurring Deposit maturity value and interest earned with bank-standard quarterly compounding on monthly deposits."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Recurring Deposit (RD) Calculator" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Maturity Value">
+
+  <CalculatorLayout
+    toolName="Recurring Deposit (RD) Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmt(result.maturity)}
+    heroLabel="Maturity Value"
+  >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Recurring Deposit (RD) Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Recurring Deposit Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the total maturity and interest from regular monthly bank deposits.</p>
+
+      <!-- Monthly Deposit -->
+      <div class="mb-5">
+        <Input
+          id="rd-monthly"
+          label="Monthly Installment"
+          prefix="₹"
+          value="5,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Amount deposited every month"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="rd-monthly-slider" min={500} max={100000} step={500} value={5000} ariaLabel="Monthly installment slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="rd-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="7.0"
+          isNumeric={true}
+          helperText="Bank interest rate p.a."
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="rd-rate-slider" min={3} max={12} step={0.1} value={7.0} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Tenure in Months -->
+      <div class="mb-6">
+        <Input
+          id="rd-months"
+          label="Tenure (Months)"
+          suffix="Months"
+          value="60"
+          isNumeric={true}
+          helperText="Total investment duration (60 months = 5 years)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="rd-months-slider" min={6} max={120} step={6} value={60} ariaLabel="Tenure slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Quarterly Compounding">
+        Indian banks calculate RD interest compounded quarterly on all monthly installments per Indian Banks' Association guidelines.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="rd-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="rd-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <div id="rd-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.maturity)}
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Invested</span>
+          <span id="rd-result-invested" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.invested)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Earned</span>
+          <span id="rd-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.interest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Gain Percentage</span>
+          <span id="rd-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.invested > 0 ? ((result.interest / result.invested) * 100).toFixed(1) : '0.0'}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="rd-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.investedFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Invested"
+          gainLabel="Interest"
+          principalValue={fmt(result.invested)}
+          gainValue={fmt(result.interest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="rd-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="rd-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="rd-calculator-how">
-        <h2 id="rd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate recurring deposit maturity value with quarterly compounding. Estimate total interest earned on monthly deposits.</p>
+        <h2 id="rd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the RD calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The maturity value of a Recurring Deposit is determined by compounding each monthly installment from the deposit date until maturity:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted">Standard RD formula with quarterly compounding: each monthly instalment R compounds for the remaining quarters at i = r/400. M = Σ R × (1 + i)^(remaining quarters).</p>
+          <p class="text-base font-mono text-text-primary mb-2">M = P × (1 + r/4)^(4 × t) for each monthly contribution</p>
+          <p class="text-sm text-text-muted">
+            The earliest deposit earns interest for the full tenure, while the last deposit earns interest for one month.
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="rd-calculator-faq">
         <h2 id="rd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is RD different from FD?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">An FD (Fixed Deposit) requires a one-time lump sum investment. An RD (Recurring Deposit) accepts fixed monthly contributions — similar to a SIP but with guaranteed returns from a bank. RD is lower risk (capital is protected) but the returns are fixed and typically lower than equity mutual funds.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is RD interest compounded?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Indian bank RDs are compounded quarterly. Each monthly instalment earns interest from its deposit date to maturity at the quarterly rate (annual rate / 4). The standard formula sums the future value of each instalment.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I change my monthly RD installment?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              In traditional bank RDs, the installment amount is fixed at account opening. Some modern banks offer flexible or flexi-RD accounts where contributions can vary.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is RD interest taxable?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes, RD interest is added to your income and taxed at your marginal slab rate. TDS applies if annual interest across bank deposits exceeds ₹40,000 (₹50,000 for seniors).
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="rd-calculator-related">
         <h2 id="rd-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcRDClient(p: number, rate: number, months: number) {
+    const r = rate / 100;
+    let maturity = 0;
+    for (let i = 0; i < months; i++) {
+      const remainingMonths = months - i;
+      maturity += p * Math.pow(1 + r / 4, (remainingMonths / 12) * 4);
+    }
+    const invested = p * months;
+    const gain = maturity - invested;
+    const gainPct = invested > 0 ? (gain / invested) * 100 : 0;
+    return {
+      maturity,
+      invested,
+      gain,
+      gainPct,
+      principalFraction: maturity > 0 ? invested / maturity : 0,
+      gainFraction: maturity > 0 ? gain / maturity : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initRDCalc() {
+    const mInput = document.getElementById('rd-monthly') as HTMLInputElement | null;
+    const rInput = document.getElementById('rd-rate') as HTMLInputElement | null;
+    const yInput = document.getElementById('rd-months') as HTMLInputElement | null;
+    const mSlider = document.getElementById('rd-monthly-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('rd-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('rd-months-slider') as HTMLInputElement | null;
+
+    const resMaturity = document.getElementById('rd-result-maturity');
+    const resInvested = document.getElementById('rd-result-invested');
+    const resGain = document.getElementById('rd-result-gain');
+    const resGainPct = document.getElementById('rd-result-gainpct');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!mInput || !rInput || !yInput) return;
+
+    const DEFAULTS = { monthly: 5000, rate: 7.0, months: 60 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const m = parse(mInput.value);
+      const r = parseFloat(rInput.value) || 0;
+      const mo = parseInt(yInput.value) || 0;
+
+      if (m <= 0 || r <= 0 || mo <= 0) return;
+
+      const res = calcRDClient(m, r, mo);
+
+      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
+      if (resInvested) resInvested.textContent = fmtVal(res.invested);
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+
+      const wrapper = document.getElementById('rd-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.invested);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+      }
+
+      history.replaceState(null, '', `#m=${m}&r=${r}&mo=${mo}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(mSlider, mInput, true);
+    sync(rSlider, rInput, false);
+    sync(ySlider, yInput, false);
+
+    document.getElementById('rd-calculate')?.addEventListener('click', recalc);
+    document.getElementById('rd-reset')?.addEventListener('click', () => {
+      mInput.value = fmtLiveInput(String(DEFAULTS.monthly));
+      rInput.value = String(DEFAULTS.rate);
+      yInput.value = String(DEFAULTS.months);
+      if (mSlider) {
+        mSlider.value = String(DEFAULTS.monthly);
+        mSlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthly - 500) / (100000 - 500)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (12 - 3)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.months);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.months - 6) / (120 - 6)) * 100}%`);
+      }
+      recalc();
+      mInput.focus();
+    });
+
+    [mInput, rInput, yInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('rd-copy-btn')?.addEventListener('click', async () => {
+      const m = parse(mInput.value);
+      const r = parseFloat(rInput.value) || 0;
+      const mo = parseInt(yInput.value) || 0;
+      const res = calcRDClient(m, r, mo);
+      const text = `Recurring Deposit: ${fmtVal(m)}/mo for ${mo} months at ${r}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('rd-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('rd-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('rd-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initRDCalc();
+  document.addEventListener('astro:page-load', initRDCalc);
+</script>

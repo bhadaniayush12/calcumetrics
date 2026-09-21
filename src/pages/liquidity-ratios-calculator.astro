@@ -1,0 +1,491 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcLiquidityRatios } from '../lib/calculators/liquidity-ratios';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  cash: 300000,
+  securities: 100000,
+  receivables: 400000,
+  inventory: 450000,
+  liabilities: 500000,
+};
+
+const result = calcLiquidityRatios(
+  DEFAULT.cash,
+  DEFAULT.securities,
+  DEFAULT.receivables,
+  DEFAULT.inventory,
+  0,
+  DEFAULT.liabilities
+);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'liquidity-ratios-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/liquidity-ratios-calculator' as string;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Liquidity Ratios Suite (Current, Quick & Cash Ratios)',
+      url: canonicalUrl,
+      description: 'Calculate and benchmark key short-term liquidity ratios: Current Ratio, Quick Ratio, and Cash Ratio against financial health standards.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Liquidity Ratios Suite' },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Liquidity Ratios Suite: Current, Quick & Cash Ratio Calculator | Calcumetrics"
+  description="Calculate and benchmark key short-term liquidity ratios: Current Ratio, Quick Ratio, and Cash Ratio against financial health standards."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Liquidity Ratios Suite"
+    category="Business"
+    categoryHref="/business"
+    heroValue={result.currentRatio.toFixed(2) + 'x'}
+    heroLabel="Current Ratio"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Liquidity Ratios Suite</h1>
+      <p class="text-sm text-text-muted mb-6">Assess corporate solvency across the three tiers of liquidity: Current, Acid-Test, and Cash ratios.</p>
+
+      <!-- Cash & Bank -->
+      <div class="mb-5">
+        <Input
+          id="lr-cash"
+          label="Cash & Bank Balances"
+          prefix="₹"
+          value="3,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Direct cash held in bank checking and currency reserves"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="lr-cash-slider" min={0} max={3000000} step={25000} value={300000} ariaLabel="Cash slider" />
+        </div>
+      </div>
+
+      <!-- Marketable Securities -->
+      <div class="mb-5">
+        <Input
+          id="lr-securities"
+          label="Marketable Securities (Liquid Mutual Funds/T-Bills)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Near-cash equivalents convertible within 24 to 48 hours"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="lr-securities-slider" min={0} max={2000000} step={25000} value={100000} ariaLabel="Securities slider" />
+        </div>
+      </div>
+
+      <!-- Accounts Receivable -->
+      <div class="mb-5">
+        <Input
+          id="lr-receivables"
+          label="Accounts Receivable (Debtors)"
+          prefix="₹"
+          value="4,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Invoices due from customers on trade terms"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="lr-receivables-slider" min={0} max={3000000} step={25000} value={400000} ariaLabel="Receivables slider" />
+        </div>
+      </div>
+
+      <!-- Inventory -->
+      <div class="mb-5">
+        <Input
+          id="lr-inventory"
+          label="Inventory (Raw Materials & Finished Goods)"
+          prefix="₹"
+          value="4,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Physical goods held for manufacturing or retail sale"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="lr-inventory-slider" min={0} max={3000000} step={25000} value={450000} ariaLabel="Inventory slider" />
+        </div>
+      </div>
+
+      <!-- Current Liabilities -->
+      <div class="mb-6">
+        <Input
+          id="lr-liabilities"
+          label="Total Current Liabilities (Payables + Short-term Debt)"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="All obligations falling due within 12 months"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="lr-liabilities-slider" min={50000} max={5000000} step={25000} value={500000} ariaLabel="Liabilities slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="The Three Liquidity Tiers">
+        <strong>Current Ratio:</strong> General solvency (&gt;1.5x is healthy). <strong>Quick Ratio:</strong> Excludes inventory (&gt;1.0x is ideal). <strong>Cash Ratio:</strong> Pure cash coverage (&gt;0.2–0.5x is strong).
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="lr-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="lr-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Current Ratio</span>
+        <div id="lr-result-current" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.currentRatio.toFixed(2)}x
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Quick (Acid-Test) Ratio</span>
+          <span id="lr-result-quick" class="text-sm font-semibold tabular-nums text-dark-accent">{result.quickRatio.toFixed(2)}x</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Cash Ratio (Immediate Coverage)</span>
+          <span id="lr-result-cash" class="text-sm font-semibold tabular-nums text-dark-text">{result.cashRatio.toFixed(2)}x</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Working Capital Cushion</span>
+          <span id="lr-result-nwc" class="text-sm font-medium tabular-nums text-dark-accent">{fmt(result.netWorkingCapital)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Solvency Health Rating</span>
+          <span id="lr-result-status" class="text-sm font-bold tabular-nums text-dark-accent">Optimal Liquidity Profile</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="lr-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.liabilities / (DEFAULT.cash + DEFAULT.securities + DEFAULT.receivables + DEFAULT.inventory)}
+          gainFraction={result.netWorkingCapital / (DEFAULT.cash + DEFAULT.securities + DEFAULT.receivables + DEFAULT.inventory)}
+          principalLabel="Liabilities"
+          gainLabel="Net Cushion"
+          principalValue={fmt(DEFAULT.liabilities)}
+          gainValue={fmt(result.netWorkingCapital)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="lr-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="lr-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Essential financial health test required by commercial loan lenders.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="lr-calculator-how">
+        <h2 id="lr-calculator-how" class="text-xl font-bold text-text-primary mb-4">The Three Liquidity Formulas Explained</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-sm text-text-primary mb-2">1. Current Ratio</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">Broadest liquidity gauge: covers all assets convertible within 12 months.</p>
+            <p class="font-mono text-xs text-text-primary">Current Assets ÷ Current Liabilities</p>
+            <p class="text-xs text-accent mt-2">Benchmark: 1.5x – 2.0x</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-sm text-text-primary mb-2">2. Quick (Acid-Test) Ratio</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">Excludes slow-moving inventory and illiquid prepaid expenses.</p>
+            <p class="font-mono text-xs text-text-primary">(Cash + Securities + Debtors) ÷ Current Liabilities</p>
+            <p class="text-xs text-accent mt-2">Benchmark: &ge; 1.0x</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-sm text-text-primary mb-2">3. Cash Ratio</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">Most stringent test: examines immediate ability to pay debts without selling anything.</p>
+            <p class="font-mono text-xs text-text-primary">(Cash + Marketable Securities) ÷ Current Liabilities</p>
+            <p class="text-xs text-accent mt-2">Benchmark: 0.2x – 0.5x</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="lr-calculator-faq">
+        <h2 id="lr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can a Current Ratio be too high?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes. A Current Ratio exceeding 3.0x or 4.0x often indicates capital misallocation—such as holding excessive non-interest-bearing cash, hoarding slow-moving inventory, or failing to collect outstanding invoices aggressively from customer debtors.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Which ratio do commercial lenders inspect first?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Commercial bank credit analysts scrutinize the Quick (Acid-Test) Ratio most closely. They rely on it because it eliminates inventory liquidation uncertainty while verifying that cash and receivables cover short-term debts.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="lr-calculator-related">
+        <h2 id="lr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  function calcLRClient(cash: number, sec: number, ar: number, inv: number, cl: number) {
+    const totalAssets = cash + sec + ar + inv;
+    const quickAssets = cash + sec + ar;
+    const cashAssets = cash + sec;
+
+    const curRatio = cl > 0 ? totalAssets / cl : totalAssets > 0 ? 99 : 0;
+    const qRatio = cl > 0 ? quickAssets / cl : quickAssets > 0 ? 99 : 0;
+    const cRatio = cl > 0 ? cashAssets / cl : cashAssets > 0 ? 99 : 0;
+    const nwc = totalAssets - cl;
+
+    let status = 'Optimal Liquidity Profile';
+    if (curRatio < 1.0 || qRatio < 0.8) {
+      status = 'Liquidity Distress / Deficit';
+    } else if (curRatio < 1.5 || qRatio < 1.0) {
+      status = 'Caution: Monitor Working Capital';
+    }
+
+    return { totalAssets, curRatio, qRatio, cRatio, nwc, status };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    const sign = n < 0 ? '-' : '';
+    return sign + currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.abs(Math.round(n)));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initLRCalc() {
+    const cashInput = document.getElementById('lr-cash') as HTMLInputElement | null;
+    const secInput = document.getElementById('lr-securities') as HTMLInputElement | null;
+    const arInput = document.getElementById('lr-receivables') as HTMLInputElement | null;
+    const invInput = document.getElementById('lr-inventory') as HTMLInputElement | null;
+    const clInput = document.getElementById('lr-liabilities') as HTMLInputElement | null;
+
+    const cashSlider = document.getElementById('lr-cash-slider') as HTMLInputElement | null;
+    const secSlider = document.getElementById('lr-securities-slider') as HTMLInputElement | null;
+    const arSlider = document.getElementById('lr-receivables-slider') as HTMLInputElement | null;
+    const invSlider = document.getElementById('lr-inventory-slider') as HTMLInputElement | null;
+    const clSlider = document.getElementById('lr-liabilities-slider') as HTMLInputElement | null;
+
+    const resCurrent = document.getElementById('lr-result-current');
+    const resQuick = document.getElementById('lr-result-quick');
+    const resCash = document.getElementById('lr-result-cash');
+    const resNwc = document.getElementById('lr-result-nwc');
+    const resStatus = document.getElementById('lr-result-status');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!cashInput || !clInput) return;
+
+    const DEFAULTS = { cash: 300000, sec: 100000, ar: 400000, inv: 450000, cl: 500000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const cash = parse(cashInput.value);
+      const sec = parse(secInput ? secInput.value : '0');
+      const ar = parse(arInput ? arInput.value : '0');
+      const inv = parse(invInput ? invInput.value : '0');
+      const cl = parse(clInput.value);
+
+      const res = calcLRClient(cash, sec, ar, inv, cl);
+
+      if (resCurrent) resCurrent.textContent = res.curRatio.toFixed(2) + 'x';
+      if (resQuick) resQuick.textContent = res.qRatio.toFixed(2) + 'x';
+      if (resCash) resCash.textContent = res.cRatio.toFixed(2) + 'x';
+      if (resNwc) resNwc.textContent = fmtVal(res.nwc);
+      if (mobileHero) mobileHero.textContent = res.curRatio.toFixed(2) + 'x';
+
+      if (resStatus) {
+        resStatus.textContent = res.status;
+        resStatus.className = res.status.includes('Optimal') ? 'text-sm font-bold tabular-nums text-dark-accent' : res.status.includes('Deficit') ? 'text-sm font-bold tabular-nums text-red-400' : 'text-sm font-bold tabular-nums text-yellow-400';
+      }
+
+      const wrapper = document.getElementById('lr-composition-wrapper');
+      if (wrapper && res.totalAssets > 0) {
+        const liabFrac = Math.min(1, cl / res.totalAssets);
+        const cushionFrac = Math.max(0, res.nwc / res.totalAssets);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(cl);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.nwc);
+      }
+
+      history.replaceState(null, '', `#c=${cash}&s=${sec}&ar=${ar}&i=${inv}&cl=${cl}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(cashSlider, cashInput);
+    sync(secSlider, secInput!);
+    sync(arSlider, arInput!);
+    sync(invSlider, invInput!);
+    sync(clSlider, clInput);
+
+    document.getElementById('lr-calculate')?.addEventListener('click', recalc);
+    document.getElementById('lr-reset')?.addEventListener('click', () => {
+      cashInput.value = fmtLiveInput(String(DEFAULTS.cash));
+      if (secInput) secInput.value = fmtLiveInput(String(DEFAULTS.sec));
+      if (arInput) arInput.value = fmtLiveInput(String(DEFAULTS.ar));
+      if (invInput) invInput.value = fmtLiveInput(String(DEFAULTS.inv));
+      clInput.value = fmtLiveInput(String(DEFAULTS.cl));
+
+      if (cashSlider) {
+        cashSlider.value = String(DEFAULTS.cash);
+        cashSlider.style.setProperty('--slider-pct', `${(DEFAULTS.cash / 3000000) * 100}%`);
+      }
+      if (secSlider) {
+        secSlider.value = String(DEFAULTS.sec);
+        secSlider.style.setProperty('--slider-pct', `${(DEFAULTS.sec / 2000000) * 100}%`);
+      }
+      if (arSlider) {
+        arSlider.value = String(DEFAULTS.ar);
+        arSlider.style.setProperty('--slider-pct', `${(DEFAULTS.ar / 3000000) * 100}%`);
+      }
+      if (invSlider) {
+        invSlider.value = String(DEFAULTS.inv);
+        invSlider.style.setProperty('--slider-pct', `${(DEFAULTS.inv / 3000000) * 100}%`);
+      }
+      if (clSlider) {
+        clSlider.value = String(DEFAULTS.cl);
+        clSlider.style.setProperty('--slider-pct', `${((DEFAULTS.cl - 50000) / (5000000 - 50000)) * 100}%`);
+      }
+
+      recalc();
+      cashInput.focus();
+    });
+
+    [cashInput, secInput, arInput, invInput, clInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('lr-copy-btn')?.addEventListener('click', async () => {
+      const cash = parse(cashInput.value);
+      const sec = parse(secInput ? secInput.value : '0');
+      const ar = parse(arInput ? arInput.value : '0');
+      const inv = parse(invInput ? invInput.value : '0');
+      const cl = parse(clInput.value);
+      const res = calcLRClient(cash, sec, ar, inv, cl);
+      const text = `Liquidity Ratios: Current Ratio: ${res.curRatio.toFixed(2)}x, Quick Ratio: ${res.qRatio.toFixed(2)}x, Cash Ratio: ${res.cRatio.toFixed(2)}x (NWC: ${fmtVal(res.nwc)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('lr-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('lr-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('lr-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initLRCalc();
+  document.addEventListener('astro:page-load', initLRCalc);
+</script>

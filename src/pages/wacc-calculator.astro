@@ -1,45 +1,239 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcWACC } from '../lib/calculators/corporate';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  equityWeight: 0.70,
+  costOfEquity: 14.2,
+  debtWeight: 0.30,
+  costOfDebt: 8.5,
+  taxRate: 25,
+};
+
+const result = calcWACC(
+  DEFAULT.equityWeight,
+  DEFAULT.costOfEquity,
+  DEFAULT.debtWeight,
+  DEFAULT.costOfDebt,
+  DEFAULT.taxRate
+);
 
 const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'wacc-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/wacc-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'WACC Calculator', url: canonicalUrl, description: 'Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'WACC Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'WACC Calculator',
+      url: canonicalUrl,
+      description: 'Calculate Weighted Average Cost of Capital (WACC) from equity weight, cost of equity, debt weight, cost of debt, and corporate tax rate. Fixture: 11.85%.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'WACC Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="WACC Calculator: Weighted Average Cost of Capital | Calcumetrics" description="Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%." canonical={canonicalUrl}>
+
+<Layout
+  title="WACC Calculator: Weighted Average Cost of Capital | Calcumetrics"
+  description="Calculate Weighted Average Cost of Capital (WACC) from equity weight, cost of equity, debt weight, cost of debt, and corporate tax rate. Fixture: 11.85%."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="WACC Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="11.8525%" heroLabel="WACC">
+
+  <CalculatorLayout
+    toolName="WACC Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={result.waccPct.toFixed(4) + '%'}
+    heroLabel="Blended Cost of Capital (WACC)"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">WACC Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate blended hurdle rates across equity financing and tax-shielded corporate debt.</p>
+
+      <!-- Equity Weight -->
+      <div class="mb-5">
+        <Input
+          id="wacc-equity-weight"
+          label="Equity Weight (E / V)"
+          suffix="%"
+          value="70"
+          isNumeric={true}
+          helperText="Proportion of total capital financed by equity (Debt will be 30%)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="wacc-equity-weight-slider" min={0} max={100} step={1} value={70} ariaLabel="Equity weight slider" />
+        </div>
+      </div>
+
+      <!-- Cost of Equity -->
+      <div class="mb-5">
+        <Input
+          id="wacc-cost-equity"
+          label="Cost of Equity (Re)"
+          suffix="%"
+          value="14.2"
+          isNumeric={true}
+          helperText="Required return on equity (e.g. from CAPM)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="wacc-cost-equity-slider" min={1} max={30} step={0.1} value={14.2} ariaLabel="Cost of equity slider" />
+        </div>
+      </div>
+
+      <!-- Cost of Debt -->
+      <div class="mb-5">
+        <Input
+          id="wacc-cost-debt"
+          label="Pre-Tax Cost of Debt (Rd)"
+          suffix="%"
+          value="8.5"
+          isNumeric={true}
+          helperText="Nominal interest rate on corporate loans or bonds"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="wacc-cost-debt-slider" min={0} max={25} step={0.1} value={8.5} ariaLabel="Cost of debt slider" />
+        </div>
+      </div>
+
+      <!-- Tax Rate -->
+      <div class="mb-6">
+        <Input
+          id="wacc-tax-rate"
+          label="Effective Corporate Tax Rate (Tc)"
+          suffix="%"
+          value="25"
+          isNumeric={true}
+          helperText="Marginal corporate tax rate (creates interest tax shield)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="wacc-tax-rate-slider" min={0} max={45} step={0.5} value={25} ariaLabel="Tax rate slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Tax Shield on Debt">
+        Interest on debt is tax-deductible in most jurisdictions, which makes debt cheaper than equity: <strong>After-tax cost of debt = Rd &times; (1 &minus; Tc)</strong>.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="wacc-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="wacc-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">WACC</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">11.8525%</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Blended Cost of Capital (WACC)</span>
+        <div id="wacc-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.waccPct.toFixed(4)}%
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Equity Component Weight</span>
+          <span id="wacc-result-eq-contrib" class="text-sm font-semibold tabular-nums text-dark-accent">{(result.equityComponent * 100).toFixed(4)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Debt Component (After-Tax)</span>
+          <span id="wacc-result-debt-contrib" class="text-sm font-semibold tabular-nums text-dark-accent">{(result.debtComponent * 100).toFixed(4)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Effective After-Tax Cost of Debt</span>
+          <span id="wacc-result-after-tax-rd" class="text-sm font-medium tabular-nums text-dark-text">{(DEFAULT.costOfDebt * (1 - DEFAULT.taxRate / 100)).toFixed(2)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Implied Debt Weight (D / V)</span>
+          <span id="wacc-result-debt-weight" class="text-sm font-medium tabular-nums text-dark-text">{(DEFAULT.debtWeight * 100).toFixed(0)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="wacc-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.equityWeight}
+          gainFraction={DEFAULT.debtWeight}
+          principalLabel="Equity Weight"
+          gainLabel="Debt Weight"
+          principalValue="70%"
+          gainValue="30%"
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="wacc-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="wacc-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Fundamental hurdle rate used in DCF valuations and corporate budgeting.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="wacc-calculator-how">
-        <h2 id="wacc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate WACC from equity weight, cost of equity, debt weight, cost of debt, and tax rate. Fixture: E/V 70%, Re 14.2%, D/V 30%, Rd 8.5%, tax 25% = 11.8525%.</p>
+        <h2 id="wacc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How WACC is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The Weighted Average Cost of Capital (WACC) calculates a firm's average cost of funds weighted by financing structure:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">WACC = (E/V) × Re + (D/V) × Rd × (1 − Tc). E=equity value, D=debt value, V=E+D, Re=cost of equity, Rd=cost of debt, Tc=corporate tax rate. The tax shield on debt reduces its effective cost.</p>
+          <p class="text-base font-mono text-text-primary mb-2">WACC = (E / V) &times; Re + (D / V) &times; Rd &times; (1 &minus; Tc)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">E / V</strong> — Market weight of equity capital</li>
+            <li><strong class="text-text-primary">Re</strong> — Required cost of equity capital</li>
+            <li><strong class="text-text-primary">D / V</strong> — Market weight of debt capital</li>
+            <li><strong class="text-text-primary">Rd</strong> — Pre-tax cost of debt</li>
+            <li><strong class="text-text-primary">Tc</strong> — Marginal corporate income tax rate</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="wacc-calculator-faq">
         <h2 id="wacc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is WACC used for?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">WACC is the minimum rate of return a company must earn on its investments to satisfy all its capital providers (equity holders and debt holders). It is used as the discount rate in DCF valuations and NPV analysis. Projects with returns above WACC create value; those below WACC destroy it.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How do I calculate the cost of equity?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The most common approach is the Capital Asset Pricing Model (CAPM): Re = Rf + β × (Rm − Rf), where Rf is the risk-free rate, β is the stock's beta, and (Rm − Rf) is the equity risk premium. In India, Rf is typically the 10-year G-sec yield. Our WACC calculator accepts the cost of equity directly.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is the Cost of Equity determined?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Cost of Equity (Re) is typically computed using the Capital Asset Pricing Model (CAPM): Re = Rf + Beta &times; (Rm &minus; Rf), where Rf is the risk-free rate, Beta represents systemic equity volatility, and (Rm &minus; Rf) is the equity risk premium.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why does debt lower WACC?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Debt is senior to equity in the capital stack (lower default risk) and interest payments are tax-deductible, creating an interest tax shield. However, excess leverage increases financial distress risk, eventually driving equity and debt costs higher.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="wacc-calculator-related">
         <h2 id="wacc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
@@ -47,3 +241,169 @@ const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApp
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcWACCClient(eqWeightPct: number, re: number, rd: number, tc: number) {
+    const eqWeight = eqWeightPct / 100;
+    const debtWeight = Math.max(0, 1 - eqWeight);
+    const equityComponent = eqWeight * (re / 100);
+    const afterTaxRd = rd * (1 - tc / 100);
+    const debtComponent = debtWeight * (afterTaxRd / 100);
+    const wacc = equityComponent + debtComponent;
+
+    return {
+      wacc,
+      waccPct: wacc * 100,
+      equityComponent,
+      debtComponent,
+      debtWeightPct: debtWeight * 100,
+      afterTaxRd,
+    };
+  }
+
+  function initWACCCalc() {
+    const eqWeightInput = document.getElementById('wacc-equity-weight') as HTMLInputElement | null;
+    const reInput = document.getElementById('wacc-cost-equity') as HTMLInputElement | null;
+    const rdInput = document.getElementById('wacc-cost-debt') as HTMLInputElement | null;
+    const tcInput = document.getElementById('wacc-tax-rate') as HTMLInputElement | null;
+
+    const eqWeightSlider = document.getElementById('wacc-equity-weight-slider') as HTMLInputElement | null;
+    const reSlider = document.getElementById('wacc-cost-equity-slider') as HTMLInputElement | null;
+    const rdSlider = document.getElementById('wacc-cost-debt-slider') as HTMLInputElement | null;
+    const tcSlider = document.getElementById('wacc-tax-rate-slider') as HTMLInputElement | null;
+
+    const resHero = document.getElementById('wacc-result-hero');
+    const resEqContrib = document.getElementById('wacc-result-eq-contrib');
+    const resDebtContrib = document.getElementById('wacc-result-debt-contrib');
+    const resAfterTaxRd = document.getElementById('wacc-result-after-tax-rd');
+    const resDebtWeight = document.getElementById('wacc-result-debt-weight');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!eqWeightInput || !reInput || !rdInput || !tcInput) return;
+
+    const DEFAULTS = { eqWeight: 70, re: 14.2, rd: 8.5, tc: 25 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function recalc() {
+      const eqWeight = parseFloat(eqWeightInput.value) || 0;
+      const re = parseFloat(reInput.value) || 0;
+      const rd = parseFloat(rdInput.value) || 0;
+      const tc = parseFloat(tcInput.value) || 0;
+
+      const res = calcWACCClient(eqWeight, re, rd, tc);
+
+      if (resHero) resHero.textContent = res.waccPct.toFixed(4) + '%';
+      if (resEqContrib) resEqContrib.textContent = (res.equityComponent * 100).toFixed(4) + '%';
+      if (resDebtContrib) resDebtContrib.textContent = (res.debtComponent * 100).toFixed(4) + '%';
+      if (resAfterTaxRd) resAfterTaxRd.textContent = res.afterTaxRd.toFixed(2) + '%';
+      if (resDebtWeight) resDebtWeight.textContent = res.debtWeightPct.toFixed(0) + '%';
+      if (mobileHero) mobileHero.textContent = res.waccPct.toFixed(4) + '%';
+
+      const wrapper = document.getElementById('wacc-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${eqWeight.toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${res.debtWeightPct.toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = eqWeight.toFixed(0) + '%';
+        if (legendEls[1]) legendEls[1].textContent = res.debtWeightPct.toFixed(0) + '%';
+      }
+
+      history.replaceState(null, '', `#e=${eqWeight}&re=${re}&rd=${rd}&t=${tc}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const num = parseFloat(input.value);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        debounce();
+      });
+    }
+
+    sync(eqWeightSlider, eqWeightInput);
+    sync(reSlider, reInput);
+    sync(rdSlider, rdInput);
+    sync(tcSlider, tcInput);
+
+    document.getElementById('wacc-calculate')?.addEventListener('click', recalc);
+    document.getElementById('wacc-reset')?.addEventListener('click', () => {
+      eqWeightInput.value = String(DEFAULTS.eqWeight);
+      reInput.value = String(DEFAULTS.re);
+      rdInput.value = String(DEFAULTS.rd);
+      tcInput.value = String(DEFAULTS.tc);
+
+      if (eqWeightSlider) {
+        eqWeightSlider.value = String(DEFAULTS.eqWeight);
+        eqWeightSlider.style.setProperty('--slider-pct', `${DEFAULTS.eqWeight}%`);
+      }
+      if (reSlider) {
+        reSlider.value = String(DEFAULTS.re);
+        reSlider.style.setProperty('--slider-pct', `${((DEFAULTS.re - 1) / (30 - 1)) * 100}%`);
+      }
+      if (rdSlider) {
+        rdSlider.value = String(DEFAULTS.rd);
+        rdSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rd - 0) / (25 - 0)) * 100}%`);
+      }
+      if (tcSlider) {
+        tcSlider.value = String(DEFAULTS.tc);
+        tcSlider.style.setProperty('--slider-pct', `${((DEFAULTS.tc - 0) / (45 - 0)) * 100}%`);
+      }
+
+      recalc();
+      eqWeightInput.focus();
+    });
+
+    [eqWeightInput, reInput, rdInput, tcInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('wacc-copy-btn')?.addEventListener('click', async () => {
+      const eqWeight = parseFloat(eqWeightInput.value) || 0;
+      const re = parseFloat(reInput.value) || 0;
+      const rd = parseFloat(rdInput.value) || 0;
+      const tc = parseFloat(tcInput.value) || 0;
+      const res = calcWACCClient(eqWeight, re, rd, tc);
+      const text = `WACC Result: E/V ${eqWeight}%, Re ${re}%, Rd ${rd}%, Tax ${tc}% => WACC: ${res.waccPct.toFixed(4)}%. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('wacc-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('wacc-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('wacc-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+  }
+
+  initWACCCalc();
+  document.addEventListener('astro:page-load', initWACCCalc);
+</script>

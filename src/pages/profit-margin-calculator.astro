@@ -1,49 +1,445 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcProfitMargin } from '../lib/calculators/business';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = { revenue: 1000000, cogs: 600000, opex: 150000, taxes: 50000 };
+const result = calcProfitMargin(DEFAULT.revenue, DEFAULT.cogs, DEFAULT.opex, DEFAULT.taxes);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'profit-margin-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/profit-margin-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Profit Margin Calculator', url: canonicalUrl, description: 'Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'Profit Margin Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Profit Margin Calculator',
+      url: canonicalUrl,
+      description: 'Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs with comprehensive cost breakdown.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Profit Margin Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Profit Margin Calculator: Gross & Net Margin | Calcumetrics" description="Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs." canonical={canonicalUrl}>
+
+<Layout
+  title="Profit Margin Calculator: Gross & Net Margin Analysis | Calcumetrics"
+  description="Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs with comprehensive cost breakdown."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Profit Margin Calculator" category="Business" categoryHref="/business" heroValue="Calculate to see" heroLabel="Gross Margin">
+
+  <CalculatorLayout
+    toolName="Profit Margin Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={result.netMarginPct.toFixed(1) + '%'}
+    heroLabel="Net Profit Margin"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Profit Margin Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate gross and net profit margins, operating overheads, and true bottom-line profitability.</p>
+
+      <!-- Revenue -->
+      <div class="mb-5">
+        <Input
+          id="pm-revenue"
+          label="Total Revenue"
+          prefix="₹"
+          value="10,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Gross sales or total billings"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pm-revenue-slider" min={50000} max={10000000} step={25000} value={1000000} ariaLabel="Revenue slider" />
+        </div>
+      </div>
+
+      <!-- COGS -->
+      <div class="mb-5">
+        <Input
+          id="pm-cogs"
+          label="Cost of Goods Sold (COGS)"
+          prefix="₹"
+          value="6,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Direct raw materials, manufacturing, and direct labor"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pm-cogs-slider" min={10000} max={8000000} step={25000} value={600000} ariaLabel="COGS slider" />
+        </div>
+      </div>
+
+      <!-- Operating Expenses -->
+      <div class="mb-5">
+        <Input
+          id="pm-opex"
+          label="Operating Expenses (OpEx)"
+          prefix="₹"
+          value="1,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Sales, marketing, rent, utilities, and admin overhead"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pm-opex-slider" min={0} max={3000000} step={10000} value={150000} ariaLabel="Operating expenses slider" />
+        </div>
+      </div>
+
+      <!-- Taxes & Interest -->
+      <div class="mb-6">
+        <Input
+          id="pm-taxes"
+          label="Taxes & Other Deductions"
+          prefix="₹"
+          value="50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Income tax liability and interest charges"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pm-taxes-slider" min={0} max={1000000} step={5000} value={50000} ariaLabel="Taxes slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Margin vs Markup">
+        Gross margin is calculated as profit divided by revenue. If you need to determine the selling price from a cost markup, use our Markup vs Margin calculator.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="pm-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="pm-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Gross Margin</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Profit Margin</span>
+        <div id="pm-result-netmargin" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.netMarginPct.toFixed(1)}%
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gross Profit</span>
+          <span id="pm-result-grossprofit" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.grossProfit)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gross Profit Margin</span>
+          <span id="pm-result-grossmargin" class="text-sm font-medium tabular-nums text-dark-text">{result.grossMarginPct.toFixed(1)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Operating Profit (EBITDA)</span>
+          <span id="pm-result-operatingprofit" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.grossProfit - DEFAULT.opex)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Net Profit (Bottom Line)</span>
+          <span id="pm-result-netprofit" class="text-sm font-bold tabular-nums text-dark-text">{fmt(result.netProfit)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="pm-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.revenue > 0 ? (DEFAULT.cogs + DEFAULT.opex + DEFAULT.taxes) / DEFAULT.revenue : 0}
+          gainFraction={DEFAULT.revenue > 0 ? Math.max(0, result.netProfit) / DEFAULT.revenue : 0}
+          principalLabel="Total Costs"
+          gainLabel="Net Profit"
+          principalValue={fmt(DEFAULT.cogs + DEFAULT.opex + DEFAULT.taxes)}
+          gainValue={fmt(result.netProfit)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="pm-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="pm-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Essential financial KPI for retail, manufacturing, and SaaS businesses.</p>
     </Fragment>
+
     <Fragment slot="below">
-      <section aria-labelledby="profit-margin-calculator-how">
-        <h2 id="profit-margin-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate gross profit margin, net profit margin, and operating profit from revenue and cost inputs.</p>
+      <section aria-labelledby="pm-calculator-how">
+        <h2 id="pm-calculator-how" class="text-xl font-bold text-text-primary mb-4">How profit margins are calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Profit margins show what percentage of revenue remains after covering expenses at various operational tiers:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Gross margin = (Revenue − COGS) / Revenue × 100. Net margin = (Revenue − COGS − Operating expenses − Taxes) / Revenue × 100. Operating margin sits between these two.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Gross Profit:</strong> Revenue − Cost of Goods Sold (COGS)<br />
+            <strong>Gross Margin %:</strong> (Gross Profit ÷ Revenue) × 100<br />
+            <strong>Operating Profit:</strong> Gross Profit − Operating Expenses (OpEx)<br />
+            <strong>Net Profit:</strong> Operating Profit − Taxes & Interest<br />
+            <strong>Net Margin %:</strong> (Net Profit ÷ Revenue) × 100
+          </p>
         </div>
       </section>
-      <section aria-labelledby="profit-margin-calculator-faq">
-        <h2 id="profit-margin-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+
+      <section aria-labelledby="pm-calculator-faq">
+        <h2 id="pm-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good profit margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Profit margins vary significantly by industry. Software businesses can achieve 70%+ gross margins; retail typically runs 20-30%. Net margins of 10%+ are generally considered healthy for most businesses. The key is benchmarking within your specific industry and tracking the trend over time.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between gross and net margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Gross margin measures profitability after only the direct costs of producing goods/services (COGS). Net margin deducts all operating expenses, interest, and taxes — it is the 'bottom line' profitability. A high gross margin with a low net margin suggests high overhead or operating costs.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good profit margin benchmark?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Software companies frequently operate with 70–85% gross margins and 20–30% net margins. Physical retail typically experiences 20–35% gross margins and 3–8% net margins. Food and restaurant businesses generally run at 10–15% net margin.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why can a business have high gross margin but low net margin?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              This indicates high operating overheads—such as elevated customer acquisition costs (marketing), high administrative payroll, expensive executive leases, or heavy debt interest payments eating away at direct product profitability.
+            </div>
+          </details>
         </div>
       </section>
-      <section aria-labelledby="profit-margin-calculator-related">
-        <h2 id="profit-margin-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+
+      <section aria-labelledby="pm-calculator-related">
+        <h2 id="pm-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcProfitMarginClient(rev: number, cogs: number, opex: number, taxes: number) {
+    const grossProfit = rev - cogs;
+    const grossMarginPct = rev > 0 ? (grossProfit / rev) * 100 : 0;
+    const operatingProfit = grossProfit - opex;
+    const netProfit = operatingProfit - taxes;
+    const netMarginPct = rev > 0 ? (netProfit / rev) * 100 : 0;
+    const totalCosts = cogs + opex + taxes;
+
+    return {
+      grossProfit,
+      grossMarginPct,
+      operatingProfit,
+      netProfit,
+      netMarginPct,
+      totalCosts,
+      costFraction: rev > 0 ? Math.min(1, totalCosts / rev) : 1,
+      profitFraction: rev > 0 ? Math.max(0, netProfit / rev) : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initProfitMarginCalc() {
+    const revInput = document.getElementById('pm-revenue') as HTMLInputElement | null;
+    const cogsInput = document.getElementById('pm-cogs') as HTMLInputElement | null;
+    const opexInput = document.getElementById('pm-opex') as HTMLInputElement | null;
+    const taxesInput = document.getElementById('pm-taxes') as HTMLInputElement | null;
+
+    const revSlider = document.getElementById('pm-revenue-slider') as HTMLInputElement | null;
+    const cogsSlider = document.getElementById('pm-cogs-slider') as HTMLInputElement | null;
+    const opexSlider = document.getElementById('pm-opex-slider') as HTMLInputElement | null;
+    const taxesSlider = document.getElementById('pm-taxes-slider') as HTMLInputElement | null;
+
+    const resNetMargin = document.getElementById('pm-result-netmargin');
+    const resGrossProfit = document.getElementById('pm-result-grossprofit');
+    const resGrossMargin = document.getElementById('pm-result-grossmargin');
+    const resOpProfit = document.getElementById('pm-result-operatingprofit');
+    const resNetProfit = document.getElementById('pm-result-netprofit');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!revInput || !cogsInput) return;
+
+    const DEFAULTS = { revenue: 1000000, cogs: 600000, opex: 150000, taxes: 50000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const rev = parse(revInput.value);
+      const cogs = parse(cogsInput.value);
+      const opex = parse(opexInput ? opexInput.value : '0');
+      const taxes = parse(taxesInput ? taxesInput.value : '0');
+
+      if (rev <= 0) return;
+
+      const res = calcProfitMarginClient(rev, cogs, opex, taxes);
+
+      if (resNetMargin) resNetMargin.textContent = res.netMarginPct.toFixed(1) + '%';
+      if (resGrossProfit) resGrossProfit.textContent = fmtVal(res.grossProfit);
+      if (resGrossMargin) resGrossMargin.textContent = res.grossMarginPct.toFixed(1) + '%';
+      if (resOpProfit) resOpProfit.textContent = fmtVal(res.operatingProfit);
+      if (resNetProfit) resNetProfit.textContent = fmtVal(res.netProfit);
+      if (mobileHero) mobileHero.textContent = res.netMarginPct.toFixed(1) + '%';
+
+      const wrapper = document.getElementById('pm-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.costFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalCosts);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netProfit);
+      }
+
+      history.replaceState(null, '', `#r=${rev}&c=${cogs}&o=${opex}&t=${taxes}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(revSlider, revInput);
+    sync(cogsSlider, cogsInput);
+    sync(opexSlider, opexInput!);
+    sync(taxesSlider, taxesInput!);
+
+    document.getElementById('pm-calculate')?.addEventListener('click', recalc);
+    document.getElementById('pm-reset')?.addEventListener('click', () => {
+      revInput.value = fmtLiveInput(String(DEFAULTS.revenue));
+      cogsInput.value = fmtLiveInput(String(DEFAULTS.cogs));
+      if (opexInput) opexInput.value = fmtLiveInput(String(DEFAULTS.opex));
+      if (taxesInput) taxesInput.value = fmtLiveInput(String(DEFAULTS.taxes));
+
+      if (revSlider) {
+        revSlider.value = String(DEFAULTS.revenue);
+        revSlider.style.setProperty('--slider-pct', `${((DEFAULTS.revenue - 50000) / (10000000 - 50000)) * 100}%`);
+      }
+      if (cogsSlider) {
+        cogsSlider.value = String(DEFAULTS.cogs);
+        cogsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.cogs - 10000) / (8000000 - 10000)) * 100}%`);
+      }
+      if (opexSlider) {
+        opexSlider.value = String(DEFAULTS.opex);
+        opexSlider.style.setProperty('--slider-pct', `${((DEFAULTS.opex - 0) / (3000000 - 0)) * 100}%`);
+      }
+      if (taxesSlider) {
+        taxesSlider.value = String(DEFAULTS.taxes);
+        taxesSlider.style.setProperty('--slider-pct', `${((DEFAULTS.taxes - 0) / (1000000 - 0)) * 100}%`);
+      }
+
+      recalc();
+      revInput.focus();
+    });
+
+    [revInput, cogsInput, opexInput, taxesInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('pm-copy-btn')?.addEventListener('click', async () => {
+      const rev = parse(revInput.value);
+      const cogs = parse(cogsInput.value);
+      const opex = parse(opexInput ? opexInput.value : '0');
+      const taxes = parse(taxesInput ? taxesInput.value : '0');
+      const res = calcProfitMarginClient(rev, cogs, opex, taxes);
+      const text = `Profit Margin: Revenue ${fmtVal(rev)}, COGS ${fmtVal(cogs)} => Gross Margin: ${res.grossMarginPct.toFixed(1)}%, Net Margin: ${res.netMarginPct.toFixed(1)}% (${fmtVal(res.netProfit)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('pm-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('pm-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('pm-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initProfitMarginCalc();
+  document.addEventListener('astro:page-load', initProfitMarginCalc);
+</script>

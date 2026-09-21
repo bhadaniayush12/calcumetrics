@@ -1,49 +1,401 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
+import { calcPPF } from '../../lib/calculators/ppf';
+import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'ppf-calculator' && t.status === 'published').slice(0, 3);
-const canonicalUrl = 'https://calcumetrics.com/in/ppf-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'PPF Calculator', url: canonicalUrl, description: 'Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: 'PPF Calculator' }] }] };
+const DEFAULT = { annual: 150000, rate: 7.1, years: 15 };
+const result = calcPPF(DEFAULT.annual, DEFAULT.rate, DEFAULT.years);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Investments' && t.slug !== 'ppf-calculator' && t.status === 'published'
+).slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/in/ppf-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'PPF Calculator (Public Provident Fund)',
+      url: canonicalUrl,
+      description: 'Calculate PPF maturity value, annual interest, and Section 80C tax benefits over 15 to 30 years.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'PPF Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="PPF Calculator (India): Public Provident Fund Maturity | Calcumetrics" description="Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period." canonical={canonicalUrl}>
+
+<Layout
+  title="PPF Calculator: Maturity Value & Interest | Calcumetrics India"
+  description="Calculate your Public Provident Fund (PPF) maturity value and interest with annual compounding over 15 to 30 years. Section 80C EEE status."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="PPF Calculator" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Maturity Value">
+
+  <CalculatorLayout
+    toolName="PPF Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmt(result.maturity)}
+    heroLabel="Maturity Value"
+  >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">PPF Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Public Provident Fund (PPF) Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate maturity value and tax-free interest on your PPF account over 15 to 30 years.</p>
+
+      <!-- Annual Deposit -->
+      <div class="mb-5">
+        <Input
+          id="ppf-annual"
+          label="Yearly Investment Amount"
+          prefix="₹"
+          value="1,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Maximum allowed deposit is ₹1.5 lakh per financial year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ppf-annual-slider" min={500} max={150000} step={500} value={150000} ariaLabel="Yearly deposit slider" />
+        </div>
+      </div>
+
+      <!-- Rate -->
+      <div class="mb-5">
+        <Input
+          id="ppf-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="7.1"
+          isNumeric={true}
+          helperText="Current government notified rate (7.1% p.a.)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ppf-rate-slider" min={6.0} max={9.0} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Years -->
+      <div class="mb-6">
+        <Input
+          id="ppf-years"
+          label="Tenure (Years)"
+          suffix="Years"
+          value="15"
+          isNumeric={true}
+          helperText="Initial lock-in is 15 years; extendable in 5-year blocks"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="ppf-years-slider" min={15} max={30} step={5} value={15} ariaLabel="Tenure slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Exempt-Exempt-Exempt (EEE)">
+        PPF carries EEE tax status: deposits qualify for Section 80C deduction, interest earned is completely tax-free, and maturity proceeds are exempt from tax.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="ppf-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="ppf-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <div id="ppf-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.maturity)}
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Amount Invested</span>
+          <span id="ppf-result-invested" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.invested)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Earned</span>
+          <span id="ppf-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.interest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Return on Investment</span>
+          <span id="ppf-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.invested > 0 ? ((result.interest / result.invested) * 100).toFixed(1) : '0.0'}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="ppf-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.investedFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Invested"
+          gainLabel="Interest"
+          principalValue={fmt(result.invested)}
+          gainValue={fmt(result.interest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="ppf-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="ppf-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="ppf-calculator-how">
-        <h2 id="ppf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate Public Provident Fund maturity value with India-specific interest rates and the 15-year lock-in period.</p>
+        <h2 id="ppf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the PPF calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Public Provident Fund interest is compounded annually and calculated on the minimum balance between the 5th and the end of each calendar month.
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Annual compounding: balance = (balance + deposit) × (1 + rate). PPF rate is announced quarterly by Ministry of Finance. Lock-in: 15 years with partial withdrawal rules.</p>
+          <p class="text-base font-mono text-text-primary mb-2">F = P × [({'{'}1 + i{'}'}^n - 1) / i] × (1 + i)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">F</strong> — Maturity amount</li>
+            <li><strong class="text-text-primary">P</strong> — Annual installment deposited before the 5th of April</li>
+            <li><strong class="text-text-primary">i</strong> — Annual interest rate (decimal)</li>
+            <li><strong class="text-text-primary">n</strong> — Total tenure in years (15, 20, 25, 30)</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="ppf-calculator-faq">
         <h2 id="ppf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the current PPF interest rate?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The PPF interest rate is announced quarterly by the Ministry of Finance. As of our last verification (see rates.json), the rate is 7.1% p.a. Rates change periodically — check the official India Post or RBI website for the current rate before making decisions.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I extend my PPF account after 15 years?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes, you can extend in blocks of 5 years, with or without contributions. Extensions with contributions continue to earn interest on the full balance plus new deposits. Extensions without contributions earn interest only on the existing balance.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When should I deposit money in PPF to get maximum interest?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Depositing between the 1st and 5th of April ensures your entire annual contribution earns interest for all 12 months of that financial year.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I extend PPF beyond 15 years?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes, PPF can be extended indefinitely in blocks of 5 years each, with or without continuing new contributions.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="ppf-calculator-related">
         <h2 id="ppf-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcPPFClient(annual: number, rate: number, years: number) {
+    const r = rate / 100;
+    let balance = 0;
+    for (let yr = 1; yr <= years; yr++) {
+      balance = (balance + annual) * (1 + r);
+    }
+    const invested = annual * years;
+    const gain = balance - invested;
+    const gainPct = invested > 0 ? (gain / invested) * 100 : 0;
+    return {
+      maturity: balance,
+      invested,
+      gain,
+      gainPct,
+      principalFraction: balance > 0 ? invested / balance : 0,
+      gainFraction: balance > 0 ? gain / balance : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initPPFCalc() {
+    const aInput = document.getElementById('ppf-annual') as HTMLInputElement | null;
+    const rInput = document.getElementById('ppf-rate') as HTMLInputElement | null;
+    const yInput = document.getElementById('ppf-years') as HTMLInputElement | null;
+    const aSlider = document.getElementById('ppf-annual-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('ppf-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('ppf-years-slider') as HTMLInputElement | null;
+
+    const resMaturity = document.getElementById('ppf-result-maturity');
+    const resInvested = document.getElementById('ppf-result-invested');
+    const resGain = document.getElementById('ppf-result-gain');
+    const resGainPct = document.getElementById('ppf-result-gainpct');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!aInput || !rInput || !yInput) return;
+
+    const DEFAULTS = { annual: 150000, rate: 7.1, years: 15 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const a = Math.min(150000, parse(aInput.value));
+      const r = parseFloat(rInput.value) || 0;
+      const y = parseInt(yInput.value) || 0;
+
+      if (a <= 0 || r <= 0 || y <= 0) return;
+
+      const res = calcPPFClient(a, r, y);
+
+      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
+      if (resInvested) resInvested.textContent = fmtVal(res.invested);
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+
+      const wrapper = document.getElementById('ppf-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.invested);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+      }
+
+      history.replaceState(null, '', `#a=${a}&r=${r}&y=${y}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(aSlider, aInput, true);
+    sync(rSlider, rInput, false);
+    sync(ySlider, yInput, false);
+
+    document.getElementById('ppf-calculate')?.addEventListener('click', recalc);
+    document.getElementById('ppf-reset')?.addEventListener('click', () => {
+      aInput.value = fmtLiveInput(String(DEFAULTS.annual));
+      rInput.value = String(DEFAULTS.rate);
+      yInput.value = String(DEFAULTS.years);
+      if (aSlider) {
+        aSlider.value = String(DEFAULTS.annual);
+        aSlider.style.setProperty('--slider-pct', `${((DEFAULTS.annual - 500) / (150000 - 500)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 6.0) / (9.0 - 6.0)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.years);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 15) / (30 - 15)) * 100}%`);
+      }
+      recalc();
+      aInput.focus();
+    });
+
+    [aInput, rInput, yInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('ppf-copy-btn')?.addEventListener('click', async () => {
+      const a = parse(aInput.value);
+      const r = parseFloat(rInput.value) || 0;
+      const y = parseInt(yInput.value) || 0;
+      const res = calcPPFClient(a, r, y);
+      const text = `PPF: ${fmtVal(a)}/yr for ${y} yrs at ${r}% p.a. gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('ppf-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('ppf-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('ppf-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+  }
+
+  initPPFCalc();
+  document.addEventListener('astro:page-load', initPPFCalc);
+</script>

@@ -31,9 +31,26 @@ const canonicalUrl = canonical || `${domain}${currentPath === '/' ? '/' : curren
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     <meta name="robots" content={robots} />
-    <meta name="theme-color" content="#F7F7F4" />
+    <meta id="meta-theme-color" name="theme-color" content="#F7F7F4" />
 
-    <!-- Favicon & Icons per Section 16 -->
+    <!-- Section 26.7 — Instant theme initialization to eliminate flash of light theme -->
+    <script is:inline>
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('cm_theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+            var meta = document.getElementById('meta-theme-color');
+            if (meta) meta.setAttribute('content', '#0F1211');
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon.ico" />

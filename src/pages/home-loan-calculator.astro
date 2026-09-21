@@ -1,51 +1,440 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcEMI } from '../lib/calculators/emi';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'home-loan-calculator' && t.status === 'published').slice(0, 3);
+const DEFAULT = { price: 5000000, downPct: 20, rate: 8.5, years: 20 };
+const loanAmount = DEFAULT.price * (1 - DEFAULT.downPct / 100);
+const result = calcEMI(loanAmount, DEFAULT.rate, DEFAULT.years);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Loans' && t.slug !== 'home-loan-calculator' && t.status === 'published'
+).slice(0, 3);
+
 const canonicalUrl = 'https://calcumetrics.com/home-loan-calculator';
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Home Loan Calculator', url: canonicalUrl, description: 'Calculate your home loan EMI, total interest paid, and year-by-year amortization schedule for any loan amount, rate, and tenure.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' }, { '@type': 'ListItem', position: 3, name: 'Home Loan Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Home Loan EMI Calculator',
+      url: canonicalUrl,
+      description: 'Calculate your home loan EMI, total interest, and down payment requirements with detailed repayment insights.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Home Loan Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Home Loan Calculator: EMI & Total Interest | Calcumetrics" description="Calculate your home loan EMI, total interest paid, and year-by-year amortization schedule for any loan amount, rate, and tenure." canonical={canonicalUrl}>
+
+<Layout
+  title="Home Loan EMI Calculator: Monthly Instalment & Down Payment | Calcumetrics"
+  description="Calculate your home loan monthly EMI, down payment, total interest, and property repayment breakdown. Free, instant, 100% client-side."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Home Loan Calculator" category="Loans" categoryHref="/loans" heroValue="Calculate to see" heroLabel="Monthly EMI">
+
+  <CalculatorLayout
+    toolName="Home Loan EMI Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={fmt(result.emiRounded)}
+    heroLabel="Monthly EMI"
+  >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Home Loan Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate your home loan EMI, total interest paid, and year-by-year amortization schedule for any loan amount, rate, and tenure.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Home Loan EMI Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Estimate your housing loan EMI, interest burden, and required down payment.</p>
+
+      <!-- Property Value -->
+      <div class="mb-5">
+        <Input
+          id="hl-price"
+          label="Property Value"
+          prefix="₹"
+          value="50,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total cost of the home"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hl-price-slider" min={500000} max={50000000} step={100000} value={5000000} ariaLabel="Property value slider" />
+        </div>
+      </div>
+
+      <!-- Down Payment % -->
+      <div class="mb-5">
+        <Input
+          id="hl-down"
+          label="Down Payment (%)"
+          suffix="%"
+          value="20"
+          isNumeric={true}
+          helperText="Standard minimum is 10% to 20%"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hl-down-slider" min={10} max={80} step={1} value={20} ariaLabel="Down payment slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="hl-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="8.5"
+          isNumeric={true}
+          helperText="Prevailing bank home loan rate"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hl-rate-slider" min={6.5} max={15} step={0.1} value={8.5} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Tenure -->
+      <div class="mb-6">
+        <Input
+          id="hl-years"
+          label="Loan Tenure (Years)"
+          suffix="Years"
+          value="20"
+          isNumeric={true}
+          helperText="Duration of repayment (up to 30 years)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hl-years-slider" min={1} max={30} step={1} value={20} ariaLabel="Tenure slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Tax Benefit">
+        Repayment of principal qualifies for deduction under Section 80C (up to ₹1.5L), while interest paid is deductible under Section 24(b) (up to ₹2L/year).
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="hl-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="hl-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly EMI</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <div id="hl-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.emiRounded)}
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Loan Amount (Principal)</span>
+          <span id="hl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(loanAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Down Payment</span>
+          <span id="hl-result-down" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.price * 0.2)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest</span>
+          <span id="hl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Payment</span>
+          <span id="hl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalPayment)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="hl-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmt(loanAmount)}
+          gainValue={fmt(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="hl-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="hl-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="home-loan-calculator-how">
-        <h2 id="home-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate your home loan EMI, total interest paid, and year-by-year amortization schedule for any loan amount, rate, and tenure.</p>
+        <h2 id="home-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How home loan EMI is computed</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The monthly instalment covers both principal amortization and interest according to the reducing balance method:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted">EMI = P × r × (1+r)^n / ((1+r)^n − 1). For home loans: n = years × 12, r = annual rate / 12 / 100. The amortization schedule shows each year's principal and interest breakdown.</p>
+          <p class="text-base font-mono text-text-primary mb-2">EMI = [P × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">P</strong> — Principal loan = Property Cost − Down Payment</li>
+            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual Rate / 12 / 100</li>
+            <li><strong class="text-text-primary">n</strong> — Total tenure in months = Years × 12</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="home-loan-calculator-faq">
         <h2 id="home-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the ideal home loan tenure?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">A shorter tenure means higher EMI but significantly lower total interest. A longer tenure lowers monthly burden but increases total cost. A common strategy is to take a longer tenure initially for affordability, then make prepayments as income grows to reduce the effective tenure.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I claim tax benefits on home loan interest?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Under India's Income Tax Act, 2025, interest on home loans may be deductible from income from house property. Principal repayment may qualify under Section 80C. Eligibility and limits have changed from the 1961 Act — consult a CA or tax professional for your specific situation.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How much down payment should I make?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              While RBI permits financing up to 80%–90% of property cost depending on the loan bracket, providing a higher down payment (e.g. 20% to 30%) substantially reduces your lifetime interest burden.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I prepay my home loan without penalty?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes, per RBI guidelines, commercial banks and HFCs cannot levy prepayment charges on floating-rate home loans availed by individual borrowers.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="home-loan-calculator-related">
         <h2 id="home-loan-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcEMIClient(p: number, rate: number, years: number) {
+    const n = years * 12;
+    const r = rate / (12 * 100);
+    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const totalPayment = emi * n;
+    const totalInterest = totalPayment - p;
+    return {
+      emi,
+      emiRounded: Math.round(emi),
+      totalPayment,
+      totalInterest,
+      principalFraction: totalPayment > 0 ? p / totalPayment : 0,
+      interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initHLCalc() {
+    const priceInput = document.getElementById('hl-price') as HTMLInputElement | null;
+    const downInput = document.getElementById('hl-down') as HTMLInputElement | null;
+    const rateInput = document.getElementById('hl-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('hl-years') as HTMLInputElement | null;
+    const priceSlider = document.getElementById('hl-price-slider') as HTMLInputElement | null;
+    const downSlider = document.getElementById('hl-down-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('hl-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('hl-years-slider') as HTMLInputElement | null;
+
+    const resEMI = document.getElementById('hl-result-emi');
+    const resPrincipal = document.getElementById('hl-result-principal');
+    const resDown = document.getElementById('hl-result-down');
+    const resInterest = document.getElementById('hl-result-interest');
+    const resTotal = document.getElementById('hl-result-total');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!priceInput || !downInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { price: 5000000, downPct: 20, rate: 8.5, years: 20 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const price = parse(priceInput.value);
+      const downPct = parseFloat(downInput.value) || 0;
+      const rate = parseFloat(rateInput.value) || 0;
+      const years = parseInt(yearsInput.value) || 0;
+
+      if (price <= 0 || rate <= 0 || years <= 0) return;
+
+      const downAmt = price * (downPct / 100);
+      const loan = Math.max(0, price - downAmt);
+      const res = calcEMIClient(loan, rate, years);
+
+      if (resEMI) resEMI.textContent = fmtVal(res.emiRounded);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(loan);
+      if (resDown) resDown.textContent = fmtVal(downAmt);
+      if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
+      if (resTotal) resTotal.textContent = fmtVal(res.totalPayment);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.emiRounded);
+
+      const wrapper = document.getElementById('hl-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(loan);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', `#p=${price}&d=${downPct}&r=${rate}&y=${years}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(priceSlider, priceInput, true);
+    sync(downSlider, downInput, false);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('hl-calculate')?.addEventListener('click', recalc);
+    document.getElementById('hl-reset')?.addEventListener('click', () => {
+      priceInput.value = fmtLiveInput(String(DEFAULTS.price));
+      downInput.value = String(DEFAULTS.downPct);
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+      if (priceSlider) {
+        priceSlider.value = String(DEFAULTS.price);
+        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.price - 500000) / (50000000 - 500000)) * 100}%`);
+      }
+      if (downSlider) {
+        downSlider.value = String(DEFAULTS.downPct);
+        downSlider.style.setProperty('--slider-pct', `${((DEFAULTS.downPct - 10) / (80 - 10)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 6.5) / (15 - 6.5)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+      recalc();
+      priceInput.focus();
+    });
+
+    [priceInput, downInput, rateInput, yearsInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('hl-copy-btn')?.addEventListener('click', async () => {
+      const price = parse(priceInput.value);
+      const downPct = parseFloat(downInput.value) || 0;
+      const rate = parseFloat(rateInput.value) || 0;
+      const years = parseInt(yearsInput.value) || 0;
+      const loan = price * (1 - downPct / 100);
+      const res = calcEMIClient(loan, rate, years);
+      const text = `Home Loan EMI: ${fmtVal(res.emiRounded)}/month on property value of ${fmtVal(price)} (${downPct}% down, ${rate}% for ${years} yrs). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('hl-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('hl-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('hl-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initHLCalc();
+  document.addEventListener('astro:page-load', initHLCalc);
+</script>

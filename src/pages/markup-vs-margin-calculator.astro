@@ -1,49 +1,425 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcMarkupMargin, markupToMargin, marginToMarkup } from '../lib/calculators/business';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = { cost: 1000, markup: 25 };
+const result = calcMarkupMargin(DEFAULT.cost, DEFAULT.markup);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'markup-vs-margin-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/markup-vs-margin-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Markup vs Margin Calculator', url: canonicalUrl, description: 'Understand and convert between markup percentage and gross profit margin. These are related but different concepts that cause frequent confusion in pricing.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'Markup vs Margin Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Markup vs Margin Calculator',
+      url: canonicalUrl,
+      description: 'Understand and convert between markup percentage and gross profit margin. Calculate selling price, profit, and equivalent rates.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Markup vs Margin Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Markup vs Margin Calculator: Convert Between Both | Calcumetrics" description="Understand and convert between markup percentage and gross profit margin. These are related but different concepts that cause frequent confusion in pricing." canonical={canonicalUrl}>
+
+<Layout
+  title="Markup vs Margin Calculator: Convert Between Both | Calcumetrics"
+  description="Understand and convert between markup percentage and gross profit margin. Calculate selling price, profit, and equivalent rates."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Markup vs Margin Calculator" category="Business" categoryHref="/business" heroValue="Calculate to see" heroLabel="Selling Price">
+
+  <CalculatorLayout
+    toolName="Markup vs Margin Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={fmt(result.sellingPrice)}
+    heroLabel="Recommended Selling Price"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Markup vs Margin Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Understand and convert between markup percentage and gross profit margin. These are related but different concepts that cause frequent confusion in pricing.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Convert between markup % (on cost) and margin % (on price) to protect your profitability.</p>
+
+      <!-- Cost -->
+      <div class="mb-5">
+        <Input
+          id="mvm-cost"
+          label="Unit Cost (COGS)"
+          prefix="₹"
+          value="1,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Direct purchase or production cost per unit"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="mvm-cost-slider" min={50} max={100000} step={50} value={1000} ariaLabel="Unit cost slider" />
+        </div>
+      </div>
+
+      <!-- Calculation Mode -->
+      <div class="mb-5">
+        <Dropdown
+          id="mvm-mode"
+          label="Calculate By"
+          options={[
+            { value: 'markup', label: 'Markup Percentage (added onto cost)' },
+            { value: 'margin', label: 'Target Gross Margin Percentage (of final price)' },
+          ]}
+          value="markup"
+          helperText="Choose which pricing metric you want to specify"
+        />
+      </div>
+
+      <!-- Percentage Value -->
+      <div class="mb-6">
+        <Input
+          id="mvm-rate"
+          label="Percentage (%)"
+          suffix="%"
+          value="25"
+          isNumeric={true}
+          helperText="Enter markup or target margin %"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="mvm-rate-slider" min={1} max={200} step={0.5} value={25} ariaLabel="Rate percentage slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Key Distinction">
+        <strong>Markup</strong> is the % added to cost. <strong>Margin</strong> is the % of selling price that is profit. A 100% markup equals a 50% profit margin!
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="mvm-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="mvm-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Selling Price</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Recommended Selling Price</span>
+        <div id="mvm-result-price" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.sellingPrice)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Unit Cost</span>
+          <span id="mvm-result-cost" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.cost)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gross Profit per Unit</span>
+          <span id="mvm-result-profit" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.profit)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Markup on Cost</span>
+          <span id="mvm-result-markup" class="text-sm font-medium tabular-nums text-dark-text">{result.markupPct.toFixed(1)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Gross Margin on Price</span>
+          <span id="mvm-result-margin" class="text-sm font-bold tabular-nums text-dark-text">{result.marginPct.toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="mvm-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.sellingPrice > 0 ? DEFAULT.cost / result.sellingPrice : 1}
+          gainFraction={result.sellingPrice > 0 ? result.profit / result.sellingPrice : 0}
+          principalLabel="Cost"
+          gainLabel="Profit"
+          principalValue={fmt(DEFAULT.cost)}
+          gainValue={fmt(result.profit)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="mvm-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="mvm-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Avoid pricing errors: Never confuse markup % with margin %.</p>
     </Fragment>
+
     <Fragment slot="below">
-      <section aria-labelledby="markup-vs-margin-calculator-how">
-        <h2 id="markup-vs-margin-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Understand and convert between markup percentage and gross profit margin. These are related but different concepts that cause frequent confusion in pricing.</p>
+      <section aria-labelledby="mvm-calculator-how">
+        <h2 id="mvm-calculator-how" class="text-xl font-bold text-text-primary mb-4">How to convert between markup and margin</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Both metrics measure profitability, but from different baselines:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Markup % = profit / cost × 100. Margin % = profit / price × 100. Convert: margin = markup / (1 + markup/100) × 100; markup = margin / (1 − margin/100) × 100.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Markup %:</strong> (Profit ÷ Cost) × 100<br />
+            <strong>Margin %:</strong> (Profit ÷ Selling Price) × 100<br />
+            <strong>Convert Markup to Margin:</strong> Margin % = [Markup % ÷ (100 + Markup %)] × 100<br />
+            <strong>Convert Margin to Markup:</strong> Markup % = [Margin % ÷ (100 − Margin %)] × 100
+          </p>
         </div>
       </section>
-      <section aria-labelledby="markup-vs-margin-calculator-faq">
-        <h2 id="markup-vs-margin-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+
+      <section aria-labelledby="mvm-calculator-faq">
+        <h2 id="mvm-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between markup and margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Markup is calculated as a percentage of cost (how much you add on top of what you paid). Margin is calculated as a percentage of selling price (how much of each sale is profit). A 50% markup gives a 33% margin. A 50% margin requires a 100% markup. Confusing the two leads to significant underpricing.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why do retailers use markup while analysts use margin?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Retailers traditionally use markup because they start with a known cost and add a percentage to set the price. Analysts prefer margin because it expresses profitability as a share of revenue, which is standard in income statement analysis. Both are valid; the key is knowing which you are using.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What markup is needed for a 50% margin?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              To achieve a 50% gross margin, you must apply a 100% markup to your cost (i.e. doubling the cost). For example, an item costing ₹500 marked up 100% sells for ₹1,000, yielding ₹500 profit (50% of the ₹1,000 selling price).
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can margin ever exceed 100%?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              No. Gross margin cannot exceed 100% unless your cost is negative. However, markup can exceed 100% indefinitely (e.g. 200%, 500%, or 1000% markup on low-cost digital goods or luxury items).
+            </div>
+          </details>
         </div>
       </section>
-      <section aria-labelledby="markup-vs-margin-calculator-related">
-        <h2 id="markup-vs-margin-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+
+      <section aria-labelledby="mvm-calculator-related">
+        <h2 id="mvm-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcMVMClient(cost: number, rate: number, mode: 'markup' | 'margin') {
+    let markupPct = 0;
+    let marginPct = 0;
+    let sellingPrice = 0;
+    let profit = 0;
+
+    if (mode === 'markup') {
+      markupPct = rate;
+      sellingPrice = cost * (1 + markupPct / 100);
+      profit = sellingPrice - cost;
+      marginPct = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
+    } else {
+      marginPct = Math.min(rate, 99.9);
+      sellingPrice = cost / (1 - marginPct / 100);
+      profit = sellingPrice - cost;
+      markupPct = cost > 0 ? (profit / cost) * 100 : 0;
+    }
+
+    return {
+      cost,
+      sellingPrice,
+      profit,
+      markupPct,
+      marginPct,
+      costFraction: sellingPrice > 0 ? cost / sellingPrice : 1,
+      profitFraction: sellingPrice > 0 ? profit / sellingPrice : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initMVMCalc() {
+    const costInput = document.getElementById('mvm-cost') as HTMLInputElement | null;
+    const modeSelect = document.getElementById('mvm-mode') as HTMLSelectElement | null;
+    const rateInput = document.getElementById('mvm-rate') as HTMLInputElement | null;
+
+    const costSlider = document.getElementById('mvm-cost-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('mvm-rate-slider') as HTMLInputElement | null;
+
+    const resPrice = document.getElementById('mvm-result-price');
+    const resCost = document.getElementById('mvm-result-cost');
+    const resProfit = document.getElementById('mvm-result-profit');
+    const resMarkup = document.getElementById('mvm-result-markup');
+    const resMargin = document.getElementById('mvm-result-margin');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!costInput || !rateInput) return;
+
+    const DEFAULTS = { cost: 1000, rate: 25, mode: 'markup' };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const cost = parse(costInput.value);
+      const rate = parseFloat(rateInput.value) || 0;
+      const mode = (modeSelect ? modeSelect.value : 'markup') as 'markup' | 'margin';
+
+      if (cost <= 0) return;
+
+      const res = calcMVMClient(cost, rate, mode);
+
+      if (resPrice) resPrice.textContent = fmtVal(res.sellingPrice);
+      if (resCost) resCost.textContent = fmtVal(cost);
+      if (resProfit) resProfit.textContent = fmtVal(res.profit);
+      if (resMarkup) resMarkup.textContent = res.markupPct.toFixed(1) + '%';
+      if (resMargin) resMargin.textContent = res.marginPct.toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.sellingPrice);
+
+      const wrapper = document.getElementById('mvm-composition-wrapper');
+      if (wrapper && res.sellingPrice > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.costFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(cost);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.profit);
+      }
+
+      history.replaceState(null, '', `#c=${cost}&r=${rate}&m=${mode}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(costSlider, costInput, true);
+    sync(rateSlider, rateInput, false);
+    modeSelect?.addEventListener('change', () => {
+      const mode = modeSelect.value;
+      if (rateSlider) {
+        rateSlider.max = mode === 'margin' ? '95' : '200';
+      }
+      recalc();
+    });
+
+    document.getElementById('mvm-calculate')?.addEventListener('click', recalc);
+    document.getElementById('mvm-reset')?.addEventListener('click', () => {
+      costInput.value = fmtLiveInput(String(DEFAULTS.cost));
+      rateInput.value = String(DEFAULTS.rate);
+      if (modeSelect) modeSelect.value = DEFAULTS.mode;
+
+      if (costSlider) {
+        costSlider.value = String(DEFAULTS.cost);
+        costSlider.style.setProperty('--slider-pct', `${((DEFAULTS.cost - 50) / (100000 - 50)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.max = '200';
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (200 - 1)) * 100}%`);
+      }
+
+      recalc();
+      costInput.focus();
+    });
+
+    [costInput, rateInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('mvm-copy-btn')?.addEventListener('click', async () => {
+      const cost = parse(costInput.value);
+      const rate = parseFloat(rateInput.value) || 0;
+      const mode = (modeSelect ? modeSelect.value : 'markup') as any;
+      const res = calcMVMClient(cost, rate, mode);
+      const text = `Markup vs Margin: Cost ${fmtVal(cost)} => Selling Price: ${fmtVal(res.sellingPrice)} (Profit: ${fmtVal(res.profit)} | Markup: ${res.markupPct.toFixed(1)}% | Margin: ${res.marginPct.toFixed(1)}%). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('mvm-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('mvm-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('mvm-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initMVMCalc();
+  document.addEventListener('astro:page-load', initMVMCalc);
+</script>

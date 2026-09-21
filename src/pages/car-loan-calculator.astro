@@ -1,51 +1,433 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcEMI } from '../lib/calculators/emi';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'car-loan-calculator' && t.status === 'published').slice(0, 3);
+const DEFAULT = { price: 1200000, down: 200000, rate: 9.0, years: 5 };
+const loanAmount = DEFAULT.price - DEFAULT.down;
+const result = calcEMI(loanAmount, DEFAULT.rate, DEFAULT.years);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Loans' && t.slug !== 'car-loan-calculator' && t.status === 'published'
+).slice(0, 3);
+
 const canonicalUrl = 'https://calcumetrics.com/car-loan-calculator';
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Car Loan Calculator', url: canonicalUrl, description: 'Calculate your car loan monthly payment, total cost, and interest charges for any loan amount, interest rate, and tenure.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' }, { '@type': 'ListItem', position: 3, name: 'Car Loan Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Car Loan EMI Calculator',
+      url: canonicalUrl,
+      description: 'Calculate your auto loan monthly EMI, down payment, total interest, and total car acquisition cost.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Car Loan Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Car Loan Calculator: Monthly Payment & Interest | Calcumetrics" description="Calculate your car loan monthly payment, total cost, and interest charges for any loan amount, interest rate, and tenure." canonical={canonicalUrl}>
+
+<Layout
+  title="Car Loan EMI Calculator: Auto Loan Instalment & Cost | Calcumetrics"
+  description="Calculate your auto loan monthly EMI, down payment, total interest, and total car acquisition cost. Instant, free, 100% client-side."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Car Loan Calculator" category="Loans" categoryHref="/loans" heroValue="Calculate to see" heroLabel="Monthly EMI">
+
+  <CalculatorLayout
+    toolName="Car Loan EMI Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={fmt(result.emiRounded)}
+    heroLabel="Monthly EMI"
+  >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Car Loan Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate your car loan monthly payment, total cost, and interest charges for any loan amount, interest rate, and tenure.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Car Loan EMI Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Estimate your vehicle loan EMI, down payment impact, and total interest.</p>
+
+      <!-- Vehicle Price -->
+      <div class="mb-5">
+        <Input
+          id="cl-price"
+          label="On-Road Vehicle Price"
+          prefix="₹"
+          value="12,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total purchase price including registration and insurance"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="cl-price-slider" min={200000} max={10000000} step={25000} value={1200000} ariaLabel="Vehicle price slider" />
+        </div>
+      </div>
+
+      <!-- Down Payment -->
+      <div class="mb-5">
+        <Input
+          id="cl-down"
+          label="Down Payment"
+          prefix="₹"
+          value="2,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Upfront payment from savings or vehicle exchange"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="cl-down-slider" min={0} max={5000000} step={25000} value={200000} ariaLabel="Down payment slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="cl-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="9.0"
+          isNumeric={true}
+          helperText="Bank or NBFC auto loan interest rate"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="cl-rate-slider" min={7.0} max={18.0} step={0.25} value={9.0} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Tenure -->
+      <div class="mb-6">
+        <Input
+          id="cl-years"
+          label="Loan Tenure (Years)"
+          suffix="Years"
+          value="5"
+          isNumeric={true}
+          helperText="Standard auto loan duration (1 to 7 years)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="cl-years-slider" min={1} max={7} step={1} value={5} ariaLabel="Tenure slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Depreciation Tip">
+        Cars depreciate 15%–20% in their first year. Aim to keep your car loan tenure under 5 years to avoid owing more than the vehicle is worth (negative equity).
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="cl-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="cl-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly EMI</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <div id="cl-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.emiRounded)}
+        </div>
       </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Loan Amount (Principal)</span>
+          <span id="cl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(loanAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Down Payment</span>
+          <span id="cl-result-down" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.down)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest</span>
+          <span id="cl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Cost of Car</span>
+          <span id="cl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.down + result.totalPayment)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="cl-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmt(loanAmount)}
+          gainValue={fmt(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="cl-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="cl-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="car-loan-calculator-how">
-        <h2 id="car-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate your car loan monthly payment, total cost, and interest charges for any loan amount, interest rate, and tenure.</p>
+        <h2 id="car-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How car loan EMI is computed</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Car loan EMIs follow the reducing balance method:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted">EMI = P × r × (1+r)^n / ((1+r)^n − 1). Car loans in India typically have 1–7 year tenures. Total cost of ownership includes on-road price plus all interest paid over the loan term.</p>
+          <p class="text-base font-mono text-text-primary mb-2">EMI = [P × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">P</strong> — Net loan amount = On-road price − Down payment</li>
+            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual rate / 12 / 100</li>
+            <li><strong class="text-text-primary">n</strong> — Months of tenure = Years × 12</li>
+          </ul>
         </div>
       </section>
+
       <section aria-labelledby="car-loan-calculator-faq">
         <h2 id="car-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good interest rate for a car loan?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Car loan rates in India typically range from 7% to 15% p.a. depending on the lender, your credit score, and the vehicle. New cars generally attract lower rates than used cars. A higher credit score and a larger down payment can help secure a lower rate.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Should I prepay my car loan?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Prepaying a car loan reduces total interest paid, but some lenders charge a prepayment penalty (typically 2-5% of outstanding principal). Check your loan agreement. Use our Loan Prepayment Calculator to compare the interest saved against any prepayment charge.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good tenure for a car loan?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Financial advisors generally recommend a 3 to 5 year tenure. Longer tenures (like 7 years) lower the monthly payment but significantly increase the total interest paid on a depreciating asset.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Are fixed rate car loans common?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes, unlike home loans which are predominantly floating rate, many car loans in India are offered on fixed interest rates. Always verify whether prepayment penalties apply.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="car-loan-calculator-related">
         <h2 id="car-loan-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcEMIClient(p: number, rate: number, years: number) {
+    const n = years * 12;
+    const r = rate / (12 * 100);
+    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const totalPayment = emi * n;
+    const totalInterest = totalPayment - p;
+    return {
+      emi,
+      emiRounded: Math.round(emi),
+      totalPayment,
+      totalInterest,
+      principalFraction: totalPayment > 0 ? p / totalPayment : 0,
+      interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initCLCalc() {
+    const priceInput = document.getElementById('cl-price') as HTMLInputElement | null;
+    const downInput = document.getElementById('cl-down') as HTMLInputElement | null;
+    const rateInput = document.getElementById('cl-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('cl-years') as HTMLInputElement | null;
+    const priceSlider = document.getElementById('cl-price-slider') as HTMLInputElement | null;
+    const downSlider = document.getElementById('cl-down-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('cl-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('cl-years-slider') as HTMLInputElement | null;
+
+    const resEMI = document.getElementById('cl-result-emi');
+    const resPrincipal = document.getElementById('cl-result-principal');
+    const resDown = document.getElementById('cl-result-down');
+    const resInterest = document.getElementById('cl-result-interest');
+    const resTotal = document.getElementById('cl-result-total');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!priceInput || !downInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { price: 1200000, down: 200000, rate: 9.0, years: 5 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const price = parse(priceInput.value);
+      const down = parse(downInput.value);
+      const rate = parseFloat(rateInput.value) || 0;
+      const years = parseInt(yearsInput.value) || 0;
+
+      if (price <= 0 || rate <= 0 || years <= 0) return;
+
+      const loan = Math.max(0, price - down);
+      const res = calcEMIClient(loan, rate, years);
+
+      if (resEMI) resEMI.textContent = fmtVal(res.emiRounded);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(loan);
+      if (resDown) resDown.textContent = fmtVal(down);
+      if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
+      if (resTotal) resTotal.textContent = fmtVal(down + res.totalPayment);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.emiRounded);
+
+      const wrapper = document.getElementById('cl-composition-wrapper');
+      if (wrapper) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(loan);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', `#p=${price}&d=${down}&r=${rate}&y=${years}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(priceSlider, priceInput, true);
+    sync(downSlider, downInput, true);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('cl-calculate')?.addEventListener('click', recalc);
+    document.getElementById('cl-reset')?.addEventListener('click', () => {
+      priceInput.value = fmtLiveInput(String(DEFAULTS.price));
+      downInput.value = fmtLiveInput(String(DEFAULTS.down));
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+      if (priceSlider) {
+        priceSlider.value = String(DEFAULTS.price);
+        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.price - 200000) / (10000000 - 200000)) * 100}%`);
+      }
+      if (downSlider) {
+        downSlider.value = String(DEFAULTS.down);
+        downSlider.style.setProperty('--slider-pct', `${((DEFAULTS.down - 0) / (5000000 - 0)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 7.0) / (18.0 - 7.0)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (7 - 1)) * 100}%`);
+      }
+      recalc();
+      priceInput.focus();
+    });
+
+    [priceInput, downInput, rateInput, yearsInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('cl-copy-btn')?.addEventListener('click', async () => {
+      const price = parse(priceInput.value);
+      const down = parse(downInput.value);
+      const rate = parseFloat(rateInput.value) || 0;
+      const years = parseInt(yearsInput.value) || 0;
+      const loan = price - down;
+      const res = calcEMIClient(loan, rate, years);
+      const text = `Car Loan EMI: ${fmtVal(res.emiRounded)}/month on car price ${fmtVal(price)} (down: ${fmtVal(down)}, ${rate}% for ${years} yrs). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('cl-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('cl-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('cl-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+  }
+
+  initCLCalc();
+  document.addEventListener('astro:page-load', initCLCalc);
+</script>

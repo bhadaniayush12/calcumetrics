@@ -222,6 +222,27 @@ const {
         first.focus();
       }
     });
+
+    // ── Generic currency prefix updater across calculators ──────────────────
+    const syncCurrencyPrefixes = (symbol: string) => {
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = symbol;
+      });
+    };
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        syncCurrencyPrefixes(e.detail.symbol);
+      }
+    });
+
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        const symbol = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        syncCurrencyPrefixes(symbol);
+      }
+    } catch (e) {}
   }
 
   initCalculatorShell();

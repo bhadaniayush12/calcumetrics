@@ -2,13 +2,14 @@
  * Section 12: ₹1,00,000, 8% annual, 10 yrs → ₹2,15,892.50
  * Formula: A = P × (1 + r/n)^(n×t)
  */
-export type CompoundFrequency = 'annually' | 'semi-annually' | 'quarterly' | 'monthly';
+export type CompoundFrequency = 'annually' | 'semi-annually' | 'quarterly' | 'monthly' | 'daily';
 
 const FREQ_MAP: Record<CompoundFrequency, number> = {
   annually: 1,
   'semi-annually': 2,
   quarterly: 4,
   monthly: 12,
+  daily: 365,
 };
 
 export interface LumpSumResult {

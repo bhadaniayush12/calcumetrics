@@ -1,49 +1,409 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcPayback } from '../lib/calculators/corporate';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = { initial: 500000, annual: 150000 };
+const result = calcPayback(DEFAULT.initial, [DEFAULT.annual, DEFAULT.annual, DEFAULT.annual, DEFAULT.annual, DEFAULT.annual]);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'payback-period-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/payback-period-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'Payback Period Calculator', url: canonicalUrl, description: 'Calculate how long it takes to recover an initial investment from projected annual cash flows. Simple and useful for quick liquidity assessment.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'Payback Period Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Payback Period Calculator',
+      url: canonicalUrl,
+      description: 'Calculate how long it takes to recover an initial investment from projected annual cash flows with fractional years and monthly breakdown.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'Payback Period Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="Payback Period Calculator: Investment Recovery Time | Calcumetrics" description="Calculate how long it takes to recover an initial investment from projected annual cash flows. Simple and useful for quick liquidity assessment." canonical={canonicalUrl}>
+
+<Layout
+  title="Payback Period Calculator: Investment Recovery Time | Calcumetrics"
+  description="Calculate how long it takes to recover an initial investment from projected annual cash flows with fractional years and monthly breakdown."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="Payback Period Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="Calculate to see" heroLabel="Payback Period">
+
+  <CalculatorLayout
+    toolName="Payback Period Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={result.paybackYears.toFixed(1) + ' Years'}
+    heroLabel="Payback Period"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Payback Period Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate how long it takes to recover an initial investment from projected annual cash flows. Simple and useful for quick liquidity assessment.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Determine the exact time required for capital outlays to be completely recouped.</p>
+
+      <!-- Initial Investment -->
+      <div class="mb-5">
+        <Input
+          id="pb-initial"
+          label="Initial Investment (Outflow)"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total upfront capital expenditure at Year 0"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pb-initial-slider" min={50000} max={5000000} step={25000} value={500000} ariaLabel="Initial outlay slider" />
+        </div>
+      </div>
+
+      <!-- Expected Annual Inflow -->
+      <div class="mb-5">
+        <Input
+          id="pb-annual"
+          label="Expected Annual Cash Inflow"
+          prefix="₹"
+          value="1,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Estimated net cash generated per year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="pb-annual-slider" min={10000} max={2500000} step={10000} value={150000} ariaLabel="Annual cash flow slider" />
+        </div>
+      </div>
+
+      <div class="border-t border-border pt-4 mb-6">
+        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Or Specify Uneven Inflows (Years 1 to 5)</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div>
+            <Input id="pb-y1" label="Year 1" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="pb-y2" label="Year 2" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="pb-y3" label="Year 3" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="pb-y4" label="Year 4" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="pb-y5" label="Year 5" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" title="Capital Budgeting Tip">
+        Payback period ignores the time value of money and cash flows generated after the break-even point. For comprehensive capital decisions, review Net Present Value (NPV).
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="pb-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="pb-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Payback Period</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <div id="pb-result-years" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.paybackYears.toFixed(1)} Years
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Recovery In Months</span>
+          <span id="pb-result-months" class="text-sm font-semibold tabular-nums text-dark-accent">{Math.round(result.paybackMonths)} Months</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Initial Outlay</span>
+          <span id="pb-result-initial" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.initial)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">5-Year Cumulative Inflows</span>
+          <span id="pb-result-inflows" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.annual * 5)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Status</span>
+          <span id="pb-result-status" class="text-sm font-bold tabular-nums text-dark-text">Fully Recovered</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="pb-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.recovered ? 1 : 0.6}
+          gainFraction={result.recovered ? 0 : 0.4}
+          principalLabel="Recouped"
+          gainLabel="Unrecovered"
+          principalValue={fmt(DEFAULT.initial)}
+          gainValue={fmt(0)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="pb-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="pb-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes continuous linear cash inflows during recovery year.</p>
     </Fragment>
+
     <Fragment slot="below">
-      <section aria-labelledby="payback-period-calculator-how">
-        <h2 id="payback-period-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate how long it takes to recover an initial investment from projected annual cash flows. Simple and useful for quick liquidity assessment.</p>
+      <section aria-labelledby="pb-calculator-how">
+        <h2 id="pb-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the payback period is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The payback period counts the years of cumulative cash inflows until the initial investment is recovered:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Payback = number of years to cumulate cash flows until they equal the initial investment. Fractional year: (remaining balance / next year CF). Does not account for time value of money — use NPV or IRR for value-creation decisions.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Even Cash Flows: </strong> Initial Investment ÷ Annual Cash Inflow<br />
+            <strong>Uneven Cash Flows: </strong> Full Years Prior + (Unrecovered Balance at Start of Year ÷ Total Cash Inflow in that Year)
+          </p>
         </div>
       </section>
-      <section aria-labelledby="payback-period-calculator-faq">
-        <h2 id="payback-period-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+
+      <section aria-labelledby="pb-calculator-faq">
+        <h2 id="pb-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the limitations of payback period?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Payback period ignores the time value of money — a ₹1 cash flow received in year 5 is treated the same as one in year 1. It also ignores cash flows after the payback point. For these reasons, it is used as a quick screening tool (especially for liquidity risk) but should not be the primary decision criterion. Complement it with NPV.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good payback period?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">This depends on the industry and the investment's risk. Manufacturing and infrastructure projects might target 3-5 years. Technology investments often target 2-3 years due to rapid obsolescence. Lower-risk, utility-like projects may accept 7-10 years. There is no universal standard — compare within your industry and strategic context.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good payback period for equipment or software?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Industrial machinery usually has acceptable payback periods between 3 to 5 years. Enterprise software, tooling, or marketing automation projects generally aim for a payback period of under 18 to 24 months due to fast technological shifts.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is discounted payback period?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The discounted payback period discounts future cash flows at the company's cost of capital before calculating the recovery time. Because discounted dollars have lower present values, the discounted payback period is always longer than the simple payback period.
+            </div>
+          </details>
         </div>
       </section>
-      <section aria-labelledby="payback-period-calculator-related">
-        <h2 id="payback-period-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+
+      <section aria-labelledby="pb-calculator-related">
+        <h2 id="pb-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcPaybackClient(initial: number, flows: number[]) {
+    let cumulative = 0;
+    for (let i = 0; i < flows.length; i++) {
+      const prev = cumulative;
+      cumulative += flows[i];
+      if (cumulative >= initial) {
+        const fraction = flows[i] > 0 ? (initial - prev) / flows[i] : 0;
+        const years = i + fraction;
+        return { paybackYears: years, paybackMonths: years * 12, recovered: true, totalInflows: flows.reduce((a, b) => a + b, 0) };
+      }
+    }
+    return { paybackYears: Infinity, paybackMonths: Infinity, recovered: false, totalInflows: flows.reduce((a, b) => a + b, 0) };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initPaybackCalc() {
+    const initInput = document.getElementById('pb-initial') as HTMLInputElement | null;
+    const annualInput = document.getElementById('pb-annual') as HTMLInputElement | null;
+    const initSlider = document.getElementById('pb-initial-slider') as HTMLInputElement | null;
+    const annualSlider = document.getElementById('pb-annual-slider') as HTMLInputElement | null;
+
+    const yInputs = [
+      document.getElementById('pb-y1') as HTMLInputElement | null,
+      document.getElementById('pb-y2') as HTMLInputElement | null,
+      document.getElementById('pb-y3') as HTMLInputElement | null,
+      document.getElementById('pb-y4') as HTMLInputElement | null,
+      document.getElementById('pb-y5') as HTMLInputElement | null,
+    ];
+
+    const resYears = document.getElementById('pb-result-years');
+    const resMonths = document.getElementById('pb-result-months');
+    const resInitial = document.getElementById('pb-result-initial');
+    const resInflows = document.getElementById('pb-result-inflows');
+    const resStatus = document.getElementById('pb-result-status');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!initInput || !annualInput) return;
+
+    const DEFAULTS = { initial: 500000, annual: 150000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const initial = parse(initInput.value);
+      const annual = parse(annualInput.value);
+
+      if (initial <= 0) return;
+
+      // Check if uneven inputs were edited or use annual default
+      const flows = yInputs.map((el) => (el ? parse(el.value) : annual));
+      const res = calcPaybackClient(initial, flows);
+
+      const yrsText = isFinite(res.paybackYears) ? res.paybackYears.toFixed(1) + ' Years' : '> 5 Years';
+      const mthsText = isFinite(res.paybackMonths) ? Math.round(res.paybackMonths) + ' Months' : 'Unrecovered';
+
+      if (resYears) resYears.textContent = yrsText;
+      if (resMonths) resMonths.textContent = mthsText;
+      if (resInitial) resInitial.textContent = fmtVal(initial);
+      if (resInflows) resInflows.textContent = fmtVal(res.totalInflows);
+      if (resStatus) {
+        resStatus.textContent = res.recovered ? 'Fully Recovered' : 'Not Recovered in 5 Yrs';
+        resStatus.className = res.recovered ? 'text-sm font-bold tabular-nums text-dark-accent' : 'text-sm font-bold tabular-nums text-red-400';
+      }
+      if (mobileHero) mobileHero.textContent = yrsText;
+
+      history.replaceState(null, '', `#i=${initial}&a=${annual}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        // update year inputs
+        if (slider === annualSlider) {
+          yInputs.forEach((y) => { if (y) y.value = input.value; });
+        }
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        if (input === annualInput) {
+          yInputs.forEach((y) => { if (y) y.value = input.value; });
+        }
+        debounce();
+      });
+    }
+
+    sync(initSlider, initInput);
+    sync(annualSlider, annualInput);
+
+    yInputs.forEach((el) => {
+      el?.addEventListener('input', () => {
+        el.value = fmtLiveInput(el.value);
+        debounce();
+      });
+    });
+
+    document.getElementById('pb-calculate')?.addEventListener('click', recalc);
+    document.getElementById('pb-reset')?.addEventListener('click', () => {
+      initInput.value = fmtLiveInput(String(DEFAULTS.initial));
+      annualInput.value = fmtLiveInput(String(DEFAULTS.annual));
+      yInputs.forEach((y) => { if (y) y.value = fmtLiveInput(String(DEFAULTS.annual)); });
+
+      if (initSlider) {
+        initSlider.value = String(DEFAULTS.initial);
+        initSlider.style.setProperty('--slider-pct', `${((DEFAULTS.initial - 50000) / (5000000 - 50000)) * 100}%`);
+      }
+      if (annualSlider) {
+        annualSlider.value = String(DEFAULTS.annual);
+        annualSlider.style.setProperty('--slider-pct', `${((DEFAULTS.annual - 10000) / (2500000 - 10000)) * 100}%`);
+      }
+
+      recalc();
+      initInput.focus();
+    });
+
+    // Copy & Share
+    document.getElementById('pb-copy-btn')?.addEventListener('click', async () => {
+      const initial = parse(initInput.value);
+      const annual = parse(annualInput.value);
+      const flows = yInputs.map((el) => (el ? parse(el.value) : annual));
+      const res = calcPaybackClient(initial, flows);
+      const text = `Payback Period: Initial Outflow ${fmtVal(initial)} => Payback in ${isFinite(res.paybackYears) ? res.paybackYears.toFixed(1) + ' years' : '> 5 years'} (${Math.round(res.paybackMonths)} months). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('pb-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('pb-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('pb-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initPaybackCalc();
+  document.addEventListener('astro:page-load', initPaybackCalc);
+</script>

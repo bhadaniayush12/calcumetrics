@@ -1,45 +1,220 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcNPV } from '../lib/calculators/corporate';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  discountRate: 10,
+  initialOutflow: 100000,
+  cashFlows: [30000, 40000, 50000, 60000],
+};
+
+const fullFlows = [-DEFAULT.initialOutflow, ...DEFAULT.cashFlows];
+const npvValue = calcNPV(DEFAULT.discountRate, fullFlows);
+const pvInflows = npvValue + DEFAULT.initialOutflow;
+
+const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
 
 const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'npv-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/npv-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'NPV Calculator', url: canonicalUrl, description: 'Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'NPV Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'NPV Calculator',
+      url: canonicalUrl,
+      description: 'Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'NPV Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="NPV Calculator: Net Present Value of Cash Flows | Calcumetrics" description="Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13." canonical={canonicalUrl}>
+
+<Layout
+  title="NPV Calculator: Net Present Value of Cash Flows | Calcumetrics"
+  description="Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="NPV Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="₹38,877" heroLabel="Net Present Value">
+
+  <CalculatorLayout
+    toolName="NPV Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={fmt(npvValue)}
+    heroLabel="Net Present Value (NPV)"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">NPV Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate the net present value and profitability index of future project cash inflows.</p>
+
+      <!-- Discount Rate -->
+      <div class="mb-5">
+        <Input
+          id="npv-discount"
+          label="Discount Rate (Cost of Capital)"
+          suffix="%"
+          value="10"
+          isNumeric={true}
+          helperText="Target hurdle rate or cost of capital"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="npv-discount-slider" min={1} max={30} step={0.25} value={10} ariaLabel="Discount rate slider" />
+        </div>
+      </div>
+
+      <!-- Initial Outlay -->
+      <div class="mb-5">
+        <Input
+          id="npv-initial"
+          label="Initial Investment (Year 0 Outlay)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Negative cash outflow at start of project"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="npv-initial-slider" min={10000} max={2000000} step={10000} value={100000} ariaLabel="Initial outlay slider" />
+        </div>
+      </div>
+
+      <!-- Yearly Cash Inflows -->
+      <div class="border-t border-border pt-4 mb-6">
+        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Annual Cash Inflows</div>
+        <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
+          <div>
+            <Input id="npv-cf1" label="Year 1 Cash Flow" prefix="₹" value="30,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="npv-cf2" label="Year 2 Cash Flow" prefix="₹" value="40,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="npv-cf3" label="Year 3 Cash Flow" prefix="₹" value="50,000" isNumeric={true} localeFormat="indian" />
+          </div>
+          <div>
+            <Input id="npv-cf4" label="Year 4 Cash Flow" prefix="₹" value="60,000" isNumeric={true} localeFormat="indian" />
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" title="Decision Rule">
+        If <strong>NPV &gt; 0</strong>, the project generates value above the hurdle rate and should be accepted. If <strong>NPV &lt; 0</strong>, the investment will yield less than the discount rate.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="npv-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="npv-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Present Value</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">₹38,877</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Present Value (NPV)</span>
+        <div id="npv-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(npvValue)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">PV of Future Inflows</span>
+          <span id="npv-result-pvinflows" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(pvInflows)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Initial Outlay (Year 0)</span>
+          <span id="npv-result-outlay" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.initialOutflow)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Profitability Index (PI)</span>
+          <span id="npv-result-pi" class="text-sm font-medium tabular-nums text-dark-text">{(pvInflows / DEFAULT.initialOutflow).toFixed(2)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Recommendation</span>
+          <span id="npv-result-decision" class="text-sm font-bold tabular-nums text-dark-accent">Accept Project (Creates Value)</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="npv-composition-wrapper">
+        <CompositionBar
+          principalFraction={pvInflows > 0 ? Math.min(1, DEFAULT.initialOutflow / pvInflows) : 1}
+          gainFraction={pvInflows > 0 ? Math.max(0, npvValue / pvInflows) : 0}
+          principalLabel="Initial Cost"
+          gainLabel="Net Value Created"
+          principalValue={fmt(DEFAULT.initialOutflow)}
+          gainValue={fmt(npvValue)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="npv-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="npv-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Calculated using standard discounted cash flow discounting formulas.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="npv-calculator-how">
-        <h2 id="npv-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate Net Present Value of a series of cash flows at a given discount rate. Fixture: NPV @10% for −1,00,000; 30,000; 40,000; 50,000; 60,000 = ₹38,877.13.</p>
+        <h2 id="npv-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Net Present Value works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          NPV determines whether a project's cash inflows exceed the present value of capital expenditures:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">NPV = Σ CF_t / (1 + r)^t, summed from t=0 to n. A negative CF at t=0 is the initial investment. Positive NPV means the project creates value at the given discount rate.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>NPV = </strong> &Sigma; [ CF<sub>t</sub> / (1 + r)<sup>t</sup> ] &minus; Initial Investment<br />
+            <strong>Profitability Index (PI) = </strong> PV of Future Inflows &divide; Initial Investment
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="npv-calculator-faq">
         <h2 id="npv-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What does a positive NPV mean?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">A positive NPV means the present value of future cash inflows exceeds the initial investment and all costs — the project creates value at the specified discount rate. A negative NPV means the project destroys value. NPV is theoretically the best capital budgeting method because it considers both the time value of money and the scale of the investment.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What discount rate should I use for NPV?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The discount rate should reflect the risk of the project's cash flows. For corporate projects, WACC is the standard choice. For a project riskier than the firm's average, use a higher rate. For riskier real-estate projects, cap rates are sometimes used. The choice of discount rate significantly affects NPV — sensitivity analysis helps.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is NPV preferred over IRR for capital budgeting?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              NPV is generally superior because it assumes cash inflows are reinvested at the firm's true cost of capital (hurdle rate), whereas IRR unrealistically assumes reinvestment at the internal rate of return itself. Furthermore, NPV never encounters multiple or undefined mathematical solutions.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the Profitability Index (PI)?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The Profitability Index represents the bang-for-your-buck per dollar invested (PV of inflows divided by initial cost). A PI greater than 1.0 indicates value creation and is especially valuable when ranking projects under capital rationing.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="npv-calculator-related">
         <h2 id="npv-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
@@ -47,3 +222,185 @@ const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApp
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcNPVClient(discountPct: number, flows: number[]) {
+    const r = discountPct / 100;
+    const npv = flows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t), 0);
+    const initialOutflow = Math.abs(flows[0] || 0);
+    const pvInflows = npv + initialOutflow;
+    const pi = initialOutflow > 0 ? pvInflows / initialOutflow : 0;
+    return { npv, pvInflows, initialOutflow, pi };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    const sign = n < 0 ? '-' : '';
+    return sign + currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.abs(Math.round(n)));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initNPVCalc() {
+    const discInput = document.getElementById('npv-discount') as HTMLInputElement | null;
+    const initInput = document.getElementById('npv-initial') as HTMLInputElement | null;
+    const discSlider = document.getElementById('npv-discount-slider') as HTMLInputElement | null;
+    const initSlider = document.getElementById('npv-initial-slider') as HTMLInputElement | null;
+
+    const cfInputs = [
+      document.getElementById('npv-cf1') as HTMLInputElement | null,
+      document.getElementById('npv-cf2') as HTMLInputElement | null,
+      document.getElementById('npv-cf3') as HTMLInputElement | null,
+      document.getElementById('npv-cf4') as HTMLInputElement | null,
+    ];
+
+    const resHero = document.getElementById('npv-result-hero');
+    const resPvInflows = document.getElementById('npv-result-pvinflows');
+    const resOutlay = document.getElementById('npv-result-outlay');
+    const resPi = document.getElementById('npv-result-pi');
+    const resDecision = document.getElementById('npv-result-decision');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!discInput || !initInput) return;
+
+    const DEFAULTS = { discount: 10, initial: 100000, cf: [30000, 40000, 50000, 60000] };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const disc = parseFloat(discInput.value) || 10;
+      const initial = parse(initInput.value);
+      const cfs = cfInputs.map((el) => (el ? parse(el.value) : 0));
+
+      if (initial <= 0) return;
+
+      const flows = [-initial, ...cfs];
+      const res = calcNPVClient(disc, flows);
+
+      if (resHero) resHero.textContent = fmtVal(res.npv);
+      if (resPvInflows) resPvInflows.textContent = fmtVal(res.pvInflows);
+      if (resOutlay) resOutlay.textContent = fmtVal(res.initialOutflow);
+      if (resPi) resPi.textContent = res.pi.toFixed(2);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.npv);
+
+      if (resDecision) {
+        if (res.npv >= 0) {
+          resDecision.textContent = 'Accept Project (Creates Value)';
+          resDecision.className = 'text-sm font-bold tabular-nums text-dark-accent';
+        } else {
+          resDecision.textContent = 'Reject Project (Destroys Value)';
+          resDecision.className = 'text-sm font-bold tabular-nums text-red-400';
+        }
+      }
+
+      history.replaceState(null, '', `#d=${disc}&i=${initial}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(discSlider, discInput, false);
+    sync(initSlider, initInput, true);
+
+    cfInputs.forEach((el) => {
+      el?.addEventListener('input', () => {
+        el.value = fmtLiveInput(el.value);
+        debounce();
+      });
+    });
+
+    document.getElementById('npv-calculate')?.addEventListener('click', recalc);
+    document.getElementById('npv-reset')?.addEventListener('click', () => {
+      discInput.value = String(DEFAULTS.discount);
+      initInput.value = fmtLiveInput(String(DEFAULTS.initial));
+      cfInputs.forEach((el, idx) => {
+        if (el) el.value = fmtLiveInput(String(DEFAULTS.cf[idx]));
+      });
+
+      if (discSlider) {
+        discSlider.value = String(DEFAULTS.discount);
+        discSlider.style.setProperty('--slider-pct', `${((DEFAULTS.discount - 1) / (30 - 1)) * 100}%`);
+      }
+      if (initSlider) {
+        initSlider.value = String(DEFAULTS.initial);
+        initSlider.style.setProperty('--slider-pct', `${((DEFAULTS.initial - 10000) / (2000000 - 10000)) * 100}%`);
+      }
+
+      recalc();
+      initInput.focus();
+    });
+
+    // Copy & Share
+    document.getElementById('npv-copy-btn')?.addEventListener('click', async () => {
+      const disc = parseFloat(discInput.value) || 10;
+      const initial = parse(initInput.value);
+      const cfs = cfInputs.map((el) => (el ? parse(el.value) : 0));
+      const res = calcNPVClient(disc, [-initial, ...cfs]);
+      const text = `NPV Result: Discount Rate ${disc}%, Outlay ${fmtVal(initial)} => NPV: ${fmtVal(res.npv)}, PI: ${res.pi.toFixed(2)}. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('npv-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('npv-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('npv-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initNPVCalc();
+  document.addEventListener('astro:page-load', initNPVCalc);
+</script>

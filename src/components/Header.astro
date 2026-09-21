@@ -1,5 +1,6 @@
 ---
 import { getPublishedTools, getToolCount } from '../config/site';
+import SearchModal from './ui/SearchModal.astro';
 
 interface Props {
   currentPath?: string;
@@ -49,7 +50,7 @@ const totalToolsCount = getToolCount();
           currentPath === '/' ? 'text-accent font-semibold' : 'hover:text-accent',
         ]}
       >
-        Home
+        <span data-i18n="nav-home">Home</span>
       </a>
 
       <!-- Tools with dropdown chevron -->
@@ -62,7 +63,7 @@ const totalToolsCount = getToolCount();
           aria-controls="tools-menu-dropdown"
           class="group px-2.5 py-1.5 rounded-control flex items-center gap-1.5 text-text-primary hover:text-accent transition-standard focus-visible:outline-accent cursor-pointer"
         >
-          <span>Tools</span>
+          <span data-i18n="nav-tools">Tools</span>
           <!-- 1.5px stroke chevron -->
           <svg
             class="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-standard"
@@ -100,7 +101,7 @@ const totalToolsCount = getToolCount();
             role="menuitem"
             class="flex items-center justify-between px-3 py-2 text-[13px] rounded font-semibold text-accent hover:bg-canvas transition-standard focus-visible:outline-accent"
           >
-            <span>View All {totalToolsCount} Calculators</span>
+            <span data-i18n="nav-view-all">View All {totalToolsCount} Calculators</span>
             <span>&rarr;</span>
           </a>
         </div>
@@ -114,7 +115,7 @@ const totalToolsCount = getToolCount();
           currentPath.startsWith('/blog') ? 'text-accent font-semibold' : 'hover:text-accent',
         ]}
       >
-        Blog
+        <span data-i18n="nav-blog">Blog</span>
       </a>
 
       <!-- About -->
@@ -125,7 +126,7 @@ const totalToolsCount = getToolCount();
           currentPath.startsWith('/about') ? 'text-accent font-semibold' : 'hover:text-accent',
         ]}
       >
-        About
+        <span data-i18n="nav-about">About</span>
       </a>
     </nav>
 
@@ -137,13 +138,13 @@ const totalToolsCount = getToolCount();
         id="header-search-btn"
         aria-label="Search calculators (press / or Ctrl+K)"
         title="Search (/ or ⌘K)"
-        class="flex items-center gap-1.5 px-2 py-1.5 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
+        class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
       >
         <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        <span class="text-[11px] text-text-muted font-medium hidden xl:inline">/</span>
+        <span class="text-[11px] text-text-muted font-mono hidden xl:inline">/</span>
       </button>
 
       <!-- Divider line subtle -->
@@ -154,7 +155,7 @@ const totalToolsCount = getToolCount();
         <button
           type="button"
           id="header-currency-btn"
-          aria-label="Select Currency (currently INR)"
+          aria-label="Select Currency"
           aria-expanded="false"
           aria-haspopup="true"
           class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
@@ -169,10 +170,22 @@ const totalToolsCount = getToolCount();
           id="header-currency-menu"
           class="hidden absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
         >
-          <button type="button" data-currency-val="₹ INR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">₹ INR (India)</button>
-          <button type="button" data-currency-val="$ USD" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">$ USD (US)</button>
-          <button type="button" data-currency-val="€ EUR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">€ EUR (Europe)</button>
-          <button type="button" data-currency-val="£ GBP" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium">£ GBP (UK)</button>
+          <button type="button" data-currency-val="₹ INR" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold transition-standard flex items-center justify-between cursor-pointer">
+            <span>₹ INR (India)</span>
+            <span data-currency-check="₹ INR" class="text-accent font-bold">✓</span>
+          </button>
+          <button type="button" data-currency-val="$ USD" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+            <span>$ USD (US)</span>
+            <span data-currency-check="$ USD" class="text-accent font-bold hidden">✓</span>
+          </button>
+          <button type="button" data-currency-val="€ EUR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+            <span>€ EUR (Europe)</span>
+            <span data-currency-check="€ EUR" class="text-accent font-bold hidden">✓</span>
+          </button>
+          <button type="button" data-currency-val="£ GBP" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+            <span>£ GBP (UK)</span>
+            <span data-currency-check="£ GBP" class="text-accent font-bold hidden">✓</span>
+          </button>
         </div>
       </div>
 
@@ -181,12 +194,12 @@ const totalToolsCount = getToolCount();
         <button
           type="button"
           id="header-lang-btn"
-          aria-label="Select Language (currently English)"
+          aria-label="Select Language"
           aria-expanded="false"
           aria-haspopup="true"
           class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
         >
-          <span>EN</span>
+          <span id="current-lang-label">EN</span>
           <svg class="w-3 h-3 text-text-muted group-hover:text-accent transition-standard" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 4.5L6 7.5L9 4.5" />
           </svg>
@@ -194,10 +207,16 @@ const totalToolsCount = getToolCount();
 
         <div
           id="header-lang-menu"
-          class="hidden absolute right-0 top-full mt-1 w-32 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
+          class="hidden absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
         >
-          <button type="button" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold">EN (English)</button>
-          <button type="button" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary">HI (Hindi)</button>
+          <button type="button" data-lang-val="EN" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold flex items-center justify-between cursor-pointer">
+            <span>EN (English)</span>
+            <span data-lang-check="EN" class="text-accent font-bold">✓</span>
+          </button>
+          <button type="button" data-lang-val="HI" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary flex items-center justify-between cursor-pointer">
+            <span>HI (हिन्दी)</span>
+            <span data-lang-check="HI" class="text-accent font-bold hidden">✓</span>
+          </button>
         </div>
       </div>
 
@@ -208,7 +227,8 @@ const totalToolsCount = getToolCount();
       <button
         type="button"
         id="theme-toggle-button"
-        aria-label="Toggle theme mode"
+        aria-label="Toggle dark mode"
+        title="Toggle dark mode"
         class="p-2 rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
       >
         <!-- Moon icon (for light mode) -->
@@ -232,16 +252,42 @@ const totalToolsCount = getToolCount();
     </div>
 
     <!-- Mobile Header Right: Compact cluster + Menu Button -->
-    <div class="flex lg:hidden items-center gap-2">
+    <div class="flex lg:hidden items-center gap-1">
+      <!-- Mobile Search Button -->
+      <button
+        type="button"
+        id="mobile-search-btn"
+        aria-label="Search calculators"
+        class="w-10 h-10 flex items-center justify-center rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
+      >
+        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </button>
+
       <!-- Dark mode toggle on mobile -->
       <button
         type="button"
         id="mobile-theme-toggle"
-        aria-label="Toggle theme"
-        class="w-10 h-10 flex items-center justify-center rounded-control text-text-primary hover:text-accent transition-standard focus-visible:outline-accent"
+        aria-label="Toggle dark mode"
+        class="w-10 h-10 flex items-center justify-center rounded-control text-text-primary hover:text-accent hover:bg-surface border border-transparent transition-standard focus-visible:outline-accent cursor-pointer"
       >
-        <svg class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Moon icon -->
+        <svg id="mobile-theme-icon-moon" class="w-4 h-4 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <!-- Sun icon -->
+        <svg id="mobile-theme-icon-sun" class="w-4 h-4 stroke-current fill-none hidden" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
         </svg>
       </button>
 
@@ -291,7 +337,7 @@ const totalToolsCount = getToolCount();
   >
     <div class="max-w-[1440px] mx-auto w-full">
       <a href="/" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        Home
+        <span data-i18n="nav-home">Home</span>
       </a>
 
       <!-- Tools accordion section in mobile -->
@@ -302,7 +348,7 @@ const totalToolsCount = getToolCount();
           aria-expanded="false"
           class="w-full h-12 flex items-center justify-between px-6 text-[15px] font-medium text-text-primary hover:text-accent hover:bg-canvas transition-standard cursor-pointer"
         >
-          <span>Tools</span>
+          <span data-i18n="nav-tools">Tools</span>
           <svg id="mobile-tools-chevron" class="w-4 h-4 text-text-muted transition-standard" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6L8 10L12 6" />
           </svg>
@@ -316,24 +362,24 @@ const totalToolsCount = getToolCount();
             </a>
           ))}
           <a href="/calculators" class="h-11 flex items-center px-8 text-sm font-semibold text-accent hover:underline">
-            View All {totalToolsCount} Calculators &rarr;
+            <span data-i18n="nav-view-all">View All {totalToolsCount} Calculators &rarr;</span>
           </a>
         </div>
       </div>
 
       <a href="/blog" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        Blog
+        <span data-i18n="nav-blog">Blog</span>
       </a>
 
       <a href="/about" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        About
+        <span data-i18n="nav-about">About</span>
       </a>
 
       <!-- Mobile utility row: Currency & Language -->
       <div class="p-4 flex items-center justify-between text-xs text-text-muted bg-canvas">
-        <div class="flex items-center gap-3">
-          <span class="font-medium text-text-primary">Currency:</span>
-          <select id="mobile-currency-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary">
+        <div class="flex items-center gap-2">
+          <span class="font-medium text-text-primary" data-i18n="nav-currency">Currency:</span>
+          <select id="mobile-currency-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
             <option value="₹ INR" selected>₹ INR</option>
             <option value="$ USD">$ USD</option>
             <option value="€ EUR">€ EUR</option>
@@ -342,8 +388,8 @@ const totalToolsCount = getToolCount();
         </div>
 
         <div class="flex items-center gap-2">
-          <span class="font-medium text-text-primary">Lang:</span>
-          <select id="mobile-lang-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary">
+          <span class="font-medium text-text-primary" data-i18n="nav-lang">Lang:</span>
+          <select id="mobile-lang-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
             <option value="EN" selected>EN</option>
             <option value="HI">HI</option>
           </select>
@@ -351,11 +397,14 @@ const totalToolsCount = getToolCount();
       </div>
     </div>
   </div>
+
+  <!-- Command Palette / Search Modal Component -->
+  <SearchModal />
 </header>
 
 <script>
   function initHeaderScripts() {
-    // 1. Desktop Tools dropdown
+    // ── 1. Desktop Tools dropdown ───────────────────────────────────────────
     const toolsBtn = document.getElementById('tools-menu-button');
     const toolsDropdown = document.getElementById('tools-menu-dropdown');
 
@@ -386,12 +435,72 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // 2. Currency dropdown
+    // ── 2. Search Buttons (Desktop & Mobile) ─────────────────────────────────
+    const searchBtn = document.getElementById('header-search-btn');
+    const mobileSearchBtn = document.getElementById('mobile-search-btn');
+
+    const triggerSearch = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      window.dispatchEvent(new CustomEvent('cm:open-search'));
+    };
+
+    searchBtn?.addEventListener('click', triggerSearch);
+    mobileSearchBtn?.addEventListener('click', triggerSearch);
+
+    // ── 3. Currency Selector with Persistence & Event Dispatch ──────────────
     const currencyBtn = document.getElementById('header-currency-btn');
     const currencyMenu = document.getElementById('header-currency-menu');
     const currencyLabel = document.getElementById('current-currency-label');
+    const mobileCurrencySelect = document.getElementById('mobile-currency-select') as HTMLSelectElement | null;
 
-    if (currencyBtn && currencyMenu && currencyLabel) {
+    const CURRENCIES: Record<string, { code: string; symbol: string; format: string }> = {
+      '₹ INR': { code: 'INR', symbol: '₹', format: 'indian' },
+      '$ USD': { code: 'USD', symbol: '$', format: 'international' },
+      '€ EUR': { code: 'EUR', symbol: '€', format: 'international' },
+      '£ GBP': { code: 'GBP', symbol: '£', format: 'international' },
+    };
+
+    function applyCurrency(val: string, broadcast = true) {
+      if (!CURRENCIES[val]) val = '₹ INR';
+      if (currencyLabel) currencyLabel.textContent = val;
+      if (mobileCurrencySelect) mobileCurrencySelect.value = val;
+
+      currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-check]').forEach((el) => {
+        const checkVal = el.getAttribute('data-currency-check');
+        el.classList.toggle('hidden', checkVal !== val);
+      });
+
+      currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-val]').forEach((btn) => {
+        const btnVal = btn.getAttribute('data-currency-val');
+        if (btnVal === val) {
+          btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
+          btn.classList.remove('text-text-primary');
+        } else {
+          btn.classList.remove('bg-canvas', 'text-accent', 'font-semibold');
+          btn.classList.add('text-text-primary');
+        }
+      });
+
+      try {
+        localStorage.setItem('cm_currency', val);
+      } catch (e) {}
+
+      if (broadcast) {
+        const detail = { label: val, ...CURRENCIES[val] };
+        window.dispatchEvent(new CustomEvent('cm:currency-change', { detail }));
+      }
+    }
+
+    // Restore saved currency
+    try {
+      const savedCur = localStorage.getItem('cm_currency');
+      if (savedCur && CURRENCIES[savedCur]) {
+        applyCurrency(savedCur, false);
+      }
+    } catch (e) {}
+
+    if (currencyBtn && currencyMenu) {
       currencyBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         currencyMenu.classList.toggle('hidden');
@@ -402,7 +511,7 @@ const totalToolsCount = getToolCount();
       currencyMenu.querySelectorAll('[data-currency-val]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const val = btn.getAttribute('data-currency-val') || '₹ INR';
-          currencyLabel.textContent = val;
+          applyCurrency(val, true);
           currencyMenu.classList.add('hidden');
           currencyMenu.classList.remove('flex');
           currencyBtn.setAttribute('aria-expanded', 'false');
@@ -418,9 +527,100 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // 3. Language dropdown
+    mobileCurrencySelect?.addEventListener('change', () => {
+      applyCurrency(mobileCurrencySelect.value, true);
+    });
+
+    // ── 4. Language Selector with Persistence & Feedback ────────────────────
     const langBtn = document.getElementById('header-lang-btn');
     const langMenu = document.getElementById('header-lang-menu');
+    const langLabel = document.getElementById('current-lang-label');
+    const mobileLangSelect = document.getElementById('mobile-lang-select') as HTMLSelectElement | null;
+
+    const I18N_TEXTS: Record<string, Record<string, string>> = {
+      EN: {
+        'nav-home': 'Home',
+        'nav-tools': 'Tools',
+        'nav-blog': 'Blog',
+        'nav-about': 'About',
+        'nav-currency': 'Currency:',
+        'nav-lang': 'Lang:',
+      },
+      HI: {
+        'nav-home': 'होम',
+        'nav-tools': 'कैलकुलेटर',
+        'nav-blog': 'ब्लॉग',
+        'nav-about': 'परिचय',
+        'nav-currency': 'मुद्रा:',
+        'nav-lang': 'भाषा:',
+      },
+    };
+
+    function showToast(message: string) {
+      let toast = document.getElementById('cm-global-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'cm-global-toast';
+        toast.className = 'fixed bottom-5 right-5 z-[150] bg-surface border border-border text-text-primary px-4 py-2.5 rounded-control text-xs font-medium transition-standard pointer-events-none opacity-0 translate-y-2';
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-2');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast?.classList.remove('opacity-100', 'translate-y-0');
+        toast?.classList.add('opacity-0', 'translate-y-2');
+      }, 2200);
+    }
+
+    function applyLanguage(lang: string, broadcast = true) {
+      if (lang !== 'HI' && lang !== 'EN') lang = 'EN';
+      if (langLabel) langLabel.textContent = lang;
+      if (mobileLangSelect) mobileLangSelect.value = lang;
+
+      langMenu?.querySelectorAll<HTMLElement>('[data-lang-check]').forEach((el) => {
+        const checkLang = el.getAttribute('data-lang-check');
+        el.classList.toggle('hidden', checkLang !== lang);
+      });
+
+      langMenu?.querySelectorAll<HTMLElement>('[data-lang-val]').forEach((btn) => {
+        const btnLang = btn.getAttribute('data-lang-val');
+        if (btnLang === lang) {
+          btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
+          btn.classList.remove('text-text-primary');
+        } else {
+          btn.classList.remove('bg-canvas', 'text-accent', 'font-semibold');
+          btn.classList.add('text-text-primary');
+        }
+      });
+
+      try {
+        localStorage.setItem('cm_lang', lang);
+      } catch (e) {}
+
+      // Update translated UI text
+      const texts = I18N_TEXTS[lang];
+      if (texts) {
+        Object.entries(texts).forEach(([key, val]) => {
+          document.querySelectorAll(`[data-i18n="${key}"]`).forEach((el) => {
+            el.textContent = val;
+          });
+        });
+      }
+
+      if (broadcast) {
+        window.dispatchEvent(new CustomEvent('cm:lang-change', { detail: { lang } }));
+        showToast(lang === 'HI' ? 'भाषा: हिन्दी सेट की गई' : 'Language set to English');
+      }
+    }
+
+    // Restore saved language
+    try {
+      const savedLang = localStorage.getItem('cm_lang');
+      if (savedLang === 'HI' || savedLang === 'EN') {
+        applyLanguage(savedLang, false);
+      }
+    } catch (e) {}
 
     if (langBtn && langMenu) {
       langBtn.addEventListener('click', (e) => {
@@ -428,6 +628,16 @@ const totalToolsCount = getToolCount();
         langMenu.classList.toggle('hidden');
         langMenu.classList.toggle('flex');
         langBtn.setAttribute('aria-expanded', langMenu.classList.contains('flex') ? 'true' : 'false');
+      });
+
+      langMenu.querySelectorAll('[data-lang-val]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang-val') || 'EN';
+          applyLanguage(lang, true);
+          langMenu.classList.add('hidden');
+          langMenu.classList.remove('flex');
+          langBtn.setAttribute('aria-expanded', 'false');
+        });
       });
 
       document.addEventListener('click', (e) => {
@@ -439,24 +649,44 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // 4. Dark mode toggle
+    mobileLangSelect?.addEventListener('change', () => {
+      applyLanguage(mobileLangSelect.value, true);
+    });
+
+    // ── 5. Dark Mode Toggle (Desktop & Mobile Sync) ──────────────────────────
     const themeBtn = document.getElementById('theme-toggle-button');
     const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
     const iconMoon = document.getElementById('theme-icon-moon');
     const iconSun = document.getElementById('theme-icon-sun');
+    const mobileIconMoon = document.getElementById('mobile-theme-icon-moon');
+    const mobileIconSun = document.getElementById('mobile-theme-icon-sun');
+    const metaTheme = document.getElementById('meta-theme-color');
 
-    const toggleTheme = () => {
+    function syncThemeUI(isDark: boolean) {
+      if (iconMoon) iconMoon.classList.toggle('hidden', isDark);
+      if (iconSun) iconSun.classList.toggle('hidden', !isDark);
+      if (mobileIconMoon) mobileIconMoon.classList.toggle('hidden', isDark);
+      if (mobileIconSun) mobileIconSun.classList.toggle('hidden', !isDark);
+      if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0F1211' : '#F7F7F4');
+    }
+
+    function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
-      if (iconMoon && iconSun) {
-        iconMoon.classList.toggle('hidden', isDark);
-        iconSun.classList.toggle('hidden', !isDark);
-      }
-    };
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      try {
+        localStorage.setItem('cm_theme', isDark ? 'dark' : 'light');
+      } catch (e) {}
+      syncThemeUI(isDark);
+    }
+
+    // Sync icons with initial class on <html>
+    const isCurrentlyDark = document.documentElement.classList.contains('dark');
+    syncThemeUI(isCurrentlyDark);
 
     themeBtn?.addEventListener('click', toggleTheme);
     mobileThemeBtn?.addEventListener('click', toggleTheme);
 
-    // 5. Mobile Navigation
+    // ── 6. Mobile Navigation ────────────────────────────────────────────────
     const mobileMenuBtn = document.getElementById('mobile-menu-button');
     const mobileNavPanel = document.getElementById('mobile-nav-panel');
     const iconBars = document.getElementById('menu-icon-bars');
@@ -506,7 +736,7 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // 6. Mobile Tools Accordion
+    // ── 7. Mobile Tools Accordion ───────────────────────────────────────────
     const mobileToolsToggle = document.getElementById('mobile-tools-toggle');
     const mobileToolsSubpanel = document.getElementById('mobile-tools-subpanel');
     const mobileToolsChevron = document.getElementById('mobile-tools-chevron');

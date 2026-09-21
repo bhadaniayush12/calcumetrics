@@ -65,4 +65,42 @@ describe('Section 12 Calculation Test Fixtures', () => {
     expect(irr.valid).toBe(true);
     expect(irr.irrPct).toBeCloseTo(24.89, 2);
   });
+
+  it('Simple Interest: ₹1,00,000, 7.5%, 5yr → ₹37,500 interest, ₹1,37,500 total', async () => {
+    const { calcSimpleInterest } = await import('./calculators/simple-interest');
+    const res = calcSimpleInterest(100000, 7.5, 5);
+    expect(res.interest).toBe(37500);
+    expect(res.totalAmount).toBe(137500);
+  });
+
+  it('Income Tax: Budget 2024 New Regime standard deduction ₹75,000', async () => {
+    const { calcIncomeTax } = await import('./calculators/income-tax');
+    const res = calcIncomeTax(700000);
+    // Gross 7L - 75k std ded = 6.25L taxable <= 7L => 0 tax after Sec 87A rebate
+    expect(res.newRegime.totalTax).toBe(0);
+  });
+
+  it('EOQ: D=10,000, S=₹500, H=₹25 → 632 units', async () => {
+    const { calcEOQ } = await import('./calculators/eoq');
+    const res = calcEOQ(10000, 500, 25);
+    expect(res.eoqRounded).toBe(632);
+    expect(res.ordersPerYear).toBeCloseTo(15.81, 1);
+  });
+
+  it('Depreciation SLM: Cost ₹5,00,000, Salvage ₹50,000, 5yr → ₹90,000/yr', async () => {
+    const { calcDepreciation } = await import('./calculators/depreciation');
+    const res = calcDepreciation(500000, 50000, 5, 'SLM');
+    expect(res.annualDepreciation).toBe(90000);
+    expect(res.totalDepreciation).toBe(450000);
+  });
+
+  it('Working Capital: Assets ₹10L, Liab ₹4.5L → NWC ₹5.5L', async () => {
+    const { calcWorkingCapital } = await import('./calculators/working-capital');
+    const res = calcWorkingCapital(250000, 350000, 400000, 0, 300000, 150000);
+    expect(res.totalCurrentAssets).toBe(1000000);
+    expect(res.totalCurrentLiabilities).toBe(450000);
+    expect(res.netWorkingCapital).toBe(550000);
+    expect(res.currentRatio).toBeCloseTo(2.22, 2);
+  });
 });
+

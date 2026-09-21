@@ -1,49 +1,515 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
+import { calc401K } from '../../lib/calculators/401k';
 import { TOOLS } from '../../config/site';
+
+const DEFAULT = {
+  annualSalary: 100000,
+  contributionPct: 8,
+  employerMatchPct: 50,
+  employerMatchUpToPct: 6,
+  ratePercent: 8,
+  years: 30,
+};
+
+const result = calc401K(
+  DEFAULT.annualSalary,
+  DEFAULT.contributionPct,
+  DEFAULT.employerMatchPct,
+  DEFAULT.employerMatchUpToPct,
+  DEFAULT.ratePercent,
+  DEFAULT.years
+);
+
+const fmtUSD = (n: number) => '$' + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== '401k-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/us/401k-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: '401(k) Calculator (US)', url: canonicalUrl, description: 'Calculate 401(k) retirement savings growth with employer match and annual contribution limits.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' }, { '@type': 'ListItem', position: 3, name: '401(k) Calculator (US)' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: '401(k) Calculator (US)',
+      url: canonicalUrl,
+      description: 'Calculate 401(k) retirement savings growth with employer match, compound interest, and annual contribution limits.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: '401(k) Calculator (US)' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="401(k) Calculator: Retirement Savings Growth | Calcumetrics" description="Calculate 401(k) retirement savings growth with employer match and annual contribution limits." canonical={canonicalUrl}>
+
+<Layout
+  title="401(k) Calculator: Retirement Savings Growth with Employer Match | Calcumetrics"
+  description="Calculate 401(k) retirement savings growth with employer match, compound interest, and annual contribution limits."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="401(k) Calculator (US)" category="Investments" categoryHref="/investments" heroValue="Calculate to see" heroLabel="Retirement Balance">
+
+  <CalculatorLayout
+    toolName="401(k) Calculator (US)"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmtUSD(result.maturity)}
+    heroLabel="Projected 401(k) Balance"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">401(k) Calculator (US)</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate 401(k) retirement savings growth with employer match and annual contribution limits.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Estimate your retirement balance including employee contributions and employer matching.</p>
+
+      <!-- Annual Salary -->
+      <div class="mb-5">
+        <Input
+          id="k401-salary"
+          label="Current Annual Salary"
+          prefix="$"
+          value="100,000"
+          isNumeric={true}
+          localeFormat="western"
+          helperText="Gross pre-tax annual income"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="k401-salary-slider" min={20000} max={500000} step={5000} value={100000} ariaLabel="Annual salary slider" />
+        </div>
+      </div>
+
+      <!-- Contribution Pct -->
+      <div class="mb-5">
+        <Input
+          id="k401-contrib"
+          label="Your Contribution"
+          suffix="%"
+          value="8"
+          isNumeric={true}
+          helperText="Percentage of salary you contribute each year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="k401-contrib-slider" min={1} max={50} step={0.5} value={8} ariaLabel="Employee contribution slider" />
+        </div>
+      </div>
+
+      <!-- Employer Match % -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+        <div>
+          <Input
+            id="k401-match"
+            label="Employer Match"
+            suffix="%"
+            value="50"
+            isNumeric={true}
+            helperText="e.g. 50% or 100% match"
+            inputmode="decimal"
+          />
+          <div class="mt-2">
+            <Slider id="k401-match-slider" min={0} max={100} step={5} value={50} ariaLabel="Employer match rate slider" />
+          </div>
+        </div>
+        <div>
+          <Input
+            id="k401-match-limit"
+            label="Match Limit"
+            suffix="% of Salary"
+            value="6"
+            isNumeric={true}
+            helperText="Maximum salary % matched"
+            inputmode="decimal"
+          />
+          <div class="mt-2">
+            <Slider id="k401-match-limit-slider" min={0} max={15} step={0.5} value={6} ariaLabel="Employer match ceiling slider" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Expected Return & Years -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div>
+          <Input
+            id="k401-rate"
+            label="Annual Return"
+            suffix="%"
+            value="8"
+            isNumeric={true}
+            helperText="Expected annual portfolio growth"
+            inputmode="decimal"
+          />
+          <div class="mt-2">
+            <Slider id="k401-rate-slider" min={1} max={15} step={0.25} value={8} ariaLabel="Annual return rate slider" />
+          </div>
+        </div>
+        <div>
+          <Input
+            id="k401-years"
+            label="Years to Retirement"
+            suffix="Years"
+            value="30"
+            isNumeric={true}
+            helperText="Investment timeframe"
+            inputmode="decimal"
+          />
+          <div class="mt-2">
+            <Slider id="k401-years-slider" min={1} max={45} step={1} value={30} ariaLabel="Years to retirement slider" />
+          </div>
+        </div>
+      </div>
+
+      <Alert variant="info" title="IRS 401(k) Limits">
+        For 2025/2026, the IRS employee elective deferral limit is $23,500/year (plus $7,500 catch-up for age 50+). Employer contributions do not count toward this elective limit.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="k401-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="k401-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Retirement Balance</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Projected 401(k) Balance</span>
+        <div id="k401-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtUSD(result.maturity)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Your Contributions</span>
+          <span id="k401-result-emp" class="text-sm font-medium tabular-nums text-dark-text">{fmtUSD(result.employeeContributed)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Employer Match (Free Money)</span>
+          <span id="k401-result-er" class="text-sm font-medium tabular-nums text-dark-text">{fmtUSD(result.employerContributed)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Contributed</span>
+          <span id="k401-result-total-contrib" class="text-sm font-medium tabular-nums text-dark-text">{fmtUSD(result.totalContributed)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Compound Growth / Gains</span>
+          <span id="k401-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtUSD(result.gain)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="k401-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.contributedFraction}
+          gainFraction={result.gainFraction}
+          principalLabel="Contributions"
+          gainLabel="Growth"
+          principalValue={fmtUSD(result.totalContributed)}
+          gainValue={fmtUSD(result.gain)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="k401-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="k401-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes regular contributions and annual compounding. Not investment advice.</p>
     </Fragment>
+
     <Fragment slot="below">
-      <section aria-labelledby="401k-calculator-how">
-        <h2 id="401k-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate 401(k) retirement savings growth with employer match and annual contribution limits.</p>
+      <section aria-labelledby="k401-calculator-how">
+        <h2 id="k401-calculator-how" class="text-xl font-bold text-text-primary mb-4">How 401(k) compound growth works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          A 401(k) allows pre-tax dollars to grow tax-deferred until retirement. Employer matching provides an immediate guaranteed return on contributed funds:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Each year: balance = (balance + employee_contribution + employer_match) × (1 + annual_return). Employer match = min(contribution%, match_up_to%) × salary × match_rate.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Annual Balance Growth:</strong> Balance<sub>t</sub> = (Balance<sub>t-1</sub> + Employee Contribution + Employer Match) × (1 + r)<br />
+            <strong>Employer Match Formula:</strong> Min(Your Contribution %, Match Cap %) × Salary × Match Rate %
+          </p>
         </div>
       </section>
-      <section aria-labelledby="401k-calculator-faq">
-        <h2 id="401k-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+
+      <section aria-labelledby="k401-calculator-faq">
+        <h2 id="k401-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is employer match and how does it work?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Employer match is a contribution your employer makes to your 401(k) based on your own contributions. A common structure is '100% match up to 6% of salary' — meaning if you earn $100,000 and contribute 6% ($6,000), your employer adds another $6,000. This is effectively a 100% return on that portion of your contribution.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the 401(k) contribution limits?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Contribution limits are set by the IRS and adjusted for inflation each year. In 2025, the elective deferral limit is $23,500 for employees under 50, and $31,000 for those 50 and over (catch-up contribution). Verify current limits at irs.gov before making decisions.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is employer matching in a 401(k)?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Employer match is additional money contributed by your company based on how much you save. For example, a 50% match up to 6% means if you earn $100,000 and save 6% ($6,000), your company contributes $3,000, boosting your total annual savings to $9,000.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When can I withdraw without penalty?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Generally, you can make qualified penalty-free withdrawals starting at age 59½. Withdrawals prior to this age may be subject to ordinary income tax plus an additional 10% IRS early withdrawal penalty, subject to specific exceptions.
+            </div>
+          </details>
         </div>
       </section>
-      <section aria-labelledby="401k-calculator-related">
-        <h2 id="401k-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+
+      <section aria-labelledby="k401-calculator-related">
+        <h2 id="k401-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calc401KClient(salary: number, contribPct: number, matchPct: number, matchUpTo: number, ratePct: number, years: number) {
+    const rate = ratePct / 100;
+    const empContrib = salary * (contribPct / 100);
+    const matchable = salary * (Math.min(contribPct, matchUpTo) / 100);
+    const erContrib = matchable * (matchPct / 100);
+
+    let balance = 0;
+    let totalEmp = 0;
+    let totalEr = 0;
+
+    for (let yr = 1; yr <= years; yr++) {
+      balance = (balance + empContrib + erContrib) * (1 + rate);
+      totalEmp += empContrib;
+      totalEr += erContrib;
+    }
+
+    const totalContrib = totalEmp + totalEr;
+    const gain = Math.max(0, balance - totalContrib);
+
+    return {
+      maturity: balance,
+      employeeContributed: totalEmp,
+      employerContributed: totalEr,
+      totalContributed: totalContrib,
+      gain,
+      contributedFraction: balance > 0 ? totalContrib / balance : 0,
+      gainFraction: balance > 0 ? gain / balance : 0,
+    };
+  }
+
+  let currSym = '$';
+  let currLocale = 'en-US';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function init401KCalc() {
+    const salaryInput = document.getElementById('k401-salary') as HTMLInputElement | null;
+    const contribInput = document.getElementById('k401-contrib') as HTMLInputElement | null;
+    const matchInput = document.getElementById('k401-match') as HTMLInputElement | null;
+    const matchLimitInput = document.getElementById('k401-match-limit') as HTMLInputElement | null;
+    const rateInput = document.getElementById('k401-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('k401-years') as HTMLInputElement | null;
+
+    const salarySlider = document.getElementById('k401-salary-slider') as HTMLInputElement | null;
+    const contribSlider = document.getElementById('k401-contrib-slider') as HTMLInputElement | null;
+    const matchSlider = document.getElementById('k401-match-slider') as HTMLInputElement | null;
+    const matchLimitSlider = document.getElementById('k401-match-limit-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('k401-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('k401-years-slider') as HTMLInputElement | null;
+
+    const resMaturity = document.getElementById('k401-result-maturity');
+    const resEmp = document.getElementById('k401-result-emp');
+    const resEr = document.getElementById('k401-result-er');
+    const resTotalContrib = document.getElementById('k401-result-total-contrib');
+    const resGain = document.getElementById('k401-result-gain');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!salaryInput || !contribInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { salary: 100000, contrib: 8, match: 50, matchLimit: 6, rate: 8, years: 30 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const sal = parse(salaryInput.value);
+      const con = parseFloat(contribInput.value) || 0;
+      const mat = parseFloat(matchInput ? matchInput.value : '50') || 0;
+      const lim = parseFloat(matchLimitInput ? matchLimitInput.value : '6') || 0;
+      const r = parseFloat(rateInput.value) || 0;
+      const y = parseInt(yearsInput.value) || 0;
+
+      if (sal <= 0 || y <= 0) return;
+
+      const res = calc401KClient(sal, con, mat, lim, r, y);
+
+      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
+      if (resEmp) resEmp.textContent = fmtVal(res.employeeContributed);
+      if (resEr) resEr.textContent = fmtVal(res.employerContributed);
+      if (resTotalContrib) resTotalContrib.textContent = fmtVal(res.totalContributed);
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+
+      const wrapper = document.getElementById('k401-composition-wrapper');
+      if (wrapper && res.maturity > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.contributedFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalContributed);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+      }
+
+      history.replaceState(null, '', `#s=${sal}&c=${con}&m=${mat}&l=${lim}&r=${r}&y=${y}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(salarySlider, salaryInput, true);
+    sync(contribSlider, contribInput, false);
+    sync(matchSlider, matchInput, false);
+    sync(matchLimitSlider, matchLimitInput, false);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('k401-calculate')?.addEventListener('click', recalc);
+    document.getElementById('k401-reset')?.addEventListener('click', () => {
+      salaryInput.value = fmtLiveInput(String(DEFAULTS.salary));
+      contribInput.value = String(DEFAULTS.contrib);
+      if (matchInput) matchInput.value = String(DEFAULTS.match);
+      if (matchLimitInput) matchLimitInput.value = String(DEFAULTS.matchLimit);
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+
+      if (salarySlider) {
+        salarySlider.value = String(DEFAULTS.salary);
+        salarySlider.style.setProperty('--slider-pct', `${((DEFAULTS.salary - 20000) / (500000 - 20000)) * 100}%`);
+      }
+      if (contribSlider) {
+        contribSlider.value = String(DEFAULTS.contrib);
+        contribSlider.style.setProperty('--slider-pct', `${((DEFAULTS.contrib - 1) / (50 - 1)) * 100}%`);
+      }
+      if (matchSlider) {
+        matchSlider.value = String(DEFAULTS.match);
+        matchSlider.style.setProperty('--slider-pct', `${((DEFAULTS.match - 0) / (100 - 0)) * 100}%`);
+      }
+      if (matchLimitSlider) {
+        matchLimitSlider.value = String(DEFAULTS.matchLimit);
+        matchLimitSlider.style.setProperty('--slider-pct', `${((DEFAULTS.matchLimit - 0) / (15 - 0)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (15 - 1)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (45 - 1)) * 100}%`);
+      }
+
+      recalc();
+      salaryInput.focus();
+    });
+
+    [salaryInput, contribInput, matchInput, matchLimitInput, rateInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('k401-copy-btn')?.addEventListener('click', async () => {
+      const sal = parse(salaryInput.value);
+      const con = parseFloat(contribInput.value) || 0;
+      const mat = parseFloat(matchInput ? matchInput.value : '50') || 0;
+      const lim = parseFloat(matchLimitInput ? matchLimitInput.value : '6') || 0;
+      const r = parseFloat(rateInput.value) || 0;
+      const y = parseInt(yearsInput.value) || 0;
+      const res = calc401KClient(sal, con, mat, lim, r, y);
+      const text = `401(k) Projection: Salary ${fmtVal(sal)}, saving ${con}% with ${mat}% match up to ${lim}% at ${r}% for ${y} years => Retirement balance: ${fmtVal(res.maturity)} (gains: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('k401-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('k401-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('k401-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('₹') ? '₹' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '$';
+        currLocale = saved.includes('INR') ? 'en-IN' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-US';
+      }
+    } catch (e) {}
+  }
+
+  init401KCalc();
+  document.addEventListener('astro:page-load', init401KCalc);
+</script>

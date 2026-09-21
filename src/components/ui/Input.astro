@@ -86,6 +86,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
           'text-[14px] select-none pr-1.5 shrink-0 font-medium',
           isError ? 'text-error-text' : disabled ? 'text-disabled-text' : 'text-text-muted',
         ]}
+        data-currency-prefix={['₹', '$', '€', '£'].includes(prefix) ? 'true' : undefined}
       >
         {prefix}
       </span>

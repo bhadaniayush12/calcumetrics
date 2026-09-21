@@ -1,0 +1,512 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcDepreciation } from '../lib/calculators/depreciation';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { cost: 500000, salvage: 50000, life: 5, method: 'SLM' as const };
+const result = calcDepreciation(DEFAULT.cost, DEFAULT.salvage, DEFAULT.life, DEFAULT.method);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'depreciation-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/depreciation-calculator' as string;
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Depreciation Calculator (SLM & WDV)',
+      url: canonicalUrl,
+      description: 'Calculate asset depreciation using Straight Line Method (SLM) and Written Down Value (WDV) methods with full annual asset write-off schedule.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Depreciation Calculator' },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Depreciation Calculator: SLM & WDV Methods with Schedule | Calcumetrics"
+  description="Calculate asset depreciation using Straight Line Method (SLM) and Written Down Value (WDV) methods with full annual asset write-off schedule."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Depreciation Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={fmt(result.annualDepreciation)}
+    heroLabel="Annual Depreciation"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Depreciation Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Model asset book values, tax deductions, and depreciation schedules under SLM and WDV.</p>
+
+      <!-- Asset Cost -->
+      <div class="mb-5">
+        <Input
+          id="dep-cost"
+          label="Asset Purchase Cost"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total acquisition cost including shipping and installation"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dep-cost-slider" min={25000} max={5000000} step={25000} value={500000} ariaLabel="Asset cost slider" />
+        </div>
+      </div>
+
+      <!-- Salvage / Scrap Value -->
+      <div class="mb-5">
+        <Input
+          id="dep-salvage"
+          label="Salvage / Scrap Value"
+          prefix="₹"
+          value="50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Estimated resale value at end of asset lifecycle"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dep-salvage-slider" min={0} max={1000000} step={10000} value={50000} ariaLabel="Salvage value slider" />
+        </div>
+      </div>
+
+      <!-- Useful Life -->
+      <div class="mb-5">
+        <Input
+          id="dep-life"
+          label="Useful Life"
+          suffix="Years"
+          value="5"
+          isNumeric={true}
+          helperText="Number of operating years asset will be actively used"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dep-life-slider" min={1} max={30} step={1} value={5} ariaLabel="Useful life slider" />
+        </div>
+      </div>
+
+      <!-- Depreciation Method -->
+      <div class="mb-6">
+        <Dropdown
+          id="dep-method"
+          label="Depreciation Method"
+          options={[
+            { value: 'SLM', label: 'Straight Line Method (SLM) — Constant yearly charge' },
+            { value: 'WDV', label: 'Written Down Value (WDV) — Accelerated declining balance' },
+          ]}
+          value="SLM"
+          helperText="Choose corporate accounting or taxation write-off standard"
+        />
+      </div>
+
+      <Alert variant="info" title="Tax vs Book Accounting">
+        Indian Income Tax Act requires the <strong>Written Down Value (WDV)</strong> method for most block of assets, while Companies Act allows both SLM and WDV for financial reporting.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="dep-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="dep-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Annual Depreciation</span>
+        <div id="dep-result-annual" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.annualDepreciation)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Depreciation Rate (% p.a.)</span>
+          <span id="dep-result-rate" class="text-sm font-semibold tabular-nums text-dark-accent">{result.depreciationRatePct.toFixed(2)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Written-Off Amount</span>
+          <span id="dep-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalDepreciation)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Remaining Book / Salvage Value</span>
+          <span id="dep-result-closing" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.salvage)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Accounting Method</span>
+          <span id="dep-result-methodlabel" class="text-sm font-bold tabular-nums text-dark-text">Straight Line Method (SLM)</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="dep-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.totalDepreciation / DEFAULT.cost}
+          gainFraction={DEFAULT.salvage / DEFAULT.cost}
+          principalLabel="Depreciation"
+          gainLabel="Salvage"
+          principalValue={fmt(result.totalDepreciation)}
+          gainValue={fmt(DEFAULT.salvage)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="dep-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="dep-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Schedule complies with schedule II of Companies Act &amp; Section 32 Income Tax.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="dep-calculator-schedule" class="mb-8">
+        <h2 id="dep-calculator-schedule" class="text-xl font-bold text-text-primary mb-4">Annual Depreciation Schedule</h2>
+        <div class="overflow-x-auto border border-border rounded-card">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-surface border-b border-border text-text-muted font-medium text-xs uppercase tracking-wider">
+              <tr>
+                <th class="px-4 py-3">Year</th>
+                <th class="px-4 py-3">Opening Book Value</th>
+                <th class="px-4 py-3">Depreciation</th>
+                <th class="px-4 py-3">Accumulated Depreciation</th>
+                <th class="px-4 py-3">Closing Book Value</th>
+              </tr>
+            </thead>
+            <tbody id="dep-schedule-body" class="divide-y divide-border">
+              {result.schedule.map((row) => (
+                <tr class="hover:bg-canvas transition-standard">
+                  <td class="px-4 py-2.5 font-medium text-text-primary">Year {row.year}</td>
+                  <td class="px-4 py-2.5 tabular-nums text-text-muted">{fmt(row.openingValue)}</td>
+                  <td class="px-4 py-2.5 tabular-nums text-accent font-semibold">{fmt(row.depreciation)}</td>
+                  <td class="px-4 py-2.5 tabular-nums text-text-muted">{fmt(row.accumulatedDepreciation)}</td>
+                  <td class="px-4 py-2.5 tabular-nums text-text-primary font-medium">{fmt(row.closingValue)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="dep-calculator-how">
+        <h2 id="dep-calculator-how" class="text-xl font-bold text-text-primary mb-4">SLM vs WDV Depreciation Formulas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="font-bold text-base text-text-primary mb-2">Straight Line Method (SLM)</h3>
+            <p class="text-sm text-text-muted leading-relaxed mb-2">
+              Depreciates an equal monetary amount every year over the asset's useful lifetime:
+            </p>
+            <p class="font-mono text-xs text-text-primary mb-1">Annual Dep = (Cost − Salvage) ÷ Life</p>
+            <p class="font-mono text-xs text-text-primary">Rate % = (Annual Dep ÷ Cost) × 100</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="font-bold text-base text-text-primary mb-2">Written Down Value (WDV)</h3>
+            <p class="text-sm text-text-muted leading-relaxed mb-2">
+              Accelerates depreciation in earlier years by charging a constant percentage on decreasing book value:
+            </p>
+            <p class="font-mono text-xs text-text-primary mb-1">Rate % = [ 1 − (Salvage ÷ Cost)<sup>(1/Life)</sup> ] × 100</p>
+            <p class="font-mono text-xs text-text-primary">Annual Dep = Opening Value × Rate %</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="dep-calculator-faq">
+        <h2 id="dep-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why do tax authorities prefer WDV?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Most physical assets lose value rapidly right after acquisition (cars, computers, machinery). WDV aligns tax write-offs with realistic market depreciation and combines higher early tax deductions with lower repair costs, balancing overall annual expense.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can an asset be depreciated below its salvage value?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              No. An asset cannot be depreciated below its estimated salvage or scrap value. Once the net book value matches the salvage value, further depreciation deductions cease.
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section aria-labelledby="dep-calculator-related">
+        <h2 id="dep-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  function calcDepClient(cost: number, salvageVal: number, usefulLife: number, method: 'SLM' | 'WDV') {
+    const salvage = Math.min(cost, Math.max(0, salvageVal));
+    const depreciable = cost - salvage;
+    const schedule: any[] = [];
+
+    if (method === 'SLM') {
+      const annualDep = usefulLife > 0 ? depreciable / usefulLife : 0;
+      const ratePct = cost > 0 ? (annualDep / cost) * 100 : 0;
+      let opening = cost;
+      let accum = 0;
+
+      for (let yr = 1; yr <= usefulLife; yr++) {
+        const dep = Math.min(annualDep, Math.max(0, opening - salvage));
+        accum += dep;
+        const closing = Math.max(salvage, opening - dep);
+        schedule.push({ year: yr, openingValue: opening, depreciation: dep, accumulatedDepreciation: accum, closingValue: closing });
+        opening = closing;
+      }
+
+      return {
+        annualDepreciation: Math.round(annualDep),
+        depreciationRatePct: ratePct,
+        totalDepreciation: Math.round(accum),
+        salvageValue: salvage,
+        schedule,
+      };
+    } else {
+      const effectiveSalvage = salvage > 0 ? salvage : Math.max(1, cost * 0.05);
+      const rate = 1 - Math.pow(effectiveSalvage / cost, 1 / usefulLife);
+      const ratePct = rate * 100;
+      let opening = cost;
+      let accum = 0;
+
+      for (let yr = 1; yr <= usefulLife; yr++) {
+        let dep = opening * rate;
+        if (yr === usefulLife || opening - dep < salvage) {
+          dep = Math.max(0, opening - salvage);
+        }
+        accum += dep;
+        const closing = Math.max(salvage, opening - dep);
+        schedule.push({ year: yr, openingValue: opening, depreciation: dep, accumulatedDepreciation: accum, closingValue: closing });
+        opening = closing;
+      }
+
+      return {
+        annualDepreciation: schedule[0] ? Math.round(schedule[0].depreciation) : 0,
+        depreciationRatePct: ratePct,
+        totalDepreciation: Math.round(accum),
+        salvageValue: salvage,
+        schedule,
+      };
+    }
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initDepCalc() {
+    const costInput = document.getElementById('dep-cost') as HTMLInputElement | null;
+    const salvageInput = document.getElementById('dep-salvage') as HTMLInputElement | null;
+    const lifeInput = document.getElementById('dep-life') as HTMLInputElement | null;
+    const methodSelect = document.getElementById('dep-method') as HTMLSelectElement | null;
+
+    const costSlider = document.getElementById('dep-cost-slider') as HTMLInputElement | null;
+    const salvageSlider = document.getElementById('dep-salvage-slider') as HTMLInputElement | null;
+    const lifeSlider = document.getElementById('dep-life-slider') as HTMLInputElement | null;
+
+    const resAnnual = document.getElementById('dep-result-annual');
+    const resRate = document.getElementById('dep-result-rate');
+    const resTotal = document.getElementById('dep-result-total');
+    const resClosing = document.getElementById('dep-result-closing');
+    const resMethodLabel = document.getElementById('dep-result-methodlabel');
+    const scheduleBody = document.getElementById('dep-schedule-body');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!costInput || !lifeInput) return;
+
+    const DEFAULTS = { cost: 500000, salvage: 50000, life: 5, method: 'SLM' };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const cost = parse(costInput.value);
+      const salvage = parse(salvageInput ? salvageInput.value : '0');
+      const life = parseInt(lifeInput.value) || 1;
+      const method = (methodSelect ? methodSelect.value : 'SLM') as 'SLM' | 'WDV';
+
+      if (cost <= 0 || life <= 0) return;
+
+      const res = calcDepClient(cost, salvage, life, method);
+
+      if (resAnnual) resAnnual.textContent = fmtVal(res.annualDepreciation);
+      if (resRate) resRate.textContent = res.depreciationRatePct.toFixed(2) + '%';
+      if (resTotal) resTotal.textContent = fmtVal(res.totalDepreciation);
+      if (resClosing) resClosing.textContent = fmtVal(res.salvageValue);
+      if (resMethodLabel) resMethodLabel.textContent = method === 'SLM' ? 'Straight Line Method (SLM)' : 'Written Down Value (WDV)';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.annualDepreciation);
+
+      const wrapper = document.getElementById('dep-composition-wrapper');
+      if (wrapper && cost > 0) {
+        const depFrac = res.totalDepreciation / cost;
+        const salvFrac = res.salvageValue / cost;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(depFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(salvFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalDepreciation);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.salvageValue);
+      }
+
+      if (scheduleBody) {
+        scheduleBody.innerHTML = res.schedule.map((row: any) => `
+          <tr class="hover:bg-canvas transition-standard">
+            <td class="px-4 py-2.5 font-medium text-text-primary">Year ${row.year}</td>
+            <td class="px-4 py-2.5 tabular-nums text-text-muted">${fmtVal(row.openingValue)}</td>
+            <td class="px-4 py-2.5 tabular-nums text-accent font-semibold">${fmtVal(row.depreciation)}</td>
+            <td class="px-4 py-2.5 tabular-nums text-text-muted">${fmtVal(row.accumulatedDepreciation)}</td>
+            <td class="px-4 py-2.5 tabular-nums text-text-primary font-medium">${fmtVal(row.closingValue)}</td>
+          </tr>
+        `).join('');
+      }
+
+      history.replaceState(null, '', `#c=${cost}&s=${salvage}&l=${life}&m=${method}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(costSlider, costInput, true);
+    sync(salvageSlider, salvageInput!, true);
+    sync(lifeSlider, lifeInput, false);
+    methodSelect?.addEventListener('change', recalc);
+
+    document.getElementById('dep-calculate')?.addEventListener('click', recalc);
+    document.getElementById('dep-reset')?.addEventListener('click', () => {
+      costInput.value = fmtLiveInput(String(DEFAULTS.cost));
+      if (salvageInput) salvageInput.value = fmtLiveInput(String(DEFAULTS.salvage));
+      lifeInput.value = String(DEFAULTS.life);
+      if (methodSelect) methodSelect.value = DEFAULTS.method;
+
+      if (costSlider) {
+        costSlider.value = String(DEFAULTS.cost);
+        costSlider.style.setProperty('--slider-pct', `${((DEFAULTS.cost - 25000) / (5000000 - 25000)) * 100}%`);
+      }
+      if (salvageSlider) {
+        salvageSlider.value = String(DEFAULTS.salvage);
+        salvageSlider.style.setProperty('--slider-pct', `${(DEFAULTS.salvage / 1000000) * 100}%`);
+      }
+      if (lifeSlider) {
+        lifeSlider.value = String(DEFAULTS.life);
+        lifeSlider.style.setProperty('--slider-pct', `${((DEFAULTS.life - 1) / (30 - 1)) * 100}%`);
+      }
+
+      recalc();
+      costInput.focus();
+    });
+
+    [costInput, salvageInput, lifeInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('dep-copy-btn')?.addEventListener('click', async () => {
+      const cost = parse(costInput.value);
+      const salvage = parse(salvageInput ? salvageInput.value : '0');
+      const life = parseInt(lifeInput.value) || 1;
+      const method = (methodSelect ? methodSelect.value : 'SLM') as any;
+      const res = calcDepClient(cost, salvage, life, method);
+      const text = `Depreciation (${method}): Cost ${fmtVal(cost)}, Salvage ${fmtVal(salvage)}, Life ${life} years => Annual Dep: ${fmtVal(res.annualDepreciation)} (${res.depreciationRatePct.toFixed(2)}%). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('dep-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('dep-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('dep-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initDepCalc();
+  document.addEventListener('astro:page-load', initDepCalc);
+</script>

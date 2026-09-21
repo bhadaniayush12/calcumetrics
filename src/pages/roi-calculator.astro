@@ -1,49 +1,413 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcROI } from '../lib/calculators/business';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+const DEFAULT = { initial: 100000, final: 250000, years: 3 };
+const result = calcROI(DEFAULT.initial, DEFAULT.final, DEFAULT.years);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'roi-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/roi-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'ROI Calculator', url: canonicalUrl, description: 'Calculate return on investment as a percentage and annualised rate for any investment or business decision.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }, { '@type': 'ListItem', position: 3, name: 'ROI Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'ROI Calculator',
+      url: canonicalUrl,
+      description: 'Calculate return on investment as a percentage, absolute profit, and annualised rate for any investment or business decision.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'ROI Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="ROI Calculator: Return on Investment & Annualised Rate | Calcumetrics" description="Calculate return on investment as a percentage and annualised rate for any investment or business decision." canonical={canonicalUrl}>
+
+<Layout
+  title="ROI Calculator: Return on Investment & Annualised Rate | Calcumetrics"
+  description="Calculate return on investment as a percentage, absolute profit, and annualised rate for any investment or business decision."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="ROI Calculator" category="Business" categoryHref="/business" heroValue="Calculate to see" heroLabel="ROI">
+
+  <CalculatorLayout
+    toolName="ROI Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={result.roi.toFixed(1) + '%'}
+    heroLabel="Total Return on Investment"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">ROI Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate return on investment as a percentage and annualised rate for any investment or business decision.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Evaluate capital efficiency, profit gain, and annualised compound returns.</p>
+
+      <!-- Initial Investment -->
+      <div class="mb-5">
+        <Input
+          id="roi-initial"
+          label="Initial Investment"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total capital or project expenditure committed"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="roi-initial-slider" min={5000} max={5000000} step={5000} value={100000} ariaLabel="Initial investment slider" />
+        </div>
+      </div>
+
+      <!-- Final Value -->
+      <div class="mb-5">
+        <Input
+          id="roi-final"
+          label="Final Value (Returned Capital)"
+          prefix="₹"
+          value="2,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Gross value returned or realized after exit"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="roi-final-slider" min={5000} max={10000000} step={10000} value={250000} ariaLabel="Final value slider" />
+        </div>
+      </div>
+
+      <!-- Duration -->
+      <div class="mb-6">
+        <Input
+          id="roi-years"
+          label="Investment Horizon"
+          suffix="Years"
+          value="3"
+          isNumeric={true}
+          helperText="Time elapsed between investment and return"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="roi-years-slider" min={0.5} max={30} step={0.5} value={3} ariaLabel="Years slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Annualised Returns">
+        A 100% ROI achieved over 1 year is vastly superior to a 100% ROI achieved over 10 years. Always examine Annualised ROI (CAGR) when comparing assets.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="roi-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="roi-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">ROI</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Total Return on Investment</span>
+        <div id="roi-result-pct" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.roi.toFixed(1)}%
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Profit / Gain</span>
+          <span id="roi-result-profit" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.netProfit)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Annualised Return (CAGR)</span>
+          <span id="roi-result-annualised" class="text-sm font-medium tabular-nums text-dark-text">{result.annualisedROI.toFixed(1)}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Investment Multiple</span>
+          <span id="roi-result-multiple" class="text-sm font-medium tabular-nums text-dark-text">{(DEFAULT.final / DEFAULT.initial).toFixed(2)}x</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Realized Value</span>
+          <span id="roi-result-total" class="text-sm font-bold tabular-nums text-dark-text">{fmt(DEFAULT.final)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="roi-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.final > 0 ? DEFAULT.initial / DEFAULT.final : 1}
+          gainFraction={DEFAULT.final > 0 ? Math.max(0, result.netProfit) / DEFAULT.final : 0}
+          principalLabel="Initial Capital"
+          gainLabel="Net Profit"
+          principalValue={fmt(DEFAULT.initial)}
+          gainValue={fmt(result.netProfit)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="roi-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="roi-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Standard metric for evaluating business initiatives and asset portfolios.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="roi-calculator-how">
-        <h2 id="roi-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate return on investment as a percentage and annualised rate for any investment or business decision.</p>
+        <h2 id="roi-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Return on Investment is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          ROI quantifies the efficiency of an investment relative to its cost:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">ROI = (Final Value − Initial Investment) / Initial Investment × 100. Annualised ROI = (Final Value / Initial Investment)^(1/years) − 1. Unlike CAGR, ROI does not account for intermediate cash flows.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Net Profit = </strong> Final Value − Initial Cost<br />
+            <strong>Absolute ROI % = </strong> (Net Profit ÷ Initial Cost) × 100<br />
+            <strong>Annualised ROI % = </strong> [(Final Value ÷ Initial Cost)<sup>(1 / Years)</sup> − 1] × 100<br />
+            <strong>Investment Multiple = </strong> Final Value ÷ Initial Cost
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="roi-calculator-faq">
         <h2 id="roi-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between ROI and CAGR?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">ROI is a simple percentage return over the entire holding period, without regard to time. CAGR annualises the return, making it comparable across investments of different durations. A 100% ROI over 10 years sounds impressive but equals only ~7.2% p.a. CAGR — context matters.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can ROI be negative?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Yes. A negative ROI means your final value is less than your initial investment — you have made a loss. ROI = (FV − PV) / PV × 100; if FV < PV, ROI is negative. Tracking ROI across multiple investments helps prioritise where to allocate future capital.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good ROI for business projects?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Most corporate finance teams benchmark internal projects against their Weighted Average Cost of Capital (WACC), typically requiring projects to yield at least 15% to 20% annualised ROI to justify capital risk.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does ROI differ from IRR?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Simple ROI only examines starting cost and final payoff, ignoring cash inflows or outflows occurring along the way. The Internal Rate of Return (IRR) accounts for the exact timing and magnitude of intermittent cash flows.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="roi-calculator-related">
         <h2 id="roi-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcROIClient(init: number, finalVal: number, yrs: number) {
+    const netProfit = finalVal - init;
+    const roi = init > 0 ? (netProfit / init) * 100 : 0;
+    const annualised = yrs > 0 && init > 0 && finalVal > 0
+      ? (Math.pow(finalVal / init, 1 / yrs) - 1) * 100
+      : 0;
+    const multiple = init > 0 ? finalVal / init : 0;
+    return {
+      netProfit,
+      roi,
+      annualisedROI: annualised,
+      multiple,
+      initialFraction: finalVal > 0 ? init / finalVal : 1,
+      profitFraction: finalVal > 0 ? Math.max(0, netProfit) / finalVal : 0,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initROICalc() {
+    const initInput = document.getElementById('roi-initial') as HTMLInputElement | null;
+    const finalInput = document.getElementById('roi-final') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('roi-years') as HTMLInputElement | null;
+
+    const initSlider = document.getElementById('roi-initial-slider') as HTMLInputElement | null;
+    const finalSlider = document.getElementById('roi-final-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('roi-years-slider') as HTMLInputElement | null;
+
+    const resPct = document.getElementById('roi-result-pct');
+    const resProfit = document.getElementById('roi-result-profit');
+    const resAnnualised = document.getElementById('roi-result-annualised');
+    const resMultiple = document.getElementById('roi-result-multiple');
+    const resTotal = document.getElementById('roi-result-total');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!initInput || !finalInput || !yearsInput) return;
+
+    const DEFAULTS = { initial: 100000, final: 250000, years: 3 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const initVal = parse(initInput.value);
+      const finalVal = parse(finalInput.value);
+      const yrs = parseFloat(yearsInput.value) || 1;
+
+      if (initVal <= 0) return;
+
+      const res = calcROIClient(initVal, finalVal, yrs);
+
+      if (resPct) resPct.textContent = res.roi.toFixed(1) + '%';
+      if (resProfit) resProfit.textContent = fmtVal(res.netProfit);
+      if (resAnnualised) resAnnualised.textContent = res.annualisedROI.toFixed(1) + '%';
+      if (resMultiple) resMultiple.textContent = res.multiple.toFixed(2) + 'x';
+      if (resTotal) resTotal.textContent = fmtVal(finalVal);
+      if (mobileHero) mobileHero.textContent = res.roi.toFixed(1) + '%';
+
+      const wrapper = document.getElementById('roi-composition-wrapper');
+      if (wrapper && finalVal > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.initialFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(initVal);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netProfit);
+      }
+
+      history.replaceState(null, '', `#i=${initVal}&f=${finalVal}&y=${yrs}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(initSlider, initInput, true);
+    sync(finalSlider, finalInput, true);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('roi-calculate')?.addEventListener('click', recalc);
+    document.getElementById('roi-reset')?.addEventListener('click', () => {
+      initInput.value = fmtLiveInput(String(DEFAULTS.initial));
+      finalInput.value = fmtLiveInput(String(DEFAULTS.final));
+      yearsInput.value = String(DEFAULTS.years);
+
+      if (initSlider) {
+        initSlider.value = String(DEFAULTS.initial);
+        initSlider.style.setProperty('--slider-pct', `${((DEFAULTS.initial - 5000) / (5000000 - 5000)) * 100}%`);
+      }
+      if (finalSlider) {
+        finalSlider.value = String(DEFAULTS.final);
+        finalSlider.style.setProperty('--slider-pct', `${((DEFAULTS.final - 5000) / (10000000 - 5000)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 0.5) / (30 - 0.5)) * 100}%`);
+      }
+
+      recalc();
+      initInput.focus();
+    });
+
+    [initInput, finalInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('roi-copy-btn')?.addEventListener('click', async () => {
+      const initVal = parse(initInput.value);
+      const finalVal = parse(finalInput.value);
+      const yrs = parseFloat(yearsInput.value) || 1;
+      const res = calcROIClient(initVal, finalVal, yrs);
+      const text = `ROI Result: Invested ${fmtVal(initVal)}, Returned ${fmtVal(finalVal)} over ${yrs} years => Total ROI: ${res.roi.toFixed(1)}%, CAGR: ${res.annualisedROI.toFixed(1)}% (${res.multiple.toFixed(2)}x). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('roi-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('roi-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('roi-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initROICalc();
+  document.addEventListener('astro:page-load', initROICalc);
+</script>

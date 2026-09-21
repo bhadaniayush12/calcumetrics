@@ -1,45 +1,230 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { calcDCF } from '../lib/calculators/corporate';
+import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+
+// 5 years of projected cash flows starting from ₹1,00,000 at 10% growth
+const DEFAULT = { fcf1: 100000, growth: 10, discountRate: 12, terminalGrowth: 3 };
+const flows = [DEFAULT.fcf1, DEFAULT.fcf1 * 1.1, DEFAULT.fcf1 * 1.21, DEFAULT.fcf1 * 1.331, DEFAULT.fcf1 * 1.4641];
+const result = calcDCF(flows, DEFAULT.discountRate, DEFAULT.terminalGrowth);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'dcf-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/dcf-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'DCF Calculator', url: canonicalUrl, description: 'Calculate the intrinsic value of an investment using the Discounted Cash Flow method with a terminal value based on Gordon Growth Model.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' }, { '@type': 'ListItem', position: 3, name: 'DCF Calculator' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'DCF Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the intrinsic value of an investment using Discounted Cash Flow with Gordon Growth terminal value.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'DCF Calculator' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="DCF Calculator: Discounted Cash Flow Valuation | Calcumetrics" description="Calculate the intrinsic value of an investment using the Discounted Cash Flow method with a terminal value based on Gordon Growth Model." canonical={canonicalUrl}>
+
+<Layout
+  title="DCF Calculator: Discounted Cash Flow Valuation | Calcumetrics"
+  description="Calculate the intrinsic value of an investment using Discounted Cash Flow with Gordon Growth terminal value."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="DCF Calculator" category="Corporate Finance" categoryHref="/corporate-finance" heroValue="Calculate to see" heroLabel="Intrinsic Value">
+
+  <CalculatorLayout
+    toolName="DCF Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={fmt(result.intrinsicValue)}
+    heroLabel="Intrinsic Enterprise Value"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">DCF Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate the intrinsic value of an investment using the Discounted Cash Flow method with a terminal value based on Gordon Growth Model.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Estimate corporate intrinsic value based on discounted future cash flows and terminal value.</p>
+
+      <!-- Year 1 Cash Flow -->
+      <div class="mb-5">
+        <Input
+          id="dcf-fcf1"
+          label="Year 1 Free Cash Flow (FCF)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Operating cash flow minus capital expenditures"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dcf-fcf1-slider" min={10000} max={2500000} step={10000} value={100000} ariaLabel="Year 1 FCF slider" />
+        </div>
+      </div>
+
+      <!-- Growth Rate -->
+      <div class="mb-5">
+        <Input
+          id="dcf-growth"
+          label="5-Year FCF Growth Rate"
+          suffix="%"
+          value="10"
+          isNumeric={true}
+          helperText="Forecast annual growth for explicit 5-year period"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dcf-growth-slider" min={0} max={40} step={0.5} value={10} ariaLabel="5-year growth slider" />
+        </div>
+      </div>
+
+      <!-- Discount Rate -->
+      <div class="mb-5">
+        <Input
+          id="dcf-discount"
+          label="Discount Rate (WACC / Hurdle Rate)"
+          suffix="%"
+          value="12"
+          isNumeric={true}
+          helperText="Cost of capital or required rate of return"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dcf-discount-slider" min={4} max={30} step={0.25} value={12} ariaLabel="Discount rate slider" />
+        </div>
+      </div>
+
+      <!-- Terminal Growth Rate -->
+      <div class="mb-6">
+        <Input
+          id="dcf-terminal"
+          label="Perpetual Terminal Growth Rate (g)"
+          suffix="%"
+          value="3"
+          isNumeric={true}
+          helperText="Long-term GDP growth ceiling (must be less than discount rate)"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="dcf-terminal-slider" min={0.5} max={8} step={0.25} value={3} ariaLabel="Terminal growth slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="Gordon Growth Rule">
+        The terminal growth rate must be lower than the discount rate (r &gt; g). If r &le; g, terminal value becomes mathematically undefined.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="dcf-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="dcf-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Intrinsic Value</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Intrinsic Enterprise Value</span>
+        <div id="dcf-result-intrinsic" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.intrinsicValue)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">PV of 5-Yr Forecast</span>
+          <span id="dcf-result-pvflows" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.pvOfCashFlows)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">PV of Terminal Value</span>
+          <span id="dcf-result-pvtv" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.pvOfTerminalValue)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Undiscounted Terminal Value</span>
+          <span id="dcf-result-tv" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.terminalValue)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Terminal Value % of Total</span>
+          <span id="dcf-result-tvpct" class="text-sm font-bold tabular-nums text-dark-text">{result.intrinsicValue > 0 ? ((result.pvOfTerminalValue / result.intrinsicValue) * 100).toFixed(1) : 0}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="dcf-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.intrinsicValue > 0 ? result.pvOfCashFlows / result.intrinsicValue : 0.5}
+          gainFraction={result.intrinsicValue > 0 ? result.pvOfTerminalValue / result.intrinsicValue : 0.5}
+          principalLabel="5-Yr Cash Flows"
+          gainLabel="Terminal Value"
+          principalValue={fmt(result.pvOfCashFlows)}
+          gainValue={fmt(result.pvOfTerminalValue)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="dcf-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="dcf-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">DCF intrinsic valuations are highly sensitive to discount and terminal assumptions.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="dcf-calculator-how">
-        <h2 id="dcf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate the intrinsic value of an investment using the Discounted Cash Flow method with a terminal value based on Gordon Growth Model.</p>
+        <h2 id="dcf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Discounted Cash Flow works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          DCF valuation discounts future cash flows back to the present day using the opportunity cost of capital:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">DCF = Σ FCF_t / (1+r)^t + TV / (1+r)^n. Terminal Value (Gordon Growth): TV = FCF_n × (1+g) / (r−g) where g = terminal growth rate. Sensitive to discount rate and growth rate assumptions.</p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>PV of Explicit Flows: </strong> &Sigma; [ FCF<sub>t</sub> / (1 + r)<sup>t</sup> ]<br />
+            <strong>Gordon Growth Terminal Value: </strong> TV = [ FCF<sub>n</sub> &times; (1 + g) ] / (r &minus; g)<br />
+            <strong>PV of Terminal Value: </strong> TV / (1 + r)<sup>n</sup><br />
+            <strong>Total Enterprise Value: </strong> PV of Flows + PV of Terminal Value
+          </p>
         </div>
       </section>
+
       <section aria-labelledby="dcf-calculator-faq">
         <h2 id="dcf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How sensitive is DCF to the discount rate and growth rate?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Very sensitive. Small changes in these inputs can swing the intrinsic value by 30-50%. This is why DCF analysts typically run scenarios (base, bull, bear) with different assumptions and examine a range of values rather than a single point estimate. Terminal value often comprises 60-80% of total DCF value.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a reasonable terminal growth rate?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">The terminal growth rate should not exceed the long-term nominal GDP growth rate (3-5% for developed economies; 5-7% for India at current trajectory), since no company can grow faster than the economy indefinitely. Many analysts use 2-4% for mature companies in stable industries.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is terminal value often 70%+ of DCF value?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Because companies are assumed to exist as going concerns into perpetuity, all cash flows earned beyond year 5 accumulate into the terminal value, making it naturally the largest component of total value.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What discount rate should I use?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              For firm valuation, use the Weighted Average Cost of Capital (WACC), which reflects the blended required returns of equity investors and debt lenders. Typically, WACC ranges between 8% to 15% depending on risk.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="dcf-calculator-related">
         <h2 id="dcf-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
@@ -47,3 +232,213 @@ const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApp
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcDCFClient(fcf1: number, growthPct: number, discountPct: number, terminalPct: number) {
+    const r = discountPct / 100;
+    const g = terminalPct / 100;
+    const gr = growthPct / 100;
+
+    const flows: number[] = [];
+    let cur = fcf1;
+    for (let i = 0; i < 5; i++) {
+      flows.push(cur);
+      cur *= (1 + gr);
+    }
+
+    const pvOfCashFlows = flows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t + 1), 0);
+    const lastCF = flows[flows.length - 1];
+    const terminalValue = r > g ? (lastCF * (1 + g)) / (r - g) : 0;
+    const pvOfTerminalValue = terminalValue / Math.pow(1 + r, 5);
+    const intrinsicValue = pvOfCashFlows + pvOfTerminalValue;
+
+    return {
+      intrinsicValue,
+      pvOfCashFlows,
+      terminalValue,
+      pvOfTerminalValue,
+      tvPct: intrinsicValue > 0 ? (pvOfTerminalValue / intrinsicValue) * 100 : 0,
+      flowFrac: intrinsicValue > 0 ? pvOfCashFlows / intrinsicValue : 0.5,
+      tvFrac: intrinsicValue > 0 ? pvOfTerminalValue / intrinsicValue : 0.5,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initDCFCalc() {
+    const fcf1Input = document.getElementById('dcf-fcf1') as HTMLInputElement | null;
+    const growthInput = document.getElementById('dcf-growth') as HTMLInputElement | null;
+    const discountInput = document.getElementById('dcf-discount') as HTMLInputElement | null;
+    const terminalInput = document.getElementById('dcf-terminal') as HTMLInputElement | null;
+
+    const fcf1Slider = document.getElementById('dcf-fcf1-slider') as HTMLInputElement | null;
+    const growthSlider = document.getElementById('dcf-growth-slider') as HTMLInputElement | null;
+    const discountSlider = document.getElementById('dcf-discount-slider') as HTMLInputElement | null;
+    const terminalSlider = document.getElementById('dcf-terminal-slider') as HTMLInputElement | null;
+
+    const resIntrinsic = document.getElementById('dcf-result-intrinsic');
+    const resPvFlows = document.getElementById('dcf-result-pvflows');
+    const resPvTv = document.getElementById('dcf-result-pvtv');
+    const resTv = document.getElementById('dcf-result-tv');
+    const resTvPct = document.getElementById('dcf-result-tvpct');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!fcf1Input || !growthInput || !discountInput || !terminalInput) return;
+
+    const DEFAULTS = { fcf1: 100000, growth: 10, discount: 12, terminal: 3 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const fcf1 = parse(fcf1Input.value);
+      const growth = parseFloat(growthInput.value) || 0;
+      const discount = parseFloat(discountInput.value) || 12;
+      const terminal = parseFloat(terminalInput.value) || 3;
+
+      if (fcf1 <= 0 || discount <= terminal) return;
+
+      const res = calcDCFClient(fcf1, growth, discount, terminal);
+
+      if (resIntrinsic) resIntrinsic.textContent = fmtVal(res.intrinsicValue);
+      if (resPvFlows) resPvFlows.textContent = fmtVal(res.pvOfCashFlows);
+      if (resPvTv) resPvTv.textContent = fmtVal(res.pvOfTerminalValue);
+      if (resTv) resTv.textContent = fmtVal(res.terminalValue);
+      if (resTvPct) resTvPct.textContent = res.tvPct.toFixed(1) + '%';
+      if (mobileHero) mobileHero.textContent = fmtVal(res.intrinsicValue);
+
+      const wrapper = document.getElementById('dcf-composition-wrapper');
+      if (wrapper && res.intrinsicValue > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.flowFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.tvFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.pvOfCashFlows);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.pvOfTerminalValue);
+      }
+
+      history.replaceState(null, '', `#f=${fcf1}&g=${growth}&d=${discount}&t=${terminal}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(fcf1Slider, fcf1Input, true);
+    sync(growthSlider, growthInput, false);
+    sync(discountSlider, discountInput, false);
+    sync(terminalSlider, terminalInput, false);
+
+    document.getElementById('dcf-calculate')?.addEventListener('click', recalc);
+    document.getElementById('dcf-reset')?.addEventListener('click', () => {
+      fcf1Input.value = fmtLiveInput(String(DEFAULTS.fcf1));
+      growthInput.value = String(DEFAULTS.growth);
+      discountInput.value = String(DEFAULTS.discount);
+      terminalInput.value = String(DEFAULTS.terminal);
+
+      if (fcf1Slider) {
+        fcf1Slider.value = String(DEFAULTS.fcf1);
+        fcf1Slider.style.setProperty('--slider-pct', `${((DEFAULTS.fcf1 - 10000) / (2500000 - 10000)) * 100}%`);
+      }
+      if (growthSlider) {
+        growthSlider.value = String(DEFAULTS.growth);
+        growthSlider.style.setProperty('--slider-pct', `${((DEFAULTS.growth - 0) / (40 - 0)) * 100}%`);
+      }
+      if (discountSlider) {
+        discountSlider.value = String(DEFAULTS.discount);
+        discountSlider.style.setProperty('--slider-pct', `${((DEFAULTS.discount - 4) / (30 - 4)) * 100}%`);
+      }
+      if (terminalSlider) {
+        terminalSlider.value = String(DEFAULTS.terminal);
+        terminalSlider.style.setProperty('--slider-pct', `${((DEFAULTS.terminal - 0.5) / (8 - 0.5)) * 100}%`);
+      }
+
+      recalc();
+      fcf1Input.focus();
+    });
+
+    [fcf1Input, growthInput, discountInput, terminalInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('dcf-copy-btn')?.addEventListener('click', async () => {
+      const fcf1 = parse(fcf1Input.value);
+      const growth = parseFloat(growthInput.value) || 0;
+      const discount = parseFloat(discountInput.value) || 12;
+      const terminal = parseFloat(terminalInput.value) || 3;
+      const res = calcDCFClient(fcf1, growth, discount, terminal);
+      const text = `DCF Valuation: Year 1 FCF ${fmtVal(fcf1)}, growth ${growth}%, discount ${discount}%, terminal ${terminal}% => Intrinsic Value: ${fmtVal(res.intrinsicValue)}. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('dcf-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('dcf-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('dcf-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initDCFCalc();
+  document.addEventListener('astro:page-load', initDCFCalc);
+</script>

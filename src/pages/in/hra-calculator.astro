@@ -1,49 +1,428 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Dropdown from '../../components/ui/Dropdown.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
+import { calcHRA } from '../../lib/calculators/taxes';
+import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+
+const DEFAULT = { basicSalary: 600000, hraReceived: 240000, rentPaid: 180000, isMetro: true };
+const result = calcHRA(DEFAULT.basicSalary, DEFAULT.hraReceived, DEFAULT.rentPaid, DEFAULT.isMetro);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'hra-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/in/hra-calculator' as string;
-const jsonld = { '@context': 'https://schema.org', '@graph': [{ '@type': 'WebApplication', name: 'HRA Calculator (India)', url: canonicalUrl, description: 'Calculate your HRA tax exemption amount under India\'s income tax rules. Minimum of three limits determines the tax-free portion.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } }, { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' }, { '@type': 'ListItem', position: 3, name: 'HRA Calculator (India)' }] }] };
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'HRA Calculator (India)',
+      url: canonicalUrl,
+      description: 'Calculate your HRA tax exemption amount under India\'s income tax rules. Minimum of three limits determines the tax-free portion.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-20',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'HRA Calculator (India)' },
+      ],
+    },
+  ],
+};
 ---
-<Layout title="HRA Calculator India: Tax Exemption on House Rent Allowance | Calcumetrics" description="Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion." canonical={canonicalUrl}>
+
+<Layout
+  title="HRA Calculator India: Tax Exemption on House Rent Allowance | Calcumetrics"
+  description="Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three statutory limits determines the tax-free portion."
+  canonical={canonicalUrl}
+>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="HRA Calculator (India)" category="Taxes" categoryHref="/taxes" heroValue="Calculate to see" heroLabel="HRA Exemption">
+
+  <CalculatorLayout
+    toolName="HRA Calculator (India)"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={fmt(result.exemption)}
+    heroLabel="HRA Exemption Amount"
+  >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">HRA Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion.</p>
-      <Alert variant="info" title="Assumption">Results are estimates for information only. Not financial advice.</Alert>
-      <div class="flex gap-3 mt-6"><Button variant="primary" type="button">Calculate</Button><Button variant="ghost" type="button">Reset</Button></div>
+      <p class="text-sm text-text-muted mb-6">Calculate tax-exempt House Rent Allowance under Section 10(13A) of the Income Tax Act.</p>
+
+      <!-- Basic Salary -->
+      <div class="mb-5">
+        <Input
+          id="hra-basic"
+          label="Annual Basic Salary (+ DA)"
+          prefix="₹"
+          value="6,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Your annual basic pay + dearness allowance"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hra-basic-slider" min={100000} max={5000000} step={25000} value={600000} ariaLabel="Basic salary slider" />
+        </div>
+      </div>
+
+      <!-- HRA Received -->
+      <div class="mb-5">
+        <Input
+          id="hra-received"
+          label="Annual HRA Received"
+          prefix="₹"
+          value="2,40,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total HRA component provided by employer per year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hra-received-slider" min={20000} max={2500000} step={10000} value={240000} ariaLabel="HRA received slider" />
+        </div>
+      </div>
+
+      <!-- Rent Paid -->
+      <div class="mb-5">
+        <Input
+          id="hra-rent"
+          label="Total Annual Rent Paid"
+          prefix="₹"
+          value="1,80,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Actual rent paid to landlord for the financial year"
+          inputmode="decimal"
+        />
+        <div class="mt-2">
+          <Slider id="hra-rent-slider" min={20000} max={2500000} step={10000} value={180000} ariaLabel="Rent paid slider" />
+        </div>
+      </div>
+
+      <!-- Metro / Non-metro -->
+      <div class="mb-6">
+        <Dropdown
+          id="hra-city"
+          label="City of Residence"
+          options={[
+            { value: 'metro', label: 'Metro City (Delhi, Mumbai, Kolkata, Chennai — 50% limit)' },
+            { value: 'non-metro', label: 'Non-Metro City (All other cities — 40% limit)' },
+          ]}
+          value="metro"
+          helperText="City category determines the basic salary percentage ceiling"
+        />
+      </div>
+
+      <Alert variant="info" title="Old vs New Tax Regime">
+        HRA exemption under Section 10(13A) is available only under the <strong>Old Tax Regime</strong>. If opting for the New Tax Regime (Section 115BAC), HRA is fully taxable.
+      </Alert>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="hra-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="hra-reset" type="button">Reset</Button>
+      </div>
     </Fragment>
+
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">HRA Exemption</span>
-        <div class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">Calculate to see</div>
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Tax-Exempt HRA</span>
+        <div id="hra-result-exemption" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmt(result.exemption)}
+        </div>
       </div>
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Taxable HRA</span>
+          <span id="hra-result-taxable" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.taxableHRA)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">1. Actual HRA Received</span>
+          <span id="hra-rule-actual" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.actualHRA)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">2. Rent Paid − 10% Basic</span>
+          <span id="hra-rule-rentdiff" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.rentMinusTenPct)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">3. Salary Ceiling (50% / 40%)</span>
+          <span id="hra-rule-ceiling" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.metroLimit)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="hra-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.actualHRA > 0 ? result.exemption / result.actualHRA : 0}
+          gainFraction={result.actualHRA > 0 ? result.taxableHRA / result.actualHRA : 1}
+          principalLabel="Exempted"
+          gainLabel="Taxable"
+          principalValue={fmt(result.exemption)}
+          gainValue={fmt(result.taxableHRA)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="hra-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="hra-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Exemption equals the lowest of the 3 statutory conditions under Rule 2A.</p>
     </Fragment>
+
     <Fragment slot="below">
       <section aria-labelledby="hra-calculator-how">
-        <h2 id="hra-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Calculate your HRA tax exemption amount under India's income tax rules. Minimum of three limits determines the tax-free portion.</p>
+        <h2 id="hra-calculator-how" class="text-xl font-bold text-text-primary mb-4">How HRA exemption is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Under Section 10(13A) and Rule 2A of the Income Tax Rules, your tax-exempt House Rent Allowance is the <strong>minimum</strong> of the following three criteria:
+        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">Exemption = min(1. Actual HRA received, 2. Rent paid − 10% of basic salary, 3. 50% of basic salary for metro / 40% for non-metro). Taxable HRA = HRA received − exemption.</p>
+          <ol class="list-decimal pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+            <li><strong>Actual HRA received</strong> from your employer during the year.</li>
+            <li><strong>Actual rent paid minus 10% of basic salary</strong> (+ Dearness Allowance).</li>
+            <li><strong>50% of basic salary</strong> for metro cities (Delhi, Mumbai, Kolkata, Chennai) or <strong>40% of basic salary</strong> for non-metro cities.</li>
+          </ol>
         </div>
       </section>
+
       <section aria-labelledby="hra-calculator-faq">
         <h2 id="hra-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Which cities are considered metro for HRA purposes?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">Under India's income tax rules, four cities qualify as metro for HRA: Delhi, Mumbai, Kolkata, and Chennai. Residents of these cities can claim 50% of basic salary as the third HRA limit. All other cities use 40% of basic salary.</div></details>
-          <details class="border border-border rounded-card overflow-hidden"><summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I claim HRA if I live in a rented house owned by a relative?</summary><div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">You can claim HRA if you pay actual rent to a relative (e.g. parent), provided the transaction is genuine — the relative declares the rental income in their tax return. However, rent paid to a spouse is generally not eligible as they share economic resources. Consult a tax professional for your specific situation.</div></details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Which cities are considered metro for HRA?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Under Indian income tax rules, only four metropolitan cities qualify for the 50% ceiling: New Delhi, Mumbai, Kolkata, and Chennai. All other cities, including Bengaluru, Hyderabad, and Pune, fall under the 40% non-metro category.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Do I need landlord's PAN to claim HRA?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              If the annual rent paid exceeds ₹1,00,000 (i.e. more than ₹8,333 per month), it is mandatory to provide your landlord's PAN to your employer or in your income tax return.
+            </div>
+          </details>
         </div>
       </section>
+
       <section aria-labelledby="hra-calculator-related">
         <h2 id="hra-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
+
+<script>
+  function calcHRALocal(basic: number, hra: number, rent: number, isMetro: boolean) {
+    const rentMinusTenPct = Math.max(0, rent - 0.1 * basic);
+    const metroLimit = basic * (isMetro ? 0.5 : 0.4);
+    const exemption = Math.min(hra, rentMinusTenPct, metroLimit);
+    const taxable = Math.max(0, hra - exemption);
+    return {
+      exemption,
+      taxableHRA: taxable,
+      actualHRA: hra,
+      rentMinusTenPct,
+      metroLimit,
+    };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initHRACalc() {
+    const basicInput = document.getElementById('hra-basic') as HTMLInputElement | null;
+    const hraInput = document.getElementById('hra-received') as HTMLInputElement | null;
+    const rentInput = document.getElementById('hra-rent') as HTMLInputElement | null;
+    const citySelect = document.getElementById('hra-city') as HTMLSelectElement | null;
+
+    const basicSlider = document.getElementById('hra-basic-slider') as HTMLInputElement | null;
+    const hraSlider = document.getElementById('hra-received-slider') as HTMLInputElement | null;
+    const rentSlider = document.getElementById('hra-rent-slider') as HTMLInputElement | null;
+
+    const resExemption = document.getElementById('hra-result-exemption');
+    const resTaxable = document.getElementById('hra-result-taxable');
+    const ruleActual = document.getElementById('hra-rule-actual');
+    const ruleRentDiff = document.getElementById('hra-rule-rentdiff');
+    const ruleCeiling = document.getElementById('hra-rule-ceiling');
+    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    if (!basicInput || !hraInput || !rentInput) return;
+
+    const DEFAULTS = { basic: 600000, hra: 240000, rent: 180000, city: 'metro' };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function parse(v: string) {
+      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    }
+
+    function recalc() {
+      const basic = parse(basicInput.value);
+      const hra = parse(hraInput.value);
+      const rent = parse(rentInput.value);
+      const isMetro = citySelect ? citySelect.value === 'metro' : true;
+
+      const res = calcHRALocal(basic, hra, rent, isMetro);
+
+      if (resExemption) resExemption.textContent = fmtVal(res.exemption);
+      if (resTaxable) resTaxable.textContent = fmtVal(res.taxableHRA);
+      if (ruleActual) ruleActual.textContent = fmtVal(res.actualHRA);
+      if (ruleRentDiff) ruleRentDiff.textContent = fmtVal(res.rentMinusTenPct);
+      if (ruleCeiling) ruleCeiling.textContent = fmtVal(res.metroLimit);
+      if (mobileHero) mobileHero.textContent = fmtVal(res.exemption);
+
+      const wrapper = document.getElementById('hra-composition-wrapper');
+      if (wrapper && res.actualHRA > 0) {
+        const exemptFrac = res.exemption / res.actualHRA;
+        const taxFrac = res.taxableHRA / res.actualHRA;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const taxBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(exemptFrac * 100).toFixed(2)}%`;
+        if (taxBar) taxBar.style.width = `${(taxFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.exemption);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.taxableHRA);
+      }
+
+      history.replaceState(null, '', `#b=${basic}&h=${hra}&r=${rent}&c=${isMetro ? 'metro' : 'non-metro'}`);
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = fmtLiveInput(slider.value);
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(basicSlider, basicInput);
+    sync(hraSlider, hraInput);
+    sync(rentSlider, rentInput);
+    citySelect?.addEventListener('change', recalc);
+
+    document.getElementById('hra-calculate')?.addEventListener('click', recalc);
+    document.getElementById('hra-reset')?.addEventListener('click', () => {
+      basicInput.value = fmtLiveInput(String(DEFAULTS.basic));
+      hraInput.value = fmtLiveInput(String(DEFAULTS.hra));
+      rentInput.value = fmtLiveInput(String(DEFAULTS.rent));
+      if (citySelect) citySelect.value = DEFAULTS.city;
+      if (basicSlider) {
+        basicSlider.value = String(DEFAULTS.basic);
+        basicSlider.style.setProperty('--slider-pct', `${((DEFAULTS.basic - 100000) / (5000000 - 100000)) * 100}%`);
+      }
+      if (hraSlider) {
+        hraSlider.value = String(DEFAULTS.hra);
+        hraSlider.style.setProperty('--slider-pct', `${((DEFAULTS.hra - 20000) / (2500000 - 20000)) * 100}%`);
+      }
+      if (rentSlider) {
+        rentSlider.value = String(DEFAULTS.rent);
+        rentSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rent - 20000) / (2500000 - 20000)) * 100}%`);
+      }
+      recalc();
+      basicInput.focus();
+    });
+
+    [basicInput, hraInput, rentInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('hra-copy-btn')?.addEventListener('click', async () => {
+      const basic = parse(basicInput.value);
+      const hra = parse(hraInput.value);
+      const rent = parse(rentInput.value);
+      const isMetro = citySelect ? citySelect.value === 'metro' : true;
+      const res = calcHRALocal(basic, hra, rent, isMetro);
+      const text = `HRA Exemption: Basic ${fmtVal(basic)}, HRA ${fmtVal(hra)}, Rent ${fmtVal(rent)} => Tax Exempt HRA = ${fmtVal(res.exemption)}, Taxable HRA = ${fmtVal(res.taxableHRA)}. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('hra-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('hra-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('hra-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initHRACalc();
+  document.addEventListener('astro:page-load', initHRACalc);
+</script>
