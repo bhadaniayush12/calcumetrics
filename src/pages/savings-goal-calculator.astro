@@ -15,7 +15,8 @@ const result = calcSavingsGoal(DEFAULT.target, DEFAULT.current, DEFAULT.rate, DE
 const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'savings-goal-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['sip-calculator', 'inflation-calculator', 'future-value-calculator'];
+const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/savings-goal-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
@@ -243,33 +244,133 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="sg-calculator-how">
-        <h2 id="sg-calculator-how" class="text-xl font-bold text-text-primary mb-4">How target savings calculation works</h2>
+      <section aria-labelledby="sg-calculator-how" class="mb-8">
+        <h2 id="sg-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Target Savings Accumulation Works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          To calculate the periodic contribution required to reach a future financial milestone, we solve the annuity future value equation for payment ($PMT$):
+          A savings goal calculation reverse-engineers the classic time-value-of-money annuity formula. Instead of asking how much wealth a recurring deposit will build, it determines the exact monthly or annual installment ($PMT$) required to accumulate a predetermined target lump sum, accounting for the compound growth of both existing seed savings and new contributions.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Target Equation: </strong> FV = PV &times; (1 + r)<sup>n</sup> + PMT &times; [ (1 + r)<sup>n</sup> &minus; 1 ] &divide; r<br />
-            <strong>Required Monthly Deposit: </strong> PMT = [ FV &minus; PV &times; (1 + r)<sup>n</sup> ] &times; r &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
-            <strong>Total Capital Outlay: </strong> Total Saved = PV + (PMT &times; n)
-          </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Step 1: Future Value of Seed Capital</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">FV<sub>seed</sub> = PV &times; (1 + r)<sup>n</sup></div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Determines what your existing starting savings will grow to autonomously by the target date.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Step 2: Required Monthly Contribution (PMT)</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">PMT = [ Target &minus; FV<sub>seed</sub> ] &times; r &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Solves for the recurring deposit needed to bridge the remaining deficit over <em>n</em> months at monthly rate <em>r</em>.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Worked Example: 5-Year Milestone Accumulation Analysis</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Targeting a <strong>₹25,00,000</strong> goal in <strong>5 years</strong> (60 months) with <strong>₹2,00,000</strong> current seed savings invested at an expected return of <strong>10.0% p.a.</strong> (monthly rate <em>r</em> = 0.833%):
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-border bg-surface text-text-primary">
+                <th class="py-3 px-4 font-semibold">Financial Milestone Component</th>
+                <th class="py-3 px-4 font-semibold">Mathematical Formula</th>
+                <th class="py-3 px-4 font-semibold">Computed Value</th>
+                <th class="py-3 px-4 font-semibold">Strategic Significance</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Target Goal Amount</td>
+                <td class="py-2.5 px-4 font-mono">FV Target</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹25,00,000</td>
+                <td class="py-2.5 px-4">Desired future capital pool (down payment, education fund).</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Initial Seed Capital</td>
+                <td class="py-2.5 px-4 font-mono">PV</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹2,00,000</td>
+                <td class="py-2.5 px-4">Starting balance invested on Day 1.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Compounded Growth of Seed Capital</td>
+                <td class="py-2.5 px-4 font-mono">₹2,00,000 &times; (1 + 0.10/12)<sup>60</sup></td>
+                <td class="py-2.5 px-4 font-mono">₹3,29,062</td>
+                <td class="py-2.5 px-4">Autonomous growth reduces net capital deficit to ₹21,70,938.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Required Monthly Savings</td>
+                <td class="py-2.5 px-4 font-mono">Sinking Fund Formula</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹28,035 / Month</td>
+                <td class="py-2.5 px-4">Disciplined recurring SIP or monthly recurring deposit.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Equivalent Annual Contribution</td>
+                <td class="py-2.5 px-4 font-mono">₹28,035 &times; 12</td>
+                <td class="py-2.5 px-4 font-mono">₹3,36,418 / Year</td>
+                <td class="py-2.5 px-4">Annual equivalent out-of-pocket savings rate.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Invested By You</td>
+                <td class="py-2.5 px-4 font-mono">₹2,00,000 + (₹28,035 &times; 60)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹18,82,092 (75.3%)</td>
+                <td class="py-2.5 px-4">Actual out-of-pocket cash committed over 5 years.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Compound Interest / Growth Earned</td>
+                <td class="py-3 px-4 font-mono">₹25,00,000 &minus; ₹18,82,092</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹6,17,908 (24.7%)</td>
+                <td class="py-3 px-4">Nearly a quarter of your ₹25L target is created for free by compound interest!</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Horizon Framework &amp; Asset Allocation</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Short-Term Goals (&lt;3 Years):</strong> Prioritize capital protection. Use bank fixed deposits, ultra-short debt funds, or arbitrage funds (6% to 7.5% expected). Avoid equities due to drawdown risks.</li>
+              <li><strong>Medium-Term Goals (3 to 7 Years):</strong> Balanced risk profile. Allocate across equity hybrid funds, multi-asset allocation, and high-quality corporate bonds (8% to 10% expected).</li>
+              <li><strong>Long-Term Goals (&gt;7 Years):</strong> Maximized compounding. Diversified index funds, flexi-cap equities, and international equity exposure (11% to 13% historical CAGR).</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The Brutal "Cost of Delay" (Procrastination Penalty)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Waiting drastically compresses the compounding window, escalating monthly requirements:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li>Starting Today (5 Years): <strong>₹28,035 / month</strong> (Total out-of-pocket: ₹18.82L).</li>
+              <li>Delaying 2 Years (3 Years Remaining): <strong>₹54,320 / month</strong> (+94% monthly burden; total out-of-pocket climbs to ₹21.56L).</li>
+              <li>Every year of delay transfers the burden from compound interest to your monthly paycheck!</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Practical Execution Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Sequence of Returns Risk:</strong> The calculator assumes a uniform linear 10% return each year. In volatile equity markets, experiencing a 15% market drop in Year 4 or 5 can severely jeopardize goal timing. Shift to debt/cash 12–18 months prior to goal maturity.</li>
+            <li><strong>Tax Drag on Redemptions:</strong> Realized capital gains (LTCG / STCG) or fixed deposit interest taxes diminish net maturity sums. Factor in post-tax return rates when modeling.</li>
+            <li><strong>Inflation Hedging:</strong> If the goal is a physical purchase (e.g., college tuition or real estate), headline inflation will increase the required target amount by maturity date.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="sg-calculator-faq">
         <h2 id="sg-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['How does a savings goal calculator work?', 'It calculates the exact periodic deposit (monthly or annual) needed to bridge the gap between your existing savings and your target future amount, taking into account compound growth across your investment horizon.'],
-            ['How does compound interest help reach a savings goal?', 'Compound interest generates returns on both your initial principal and previously earned interest. Over long investment horizons, compound earnings can fund a significant portion of your total target, reducing the actual out-of-pocket contributions needed.'],
-            ['What expected return rate should I use for a 5-year goal?', 'For short-to-medium horizons (3 to 5 years), capital preservation is paramount. Conservative investors typically project 6% to 8% using debt funds, fixed deposits, or conservative hybrid funds. High equity allocations (10–12%) carry sequence-of-returns risk for rigid deadlines.'],
-            ['What if my existing savings already grow to my target?', 'If your initial seed savings compounded at your expected rate of return reaches or exceeds your target before the deadline, your required monthly contribution drops to ₹0 / $0.'],
-            ['How does inflation affect my savings goal?', 'If your goal represents a future real expenditure (like higher education or a house down payment), price increases will likely raise your target amount. You should increase your future target to reflect inflation or use a real (inflation-adjusted) return rate.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>

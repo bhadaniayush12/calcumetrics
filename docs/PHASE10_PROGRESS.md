@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:24:20+05:30
+- **LAST_UPDATED:** 2026-09-23T04:26:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 34
-- **IN_PROGRESS:** 035. savings-goal-calculator
-- **NEXT:** 036. mortgage-calculator
+- **COMPLETED:** 35
+- **IN_PROGRESS:** 036. mortgage-calculator
+- **NEXT:** 037. loan-affordability-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** inflation-calculator
-- **LAST_COMMIT:** b6b1cca
+- **LAST_COMPLETED_UNIT:** savings-goal-calculator
+- **LAST_COMMIT:** 9cf2b5d
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -52,8 +52,8 @@
 - [x] 032. payback-period-calculator — DONE
 - [x] 033. dcf-calculator — DONE
 - [x] 034. inflation-calculator — DONE
-- [ ] 035. savings-goal-calculator — IN PROGRESS
-- [ ] 036. mortgage-calculator — PENDING
+- [x] 035. savings-goal-calculator — DONE
+- [ ] 036. mortgage-calculator — IN PROGRESS
 - [ ] 037. loan-affordability-calculator — PENDING
 - [ ] 038. debt-to-income-ratio-calculator — PENDING
 - [ ] 039. credit-card-payoff-calculator — PENDING
@@ -254,4 +254,10 @@
   - Audited: Purchasing power erosion and future cost escalation model computing compounded price increases and residual purchasing capacity.
   - Changes: Added reciprocal mathematical formulas (Future Cost vs Purchasing Power Decay), step-by-step 10-year worked example schedule matching default inputs (₹1L initial capital at 6.0% inflation over 10 years → ₹1,79,085 future cost of today's basket / +79.1% cumulative increase, ₹55,839 residual purchasing power / ₹44,161 or 44.2% real value lost), Rule of 72 price-doubling benchmarks across inflation tiers (4%, 6%, 8%, 10%), asset class real returns analysis (FD vs Equity vs Real Estate/Gold after taxes), and analytical limitations (headline CPI vs personal inflation rate, non-linear sector inflation in healthcare/education, tax drag amplification).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcInflation`, 5 FAQs matching JSON-LD schema, and curated related links (`future-value-calculator`, `present-value-calculator`, `sip-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **035. savings-goal-calculator (/savings-goal-calculator)**:
+  - Audited: Target wealth accumulation and reverse sinking-fund model calculating required periodic savings to bridge current wealth to future targets.
+  - Changes: Added mathematical sinking-fund annuity formula breakdown with compounded seed capital deduction, complete step-by-step 5-year capital accumulation schedule matching default inputs (₹25L target, ₹2L initial seed, 10% expected annual return over 5 years → ₹3,29,062 compounded seed growth, ₹21,70,938 net deficit, ₹28,035/month or ₹3,36,418/year contribution, ₹18,82,092 total out-of-pocket investment (75.3%), ₹6,17,908 compound interest earned (24.7%)), horizon asset allocation framework (&lt;3 yrs capital preservation, 3–7 yrs balanced hybrid, &gt;7 yrs equity compounding), the "Cost of Delay" procrastination penalty (+94% monthly jump if delayed 2 yrs), and practical execution limitations (sequence of returns risk near maturity, tax drag on redemption, inflation escalation).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcSavingsGoal`, 5 FAQs matching JSON-LD schema, and curated related links (`sip-calculator`, `compound-interest-calculator`, `inflation-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
