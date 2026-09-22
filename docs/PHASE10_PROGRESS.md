@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:29:40+05:30
+- **LAST_UPDATED:** 2026-09-23T04:30:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 37
-- **IN_PROGRESS:** 038. debt-to-income-ratio-calculator
-- **NEXT:** 039. credit-card-payoff-calculator
+- **COMPLETED:** 38
+- **IN_PROGRESS:** 039. credit-card-payoff-calculator
+- **NEXT:** 040. loan-amortization-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** loan-affordability-calculator
-- **LAST_COMMIT:** 71a50b4
+- **LAST_COMPLETED_UNIT:** debt-to-income-ratio-calculator
+- **LAST_COMMIT:** dcc1e75
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -55,8 +55,8 @@
 - [x] 035. savings-goal-calculator — DONE
 - [x] 036. mortgage-calculator — DONE
 - [x] 037. loan-affordability-calculator — DONE
-- [ ] 038. debt-to-income-ratio-calculator — IN PROGRESS
-- [ ] 039. credit-card-payoff-calculator — PENDING
+- [x] 038. debt-to-income-ratio-calculator — DONE
+- [ ] 039. credit-card-payoff-calculator — IN PROGRESS
 - [ ] 040. loan-amortization-calculator — PENDING
 - [ ] 041. interest-rate-calculator — PENDING
 - [ ] 042. tds-calculator — PENDING (India Tax Protected)
@@ -272,4 +272,10 @@
   - Audited: Reverse annuity present value debt capacity model computing maximum loan principal sanctionable from target monthly repayment budget.
   - Changes: Added complete 5-stage mathematical annuity formula breakdown, comprehensive step-by-step worked example schedule matching default inputs (₹40,000 monthly EMI budget, 9.00% annual interest rate over 15-year tenure / 180 months → ₹39,43,736 maximum affordable principal, ₹72,00,000 total cash repaid, ₹32,56,264 total lifetime interest payable (45.2%), 54.8% principal share), analysis of the "Tenure Trap" detailing diminishing borrowing power across 10/15/20/25 year terms vs explosive interest growth, FOIR (Fixed Obligation to Income Ratio) and DTI underwriting caps (40%–50% net income ceiling, pre-existing debt deductions, CIBIL/FICO 750+ credit score requirements), and practical underwriting exclusions (LTV 75–80% ceiling requiring 20–25% down payment, floating benchmark rate shock sensitivity, incidental registration/stamp duty charges).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcAffordability`, 5 FAQs matching JSON-LD schema, and curated related links (`mortgage-calculator`, `home-loan-calculator`, `debt-to-income-ratio-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **038. debt-to-income-ratio-calculator (/debt-to-income-ratio-calculator)**:
+  - Audited: Debt service underwriting model calculating back-end and front-end DTI percentage against gross pre-tax income to assess loan eligibility and default risk.
+  - Changes: Added 4-stage mathematical formula breakdown (Back-end DTI, debt commitments summation, residual income, front-end housing ratio), comprehensive step-by-step worked example schedule matching default inputs (₹1,00,000 gross monthly income, ₹30,000 monthly debt commitments → 30.0% DTI, Fair/Healthy standing, ₹70,000 uncommitted disposable cash, ₹36,000 36% standard limit with ₹6,000 headroom, ₹43,000 43% Qualified Mortgage cap with ₹13,000 headroom), institutional DTI underwriting matrix (&le;20% excellent, 21–28% prime, 29–36% healthy, 37–43% stretched, &gt;43% critical risk), rapid DTI compression strategies (Snowball method, revolving card retirement, tenure restructuring), and real-world limitations (gross income distortion vs take-home cash, non-debt living expenses omission, revolving minimum payments masking high APR debt traps).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcDTIInline`, 5 FAQs matching JSON-LD schema, and curated related links (`loan-affordability-calculator`, `mortgage-calculator`, `credit-card-payoff-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.

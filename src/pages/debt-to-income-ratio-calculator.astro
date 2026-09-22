@@ -223,34 +223,119 @@ const jsonld = {
 
     <Fragment slot="below">
       <section aria-labelledby="dti-calculator-how">
-        <h2 id="dti-calculator-how" class="text-xl font-bold text-text-primary mb-4">Understanding Debt-to-Income benchmarks</h2>
+        <h2 id="dti-calculator-how" class="text-xl font-bold text-text-primary mb-4">Understanding Debt-to-Income (DTI) benchmarks</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Lenders evaluate your borrowing capacity using simple proportional debt service analysis:
+          Lenders evaluate your borrowing capacity and default risk using proportional debt service analysis. The Debt-to-Income (DTI) ratio measures what portion of your monthly pre-tax earnings is already pledged to contractual debt commitments:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>DTI Formula: </strong> DTI = (Total Monthly Debt &divide; Gross Monthly Income) &times; 100%<br />
-            <strong>&le; 28%: </strong> Ideal range for prime conventional mortgages.<br />
-            <strong>29% &ndash; 36%: </strong> Healthy debt load; accepted by nearly all retail credit lenders.<br />
-            <strong>37% &ndash; 43%: </strong> Maximum debt ceiling for standard qualified mortgages.<br />
-            <strong>&gt; 43%: </strong> Significant financial friction; difficult to secure competitive mortgage rates.
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Back-End DTI Formula:</strong> DTI = [ &sum; Monthly Debt Commitments &divide; Gross Monthly Pre-Tax Income ] &times; 100%<br /><br />
+            <strong>2. Eligible Debt Commitments:</strong> Total Debt = Home Loan EMI + Auto EMI + Personal Loan EMIs + Credit Card Minimums + Student Loans<br /><br />
+            <strong>3. Monthly Residual Income:</strong> Disposable Margin = Gross Income &minus; Total Debt Commitments<br /><br />
+            <strong>4. Front-End (Housing) DTI:</strong> Housing Ratio = [ Housing Principal + Interest + Property Tax + Insurance ] &divide; Gross Income
           </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a borrower earning a verified <strong>gross pre-tax income of ₹1,00,000 per month</strong> with cumulative recurring debt obligations totaling <strong>₹30,000 per month</strong> (e.g., ₹20,000 existing home loan + ₹7,000 car EMI + ₹3,000 credit card minimum):
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Parameter / Milestone</th>
+                <th class="py-2.5 px-4">Calculation / Input</th>
+                <th class="py-2.5 px-4">Computed Output</th>
+                <th class="py-2.5 px-4">Underwriting Standing</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Gross Monthly Income (Pre-Tax)</td>
+                <td class="py-2.5 px-4 font-mono">Verified Base Salary / Cash Flow</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000 / Month</td>
+                <td class="py-2.5 px-4">Denominator utilized across all institutional underwriting guidelines.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Monthly Debt Service</td>
+                <td class="py-2.5 px-4 font-mono">₹20k (Home) + ₹7k (Auto) + ₹3k (Cards)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹30,000 / Month</td>
+                <td class="py-2.5 px-4">All contractual credit obligations currently reported on credit bureaus.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Debt-to-Income (DTI) Ratio</td>
+                <td class="py-2.5 px-4 font-mono">(₹30,000 &divide; ₹1,00,000) &times; 100%</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">30.0%</td>
+                <td class="py-2.5 px-4">Fair / Healthy range; comfortably clears standard 36% retail ceilings.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Uncommitted Disposable Cash</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000 &minus; ₹30,000</td>
+                <td class="py-2.5 px-4 font-mono">₹70,000 / Month (70.0%)</td>
+                <td class="py-2.5 px-4">Sufficient cash buffer for taxes, daily household expenses, and emergency savings.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Standard Benchmark Limit (36%)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000 &times; 36%</td>
+                <td class="py-2.5 px-4 font-mono">₹36,000 / Month</td>
+                <td class="py-2.5 px-4">Borrower can safely take on an additional ₹6,000/month in new loan installments.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Qualified Mortgage Cap (43%)</td>
+                <td class="py-3 px-4 font-mono">₹1,00,000 &times; 43%</td>
+                <td class="py-3 px-4 font-mono">₹43,000 / Month</td>
+                <td class="py-3 px-4">Maximum legal debt ceiling under Qualified Mortgage standards (₹13,000 buffer).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Institutional DTI Underwriting Matrix</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>&le; 20% (Excellent):</strong> Top-tier credit profile. Unlocks prime loan interest discounts, waived processing fees, and instant loan approvals.</li>
+              <li><strong>21% &ndash; 28% (Prime):</strong> Optimal balance. Complies with the classical "28% front-end housing cap" with ample liquidity cushion.</li>
+              <li><strong>29% &ndash; 36% (Healthy Maximum):</strong> Standard institutional ceiling for conventional home loans and unsecured credit.</li>
+              <li><strong>37% &ndash; 43% (Stretched):</strong> Approaching regulatory limits. Lenders demand higher CIBIL scores (&ge;750), 20%+ down payments, or 6 months of liquid reserves.</li>
+              <li><strong>&gt; 43% (Critical Risk):</strong> Severe default vulnerability. Most institutional banks reject applications; borrowers are forced to high-cost subprime lenders.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Fast Strategies to Compress Your DTI</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              If your DTI exceeds 36% and you need to qualify for a mortgage, apply these targeted debt reduction tactics:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>The Snowball Method:</strong> Pay off small loan balances (like a remaining ₹30,000 two-wheeler loan) first. This completely removes that ₹4,000 monthly EMI from your DTI numerator.</li>
+              <li><strong>Zero-Balance Revolving Cards:</strong> Credit card minimum payments directly count toward DTI. Retiring credit card balances immediately expands debt capacity.</li>
+              <li><strong>Tenure Restructuring:</strong> Extending an auto or personal loan tenure lowers its monthly installment, instantly shrinking your DTI ratio before applying for a home loan.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Gross Income Distortion:</strong> DTI is measured against gross pre-tax income, but you service debt with post-tax take-home pay. If income tax takes 25%, a 36% gross DTI actually consumes nearly <strong>48% of your real take-home cash</strong>!</li>
+            <li><strong>Living Expenses Ignored:</strong> Underwriting DTI completely ignores essential non-debt expenditures like groceries, utilities, school fees, and medical insurance. A low DTI does not guarantee financial security if basic living costs are high.</li>
+            <li><strong>Minimum Payments vs True Liability:</strong> Credit card issuers report only the 5% minimum payment. A borrower carrying ₹5,00,000 in credit card debt at 42% APR may show an artificially low DTI while facing severe compound debt spiraling.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="dti-calculator-faq">
         <h2 id="dti-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What is a Debt-to-Income (DTI) ratio?', 'Your debt-to-income (DTI) ratio is the percentage of your gross pre-tax monthly income that goes toward paying recurring monthly debt obligations such as mortgages, car loans, personal loans, and minimum credit card payments.'],
-            ['What is a good DTI ratio for mortgage approval?', 'Most mortgage lenders prefer a back-end DTI ratio of 36% or lower. Lenders participating in qualified mortgage programs frequently allow up to 43%, and certain FHA or specialized loan programs may permit up to 50% with strong compensating factors.'],
-            ['What is the difference between front-end and back-end DTI?', 'Front-end DTI includes only housing costs (mortgage principal, interest, taxes, and insurance). Back-end DTI encompasses all recurring debt obligations combined (housing plus auto loans, student loans, and credit cards).'],
-            ['How can I lower my DTI ratio?', 'You can lower your DTI by either paying down existing high-interest revolving balances (such as credit cards or short-term personal loans) or by increasing your verified gross monthly income through raises, overtime, or secondary revenue streams.'],
-            ['Do living expenses like groceries and utilities count in DTI?', 'No. Standard underwriting DTI calculations only include legally binding credit liabilities (debt contracts, minimum loan installments, and court-ordered obligations like child support), excluding day-to-day living expenses like utilities, groceries, and streaming services.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
@@ -258,7 +343,23 @@ const jsonld = {
 
       <section aria-labelledby="dti-calculator-related">
         <h2 id="dti-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/loan-affordability-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Affordability Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine maximum borrowing capacity based on monthly income and debt limits.</p>
+          </a>
+          <a href="/mortgage-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Mortgage Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate monthly mortgage payments, down payment impact, and total loan interest.</p>
+          </a>
+          <a href="/credit-card-payoff-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Credit Card Payoff Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate time to eliminate card debt and interest savings from extra monthly payments.</p>
+          </a>
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
