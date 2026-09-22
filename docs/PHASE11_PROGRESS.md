@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:12:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:15:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 1
-- **IN_PROGRESS:** 002. home-loan-prepayment-vs-sip
-- **NEXT:** 003. old-vs-new-tax-regime
+- **COMPLETED_ARTICLES:** 2
+- **IN_PROGRESS:** 003. old-vs-new-tax-regime
+- **NEXT:** 004. capital-gains-tax-rules
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** cagr-vs-xirr
-- **LAST_COMMIT:** 4d3e6ed
+- **LAST_COMPLETED_ARTICLE:** home-loan-prepayment-vs-sip
+- **LAST_COMMIT:** c48b5cb
 - **TEST_STATUS:** PASS (389/389 tests)
 - **BUILD_STATUS:** PASS (67 pages)
 - **BROWSER_QA_STATUS:** PENDING
@@ -19,8 +19,8 @@
 ## Target Articles Checklist (10 Evidenced Articles)
 
 - [x] 001. cagr-vs-xirr — DONE (Evergreen)
-- [ ] 002. home-loan-prepayment-vs-sip — IN PROGRESS (Hybrid)
-- [ ] 003. old-vs-new-tax-regime — PENDING (Trending/Hybrid)
+- [x] 002. home-loan-prepayment-vs-sip — DONE (Hybrid)
+- [ ] 003. old-vs-new-tax-regime — IN PROGRESS (Trending/Hybrid)
 - [ ] 004. capital-gains-tax-rules — PENDING (Trending/Hybrid)
 - [ ] 005. markup-vs-margin — PENDING (Evergreen)
 - [ ] 006. npv-vs-irr — PENDING (Evergreen)
@@ -54,9 +54,9 @@
 ---
 
 ## Linking Status
-- **article → calculator:** In design (every article mapped to 2–4 published calculators)
-- **calculator → article:** Pending article publication
-- **article → article:** Mapped in cluster architecture
+- **article → calculator:** All published articles mapped to 2–4 published calculators with in-body contextual links
+- **calculator → article:** Reciprocal educational callouts placed on `/cagr-calculator`, `/xirr-calculator`, `/loan-prepayment-calculator`, `/home-loan-calculator`
+- **article → article:** Contextual cross-links between portfolio and debt guides
 - **broken links:** 0
 - **orphan articles:** 0
 
@@ -72,4 +72,13 @@
   - Key Content: Mathematical formulas (geometric root vs Newton-Raphson polynomial iteration), side-by-side 3-year worked example schedule (Investor A ₹1L lump sum = 16.96% CAGR/XIRR vs Investor B staggered SIP = 25.12% XIRR), metric comparison matrix, and 3 dangerous traps (short-tenure annualization distortion, benchmark comparison errors, polynomial multiple roots).
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (67 pages built), `git diff --check` PASS.
+
+- **002. home-loan-prepayment-vs-sip (/blog/home-loan-prepayment-vs-sip)**:
+  - Title: Home Loan Prepayment vs. SIP: Which Builds More Wealth?
+  - Intent: Solve the debt payoff vs equity investing dilemma with exact mathematical trade-offs, interest rate arbitrage, post-tax comparisons, and life-cycle liquidity risks.
+  - Linked Calculators: `/loan-prepayment-calculator`, `/home-loan-calculator`, `/sip-calculator`, `/emi-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/loan-prepayment-calculator` and `/home-loan-calculator`.
+  - Key Content: Arbitrage spread formula (`Spread = R_equity*(1 - T_equity) - R_debt`), comprehensive 20-year ₹50 Lakh loan @ 8.5% case study with ₹10,000 extra surplus showing Path A (prepay saves ₹23.19 Lakh interest, finishes in 12.3 yrs) vs Path B (SIP creates ₹99.91 Lakh gross / +₹40-45L net wealth advantage), 4 real-world non-mathematical risks (illiquidity trap, bear market sequence risk, front-loaded amortization schedule, discipline fallacy), and the practical 5-Year Hybrid Rule.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (68 pages built), `git diff --check` PASS.
 
