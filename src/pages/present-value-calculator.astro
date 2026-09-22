@@ -188,31 +188,180 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="pv-how">
-        <h2 id="pv-how" class="text-xl font-bold text-text-primary mb-4">How the Present Value calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Present value answers: "How much is a future sum worth in today's terms?" Using a discount rate that represents your minimum required return or opportunity cost, the formula reverses compounding to find the equivalent lump sum today.</p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
-          <p class="text-base font-mono text-text-primary mb-3">PV = FV / (1 + r/n)^(n × t)</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">PV</strong> — Present value (what you want to find)</li>
-            <li><strong class="text-text-primary">FV</strong> — Future value (the cash flow you expect to receive)</li>
-            <li><strong class="text-text-primary">r</strong> — Annual discount rate (e.g. 0.08 for 8%)</li>
-            <li><strong class="text-text-primary">n</strong> — Compounding periods per year (1 = annual, 12 = monthly)</li>
-            <li><strong class="text-text-primary">t</strong> — Time in years</li>
-          </ul>
+      <section aria-labelledby="pv-how" class="mb-10">
+        <h2 id="pv-how" class="text-xl font-bold text-text-primary mb-4">How the Present Value Calculator Works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Present Value (PV) represents the current worth of a future sum of money or stream of cash flows, discounted at a specific rate of return. It forms the bedrock of the <strong>Time Value of Money (TVM)</strong>, which asserts that money available today is inherently worth more than the identical nominal amount in the future.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          This discrepancy stems from three fundamental economic drivers:
+        </p>
+        <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
+          <li><strong>Opportunity Cost:</strong> Money in hand today can be invested in productive assets, government securities, or interest-bearing accounts to generate positive returns.</li>
+          <li><strong>Purchasing Power Erosion (Inflation):</strong> General price inflation erodes the real quantity of goods and services a fixed nominal amount can purchase in the future.</li>
+          <li><strong>Credit & Uncertainty Risk:</strong> An expected future cash flow carries counterparty default, execution, or liquidity risks compared to cash already settled.</li>
+        </ul>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6 overflow-x-auto">
+          <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Core Mathematical Formulations</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">1. Periodic Compounding (Discrete):</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">PV = FV / (1 + r / n)^(n × t)</p>
+            </div>
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">2. Continuous Compounding:</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">PV = FV × e^(-r × t)</p>
+            </div>
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">3. Ordinary Annuity Present Value (Series of Cash Flows):</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">PV_annuity = PMT × [ (1 - (1 + r)^(-t)) / r ]</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-muted">
+            <div><strong class="text-text-primary">PV:</strong> Present Value (equivalent worth in today's currency)</div>
+            <div><strong class="text-text-primary">FV:</strong> Future Value (nominal cash flow expected at time t)</div>
+            <div><strong class="text-text-primary">r:</strong> Annual nominal discount rate (expressed as a decimal, e.g., 0.08)</div>
+            <div><strong class="text-text-primary">n:</strong> Compounding frequency per annum (1=annual, 2=semi, 4=quarterly, 12=monthly)</div>
+            <div><strong class="text-text-primary">t:</strong> Time horizon in years until cash realization</div>
+            <div><strong class="text-text-primary">e:</strong> Euler's mathematical constant (~2.71828)</div>
+          </div>
         </div>
-        <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Worked example:</strong> You expect to receive ₹1,00,000 in 10 years. Your required return is 8% annually compounded. PV = 1,00,000 / (1.08)^10 = <strong>₹46,319</strong>. This means receiving ₹1 lakh in 10 years is worth only ₹46,319 today at your required rate of return.</p>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Step-by-Step Worked Example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an investor expecting to receive a lump sum of <strong>₹1,00,000</strong> in <strong>10 years</strong>. The investor's required hurdle rate (opportunity cost) is <strong>8.0% per annum</strong>, compounded <strong>annually</strong>.
+        </p>
+        <div class="bg-canvas border border-border rounded-card p-4 space-y-2 text-xs text-text-muted mb-6 font-mono">
+          <p>• Future Value (FV) = ₹1,00,000</p>
+          <p>• Discount Rate (r) = 8.00% = 0.08</p>
+          <p>• Compounding Periods per Year (n) = 1 (Annual)</p>
+          <p>• Horizon (t) = 10 Years | Total Periods = 10 × 1 = 10</p>
+          <p>• Discount Factor = (1 + 0.08 / 1)^10 = (1.08)^10 = 2.158925</p>
+          <p>• Present Value (PV) = 1,00,000 / 2.158925 = <strong class="text-accent font-sans text-sm">₹46,319</strong></p>
+          <p>• Total Discount Amount = ₹1,00,000 - ₹46,319 = <strong class="text-text-primary font-sans text-sm">₹53,681</strong> (53.68% discount)</p>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-6">
+          <strong>Strategic Takeaway:</strong> Receiving ₹1,00,000 in 10 years at an 8% discount rate is financially equivalent to receiving ₹46,319 today. If offered any lump sum today greater than ₹46,319, an investor earning 8% annually should rationally prefer the upfront cash.
+        </p>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Impact of Compounding Frequency on Present Value</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Holding nominal rate (8%) and horizon (10 years) constant, higher compounding frequencies accelerate interest compounding, which increases the effective discount rate and reduces the present value:
+        </p>
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="p-3">Compounding Frequency</th>
+                <th class="p-3">Periods / Year (n)</th>
+                <th class="p-3">Discount Factor</th>
+                <th class="p-3">Present Value (PV)</th>
+                <th class="p-3">Total Discount</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Annual</td>
+                <td class="p-3">1</td>
+                <td class="p-3 font-mono">2.158925</td>
+                <td class="p-3 font-semibold text-text-primary">₹46,319</td>
+                <td class="p-3">₹53,681 (53.68%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Semi-Annual</td>
+                <td class="p-3">2</td>
+                <td class="p-3 font-mono">2.191123</td>
+                <td class="p-3 font-semibold text-text-primary">₹45,639</td>
+                <td class="p-3">₹54,361 (54.36%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Quarterly</td>
+                <td class="p-3">4</td>
+                <td class="p-3 font-mono">2.208040</td>
+                <td class="p-3 font-semibold text-text-primary">₹45,289</td>
+                <td class="p-3">₹54,711 (54.71%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Monthly</td>
+                <td class="p-3">12</td>
+                <td class="p-3 font-mono">2.219640</td>
+                <td class="p-3 font-semibold text-text-primary">₹45,052</td>
+                <td class="p-3">₹54,948 (54.95%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Continuous</td>
+                <td class="p-3">∞</td>
+                <td class="p-3 font-mono">2.225541</td>
+                <td class="p-3 font-semibold text-text-primary">₹44,933</td>
+                <td class="p-3">₹55,067 (55.07%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Key Practical Applications</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Corporate Capital Budgeting</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Evaluating long-term capital investments by discounting projected net cash inflows at the firm's Weighted Average Cost of Capital (WACC) to assess Net Present Value (NPV).
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Fixed-Income Bond Valuation</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Calculating the intrinsic fair value of a bond by summing the present values of periodic coupon payments and the discounted par value redemption at maturity.
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Lump-Sum vs. Annuity Settlement</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Comparing whether to take an upfront cash payout versus structured periodic instalments for insurance claims, lottery proceeds, or retirement pensions.
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Discounted Cash Flow (DCF) Equity Modeling</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Estimating the fair value per share of a company by discounting projected free cash flows to firm (FCFF) and terminal enterprise value.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Analytical Assumptions and Limitations</h3>
+        <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
+          <li><strong>Flat Term Structure:</strong> Standard PV calculations assume a single, flat discount rate across all future periods. In real-world debt markets, yield curves slope upward or invert, meaning 1-year and 10-year discount rates differ.</li>
+          <li><strong>Certainty Equivalent Assumption:</strong> The base PV formula assumes future cash inflows are guaranteed. If cash flows involve uncertainty, the discount rate must incorporate an appropriate risk premium (or cash flows must be probability-weighted).</li>
+          <li><strong>Nominal vs. Real Inconsistency:</strong> If future cash flows are stated in nominal terms (including inflation), a nominal discount rate must be used. Discounting nominal cash flows with a real interest rate distorts valuation.</li>
+          <li><strong>Reinvestment Rate Hypothesis:</strong> The formulation assumes intermediate reinvestment opportunities match the chosen discount rate exactly.</li>
+        </ul>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Common Analytical Mistakes</h3>
+        <div class="space-y-3 mb-6">
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 1: Confusing APR with Compounding Frequency</span>
+            <p class="text-xs text-text-muted leading-relaxed">Applying an annual percentage rate (APR) without adjusting the exponent and divisor for monthly or quarterly compounding produces significant under-discounting over multi-year horizons.</p>
+          </div>
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 2: Using Cost of Debt Instead of WACC</span>
+            <p class="text-xs text-text-muted leading-relaxed">Discounting corporate cash flows using the firm's pre-tax borrowing interest rate rather than its blended cost of capital (WACC) artificially inflates project present value.</p>
+          </div>
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 3: Double-Counting Inflation</span>
+            <p class="text-xs text-text-muted leading-relaxed">Adjusting future cash flows downwards for projected inflation while simultaneously discounting them with a nominal market rate penalizes future cash flows twice.</p>
+          </div>
+        </div>
       </section>
 
-      <section aria-labelledby="pv-faq">
-        <h2 id="pv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <section aria-labelledby="pv-faq" class="mb-10">
+        <h2 id="pv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently Asked Questions</h2>
         <div class="space-y-3">
           {[
-            ['What is present value (PV)?', 'Present value is the current worth of a future sum of money, discounted at a specified rate. It reflects the time value of money — ₹1 today is worth more than ₹1 tomorrow because of its earning potential.'],
-            ['What discount rate should I use?', 'Use your opportunity cost — typically the expected market return (8–12% for equity investments), or the company\'s WACC for capital budgeting decisions. A risk-free rate (e.g. government bond yield) is appropriate for risk-free future cash flows.'],
-            ['How does compounding frequency affect PV?', 'More frequent compounding produces a lower PV. For ₹1,00,000 due in 10 years at 8%, annual compounding gives PV ≈ ₹46,319, while monthly compounding gives PV ≈ ₹45,052.'],
-            ['What is the difference between PV and NPV?', 'PV discounts a single future cash flow to today. NPV sums the PVs of multiple periodic cash flows and subtracts the initial investment — it tells you the net value creation or destruction of a project.'],
-            ['Can PV be higher than the future amount?', 'No — when the discount rate is positive, PV is always less than the future amount. PV equals the future amount only when the rate is 0% or the time period is zero.'],
+            ['What is present value (PV)?', 'Present value is the current worth of a future sum of money or cash flow, discounted at a specified rate of return. The concept reflects the time value of money — a rupee today is worth more than a rupee tomorrow because of its earning potential, purchasing power preservation, and lower risk.'],
+            ['What is a good discount rate to use for present value?', 'The appropriate discount rate depends on context. For corporate capital projects, the company\'s Weighted Average Cost of Capital (WACC) is standard. For personal investments, opportunity cost (such as expected equity market returns of 8–12%) is standard. Risk-free government bond yields are used when valuing guaranteed sovereign cash flows.'],
+            ['How does compounding frequency affect present value?', 'More frequent compounding (such as monthly vs annually) produces a lower PV because the effective annual discount rate is higher, causing more aggressive discounting. For example, ₹1,00,000 in 10 years discounted at 8% annually yields ₹46,319, while monthly compounding yields ₹45,052.'],
+            ['What is the difference between PV and NPV?', 'Present value (PV) discounts a single future cash flow (or series of inflows) back to today. Net Present Value (NPV) takes the total PV of all future cash inflows and subtracts the initial cash investment outlay. NPV indicates whether an investment generates positive net economic value above the hurdle rate.'],
+            ['Can present value be higher than the future amount?', 'No. Present value is always less than or equal to the future amount when the discount rate is positive. PV equals the future amount only when the discount rate is 0% or the time period is zero years. A higher PV would imply a negative discount rate.'],
           ].map(([q, a]) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
@@ -223,7 +372,7 @@ const jsonld = {
       </section>
 
       <section aria-labelledby="pv-related">
-        <h2 id="pv-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <h2 id="pv-related" class="text-xl font-bold text-text-primary mb-4">Related Calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
             <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">

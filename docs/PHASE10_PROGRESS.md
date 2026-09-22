@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:53:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:55:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 48
-- **IN_PROGRESS:** 049. present-value-calculator
-- **NEXT:** 050. future-value-calculator
+- **COMPLETED:** 49
+- **IN_PROGRESS:** 050. future-value-calculator
+- **NEXT:** NONE
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** discounted-payback-period-calculator
-- **LAST_COMMIT:** ec0d706
+- **LAST_COMPLETED_UNIT:** present-value-calculator
+- **LAST_COMMIT:** 04216fd
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -66,8 +66,8 @@
 - [x] 046. cash-conversion-cycle-calculator — DONE
 - [x] 047. dscr-calculator — DONE
 - [x] 048. discounted-payback-period-calculator — DONE
-- [ ] 049. present-value-calculator — IN PROGRESS
-- [ ] 050. future-value-calculator — PENDING
+- [x] 049. present-value-calculator — DONE
+- [ ] 050. future-value-calculator — IN PROGRESS
 
 ---
 
@@ -339,3 +339,9 @@
   - Changes: Deepened below-the-fold content in `<Fragment slot="below">`, added 5-stage time-value capital recovery mathematical formulations (period present value derivation, cumulative discounted flow summation, linear fractional breakeven interpolation, positive rate divergence `DPP ≥ SPP`, NPV relationship), comprehensive step-by-step 5-year worked example schedule matching default inputs (₹10,00,000 initial outlay, 10.00% discount rate, cash flows of ₹3L, ₹3.5L, ₹4L, ₹4L, ₹5L → Year 1: ₹2,72,727 PV; Year 2: ₹2,89,256 PV / ₹5,61,983 cum; Year 3: ₹3,00,526 PV / ₹8,62,509 cum / ₹1,37,491 unrecovered; Year 4: ₹2,73,205 PV / ₹11,35,715 cum → DPP = 3.5 years, contrasting with 2.9 years simple undiscounted payback, a 0.6-year time-value latency gap; Year 5: ₹14,46,176 total PV / +₹4,46,176 NPV), capital budgeting decision thresholds by industry (&le;2–3 yrs tech vs &le;5 yrs manufacturing vs &le;8–12 yrs infrastructure), and critical analytical limitations (the post-payback blind spot ignoring cash flows after breakeven, necessity of multi-metric pairing with NPV and IRR).
   - Preserved: Clean interactive inputs with sliders and dynamic year add/remove controls, calculation engine `calcDiscountedPayback`, 5 FAQs matching JSON-LD schema, and curated related links (`/npv-calculator`, `/irr-calculator`, `/payback-period-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **049. present-value-calculator (/present-value-calculator)**:
+  - Audited: Time Value of Money (TVM) discounting engine computing Present Value (PV) of future lump sums across discrete and continuous compounding frequencies.
+  - Changes: Substantially deepened below-the-fold content in `<Fragment slot="below">`, added core TVM foundations (opportunity cost, inflation erosion, default/liquidity risk), complete mathematical formulations (discrete periodic compounding, continuous compounding with Euler's number, ordinary annuity PV equation), comprehensive step-by-step worked example matching default inputs (₹1,00,000 future sum, 8.0% annual discount rate, 10-year horizon, annual compounding → discount factor 2.158925, PV = ₹46,319, total discount = ₹53,681 / 53.68%), compounding frequency comparative matrix (annual ₹46,319 vs semi-annual ₹45,639 vs quarterly ₹45,289 vs monthly ₹45,052 vs continuous ₹44,933), practical applications (capital budgeting, bond valuation, lump-sum vs annuity settlements, DCF modeling), analytical limitations (flat term structure, certainty assumptions, real vs nominal consistency), and common mistakes (APR vs EAR confusion, cost of debt vs WACC, double-counting inflation).
+  - Preserved: Clean interactive inputs with sliders and compounding dropdown, calculation engine `calcPV`, 5 FAQs matching JSON-LD schema, and curated related links (`/wacc-calculator`, `/npv-calculator`, `/irr-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, Frequency Table, FAQs, and Related links render in the DOM.
