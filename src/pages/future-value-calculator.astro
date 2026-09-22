@@ -187,31 +187,179 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="fv-how">
-        <h2 id="fv-how" class="text-xl font-bold text-text-primary mb-4">How the Future Value calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Future value is the mirror image of present value — instead of discounting back to today, we compound forward to a future date. This shows the power of compounding: interest earned generates additional interest over time.</p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
-          <p class="text-base font-mono text-text-primary mb-3">FV = PV × (1 + r/n)^(n × t)</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">PV</strong> — Present value (today's lump sum)</li>
-            <li><strong class="text-text-primary">r</strong> — Annual growth rate (e.g. 0.08 for 8%)</li>
-            <li><strong class="text-text-primary">n</strong> — Compounding periods per year</li>
-            <li><strong class="text-text-primary">t</strong> — Time in years</li>
-            <li><strong class="text-text-primary">FV</strong> — Future value at time t</li>
-          </ul>
+      <section aria-labelledby="fv-how" class="mb-10">
+        <h2 id="fv-how" class="text-xl font-bold text-text-primary mb-4">How the Future Value Calculator Works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Future Value (FV) measures the nominal amount of money a current asset or lump sum will accumulate to over a designated time horizon, assuming a fixed rate of compound growth. While <strong>Present Value (PV)</strong> discounts future cash flows back to today, Future Value projects today's capital forward into the future.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The engine of future value is <strong>compound interest</strong>—the mathematical process where earnings generate additional earnings over successive periods. Unlike simple interest (which grows linearly), compounding creates exponential, convex wealth accumulation that accelerates rapidly over longer durations.
+        </p>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6 overflow-x-auto">
+          <h3 class="text-sm font-semibold text-text-primary uppercase tracking-wider mb-3">Core Mathematical Formulations</h3>
+          <div class="space-y-4">
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">1. Periodic Compounding (Discrete):</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">FV = PV × (1 + r / n)^(n × t)</p>
+            </div>
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">2. Continuous Compounding:</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">FV = PV × e^(r × t)</p>
+            </div>
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">3. Future Value of an Ordinary Annuity (Periodic Savings Stream):</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">FV_annuity = PMT × [ ((1 + r)^t - 1) / r ]</p>
+            </div>
+            <div>
+              <p class="text-xs text-text-muted uppercase tracking-wider font-semibold mb-1">4. Effective Annual Rate (EAR) Equivalence:</p>
+              <p class="text-base font-mono text-text-primary bg-canvas/60 p-2.5 rounded border border-border">EAR = (1 + r / n)^n - 1</p>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-border grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-muted">
+            <div><strong class="text-text-primary">FV:</strong> Future Value (total accumulated terminal amount)</div>
+            <div><strong class="text-text-primary">PV:</strong> Present Value (initial principal capital invested today)</div>
+            <div><strong class="text-text-primary">r:</strong> Annual nominal rate of return (decimal, e.g., 0.08 for 8%)</div>
+            <div><strong class="text-text-primary">n:</strong> Compounding periods per year (1=annual, 2=semi, 4=quarterly, 12=monthly)</div>
+            <div><strong class="text-text-primary">t:</strong> Investment horizon in years</div>
+            <div><strong class="text-text-primary">e:</strong> Euler's mathematical constant (~2.71828)</div>
+          </div>
         </div>
-        <p class="text-sm text-text-muted leading-relaxed"><strong>Worked example:</strong> ₹1,00,000 at 8% annually compounded for 10 years: FV = 1,00,000 × (1.08)^10 = <strong>₹2,15,892</strong>. Your money more than doubles — ₹1,15,892 of that is growth earned from compounding.</p>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Step-by-Step Worked Example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Suppose an individual commits an initial lump sum of <strong>₹1,00,000</strong> for <strong>10 years</strong> in an asset yielding <strong>8.0% per annum</strong>, compounded <strong>annually</strong>.
+        </p>
+        <div class="bg-canvas border border-border rounded-card p-4 space-y-2 text-xs text-text-muted mb-6 font-mono">
+          <p>• Initial Principal (PV) = ₹1,00,000</p>
+          <p>• Annual Growth Rate (r) = 8.00% = 0.08</p>
+          <p>• Compounding Frequency (n) = 1 (Annual)</p>
+          <p>• Investment Horizon (t) = 10 Years | Total Periods = 10</p>
+          <p>• Growth Multiplier = (1 + 0.08 / 1)^10 = (1.08)^10 = 2.158925</p>
+          <p>• Future Value (FV) = 1,00,000 × 2.158925 = <strong class="text-accent font-sans text-sm">₹2,15,892</strong></p>
+          <p>• Net Capital Growth = ₹2,15,892 - ₹1,00,000 = <strong class="text-text-primary font-sans text-sm">₹1,15,892</strong> (115.89% total return)</p>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-6">
+          <strong>Key Insight:</strong> Over 10 years at 8%, the total interest earned (₹1,15,892) actually exceeds the original principal invested (₹1,00,000). Simple interest would have generated only ₹80,000 (10 × 8%); compounding produces an extra ₹35,892 purely from interest accumulating upon previous interest.
+        </p>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Impact of Compounding Frequency on Future Value</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Holding nominal rate (8%) and horizon (10 years) constant, more frequent compounding results in interest being capitalized earlier, producing higher effective yields and larger future wealth:
+        </p>
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="p-3">Compounding Frequency</th>
+                <th class="p-3">Periods / Year (n)</th>
+                <th class="p-3">Effective Annual Rate (EAR)</th>
+                <th class="p-3">Future Value (FV)</th>
+                <th class="p-3">Total Growth</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Annual</td>
+                <td class="p-3">1</td>
+                <td class="p-3 font-mono">8.00%</td>
+                <td class="p-3 font-semibold text-text-primary">₹2,15,892</td>
+                <td class="p-3">₹1,15,892 (115.89%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Semi-Annual</td>
+                <td class="p-3">2</td>
+                <td class="p-3 font-mono">8.16%</td>
+                <td class="p-3 font-semibold text-text-primary">₹2,19,112</td>
+                <td class="p-3">₹1,19,112 (119.11%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Quarterly</td>
+                <td class="p-3">4</td>
+                <td class="p-3 font-mono">8.24%</td>
+                <td class="p-3 font-semibold text-text-primary">₹2,20,804</td>
+                <td class="p-3">₹1,20,804 (120.80%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Monthly</td>
+                <td class="p-3">12</td>
+                <td class="p-3 font-mono">8.30%</td>
+                <td class="p-3 font-semibold text-text-primary">₹2,21,964</td>
+                <td class="p-3">₹1,21,964 (121.96%)</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-medium text-text-primary">Continuous</td>
+                <td class="p-3">∞</td>
+                <td class="p-3 font-mono">8.33%</td>
+                <td class="p-3 font-semibold text-text-primary">₹2,22,554</td>
+                <td class="p-3">₹1,22,554 (122.55%)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Strategic Financial Applications</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Long-Term Wealth Accumulation</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Evaluating the terminal corpus of equity mutual funds, index portfolios, or growth equities over multi-decade horizons to plan financial independence.
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Corporate Sinking Funds</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Forecasting the future value of reserve funds allocated today to retire corporate debentures or fund machinery replacement cycles at a known future date.
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Education & Marriage Goal Sizing</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Projecting what current educational savings will grow into by the time children reach university age, accounting for expected compounding yields.
+            </p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h4 class="text-sm font-semibold text-text-primary mb-1">Term Deposit & Certificate of Deposit Maturation</h4>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Calculating exact gross proceeds from multi-year fixed deposits compounded quarterly under standard banking convention.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Critical Analytical Limitations (Real-World Drag)</h3>
+        <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
+          <li><strong>Purchasing Power Erosion (Inflation Drag):</strong> Nominal future value does not reflect constant purchasing power. If inflation averages 6.0% annually, a nominal ₹2,15,892 in 10 years possesses an inflation-adjusted purchasing power of only ₹1,20,551 today. Real returns must be evaluated using the Fisher equation.</li>
+          <li><strong>Tax Drag on Intermittent Accruals:</strong> In taxable accounts where annual interest is taxed (such as bank deposits or debt funds), tax payments deplete the compounding base each year, resulting in a significantly lower realized future value.</li>
+          <li><strong>Sequence of Returns & Volatility Drag:</strong> In equity investments, annual returns fluctuate wildly (+20%, -10%, +15%). The geometric mean return (CAGR) is always strictly less than the arithmetic mean due to volatility drag.</li>
+          <li><strong>Expense Ratios & Management Fees:</strong> A 1.0% annual management fee or fund expense ratio reduces an 8.0% gross return to 7.0% net, reducing the 10-year future value from ₹2,15,892 to ₹1,96,715 (a ₹19,177 loss).</li>
+        </ul>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Common Analytical Mistakes</h3>
+        <div class="space-y-3 mb-6">
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 1: Confusing Nominal Future Value with Real Purchasing Power</span>
+            <p class="text-xs text-text-muted leading-relaxed">Assuming a nominal ₹1 crore corpus in 25 years will provide today's ₹1 crore lifestyle. At 6% inflation, ₹1 crore in 25 years buys only ~₹23.3 lakh worth of goods today.</p>
+          </div>
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 2: Extrapolating Short-Term Bull Runs Linearly</span>
+            <p class="text-xs text-text-muted leading-relaxed">Using exceptional 20–25% multi-year equity returns as a permanent long-term growth rate assumption leads to grossly unrealistic future corpus estimates.</p>
+          </div>
+          <div class="p-3.5 bg-canvas border border-border rounded-card">
+            <span class="text-xs font-semibold text-accent block mb-1">Mistake 3: Overlooking Reinvestment Liquidity</span>
+            <p class="text-xs text-text-muted leading-relaxed">Assuming intermediate coupons or dividends can always be reinvested at the original contracted interest rate in falling-interest-rate environments.</p>
+          </div>
+        </div>
       </section>
 
-      <section aria-labelledby="fv-faq">
-        <h2 id="fv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <section aria-labelledby="fv-faq" class="mb-10">
+        <h2 id="fv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently Asked Questions</h2>
         <div class="space-y-3">
           {[
-            ['What is future value (FV)?', 'Future value is the value of a current asset at a future date, assuming a certain rate of return. It answers "how much will my money be worth in N years?"'],
-            ['How is FV different from Lump Sum?', 'They use the same formula. The lump sum calculator is framed for investors in mutual funds; FV is the finance-theory term used in corporate finance and exams like CFA/CA.'],
-            ['Does compounding frequency matter?', 'Yes — monthly compounding generates more FV than annual compounding. At 8% for 10 years: annual = ₹2,15,892 vs. monthly = ₹2,21,964.'],
-            ['What is continuous compounding?', 'The mathematical limit of compounding infinitely often. FV = PV × e^(r × t). This produces the theoretical maximum FV for a given rate and is used in options pricing models.'],
-            ['How do I use FV for retirement planning?', 'Enter your current corpus as the present amount and your expected returns. For periodic contributions, also use the SIP Calculator and add both results together.'],
+            ['What is future value (FV)?', 'Future value is the value of a current asset at a specified date in the future, assuming a certain growth rate (interest or return). It answers "how much will my money be worth in N years?" by compounding the principal and accrued interest forward.'],
+            ['What is the difference between FV and a Lump Sum calculator?', 'Conceptually they use the same underlying compound growth mathematics (FV = PV × (1+r)^t). The distinction lies in framing: a Lump Sum calculator is oriented towards retail mutual fund investors asking about one-time investments, whereas Future Value is the broader financial economics concept used in corporate finance, bond mathematics, and CFA/CA curricula.'],
+            ['Does compounding frequency matter for FV?', 'Yes. More frequent compounding (such as monthly or quarterly) produces a higher FV than annual compounding because interest accrues on previously earned interest more frequently. For example, ₹1,00,000 at 8% for 10 years yields ₹2,15,892 with annual compounding versus ₹2,21,964 with monthly compounding.'],
+            ['What is continuous compounding?', 'Continuous compounding is the theoretical mathematical limit of compounding with infinite frequency (every infinitesimal moment). The formula is FV = PV × e^(r × t), where e is Euler\'s constant (~2.71828). It represents the maximum achievable future value for any nominal interest rate and is widely used in options pricing and quantitative derivatives models.'],
+            ['How can I use FV for retirement planning?', 'Enter your current accumulated savings as the present amount, your projected long-term asset return, and your years until retirement. The FV displays your terminal corpus from existing capital alone. To incorporate ongoing monthly or annual savings, combine this with a SIP or Savings Goal calculator.'],
           ].map(([q, a]) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
@@ -222,7 +370,7 @@ const jsonld = {
       </section>
 
       <section aria-labelledby="fv-related">
-        <h2 id="fv-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <h2 id="fv-related" class="text-xl font-bold text-text-primary mb-4">Related Calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
             <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
