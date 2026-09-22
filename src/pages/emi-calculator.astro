@@ -78,7 +78,7 @@ const jsonld = {
         <div class="mt-2"><Slider id="emi-rate-slider" min={1} max={30} step={0.25} value={8.5} ariaLabel="Interest rate slider" /></div>
       </div>
       <div class="mb-6">
-        <Input id="emi-years" label="Loan Tenure" suffix="Yrs" value="20" isNumeric={true} helperText="Duration in years" inputmode="decimal" />
+        <Input id="emi-years" label="Loan Tenure" suffix="Yrs" value="20" isNumeric={true} helperText="Duration in whole years" inputmode="numeric" />
         <div class="mt-2"><Slider id="emi-years-slider" min={1} max={30} step={1} value={20} ariaLabel="Loan tenure slider" /></div>
       </div>
 
@@ -248,11 +248,17 @@ const jsonld = {
 
     if (!principalInput || !rateInput || !yearsInput) return;
 
+    if (principalInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    principalInput.dataset.bound = 'true';
+
     const DEFAULTS = { principal: 1000000, rate: 8.5, years: 20 };
     const emiSchema = {
       p: { required: true, min: 1000, max: 1000000000, integerOnly: true, label: 'Loan Amount' },
       r: { required: true, min: 0, max: 50, decimal: true, label: 'Annual Interest Rate' },
-      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Loan Tenure (Years)' },
+      y: { required: true, min: 1, max: 50, integerOnly: true, label: 'Loan Tenure (Years)' },
     };
 
     let timer: ReturnType<typeof setTimeout>;
@@ -339,12 +345,6 @@ const jsonld = {
       };
 
       setResult(canonicalResult);
-
-      const win = window as any;
-      if (win.__cmResultStore) {
-        win.__cmResultStore.setResult(canonicalResult);
-      }
-      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
       // Fallback desktop node updates
       if (resEMI) resEMI.textContent = emiStr;
@@ -433,11 +433,18 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('emi-copy-btn')?.addEventListener('click', async () => {
-      const p = parseFloat(principalInput.value.replace(/[^0-9.]/g, '')) || 0;
-      const r = parseFloat(rateInput.value) || 0;
-      const y = parseFloat(yearsInput.value) || 0;
+      const valP = validate(principalInput.value, emiSchema.p);
+      const valR = validate(rateInput.value, emiSchema.r);
+      const valY = validate(yearsInput.value, emiSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
       const res = calcEMI(p, r, y);
-      const text = `EMI Calculator: Loan of ${fmtVal(p)} at ${r}% p.a. for ${y} years => Monthly EMI: ${fmtVal(res.emiRounded)}, Total Interest: ${fmtVal(res.totalInterest)}. ${location.href.split('#')[0]}`;
+      const text = `EMI Calculator: Loan of ${fmtVal(p)} at ${r}% p.a. for ${y} years => Monthly EMI: ${fmtVal(res.emiRounded)}, Total Interest: ${fmtVal(res.totalInterest)}. ${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -459,11 +466,22 @@ const jsonld = {
     });
 
     document.getElementById('emi-share-btn')?.addEventListener('click', async () => {
+      const valP = validate(principalInput.value, emiSchema.p);
+      const valR = validate(rateInput.value, emiSchema.r);
+      const valY = validate(yearsInput.value, emiSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const shareUrl = `${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -499,11 +517,15 @@ const jsonld = {
       }));
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.code && e.detail?.symbol) {
-        setEMICurrency(e.detail.code, e.detail.symbol);
-      }
-    });
+    const win = window as any;
+    if (!win.__cmEMICurrencyBound) {
+      win.__cmEMICurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.code && e.detail?.symbol) {
+          setEMICurrency(e.detail.code, e.detail.symbol);
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {

@@ -67,13 +67,34 @@ describe('5.6 EMI Calculator', () => {
     const emiSchema = {
       principal: { required: true, min: 1000, max: 1000000000, integerOnly: true, label: 'Loan Amount' },
       rate: { required: true, min: 0, max: 50, decimal: true, label: 'Annual Interest Rate' },
-      years: { required: true, min: 0.1, max: 50, decimal: true, label: 'Loan Tenure (Years)' },
+      years: { required: true, min: 1, max: 50, integerOnly: true, label: 'Loan Tenure (Years)' },
     };
 
     it('validates standard inputs successfully', () => {
       expect(validate('10,00,000', emiSchema.principal).valid).toBe(true);
       expect(validate('8.5', emiSchema.rate).valid).toBe(true);
       expect(validate('20', emiSchema.years).valid).toBe(true);
+    });
+
+    it('enforces whole-year integer tenure contract (Option A)', () => {
+      // Standard 20 years
+      const standard20 = validate('20', emiSchema.years);
+      expect(standard20.valid).toBe(true);
+      if (standard20.valid) expect(standard20.value).toBe(20);
+
+      // Minimum 1 year
+      const min1 = validate('1', emiSchema.years);
+      expect(min1.valid).toBe(true);
+      if (min1.valid) expect(min1.value).toBe(1);
+
+      // Fractional tenure rejected under Option A
+      const fractional = validate('2.5', emiSchema.years);
+      expect(fractional.valid).toBe(false);
+      expect(fractional.error?.code).toBe('NOT_AN_INTEGER');
+
+      // 0 tenure rejected (min is 1)
+      const zeroTenure = validate('0', emiSchema.years);
+      expect(zeroTenure.valid).toBe(false);
     });
 
     it('rejects values below min or above max', () => {
@@ -88,7 +109,7 @@ describe('5.6 EMI Calculator', () => {
     const emiSchema = {
       p: { required: true, min: 1000, max: 1000000000, integerOnly: true, label: 'Loan Amount' },
       r: { required: true, min: 0, max: 50, decimal: true, label: 'Interest Rate' },
-      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Tenure' },
+      y: { required: true, min: 1, max: 50, integerOnly: true, label: 'Tenure' },
     };
 
     it('serializes state accurately into deterministic query string', () => {
@@ -110,6 +131,53 @@ describe('5.6 EMI Calculator', () => {
       expect(restored.invalidKeys).toContain('p');
       expect(restored.invalidKeys).toContain('r');
       expect(restored.invalidKeys).toContain('y');
+    });
+  });
+
+  describe('Canonical Result & Validation Audit (Phase 5 Repair)', () => {
+    it('notifies subscribers exactly once per setResult call (single canonical write)', async () => {
+      const { setResult, subscribeResult, resetResult } = await import('../result-bus');
+      resetResult();
+
+      let updates = 0;
+      const unsub = subscribeResult(() => {
+        updates++;
+      });
+
+      setResult({
+        heroValue: '₹8,678',
+        heroLabel: 'Monthly EMI',
+        fields: { 'emi-result-emi': '₹8,678' },
+      });
+
+      expect(updates).toBe(1);
+      unsub();
+    });
+
+    it('rejects empty and invalid strings without silent coercion to 0', () => {
+      const emiSchema = {
+        p: { required: true, min: 1000, max: 1000000000, integerOnly: true, label: 'Loan Amount' },
+        r: { required: true, min: 0, max: 50, decimal: true, label: 'Annual Interest Rate' },
+        y: { required: true, min: 1, max: 50, integerOnly: true, label: 'Loan Tenure (Years)' },
+      };
+
+      // Empty strings
+      expect(validate('', emiSchema.p).valid).toBe(false);
+      expect(validate('  ', emiSchema.r).valid).toBe(false);
+
+      // Non-numeric strings
+      expect(validate('xyz', emiSchema.p).valid).toBe(false);
+      expect(validate('NaN', emiSchema.y).valid).toBe(false);
+
+      // Valid zero where allowed (rate min: 0)
+      const zeroRate = validate('0', emiSchema.r);
+      expect(zeroRate.valid).toBe(true);
+      if (zeroRate.valid) expect(zeroRate.value).toBe(0);
+
+      // Valid decimal rate
+      const decimalRate = validate('8.75', emiSchema.r);
+      expect(decimalRate.valid).toBe(true);
+      if (decimalRate.valid) expect(decimalRate.value).toBe(8.75);
     });
   });
 });
