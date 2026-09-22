@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:25:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:30:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 6
-- **IN_PROGRESS:** 007. flat-vs-reducing-interest-rate
-- **NEXT:** 008. cash-conversion-cycle
+- **COMPLETED_ARTICLES:** 7
+- **IN_PROGRESS:** 008. cash-conversion-cycle
+- **NEXT:** 009. advance-tax-guide
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** npv-vs-irr
-- **LAST_COMMIT:** 9711551
+- **LAST_COMPLETED_ARTICLE:** flat-vs-reducing-interest-rate
+- **LAST_COMMIT:** e82605e
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (71 pages)
+- **BUILD_STATUS:** PASS (72 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -24,8 +24,8 @@
 - [x] 004. capital-gains-tax-rules — DONE (Trending/Hybrid)
 - [x] 005. markup-vs-margin — DONE (Evergreen)
 - [x] 006. npv-vs-irr — DONE (Evergreen)
-- [ ] 007. flat-vs-reducing-interest-rate — IN PROGRESS (Evergreen)
-- [ ] 008. cash-conversion-cycle — PENDING (Evergreen)
+- [x] 007. flat-vs-reducing-interest-rate — DONE (Evergreen)
+- [ ] 008. cash-conversion-cycle — IN PROGRESS (Evergreen)
 - [ ] 009. advance-tax-guide — PENDING (Evergreen/Statutory)
 - [ ] 010. real-rate-of-return — PENDING (Evergreen)
 
@@ -118,3 +118,12 @@
   - Key Content: Mathematical definitions of NPV and IRR, the reinvestment rate assumption flaw (reinvesting at IRR vs WACC), scale disparity and cash flow timing traps, worked 3-year incremental cash flow schedule determining Fisher's crossover discount rate (14.5%) and showing how Project B ($NPV_B = ₹26,371$) creates more value than Project A ($NPV_A = ₹21,638$) despite Project A's higher IRR (24.0% vs 21.2%), Descartes' Rule of Signs multiple-root hazard for non-conventional cash flows, and 4-step executive decision protocol.
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (72 pages built), `git diff --check` PASS.
+
+- **007. flat-vs-reducing-interest-rate (/blog/flat-vs-reducing-interest-rate)**:
+  - Title: Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR
+  - Intent: Reveal the optical illusion of flat interest rates marketed by dealerships and NBFCs, provide exact conversion mechanics to true reducing APR, and explain RBI's Key Facts Statement (KFS) mandate.
+  - Linked Calculators: `/interest-rate-calculator`, `/car-loan-calculator`, `/emi-calculator`, `/loan-amortization-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/interest-rate-calculator` and `/car-loan-calculator`.
+  - Key Content: Mechanics of flat interest calculation and why it ignores principal amortization, reducing balance formula and declining balance charge mechanics, analytical approximation formula `Reducing Rate ≈ Flat Rate × [2n / (n + 1)]`, multi-tenure conversion matrix (6% to 15% flat across 3-year and 5-year tenures), worked ₹10,00,000 5-year car loan case study comparing Dealership 8.5% flat (₹4.25L interest, 15.84% APR, ₹23,750 EMI) against Commercial Bank 14.0% reducing (₹3.96L interest, 14.00% APR, ₹23,268 EMI), and RBI Key Facts Statement (KFS) consumer protections.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
