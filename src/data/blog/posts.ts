@@ -484,4 +484,319 @@ export const BLOG_POSTS: BlogPost[] = [
       </p>
     `,
   },
+  {
+    slug: 'old-vs-new-tax-regime',
+    title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+    seoTitle: 'Old vs New Tax Regime Breakeven Deduction Formula (Budget 2024) | Calcumetrics',
+    description:
+      'Learn the exact breakeven deduction formula between the Old and New Tax Regime after Budget 2024, including the ₹75,000 standard deduction and salary-by-salary lookup tables.',
+    category: 'Taxes',
+    publishDate: '2026-09-23',
+    dateModified: '2026-09-23',
+    readTime: '9 min read',
+    author: 'Calcumetrics Financial Research Team',
+    type: 'Hybrid',
+    summary:
+      'A comprehensive mathematical breakdown of the Old vs. New Tax Regime following the Finance (No. 2) Act 2024 revisions. Learn the exact breakeven deduction thresholds across salary bands (₹8.5L to ₹50L), how the ₹75,000 standard deduction shifts the balance, and how to evaluate employer NPS under Section 80CCD(2).',
+    relatedCalculators: [
+      {
+        name: 'Income Tax Calculator (India)',
+        path: '/in/income-tax-calculator',
+        description: 'Compare side-by-side tax liability under Old and New regimes for FY 2024-25 and FY 2025-26.',
+        badge: 'Budget 2024 Slabs',
+      },
+      {
+        name: 'HRA Exemption Calculator',
+        path: '/in/hra-calculator',
+        description: 'Calculate your exact House Rent Allowance tax deduction under Section 10(13A).',
+      },
+      {
+        name: 'Salary / CTC Calculator',
+        path: '/in/salary-ctc-calculator',
+        description: 'Estimate your monthly take-home pay after PF, gratuity, and tax deductions.',
+      },
+    ],
+    relatedArticles: [
+      {
+        slug: 'home-loan-prepayment-vs-sip',
+        title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
+        description:
+          'How tax deductions on home loan interest alter the trade-off between paying off debt and investing in mutual funds.',
+      },
+      {
+        slug: 'cagr-vs-xirr',
+        title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
+        description: 'Ensure your post-tax investment returns are accurately measured across lump-sum and SIP investments.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'What is the breakeven deduction between Old and New Tax Regime for a ₹15 Lakh salary?',
+        answer: 'For a gross salary of ₹15,00,000 in FY 2024-25 / FY 2025-26, the breakeven eligible deduction is ₹4,08,333 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹4,08,333, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
+      },
+      {
+        question: 'Is the standard deduction ₹75,000 in both Old and New Tax Regimes?',
+        answer: 'No. The standard deduction of ₹75,000 (introduced by the Finance (No. 2) Act 2024) is exclusively available under the New Tax Regime (Section 115BAC). Under the Old Tax Regime, the standard deduction remains fixed at ₹50,000 for salaried employees.',
+      },
+      {
+        question: 'Up to what income is tax zero under the New Tax Regime?',
+        answer: 'Under the New Tax Regime, a resident individual with a gross total income up to ₹7,75,000 pays zero tax. This consists of the ₹75,000 standard deduction bringing taxable income down to ₹7,00,000, followed by the Section 87A rebate of up to ₹25,000 which completely eliminates the tax liability.',
+      },
+      {
+        question: 'Can I switch between the Old and New Tax Regime every year?',
+        answer: 'Salaried taxpayers who have no business or professional income can switch between the Old and New Tax Regimes every financial year when filing their Income Tax Return (ITR) under Section 139(1). However, individuals with business or professional income (including freelance income filed under ITR-3 or ITR-4) can only switch back to the Old Regime once in their lifetime and cannot easily switch back thereafter.',
+      },
+      {
+        question: 'Can I claim employer NPS contribution under the New Tax Regime?',
+        answer: 'Yes! Employer contribution to the National Pension System (NPS) under Section 80CCD(2) is one of the very few deductions permitted under the New Tax Regime (up to 14% of Basic + DA for Central/State Government employees, and up to 14% for private sector employees as updated). However, employee voluntary NPS contribution under Section 80CCD(1B) up to ₹50,000 is only allowed under the Old Regime.',
+      },
+    ],
+    content: `
+      <p class="text-base text-text-muted leading-relaxed mb-6 font-normal">
+        Every financial year, millions of Indian taxpayers face the same high-stakes dilemma during employer declaration windows and tax filing season: <strong>Should I choose the Old Tax Regime or the New Tax Regime?</strong> With the passage of the Finance (No. 2) Act 2024, the Indian government made structural changes that significantly tipped the mathematical scales toward the New Regime (Section 115BAC).
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        Yet many financial portals publish a single static "breakeven" claim—such as <em>"if your deductions exceed ₹3.75 lakh, choose the Old Regime"</em>—that is mathematically incorrect for most income brackets. Because tax slabs and marginal rates scale differently across income bands, the exact deduction required to beat the New Regime varies dramatically whether you earn ₹10 Lakh, ₹15 Lakh, or ₹30 Lakh.
+      </p>
+
+      <div class="p-4 bg-surface border border-accent/30 rounded-card mb-8 text-xs text-text-muted">
+        <strong class="text-text-primary text-sm block mb-1">Quick Tool Access:</strong>
+        To run your exact salary, rent receipts, and Section 80C deductions through our verified engine, open the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> and compute your exact tax liability under both regimes in seconds.
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. What Changed in the Finance (No. 2) Act 2024?</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Budget 2024 introduced two crucial statutory modifications specifically designed to make the New Tax Regime the default choice for the vast majority of middle- and upper-income taxpayers:
+      </p>
+
+      <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
+        <li><strong>Enhanced Standard Deduction:</strong> The standard deduction for salaried individuals under the New Regime was increased by 50%, rising from <strong>₹50,000 to ₹75,000</strong>. Under the Old Regime, the standard deduction remains frozen at ₹50,000.</li>
+        <li><strong>Widened Tax Slab Bands:</strong> The 10% and 15% slab thresholds were expanded by ₹1,00,000 each, delaying entry into the higher 15% and 20% marginal brackets.</li>
+        <li><strong>Zero Tax Up to ₹7.75 Lakh:</strong> With the ₹75,000 standard deduction and the Section 87A rebate for taxable incomes up to ₹7,00,000, anyone earning up to ₹7,75,000 gross salary pays <strong>₹0 in income tax</strong> under the New Regime without investing a single rupee in tax-saving instruments.</li>
+      </ul>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Tax Slab</th>
+              <th class="p-3">Old Tax Regime Rate</th>
+              <th class="p-3">New Tax Regime Rate (Post-Budget 2024)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted">
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Up to ₹2,50,000</td>
+              <td class="p-3">Nil</td>
+              <td class="p-3">Nil</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">₹2,50,001 to ₹3,00,000</td>
+              <td class="p-3">5%</td>
+              <td class="p-3">Nil</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">₹3,00,001 to ₹5,00,000</td>
+              <td class="p-3">5%</td>
+              <td class="p-3 text-accent font-semibold">5%</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">₹5,00,001 to ₹7,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">20%</td>
+              <td class="p-3 text-accent font-semibold">5%</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">₹7,00,001 to ₹10,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">20%</td>
+              <td class="p-3 text-accent font-semibold">10%</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">₹10,00,001 to ₹12,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">30%</td>
+              <td class="p-3 text-accent font-semibold">15%</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">₹12,00,001 to ₹15,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">30%</td>
+              <td class="p-3 text-accent font-semibold">20%</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Above ₹15,00,000</td>
+              <td class="p-3 font-semibold text-text-primary">30%</td>
+              <td class="p-3 font-semibold text-text-primary">30%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-xs text-text-muted mb-6 leading-relaxed">
+        <em>Note:</em> Standard 4% Health and Education Cess applies to the computed tax across both regimes. Surcharge applies to taxable incomes exceeding ₹50 Lakh.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Core Mathematical Principle: The Breakeven Deduction</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The decision between regimes boils down to a pure mathematical equation:
+      </p>
+
+      <div class="bg-canvas border border-border rounded-card p-4 mb-6 font-mono text-xs text-text-primary leading-relaxed text-center">
+        Tax_Old(Gross_Salary - 50,000 - Eligible_Deductions) = Tax_New(Gross_Salary - 75,000)
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Here, <strong>Eligible Deductions</strong> represents all chapter VI-A exemptions and deductions that are permissible <em>only</em> under the Old Regime, including:
+      </p>
+      <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mb-6 ml-2">
+        <li><strong>Section 80C:</strong> Up to ₹1,50,000 (EPF, PPF, ELSS, life insurance, home loan principal).</li>
+        <li><strong>Section 80D:</strong> Up to ₹25,000 (self/family) + up to ₹50,000 (senior citizen parents) for health insurance.</li>
+        <li><strong>Section 10(13A) HRA:</strong> House Rent Allowance exemption for rent paid in excess of 10% of basic salary. You can verify your exact entitlement with our <a href="/in/hra-calculator" class="text-accent font-medium hover:underline">HRA Exemption Calculator</a>.</li>
+        <li><strong>Section 24(b):</strong> Up to ₹2,00,000 for interest on a self-occupied housing loan.</li>
+        <li><strong>Section 80CCD(1B):</strong> Up to ₹50,000 for voluntary individual NPS investment.</li>
+        <li><strong>Other Exemptions:</strong> Leave Travel Allowance (LTA), food coupons, education loan interest (Section 80E).</li>
+      </ul>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Because the Old Regime's marginal rate jumps abruptly from 5% to 20% at just ₹5,00,000, and from 20% to 30% at ₹10,00,000, you must claim heavy deductions to compress your Old Regime taxable income below the threshold where New Regime's gentler slabs outperform it.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Master Breakeven Deduction Table by Salary Band</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-3">
+        Here is the exact mathematical breakeven schedule for salaried individuals in FY 2024-25 and FY 2025-26:
+      </p>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Gross Salary</th>
+              <th class="p-3">New Regime Tax (with 4% Cess)</th>
+              <th class="p-3">Target Taxable Income (Old Regime)</th>
+              <th class="p-3 text-accent font-bold">Breakeven Deductions Required*</th>
+              <th class="p-3">Practical Verdict</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted">
+            <tr>
+              <td class="p-3 font-semibold text-text-primary">₹7,75,000</td>
+              <td class="p-3 text-accent font-semibold">₹0</td>
+              <td class="p-3">₹5,00,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹2,25,000</td>
+              <td class="p-3">New Regime is unbeatable (zero tax with zero investments).</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-semibold text-text-primary">₹10,00,000</td>
+              <td class="p-3 font-semibold">₹44,200</td>
+              <td class="p-3">₹6,50,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹3,00,000</td>
+              <td class="p-3">Hard to beat New Regime unless you have substantial HRA or home loan interest.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-text-primary">₹12,50,000</td>
+              <td class="p-3 font-semibold">₹80,600</td>
+              <td class="p-3">₹8,25,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹3,75,000</td>
+              <td class="p-3">Requires ₹1.5L 80C + ₹25k 80D + ~₹2L HRA to make Old Regime viable.</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-semibold text-text-primary">₹15,00,000</td>
+              <td class="p-3 font-semibold">₹1,30,000</td>
+              <td class="p-3">₹10,41,667</td>
+              <td class="p-3 font-mono font-bold text-accent">₹4,08,333</td>
+              <td class="p-3">Old Regime requires &gt;₹4.08 Lakh in deductions to save tax.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-text-primary">₹20,00,000</td>
+              <td class="p-3 font-semibold">₹2,78,200</td>
+              <td class="p-3">₹15,16,667</td>
+              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
+              <td class="p-3">Old Regime viable only with high HRA + home loan interest + 80C + 80D.</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-semibold text-text-primary">₹25,00,000</td>
+              <td class="p-3 font-semibold">₹4,34,200</td>
+              <td class="p-3">₹20,16,667</td>
+              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
+              <td class="p-3">Breakeven plateaus around ₹4.33–₹4.50 Lakh across upper salary brackets.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-semibold text-text-primary">₹50,00,000</td>
+              <td class="p-3 font-semibold">₹12,14,200</td>
+              <td class="p-3">₹45,16,667</td>
+              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
+              <td class="p-3">Surcharge rates apply above ₹50L. New Regime caps surcharge at 25% (vs 37% Old).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-text-muted mb-6 leading-relaxed">
+        * <em>Note:</em> The breakeven deduction figure represents the total eligible exemptions and deductions (e.g. 80C, 80D, HRA, home loan interest) required <strong>over and above the Old Regime standard deduction of ₹50,000</strong>.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Numerical Case Study: Two ₹15 Lakh Earners</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        To understand how this operates in practice, consider two software engineers in Bengaluru, both earning an identical gross salary of ₹15,00,000:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-text-primary mb-2">Employee A (Standard Investments)</h4>
+          <p class="text-xs text-text-muted mb-2">• Lives in parents' house (no HRA claimed)</p>
+          <p class="text-xs text-text-muted mb-2">• Section 80C (EPF + ELSS): ₹1,50,000</p>
+          <p class="text-xs text-text-muted mb-3">• Section 80D (Health Insurance): ₹25,000</p>
+          <p class="text-xs font-semibold text-text-primary mb-1">Total Deductions: ₹1,75,000</p>
+          <div class="border-t border-border pt-2 text-xs space-y-1">
+            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-accent font-mono">₹1,30,000</strong></div>
+            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-red-400 font-mono">₹2,00,200</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>New Regime Advantage:</span> <span>Saves ₹70,200/yr</span></div>
+          </div>
+        </div>
+
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-text-primary mb-2">Employee B (High Deductions)</h4>
+          <p class="text-xs text-text-muted mb-1">• Rents apartment (HRA Exemption): ₹2,40,000</p>
+          <p class="text-xs text-text-muted mb-1">• Section 80C: ₹1,50,000</p>
+          <p class="text-xs text-text-muted mb-1">• Section 80D (Self + Parents): ₹50,000</p>
+          <p class="text-xs text-text-muted mb-3">• Section 80CCD(1B) NPS: ₹50,000</p>
+          <p class="text-xs font-semibold text-text-primary mb-1">Total Deductions: ₹4,90,000</p>
+          <div class="border-t border-border pt-2 text-xs space-y-1">
+            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-text-muted font-mono">₹1,30,000</strong></div>
+            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-accent font-mono">₹1,07,640</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>Old Regime Advantage:</span> <span>Saves ₹22,360/yr</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        <strong>The Takeaway:</strong> For Employee A, choosing the Old Regime would trigger an accidental tax penalty of over ₹70,000 per year. For Employee B, who pays substantial rent in a metro and aggressively exhausts multiple deduction sections, the Old Regime still delivers a modest ₹22,360 tax saving.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Secret Weapon: Section 80CCD(2) Employer NPS</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Most taxpayers mistakenly believe that <em>all</em> deductions are barred under the New Tax Regime. There is one monumental exception: <strong>Section 80CCD(2) — Employer contribution to the National Pension System (NPS)</strong>.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Under Section 80CCD(2), your employer can contribute up to <strong>14% of your Basic Salary + Dearness Allowance (DA)</strong> directly into your NPS tier-1 account. This entire amount is completely deductible from your gross taxable income under the New Tax Regime!
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        For an employee with a Basic Salary of ₹8,00,000, having your employer restructure ₹1,12,000 (14%) into NPS cuts your New Regime taxable income by ₹1,12,000. At a 20% or 30% marginal bracket, this single corporate benefit saves an additional ₹23,000 to ₹35,000 in cash taxes, widening the New Regime's lead even further. You can evaluate how restructuring your basic salary impacts take-home pay with our <a href="/in/salary-ctc-calculator" class="text-accent font-medium hover:underline">Salary / CTC Calculator</a>.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">6. The 4-Step Practical Decision Framework</h2>
+      <div class="bg-canvas border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
+        <p><strong class="text-text-primary">Step 1: Calculate your gross salary and baseline deductions</strong><br>
+        Sum your mandatory Section 80C contributions (like employee EPF) and medical insurance (80D). If you have no HRA and no home loan interest, your deductions will rarely exceed ₹2,00,000. In this scenario, choose the New Tax Regime immediately.</p>
+        <p><strong class="text-text-primary">Step 2: Compute your rent or home loan interest shield</strong><br>
+        If you pay rent in a metro city or pay substantial home loan interest on a self-occupied property (up to ₹2,00,000 under Section 24(b)), add this to your Step 1 deductions.</p>
+        <p><strong class="text-text-primary">Step 3: Compare against the Breakeven Table</strong><br>
+        Check your gross income against our Section 3 lookup table. If your total eligible deductions exceed the breakeven threshold for your band (e.g. ₹4,08,333 for ₹15 Lakh income), opt for the Old Regime. If they fall below, choose the New Regime.</p>
+        <p><strong class="text-text-primary">Step 4: Verify with the Calcumetrics Engine</strong><br>
+        Before submitting your investment declaration or filing your ITR, plug your numbers into the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> to compare exact tax outgoes, including marginal relief and cess.</p>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <p class="text-sm text-text-muted leading-relaxed">
+        The Finance (No. 2) Act 2024 has made the New Tax Regime the mathematically superior choice for approximately 75% to 80% of salaried individuals in India. Unless your salary is above ₹12 Lakh <em>and</em> you claim substantial HRA or home loan interest alongside Section 80C and 80D, locking your capital into rigid 5-year tax-saving instruments simply to preserve the Old Regime no longer makes financial sense.
+      </p>
+    `,
+  },
 ];

@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:15:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:18:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 2
-- **IN_PROGRESS:** 003. old-vs-new-tax-regime
-- **NEXT:** 004. capital-gains-tax-rules
+- **COMPLETED_ARTICLES:** 3
+- **IN_PROGRESS:** 004. capital-gains-tax-rules
+- **NEXT:** 005. markup-vs-margin
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** home-loan-prepayment-vs-sip
-- **LAST_COMMIT:** c48b5cb
+- **LAST_COMPLETED_ARTICLE:** old-vs-new-tax-regime
+- **LAST_COMMIT:** d626e07
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (67 pages)
+- **BUILD_STATUS:** PASS (68 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -20,8 +20,8 @@
 
 - [x] 001. cagr-vs-xirr — DONE (Evergreen)
 - [x] 002. home-loan-prepayment-vs-sip — DONE (Hybrid)
-- [ ] 003. old-vs-new-tax-regime — IN PROGRESS (Trending/Hybrid)
-- [ ] 004. capital-gains-tax-rules — PENDING (Trending/Hybrid)
+- [x] 003. old-vs-new-tax-regime — DONE (Trending/Hybrid)
+- [ ] 004. capital-gains-tax-rules — IN PROGRESS (Trending/Hybrid)
 - [ ] 005. markup-vs-margin — PENDING (Evergreen)
 - [ ] 006. npv-vs-irr — PENDING (Evergreen)
 - [ ] 007. flat-vs-reducing-interest-rate — PENDING (Evergreen)
@@ -81,4 +81,13 @@
   - Key Content: Arbitrage spread formula (`Spread = R_equity*(1 - T_equity) - R_debt`), comprehensive 20-year ₹50 Lakh loan @ 8.5% case study with ₹10,000 extra surplus showing Path A (prepay saves ₹23.19 Lakh interest, finishes in 12.3 yrs) vs Path B (SIP creates ₹99.91 Lakh gross / +₹40-45L net wealth advantage), 4 real-world non-mathematical risks (illiquidity trap, bear market sequence risk, front-loaded amortization schedule, discipline fallacy), and the practical 5-Year Hybrid Rule.
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (68 pages built), `git diff --check` PASS.
+
+- **003. old-vs-new-tax-regime (/blog/old-vs-new-tax-regime)**:
+  - Title: Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula
+  - Intent: Solve the tax declaration dilemma for salaried employees with exact mathematical breakeven formulas across salary bands, taking into account the enhanced ₹75,000 standard deduction, slab revisions, and Section 80CCD(2) employer NPS optimization.
+  - Linked Calculators: `/in/income-tax-calculator`, `/in/hra-calculator`, `/in/salary-ctc-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/in/income-tax-calculator` and `/in/hra-calculator`.
+  - Key Content: Statutory comparison of slab rates under Finance (No. 2) Act 2024, mathematical breakeven deduction formula, Master Breakeven Deduction Lookup Table by salary band (₹7.75L to ₹50L), worked case study of two ₹15 Lakh earners (Employee A standard deductions vs Employee B high metro HRA), Section 80CCD(2) employer NPS superpower, and 4-step practical decision protocol.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (69 pages built), `git diff --check` PASS.
 
