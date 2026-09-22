@@ -22,6 +22,7 @@
 
 import type { HTMLAttributes } from 'astro/types';
 import AdSlot from '../ui/AdSlot.astro';
+import IndiaTaxSourceNotice from './IndiaTaxSourceNotice.astro';
 
 interface Props {
   toolName: string;
@@ -139,6 +140,7 @@ const {
   <!-- Below the fold: formula, example, FAQ, related (full width) -->
   <div class="mt-10 space-y-10">
     <slot name="below" />
+    <IndiaTaxSourceNotice />
   </div>
 
   <!-- Reserved ad slot (§9 & §21): ≥24px below content, ≥24px from any button.
@@ -406,8 +408,9 @@ const {
         }
       });
 
-      // Generic currency prefix updater — registered only once
+      // Generic currency prefix updater — registered only once (bypassed for region-locked tools)
       window.addEventListener('cm:currency-change', (e: any) => {
+        if (window.location.pathname.startsWith('/in/') || window.location.pathname.startsWith('/us/') || window.location.pathname.startsWith('/uk/')) return;
         if (e.detail?.symbol) {
           document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
             el.textContent = e.detail.symbol;
@@ -445,6 +448,24 @@ const {
 
   // Sync currency prefix from localStorage on current page DOM
   function syncCurrencyFromStorage() {
+    if (window.location.pathname.startsWith('/in/')) {
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = '₹';
+      });
+      return;
+    }
+    if (window.location.pathname.startsWith('/us/')) {
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = '$';
+      });
+      return;
+    }
+    if (window.location.pathname.startsWith('/uk/')) {
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = '£';
+      });
+      return;
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
