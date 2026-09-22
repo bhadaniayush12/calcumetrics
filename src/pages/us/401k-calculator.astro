@@ -295,19 +295,89 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="k401-calculator-how">
         <h2 id="k401-calculator-how" class="text-xl font-bold text-text-primary mb-4">How 401(k) compound growth works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          A 401(k) allows pre-tax dollars to grow tax-deferred until retirement. Employer matching provides an immediate guaranteed return on contributed funds:
+          A 401(k) plan is an employer-sponsored retirement savings account defined under Section 401(k) of the US Internal Revenue Code. Elective employee deferrals reduce your current taxable gross income, while company matching contributions provide an immediate, guaranteed boost to your retirement savings. All funds compound tax-deferred until distribution.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Annual Balance Growth:</strong> Balance<sub>t</sub> = (Balance<sub>t-1</sub> + Employee Contribution + Employer Match) &times; (1 + r)<br />
-            <strong>Employer Match Formula:</strong> Min(Your Contribution %, Match Cap %) &times; Salary &times; Match Rate %
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Each year's account accumulation combines ongoing savings and compound market performance:
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-2">Balance<sub>t</sub> = (Balance<sub>t&minus;1</sub> + C<sub>employee</sub> + C<sub>employer</sub>) &times; (1 + r)</p>
+          <p class="text-base font-mono text-text-primary mb-3">C<sub>employer</sub> = Salary &times; min(Contribution %, Match Cap %) &times; Match Rate %</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">Balance<sub>t</sub></strong> &mdash; 401(k) balance at the end of year <em>t</em></li>
+            <li><strong class="text-text-primary">C<sub>employee</sub></strong> &mdash; Annual employee contribution (Salary &times; Contribution %)</li>
+            <li><strong class="text-text-primary">C<sub>employer</sub></strong> &mdash; Annual employer matching contribution</li>
+            <li><strong class="text-text-primary">r</strong> &mdash; Annual nominal portfolio rate of return (decimal)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="k401-calculator-example">
+        <h2 id="k401-calculator-example" class="text-xl font-bold text-text-primary mb-4">Worked example: $100,000 salary over 30 years at 8% return</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an employee earning $100,000 annually who contributes 8% of salary with an employer match of 50% up to 6% of salary, invested for 30 years at an expected 8% annual return:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Annual Employee Contribution:</strong> 8% of $100,000 = <strong class="text-text-primary">$8,000/year</strong></p>
+          <p><strong class="text-text-primary">2. Annual Employer Match:</strong> 50% of the first 6% ($6,000) = <strong class="text-text-primary">$3,000/year</strong></p>
+          <p><strong class="text-text-primary">3. Combined Annual Inflow:</strong> $8,000 + $3,000 = <strong class="text-text-primary">$11,000/year</strong></p>
+          <p><strong class="text-text-primary">4. Cumulative Contributions over 30 Years:</strong></p>
+          <ul class="list-disc pl-5 space-y-1 text-xs">
+            <li>Your direct payroll contributions: 30 &times; $8,000 = <strong class="text-text-primary">$240,000</strong></li>
+            <li>Employer matching contributions: 30 &times; $3,000 = <strong class="text-text-primary">$90,000</strong></li>
+            <li>Total capital contributed: <strong class="text-text-primary">$330,000</strong></li>
+          </ul>
+          <p><strong class="text-text-primary">5. Compound Investment Growth:</strong> <strong class="text-text-primary text-accent">+$1,015,805</strong></p>
+          <p><strong class="text-text-primary">6. Final Projected 401(k) Balance:</strong> <strong class="text-text-primary text-accent">$1,345,805</strong></p>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          <strong>The Power of Compound Growth:</strong> Over a 30-year horizon, compound returns generate <strong>$1.01M</strong> &mdash; more than triple the total deposits made by you and your employer combined.
+        </p>
+      </section>
+
+      <!-- 3. Interpreting Your Results -->
+      <section aria-labelledby="k401-calculator-interpretation">
+        <h2 id="k401-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your 401(k) results</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Capturing the Full Employer Match:</strong> Employer matching represents an immediate 50% or 100% risk-free return on your savings. Contributing less than your company's matching ceiling (6% in this example) forfeits direct compensation.
+          </p>
+          <p>
+            <strong class="text-text-primary">Tax-Deferred vs. After-Tax Balance:</strong> The projected balance represents gross tax-deferred assets. In a Traditional 401(k), distributions taken during retirement are taxed as ordinary income at your future tax bracket. If utilizing a Roth 401(k), qualified distributions at retirement are completely federal income tax-free.
           </p>
         </div>
       </section>
 
+      <!-- 4. Key Assumptions and Limitations -->
+      <section aria-labelledby="k401-calculator-assumptions">
+        <h2 id="k401-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Flat Salary Baseline:</strong> The simulation holds salary and annual contributions constant across the tenure without modeling merit raises or inflation wage adjustments.
+          </li>
+          <li>
+            <strong class="text-text-primary">Linear Annual Return:</strong> Assumes a constant 8.0% annual rate of return. Real financial markets fluctuate, introducing sequence-of-returns risk especially during the 5–10 years immediately preceding retirement.
+          </li>
+          <li>
+            <strong class="text-text-primary">Immediate Vesting:</strong> Assumes 100% immediate vesting of all employer match funds. Some company plans utilize graded vesting schedules (e.g. 20% per year of service) or cliff vesting.
+          </li>
+          <li>
+            <strong class="text-text-primary">IRS Statutory Contribution Caps:</strong> Employee contributions cannot exceed IRS elective deferral limits ($23,000 for 2024; $23,500 for 2025; plus catch-up for age 50+).
+          </li>
+          <li>
+            <strong class="text-text-primary">Plan Fees Excluded:</strong> Does not deduct underlying mutual fund expense ratios, index tracking error, or plan administration charges.
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. Frequently Asked Questions -->
       <section aria-labelledby="k401-calculator-faq">
         <h2 id="k401-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">

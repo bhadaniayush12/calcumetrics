@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:54:30+05:30
+- **LAST_UPDATED:** 2026-09-23T03:55:25+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 9
-- **IN_PROGRESS:** 401k-calculator
-- **NEXT:** 011. emi-calculator
+- **COMPLETED:** 11
+- **IN_PROGRESS:** NONE
+- **NEXT:** 012. home-loan-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** ppf-calculator
-- **LAST_COMMIT:** 0851b94
+- **LAST_COMPLETED_UNIT:** emi-calculator
+- **LAST_COMMIT:** f075a04
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -27,8 +27,8 @@
 - [x] 007. fd-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 008. rd-calculator — DONE
 - [x] 009. ppf-calculator — DONE
-- [ ] 010. 401k-calculator — IN PROGRESS
-- [ ] 011. emi-calculator — PENDING (Phase 5 Locked)
+- [x] 010. 401k-calculator — DONE
+- [x] 011. emi-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [ ] 012. home-loan-calculator — PENDING
 - [ ] 013. car-loan-calculator — PENDING
 - [ ] 014. loan-prepayment-calculator — PENDING
@@ -117,3 +117,13 @@
   - Changes: Added step-by-step worked example using statutory maximum contribution (₹1,50,000 annually for 15 years at 7.1% p.a. → ₹22,50,000 deposited, ₹18,18,209 interest, ₹40,68,209 maturity, with 5/10/15 yr milestones), added result interpretation (Exempt-Exempt-Exempt EEE tax equivalence of 10.32% pre-tax yield, 5-year extension block mechanics), and aligned explicit assumptions/limitations with versioned data (`src/data/tax/india/ppf/current.json`).
   - Preserved: Sourced statutory rate (7.1%), EEE notice, INR currency lock, calculation engine `calcPPF`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **010. 401k-calculator (/us/401k-calculator)**:
+  - Audited: US Internal Revenue Code Section 401(k) retirement accumulation model.
+  - Changes: Added step-by-step worked example using default inputs ($100k salary, 8% deferral, 50% match up to 6%, 8% return for 30 years → $240k employee contrib, $90k employer match, $1.015M growth, $1.345M projected balance), added result interpretation (importance of claiming full employer match, Traditional pre-tax vs Roth after-tax distributions), and added explicit assumptions/limitations (flat salary assumption, IRS annual elective deferral limits, vesting schedule caveats, mutual fund expense ratios excluded).
+  - Preserved: Strict USD lock, calculation engine `calc401K`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **011. emi-calculator (/emi-calculator)**:
+  - Audited: Phase 5 Locked Calculator. Verified reducing balance loan amortization formula EMI = P × r × (1+r)^n / ((1+r)^n − 1), step-by-step worked example (₹10,00,000 at 8.5% for 20 yrs → ₹8,678 EMI, ₹10,82,776 interest, ₹20,82,776 total payment), full dynamic year-by-year amortization schedule table, 3 targeted FAQs, and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
