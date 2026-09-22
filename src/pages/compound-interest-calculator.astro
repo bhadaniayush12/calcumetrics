@@ -366,118 +366,17 @@ const jsonld = {
    * Compound Interest Calculator — Phase 5.2 client-side logic.
    *
    * Architecture:
-   *   - Centralized validation via validate() / validateAll()
-   *   - Canonical result state via setResult() (result-bus)
-   *   - URL hash state via serializeHash() / restoreFromHash() / updateHash()
+   *   - Centralized validation via validate() from src/lib/validate.ts
+   *   - URL hash state via serializeHash() / restoreFromHash() / readCurrentHash() / updateHash() from src/lib/url-state.ts
+   *   - Canonical result state via setResult() from src/lib/result-bus.ts
+   *   - Pure calculation via calcLumpSum() from src/lib/calculators/lumpsum.ts
    *   - CalculatorLayout subscriber handles mobile hero updates automatically
-   *
-   * Calculation mirrored from calcLumpSum (inline to avoid module bundler
-   * dependency in plain Astro island).
    */
 
-  // ── Inline calculation (mirrors calcLumpSum) ────────────────────────────────
-  function calcCIClient(p: number, r: number, y: number, freq: string) {
-    const freqMap: Record<string, number> = {
-      annually: 1, 'semi-annually': 2, quarterly: 4, monthly: 12, daily: 365,
-    };
-    const n = freqMap[freq] || 1;
-    const rateDec = r / 100;
-    const maturity = p * Math.pow(1 + rateDec / n, n * y);
-    const gain = maturity - p;
-    const gainPct = p > 0 ? (gain / p) * 100 : 0;
-    return {
-      maturity,
-      gain,
-      gainPct,
-      principalFraction: maturity > 0 ? p / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
-
-  // ── Inline validation (mirrors validate.ts centralized engine) ──────────────
-  // We cannot import .ts modules in Astro inline scripts, so we replicate
-  // the relevant validation logic here, matching the centralized engine's
-  // behavior: no silent coercion, deterministic error codes.
-  interface CIValidationRules {
-    required?: boolean;
-    min?: number;
-    max?: number;
-    decimal?: boolean;
-    integerOnly?: boolean;
-    negativeAllowed?: boolean;
-    label?: string;
-  }
-  interface CIValidationResult {
-    valid: boolean;
-    value?: number;
-    error?: { code: string; message: string };
-  }
-
-  function ciValidate(input: string, rules: CIValidationRules): CIValidationResult {
-    const label = rules.label || 'Value';
-    const trimmed = input.trim().replace(/[₹$€£,\s]/g, '');
-    if (trimmed === '') {
-      if (rules.required) return { valid: false, error: { code: 'REQUIRED', message: `${label} is required.` } };
-      return { valid: true, value: undefined };
-    }
-    const parsed = parseFloat(trimmed);
-    if (isNaN(parsed) || !isFinite(parsed)) {
-      return { valid: false, error: { code: 'NOT_A_NUMBER', message: `${label} must be a valid number.` } };
-    }
-    if (parsed < 0 && !rules.negativeAllowed) {
-      return { valid: false, error: { code: 'NEGATIVE_NOT_ALLOWED', message: `${label} cannot be negative.` } };
-    }
-    if (rules.integerOnly && !Number.isInteger(parsed)) {
-      return { valid: false, error: { code: 'NOT_AN_INTEGER', message: `${label} must be a whole number.` } };
-    }
-    if (rules.decimal === false && !Number.isInteger(parsed)) {
-      return { valid: false, error: { code: 'DECIMAL_NOT_ALLOWED', message: `${label} must be a whole number.` } };
-    }
-    if (rules.min !== undefined && parsed < rules.min) {
-      return { valid: false, error: { code: 'BELOW_MIN', message: `${label} must be at least ${rules.min}.` } };
-    }
-    if (rules.max !== undefined && parsed > rules.max) {
-      return { valid: false, error: { code: 'ABOVE_MAX', message: `${label} must be at most ${rules.max}.` } };
-    }
-    return { valid: true, value: parsed };
-  }
-
-  // ── Inline URL state (mirrors url-state.ts) ─────────────────────────────────
-  function ciSerializeHash(state: Record<string, string | number | null | undefined>): string {
-    const keys = Object.keys(state).sort();
-    const pairs: string[] = [];
-    for (const key of keys) {
-      const val = state[key];
-      if (val === null || val === undefined || val === '') continue;
-      pairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(val))}`);
-    }
-    return pairs.length > 0 ? `#${pairs.join('&')}` : '';
-  }
-
-  function ciParseHash(hash: string): Record<string, string> {
-    const result: Record<string, string> = {};
-    if (!hash) return result;
-    let clean = hash;
-    while (clean.startsWith('#')) clean = clean.slice(1);
-    if (!clean) return result;
-    for (const pair of clean.split('&')) {
-      const eq = pair.indexOf('=');
-      if (eq === -1) continue;
-      const key = decodeURIComponent(pair.slice(0, eq)).trim();
-      const val = decodeURIComponent(pair.slice(eq + 1)).trim();
-      if (key) result[key] = val;
-    }
-    return result;
-  }
-
-  function ciUpdateHash(hash: string): void {
-    if (typeof window === 'undefined') return;
-    const normalized = hash ? (hash.startsWith('#') ? hash : `#${hash}`) : '';
-    if (normalized === (window.location.hash || '')) return;
-    if (window.history?.replaceState) {
-      window.history.replaceState(window.history.state, '', window.location.pathname + window.location.search + normalized);
-    }
-  }
+  import { validate, type ValidationRules } from '../lib/validate';
+  import { serializeHash, restoreFromHash, readCurrentHash, updateHash } from '../lib/url-state';
+  import { setResult } from '../lib/result-bus';
+  import { calcLumpSum, type CompoundFrequency } from '../lib/calculators/lumpsum';
 
   // ── Currency state ──────────────────────────────────────────────────────────
   let currSym = '₹';
@@ -492,15 +391,56 @@ const jsonld = {
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
   }
 
-  // ── Validation schema ───────────────────────────────────────────────────────
-  const CI_RULES = {
-    principal: { required: true, min: 100, max: 100_000_000, decimal: false, negativeAllowed: false, label: 'Principal' } as CIValidationRules,
-    rate: { required: true, min: 0.01, max: 100, decimal: true, negativeAllowed: false, label: 'Interest Rate' } as CIValidationRules,
-    years: { required: true, min: 1, max: 50, integerOnly: true, negativeAllowed: false, label: 'Tenure' } as CIValidationRules,
+  // ── Validation schema (Phase 4.3 Centralized Engine) ────────────────────────
+  const CI_RULES: Record<'principal' | 'rate' | 'years', ValidationRules> = {
+    principal: { required: true, min: 100, max: 100_000_000, decimal: false, negativeAllowed: false, label: 'Principal' },
+    rate: { required: true, min: 0.01, max: 100, decimal: true, negativeAllowed: false, label: 'Interest Rate' },
+    years: { required: true, min: 1, max: 50, integerOnly: true, negativeAllowed: false, label: 'Tenure' },
+  };
+
+  // URL Hash state schema mapping (Phase 4.4 URL State Engine)
+  const HASH_SCHEMA: Record<'p' | 'r' | 'y', ValidationRules> = {
+    p: CI_RULES.principal,
+    r: CI_RULES.rate,
+    y: CI_RULES.years,
   };
 
   // Valid compounding frequencies
-  const VALID_FREQUENCIES = new Set(['annually', 'semi-annually', 'quarterly', 'monthly', 'daily']);
+  const VALID_FREQUENCIES = new Set<CompoundFrequency>(['annually', 'semi-annually', 'quarterly', 'monthly', 'daily']);
+
+  // ── Field validation visual feedback ───────────────────────────────────────
+  function setFieldError(id: string, error?: string) {
+    const input = document.getElementById(id) as HTMLInputElement | null;
+    const helper = document.getElementById(`${id}-helper`);
+    const container = input?.closest('.rounded-control');
+    if (error) {
+      input?.setAttribute('aria-invalid', 'true');
+      if (container) {
+        container.classList.add('border-error-border', 'bg-error-bg', 'text-error-text');
+        container.classList.remove('border-border');
+      }
+      if (helper) {
+        helper.textContent = error;
+        helper.classList.add('text-error-text');
+        helper.classList.remove('text-text-muted');
+        helper.setAttribute('role', 'alert');
+      }
+    } else {
+      input?.removeAttribute('aria-invalid');
+      if (container) {
+        container.classList.remove('border-error-border', 'bg-error-bg', 'text-error-text');
+        container.classList.add('border-border');
+      }
+      if (helper) {
+        if (id === 'ci-principal') helper.textContent = 'Starting investment amount';
+        else if (id === 'ci-rate') helper.textContent = 'Nominal annual interest rate';
+        else if (id === 'ci-years') helper.textContent = 'Duration of compounding';
+        helper.classList.remove('text-error-text');
+        helper.classList.add('text-text-muted');
+        helper.removeAttribute('role');
+      }
+    }
+  }
 
   // ── Main initialization ─────────────────────────────────────────────────────
   function initCICalc() {
@@ -514,17 +454,18 @@ const jsonld = {
 
     if (!pInput || !rInput || !yInput) return;
 
-    const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' };
+    const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' as CompoundFrequency };
     let timer: ReturnType<typeof setTimeout>;
 
-    // Access the canonical result store from CalculatorLayout
-    const _win = window as unknown as { __cmResultStore?: { setResult(r: any): void } };
-
     function recalc() {
-      // ── Phase 4.3: Centralized validation ──────────────────────────────
-      const pResult = ciValidate(pInput.value, CI_RULES.principal);
-      const rResult = ciValidate(rInput.value, CI_RULES.rate);
-      const yResult = ciValidate(yInput.value, CI_RULES.years);
+      // ── Phase 4.3: Centralized validation engine ──────────────────────
+      const pResult = validate(pInput.value, CI_RULES.principal);
+      const rResult = validate(rInput.value, CI_RULES.rate);
+      const yResult = validate(yInput.value, CI_RULES.years);
+
+      setFieldError('ci-principal', pResult.valid ? undefined : pResult.error.message);
+      setFieldError('ci-rate', rResult.valid ? undefined : rResult.error.message);
+      setFieldError('ci-years', yResult.valid ? undefined : yResult.error.message);
 
       if (!pResult.valid || !rResult.valid || !yResult.valid) return;
       if (pResult.value === undefined || rResult.value === undefined || yResult.value === undefined) return;
@@ -532,30 +473,30 @@ const jsonld = {
       const p = pResult.value;
       const r = rResult.value;
       const y = yResult.value;
-      const f = fSelect ? fSelect.value : 'annually';
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
 
-      const res = calcCIClient(p, r, y, f);
+      const res = calcLumpSum(p, r, y, f);
 
       // ── Phase 4.2: Canonical result state (single source of truth) ─────
-      // Desktop DOM updates via fields mapping
-      // Mobile hero updated automatically by CalculatorLayout subscriber
-      if (_win.__cmResultStore) {
-        _win.__cmResultStore.setResult({
-          heroValue: fmtVal(res.maturity),
-          heroLabel: 'Future Value',
-          rows: [
-            { label: 'Initial Principal', value: fmtVal(p) },
-            { label: 'Total Interest Earned', value: fmtVal(res.gain), variant: 'accent' },
-            { label: 'Total Return', value: res.gainPct.toFixed(1) + '%' },
-          ],
-          fields: {
-            'ci-result-maturity': fmtVal(res.maturity),
-            'ci-result-principal': fmtVal(p),
-            'ci-result-gain': fmtVal(res.gain),
-            'ci-result-gainpct': res.gainPct.toFixed(1) + '%',
-          },
-        });
-      }
+      // Desktop DOM updates via fields mapping; Mobile hero updated automatically
+      setResult({
+        heroValue: fmtVal(res.maturity),
+        heroLabel: 'Future Value',
+        rows: [
+          { label: 'Initial Principal', value: fmtVal(p) },
+          { label: 'Total Interest Earned', value: fmtVal(res.gain), variant: 'accent' },
+          { label: 'Total Return', value: res.gainPct.toFixed(1) + '%' },
+        ],
+        fields: {
+          'ci-result-maturity': fmtVal(res.maturity),
+          'ci-result-principal': fmtVal(p),
+          'ci-result-gain': fmtVal(res.gain),
+          'ci-result-gainpct': res.gainPct.toFixed(1) + '%',
+        },
+      });
 
       // ── Composition bar update (visual sub-component) ──────────────────
       const wrapper = document.getElementById('ci-composition-wrapper');
@@ -569,8 +510,8 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      // ── Phase 4.4: URL hash state ─────────────────────────────────────
-      ciUpdateHash(ciSerializeHash({ f, p, r, y }));
+      // ── Phase 4.4: URL hash state via shared utility ───────────────────
+      updateHash(serializeHash({ f, p, r, y }));
     }
 
     function debounce() {
@@ -614,6 +555,9 @@ const jsonld = {
     });
 
     document.getElementById('ci-reset')?.addEventListener('click', () => {
+      setFieldError('ci-principal');
+      setFieldError('ci-rate');
+      setFieldError('ci-years');
       pInput.value = fmtLiveInput(String(DEFAULTS.principal));
       rInput.value = String(DEFAULTS.rate);
       yInput.value = String(DEFAULTS.years);
@@ -630,8 +574,8 @@ const jsonld = {
         ySlider.value = String(DEFAULTS.years);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1)) * 100}%`);
       }
-      // Clear hash on reset
-      ciUpdateHash('');
+      // Clear hash on reset via shared url-state utility
+      updateHash('');
       recalc();
       pInput.focus();
     });
@@ -642,45 +586,42 @@ const jsonld = {
       });
     });
 
-    // ── Phase 4.4: Restore from URL hash ────────────────────────────────────
-    const hashValues = ciParseHash(window.location.hash);
-    let hashRestored = false;
+    // ── Phase 4.4: Restore from URL hash via shared utility ──────────────────
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, HASH_SCHEMA);
+      let hashRestored = false;
 
-    if (Object.keys(hashValues).length > 0) {
-      const hp = hashValues['p'] ? ciValidate(hashValues['p'], CI_RULES.principal) : null;
-      const hr = hashValues['r'] ? ciValidate(hashValues['r'], CI_RULES.rate) : null;
-      const hy = hashValues['y'] ? ciValidate(hashValues['y'], CI_RULES.years) : null;
-      const hf = hashValues['f'];
-
-      if (hp?.valid && hp.value !== undefined) {
-        pInput.value = fmtLiveInput(String(hp.value));
+      if (restored.values.p !== undefined) {
+        pInput.value = fmtLiveInput(String(restored.values.p));
         if (pSlider) {
-          const clamped = Math.min(Math.max(hp.value, 5000), 10000000);
+          const clamped = Math.min(Math.max(restored.values.p, 5000), 10000000);
           pSlider.value = String(clamped);
           pSlider.style.setProperty('--slider-pct', `${((clamped - 5000) / (10000000 - 5000)) * 100}%`);
         }
         hashRestored = true;
       }
-      if (hr?.valid && hr.value !== undefined) {
-        rInput.value = String(hr.value);
+      if (restored.values.r !== undefined) {
+        rInput.value = String(restored.values.r);
         if (rSlider) {
-          const clamped = Math.min(Math.max(hr.value, 1), 30);
+          const clamped = Math.min(Math.max(restored.values.r, 1), 30);
           rSlider.value = String(clamped);
           rSlider.style.setProperty('--slider-pct', `${((clamped - 1) / (30 - 1)) * 100}%`);
         }
         hashRestored = true;
       }
-      if (hy?.valid && hy.value !== undefined) {
-        yInput.value = String(hy.value);
+      if (restored.values.y !== undefined) {
+        yInput.value = String(restored.values.y);
         if (ySlider) {
-          const clamped = Math.min(Math.max(hy.value, 1), 40);
+          const clamped = Math.min(Math.max(restored.values.y, 1), 40);
           ySlider.value = String(clamped);
           ySlider.style.setProperty('--slider-pct', `${((clamped - 1) / (40 - 1)) * 100}%`);
         }
         hashRestored = true;
       }
-      if (hf && VALID_FREQUENCIES.has(hf) && fSelect) {
-        fSelect.value = hf;
+      const rawFreq = restored.raw['f'];
+      if (rawFreq && VALID_FREQUENCIES.has(rawFreq as CompoundFrequency) && fSelect) {
+        fSelect.value = rawFreq;
         hashRestored = true;
       }
 
@@ -696,13 +637,16 @@ const jsonld = {
     }
 
     document.getElementById('ci-copy-btn')?.addEventListener('click', async () => {
-      const pRes = ciValidate(pInput.value, CI_RULES.principal);
-      const rRes = ciValidate(rInput.value, CI_RULES.rate);
-      const yRes = ciValidate(yInput.value, CI_RULES.years);
+      const pRes = validate(pInput.value, CI_RULES.principal);
+      const rRes = validate(rInput.value, CI_RULES.rate);
+      const yRes = validate(yInput.value, CI_RULES.years);
       if (!pRes.valid || !rRes.valid || !yRes.valid) return;
       const p = pRes.value!, r = rRes.value!, y = yRes.value!;
-      const f = fSelect ? fSelect.value : 'annually';
-      const res = calcCIClient(p, r, y, f);
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
+      const res = calcLumpSum(p, r, y, f);
       const text = `Compound Interest: ${fmtVal(p)} at ${r}% for ${y} years (${f}) grows to ${fmtVal(res.maturity)} (gain: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
@@ -720,13 +664,17 @@ const jsonld = {
     });
 
     document.getElementById('ci-share-btn')?.addEventListener('click', async () => {
-      const pRes = ciValidate(pInput.value, CI_RULES.principal);
-      const rRes = ciValidate(rInput.value, CI_RULES.rate);
-      const yRes = ciValidate(yInput.value, CI_RULES.years);
+      const pRes = validate(pInput.value, CI_RULES.principal);
+      const rRes = validate(rInput.value, CI_RULES.rate);
+      const yRes = validate(yInput.value, CI_RULES.years);
       if (!pRes.valid || !rRes.valid || !yRes.valid) return;
       const p = pRes.value!, r = rRes.value!, y = yRes.value!;
-      const f = fSelect ? fSelect.value : 'annually';
-      const url = `${location.href.split('#')[0]}${ciSerializeHash({ f, p, r, y })}`;
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
+      const hash = serializeHash({ f, p, r, y });
+      const url = `${location.href.split('#')[0]}${hash}`;
       try {
         await navigator.clipboard.writeText(url);
       } catch {
