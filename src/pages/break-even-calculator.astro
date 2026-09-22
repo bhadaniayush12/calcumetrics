@@ -24,14 +24,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Break-even Calculator',
       url: canonicalUrl,
-      description: 'Calculate the break-even point in units and sales revenue from fixed costs, unit price, and variable costs.',
+      description: 'Calculate the break-even point in units and sales revenue from fixed costs, unit selling price, and variable unit costs.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -42,13 +42,58 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Break-even Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a break-even point in business?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The break-even point is the production or sales volume where total sales revenue exactly equals the sum of fixed and variable expenses, yielding zero net profit or loss.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What happens if variable cost per unit exceeds the selling price?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'When variable costs exceed selling price, the contribution margin is negative. Every additional unit sold widens operating losses, making break-even mathematically impossible without pricing adjustments or cost restructuring.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How can a company lower its break-even point?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Companies can lower their break-even volume by: (1) increasing unit selling prices, (2) lowering unit variable costs through supplier renegotiation or lean manufacturing, or (3) reducing fixed monthly overhead such as facility rent and software licensing.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the contribution margin ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The contribution margin ratio represents the percentage of each revenue dollar that contributes toward paying down fixed overhead costs. It is calculated as (Selling Price − Variable Cost) ÷ Selling Price.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does target profit factor into break-even analysis?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'To calculate the sales volume needed to generate a specific target profit, add the desired profit to the fixed costs in the numerator: Required Units = (Fixed Costs + Target Profit) ÷ Contribution Margin per Unit.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
 
 <Layout
-  title="Break-even Calculator: Units & Revenue | Calcumetrics"
-  description="Calculate the break-even point in units and sales revenue from fixed costs, unit price, and variable costs."
+  title="Break-even Calculator: Units & Sales Revenue | Calcumetrics"
+  description="Calculate the break-even point in units and sales revenue from fixed costs, unit price, and variable costs. Interactive, precise, and instant."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -59,10 +104,18 @@ const jsonld = {
     categoryHref="/business"
     heroValue={new Intl.NumberFormat('en-IN').format(Math.round(result.unitsBreakEven)) + ' Units'}
     heroLabel="Break-Even Volume"
+    calcType="simple"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Break-even Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Determine the exact sales volume needed to cover all fixed and variable overheads.</p>
+      <p class="text-sm text-text-muted mb-6">Determine the exact sales volume and revenue required to cover all fixed and variable overheads.</p>
+
+      <!-- Dynamic validation error alert -->
+      <div id="be-error-alert" class="hidden mb-5">
+        <Alert variant="error" title="Input Error">
+          <span id="be-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Fixed Costs -->
       <div class="mb-5">
@@ -107,7 +160,7 @@ const jsonld = {
           value="300"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Raw materials, packaging, and shipping incurred per item"
+          helperText="Raw materials, packaging, direct labor, and shipping incurred per item"
           inputmode="decimal"
         />
         <div class="mt-2">
@@ -115,8 +168,8 @@ const jsonld = {
         </div>
       </div>
 
-      <Alert variant="info" title="Contribution Margin">
-        Contribution margin per unit is Selling Price minus Variable Cost. It must be positive to ever reach break-even.
+      <Alert variant="info" title="Contribution Margin Principle">
+        Contribution margin per unit is <strong>Selling Price &minus; Variable Cost</strong>. It represents the portion of sales revenue available to pay off fixed overhead.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -148,7 +201,7 @@ const jsonld = {
         </div>
         <div class="flex items-center justify-between py-2.5">
           <span class="text-xs text-dark-muted">Variable Cost Ratio</span>
-          <span id="be-result-vcratio" class="text-sm font-medium tabular-nums text-dark-text">{((1 - result.contributionMarginRatio) * 100).toFixed(1)}%</span>
+          <span id="be-result-vcratio" class="text-sm font-medium tabular-nums text-dark-text">{(result.variableCostRatio * 100).toFixed(1)}%</span>
         </div>
       </div>
 
@@ -172,44 +225,95 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Units beyond this threshold generate pure operating profit.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Units sold beyond this threshold contribute 100% of their contribution margin directly to operating profits.</p>
     </Fragment>
 
     <Fragment slot="below">
+      <!-- Formula Section -->
       <section aria-labelledby="break-even-calculator-how">
         <h2 id="break-even-calculator-how" class="text-xl font-bold text-text-primary mb-4">How break-even analysis works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Break-even analysis identifies the exact unit and revenue volume where total revenue matches total expenses:
+          Break-even analysis establishes the baseline operational volume where total incoming revenue matches all fixed and variable business outlays:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Contribution Margin (CM) = </strong> Selling Price − Variable Cost per Unit<br />
-            <strong>Break-Even Units = </strong> Fixed Costs ÷ Contribution Margin per Unit<br />
-            <strong>Break-Even Revenue = </strong> Break-Even Units × Selling Price<br />
-            <strong>CM Ratio = </strong> Contribution Margin ÷ Selling Price
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>Contribution Margin (CM)</strong> = Selling Price per Unit &minus; Variable Cost per Unit<br />
+            <strong>Break-Even Point (Units)</strong> = Total Fixed Costs &divide; Contribution Margin per Unit<br />
+            <strong>Break-Even Revenue</strong> = Break-Even Units &times; Selling Price per Unit = Total Fixed Costs &divide; CM Ratio<br />
+            <strong>Contribution Margin Ratio</strong> = Contribution Margin per Unit &divide; Selling Price per Unit
           </p>
         </div>
       </section>
 
-      <section aria-labelledby="break-even-calculator-faq">
+      <!-- Worked Example -->
+      <section aria-labelledby="break-even-example" class="mt-8">
+        <h2 id="break-even-example" class="text-xl font-bold text-text-primary mb-4">Worked Example: Manufacturing Business</h2>
+        <div class="bg-surface border border-border rounded-card p-5 space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            Consider an industrial tooling firm with <strong>₹5,00,000</strong> in monthly fixed overhead (factory rent, machine leases, executive salaries). Each manufactured tool sells for <strong>₹500</strong>, with <strong>₹300</strong> incurred in direct variable costs (raw metals, packaging, logistics).
+          </p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Contribution Margin per Unit:</strong> ₹500 &minus; ₹300 = <strong>₹200</strong></li>
+            <li><strong>Contribution Margin Ratio:</strong> ₹200 &divide; ₹500 = <strong>40.0%</strong></li>
+            <li><strong>Break-Even Volume:</strong> ₹5,00,000 &divide; ₹200 = <strong>2,500 units</strong></li>
+            <li><strong>Break-Even Sales Revenue:</strong> 2,500 units &times; ₹500 = <strong>₹12,50,000</strong></li>
+          </ul>
+          <p>
+            Selling fewer than 2,500 units causes an operating deficit. Every tool manufactured and sold beyond unit 2,500 generates ₹200 of net pre-tax profit.
+          </p>
+        </div>
+      </section>
+
+      <!-- Assumptions & Limitations -->
+      <section aria-labelledby="break-even-assumptions" class="mt-8">
+        <h2 id="break-even-assumptions" class="text-xl font-bold text-text-primary mb-4">Key Assumptions and Limitations</h2>
+        <div class="bg-surface border border-border rounded-card p-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <p>• <strong>Linearity:</strong> Assumes unit sales price and per-unit variable costs remain invariant regardless of production scale (no volume discounts or bulk freight surcharges).</p>
+          <p>• <strong>Constant Overhead:</strong> Assumes fixed costs remain fixed within the relevant range of operating capacity.</p>
+          <p>• <strong>Inventory Parity:</strong> Assumes all manufactured inventory is sold in the current operational period without carrying unsold warehouse inventory.</p>
+          <p>• <strong>Single Product Mix:</strong> In multi-product firms, changing product sales mixes alters weighted-average contribution margins.</p>
+        </div>
+      </section>
+
+      <!-- FAQ Section -->
+      <section aria-labelledby="break-even-calculator-faq" class="mt-8">
         <h2 id="break-even-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How can I lower my break-even point?</summary>
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a break-even point in business?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              You can lower your break-even point by: (1) raising prices if demand permits, (2) negotiating lower raw material or shipping rates to decrease variable costs, or (3) reducing fixed monthly overheads like rent and software subscriptions.
+              The break-even point is the production or sales volume where total sales revenue exactly equals the sum of fixed and variable expenses, yielding zero net profit or loss.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What happens if variable cost exceeds selling price?</summary>
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What happens if variable cost per unit exceeds the selling price?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              If variable costs exceed price, the contribution margin is negative. In this scenario, each unit sold increases your loss, and no amount of sales volume will ever achieve break-even. Pricing must be restructured immediately.
+              When variable costs exceed selling price, the contribution margin is negative. Every additional unit sold widens operating losses, making break-even mathematically impossible without pricing adjustments or cost restructuring.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How can a company lower its break-even point?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Companies can lower their break-even volume by: (1) increasing unit selling prices, (2) lowering unit variable costs through supplier renegotiation or lean manufacturing, or (3) reducing fixed monthly overhead such as facility rent and software licensing.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the contribution margin ratio?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The contribution margin ratio represents the percentage of each revenue dollar that contributes toward paying down fixed overhead costs. It is calculated as (Selling Price &minus; Variable Cost) &divide; Selling Price.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does target profit factor into break-even analysis?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              To calculate the sales volume needed to generate a specific target profit, add the desired profit to the fixed costs in the numerator: Required Units = (Fixed Costs + Target Profit) &divide; Contribution Margin per Unit.
             </div>
           </details>
         </div>
       </section>
 
-      <section aria-labelledby="break-even-calculator-related">
+      <!-- Related Calculators -->
+      <section aria-labelledby="break-even-calculator-related" class="mt-8">
         <h2 id="break-even-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
@@ -226,34 +330,34 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcBreakEvenClient(fixedCosts: number, price: number, variableCost: number) {
-    const cm = price - variableCost;
-    const units = cm > 0 ? fixedCosts / cm : Infinity;
-    const revenue = isFinite(units) ? units * price : Infinity;
-    const cmRatio = price > 0 ? cm / price : 0;
-    return {
-      unitsBreakEven: units,
-      revenueBreakEven: revenue,
-      contributionMargin: cm,
-      contributionMarginRatio: cmRatio,
-      varCostRatio: price > 0 ? variableCost / price : 0,
-    };
-  }
+  import { validate } from '../lib/validate';
+  import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
+  import { setResult } from '../lib/result-bus';
+  import { calcBreakEven } from '../lib/calculators/breakeven';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
+
   function fmtVal(n: number) {
     if (!isFinite(n)) return 'N/A';
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
+
   function fmtUnits(n: number) {
     if (!isFinite(n)) return 'Never';
     return new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)) + ' Units';
   }
+
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
   }
+
+  const beSchema = {
+    f: { required: true, min: 0, max: 1000000000, decimal: true, label: 'Fixed Costs' },
+    p: { required: true, min: 0.01, max: 10000000, decimal: true, label: 'Selling Price per Unit' },
+    v: { required: true, min: 0, max: 10000000, decimal: true, label: 'Variable Cost per Unit' },
+  };
 
   function initBreakEvenCalc() {
     const fixedInput = document.getElementById('be-fixed') as HTMLInputElement | null;
@@ -271,43 +375,125 @@ const jsonld = {
     const resVcRatio = document.getElementById('be-result-vcratio');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errorAlert = document.getElementById('be-error-alert');
+    const errorMsg = document.getElementById('be-error-msg');
+
     if (!fixedInput || !priceInput || !varInput) return;
 
     const DEFAULTS = { fixed: 500000, price: 500, variable: 300 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errorAlert && errorMsg) {
+        errorMsg.textContent = msg;
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function hideError() {
+      if (errorAlert) {
+        errorAlert.classList.add('hidden');
+      }
     }
 
     function recalc() {
-      const fixed = parse(fixedInput.value);
-      const price = parse(priceInput.value);
-      const variable = parse(varInput.value);
+      const valF = validate(fixedInput.value, beSchema.f);
+      const valP = validate(priceInput.value, beSchema.p);
+      const valV = validate(varInput.value, beSchema.v);
 
-      if (fixed <= 0 || price <= 0) return;
+      if (!valF.valid || !valP.valid || !valV.valid) {
+        const firstErr = (!valF.valid && valF.error.message) || (!valP.valid && valP.error.message) || (!valV.valid && valV.error.message) || 'Invalid inputs';
+        showError(firstErr);
+        return;
+      }
 
-      const res = calcBreakEvenClient(fixed, price, variable);
+      const fixed = valF.value!;
+      const price = valP.value!;
+      const variable = valV.value!;
 
-      if (resUnits) resUnits.textContent = fmtUnits(res.unitsBreakEven);
-      if (resRevenue) resRevenue.textContent = fmtVal(res.revenueBreakEven);
-      if (resCm) resCm.textContent = fmtVal(res.contributionMargin);
-      if (resCmRatio) resCmRatio.textContent = (res.contributionMarginRatio * 100).toFixed(1) + '%';
-      if (resVcRatio) resVcRatio.textContent = (res.varCostRatio * 100).toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtUnits(res.unitsBreakEven);
+      if (price <= variable) {
+        showError(`Selling price (${currSym}${price}) must be higher than variable cost (${currSym}${variable}) to break even.`);
+        const heroVal = 'Never';
+        const naVal = 'N/A';
+        const cmVal = fmtVal(price - variable);
+        const cmRatioVal = '0.0%';
+        const vcRatioVal = ((variable / price) * 100).toFixed(1) + '%';
+
+        setResult({
+          heroValue: heroVal,
+          heroLabel: 'Break-Even Volume',
+          rows: [
+            { label: 'Break-Even Revenue', value: naVal, variant: 'accent' },
+            { label: 'Contribution Margin per Unit', value: cmVal },
+            { label: 'Contribution Margin Ratio', value: cmRatioVal, variant: 'accent' },
+            { label: 'Variable Cost Ratio', value: vcRatioVal },
+          ],
+          fields: {
+            'be-result-units': heroVal,
+            'be-result-revenue': naVal,
+            'be-result-cm': cmVal,
+            'be-result-cmratio': cmRatioVal,
+            'be-result-vcratio': vcRatioVal,
+          },
+          meta: { fixed, price, variable, isPossible: false },
+        });
+
+        if (resUnits) resUnits.textContent = heroVal;
+        if (resRevenue) resRevenue.textContent = naVal;
+        if (resCm) resCm.textContent = cmVal;
+        if (resCmRatio) resCmRatio.textContent = cmRatioVal;
+        if (resVcRatio) resVcRatio.textContent = vcRatioVal;
+        if (mobileHero) mobileHero.textContent = heroVal;
+        return;
+      }
+
+      hideError();
+      const res = calcBreakEven(fixed, price, variable);
+
+      const heroVal = fmtUnits(res.unitsBreakEven);
+      const revVal = fmtVal(res.revenueBreakEven);
+      const cmVal = fmtVal(res.contributionMargin);
+      const cmRatioVal = (res.contributionMarginRatio * 100).toFixed(1) + '%';
+      const vcRatioVal = (res.variableCostRatio * 100).toFixed(1) + '%';
+
+      setResult({
+        heroValue: heroVal,
+        heroLabel: 'Break-Even Volume',
+        rows: [
+          { label: 'Break-Even Revenue', value: revVal, variant: 'accent' },
+          { label: 'Contribution Margin per Unit', value: cmVal },
+          { label: 'Contribution Margin Ratio', value: cmRatioVal, variant: 'accent' },
+          { label: 'Variable Cost Ratio', value: vcRatioVal },
+        ],
+        fields: {
+          'be-result-units': heroVal,
+          'be-result-revenue': revVal,
+          'be-result-cm': cmVal,
+          'be-result-cmratio': cmRatioVal,
+          'be-result-vcratio': vcRatioVal,
+        },
+        meta: { fixed, price, variable, ...res },
+      });
+
+      if (resUnits) resUnits.textContent = heroVal;
+      if (resRevenue) resRevenue.textContent = revVal;
+      if (resCm) resCm.textContent = cmVal;
+      if (resCmRatio) resCmRatio.textContent = cmRatioVal;
+      if (resVcRatio) resVcRatio.textContent = vcRatioVal;
+      if (mobileHero) mobileHero.textContent = heroVal;
 
       const wrapper = document.getElementById('be-composition-wrapper');
       if (wrapper && price > 0 && res.contributionMargin > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.varCostRatio * 100).toFixed(2)}%`;
+        if (bar) bar.style.width = `${(res.variableCostRatio * 100).toFixed(2)}%`;
         if (gainBar) gainBar.style.width = `${(res.contributionMarginRatio * 100).toFixed(2)}%`;
         const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(variable);
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.contributionMargin);
       }
 
-      history.replaceState(null, '', `#f=${fixed}&p=${price}&v=${variable}`);
+      updateHash(serializeHash({ f: fixed, p: price, v: variable }));
     }
 
     function debounce() {
@@ -359,6 +545,7 @@ const jsonld = {
         varSlider.style.setProperty('--slider-pct', `${((DEFAULTS.variable - 5) / (20000 - 5)) * 100}%`);
       }
 
+      hideError();
       recalc();
       fixedInput.focus();
     });
@@ -371,12 +558,30 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('be-copy-btn')?.addEventListener('click', async () => {
-      const fixed = parse(fixedInput.value);
-      const price = parse(priceInput.value);
-      const variable = parse(varInput.value);
-      const res = calcBreakEvenClient(fixed, price, variable);
-      const text = `Break-Even: Fixed Costs ${fmtVal(fixed)}, Price ${fmtVal(price)}, Variable Cost ${fmtVal(variable)} => Break-even: ${fmtUnits(res.unitsBreakEven)} (${fmtVal(res.revenueBreakEven)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      const valF = validate(fixedInput.value, beSchema.f);
+      const valP = validate(priceInput.value, beSchema.p);
+      const valV = validate(varInput.value, beSchema.v);
+      if (!valF.valid || !valP.valid || !valV.valid) {
+        showError((!valF.valid && valF.error.message) || (!valP.valid && valP.error.message) || (!valV.valid && valV.error.message) || 'Invalid inputs');
+        return;
+      }
+      const fixed = valF.value!;
+      const price = valP.value!;
+      const variable = valV.value!;
+      const res = calcBreakEven(fixed, price, variable);
+      const text = `Break-Even: Fixed Costs ${fmtVal(fixed)}, Price ${fmtVal(price)}, Variable Cost ${fmtVal(variable)} => Break-even: ${fmtUnits(res.unitsBreakEven)} (${fmtVal(res.revenueBreakEven)}). ${location.href.split('#')[0]}${serializeHash({ f: fixed, p: price, v: variable })}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('be-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -386,7 +591,29 @@ const jsonld = {
     });
 
     document.getElementById('be-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      const valF = validate(fixedInput.value, beSchema.f);
+      const valP = validate(priceInput.value, beSchema.p);
+      const valV = validate(varInput.value, beSchema.v);
+      if (!valF.valid || !valP.valid || !valV.valid) {
+        showError((!valF.valid && valF.error.message) || (!valP.valid && valP.error.message) || (!valV.valid && valV.error.message) || 'Invalid inputs');
+        return;
+      }
+      const fixed = valF.value!;
+      const price = valP.value!;
+      const variable = valV.value!;
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash({ f: fixed, p: price, v: variable })}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('be-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -395,13 +622,17 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmBECurrencyBound) {
+      win.__cmBECurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
@@ -409,6 +640,37 @@ const jsonld = {
         currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
       }
     } catch (e) {}
+
+    // Phase 4.4 URL State Restoration
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, beSchema);
+      if (restored.valid) {
+        if (restored.values.f !== undefined) {
+          fixedInput.value = fmtLiveInput(String(restored.values.f));
+          if (fixedSlider) {
+            fixedSlider.value = String(restored.values.f);
+            fixedSlider.style.setProperty('--slider-pct', `${((restored.values.f - 10000) / (5000000 - 10000)) * 100}%`);
+          }
+        }
+        if (restored.values.p !== undefined) {
+          priceInput.value = fmtLiveInput(String(restored.values.p));
+          if (priceSlider) {
+            priceSlider.value = String(restored.values.p);
+            priceSlider.style.setProperty('--slider-pct', `${((restored.values.p - 10) / (25000 - 10)) * 100}%`);
+          }
+        }
+        if (restored.values.v !== undefined) {
+          varInput.value = fmtLiveInput(String(restored.values.v));
+          if (varSlider) {
+            varSlider.value = String(restored.values.v);
+            varSlider.style.setProperty('--slider-pct', `${((restored.values.v - 5) / (20000 - 5)) * 100}%`);
+          }
+        }
+      }
+    }
+
+    recalc();
   }
 
   initBreakEvenCalc();
