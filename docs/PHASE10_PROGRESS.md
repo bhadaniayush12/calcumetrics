@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:00:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:01:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 14
+- **COMPLETED:** 15
 - **IN_PROGRESS:** NONE
-- **NEXT:** 015. income-tax-calculator
+- **NEXT:** 016. gst-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** loan-prepayment-calculator
-- **LAST_COMMIT:** dc99ac1
+- **LAST_COMPLETED_UNIT:** income-tax-calculator
+- **LAST_COMMIT:** f2762de
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -32,7 +32,7 @@
 - [x] 012. home-loan-calculator — DONE
 - [x] 013. car-loan-calculator — DONE
 - [x] 014. loan-prepayment-calculator — DONE
-- [ ] 015. income-tax-calculator — PENDING (Phase 5 Locked, India Tax Protected)
+- [x] 015. income-tax-calculator — DONE (Phase 5 Locked, India Tax Protected, Intentionally Preserved)
 - [ ] 016. gst-calculator — PENDING (India Tax Protected)
 - [ ] 017. hra-calculator — PENDING (India Tax Protected)
 - [ ] 018. upi-mdr-calculator — PENDING
@@ -145,3 +145,7 @@
   - Changes: Added step-by-step worked example using default inputs (₹30L balance at 8.5% with 180 months remaining, ₹29,542 current EMI, ₹3L prepayment → Strategy A tenure reduction saves 32 months and ₹6,45,333 interest; Strategy B EMI reduction lowers payment to ₹26,587 saving ₹5,31,750 interest; highlighted ₹1,13,583 differential), added strategic decision guide comparing tenure reduction vs monthly liquidity relief, and added explicit assumptions/limitations (RBI zero-penalty rules for floating rate individual loans vs fixed/NBFC charges, bank minimum threshold rules, Old Regime Section 24(b) tax shield trade-offs, and guaranteed hurdle rate vs equity investment opportunity costs).
   - Preserved: Dropdown strategy selector, calculation engine `calcLoanPrepayment`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **015. income-tax-calculator (/in/income-tax-calculator)**:
+  - Audited: Phase 5 Locked & Phase 7/8 India Tax Protected Calculator. Verified New Tax Regime (Budget 2024 / FY 2024-25 / AY 2025-26) vs Old Tax Regime comparative model, ₹75,000 salaried standard deduction, Section 87A rebate rules, complete New vs Old tax slabs table, step-by-step worked example (₹12L CTC with ₹2.25L deductions → ₹71,500 New Regime vs ₹1,01,400 Old Regime, saving ₹29,900), comprehensive assumptions/legal notes, 5 targeted FAQs, strict INR jurisdiction lock, and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
