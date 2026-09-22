@@ -256,13 +256,120 @@ const jsonld = {
       <section aria-labelledby="loan-prepayment-calculator-how">
         <h2 id="loan-prepayment-calculator-how" class="text-xl font-bold text-text-primary mb-4">How loan prepayment savings work</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Every rupee of prepayment directly subtracts from your outstanding principal balance. Because monthly interest is calculated as a percentage of the remaining principal, shrinking the principal immediately reduces future interest compounding:
+          Every rupee of prepayment directly subtracts from your outstanding loan principal. Because monthly interest on reducing-balance loans is computed strictly on the remaining unpaid principal balance, shrinking the principal immediately prevents future interest compounding:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">New Principal = Outstanding Balance − Prepayment Amount</p>
-          <p class="text-sm text-text-muted">
-            Opting for <strong>Tenure Reduction</strong> keeps your EMI the same, allowing more of every subsequent EMI to pay off principal. This yields substantially higher interest savings compared to choosing a reduced monthly EMI.
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3">
+          <p class="text-base font-mono text-text-primary">P_new = Outstanding Balance − Prepayment Amount</p>
+          <div class="border-t border-border/50 pt-3 text-sm text-text-muted space-y-2">
+            <p><strong>Strategy 1: Tenure Reduction (Keep EMI constant)</strong></p>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">n_new = ⌈ −ln(1 − (r × P_new / EMI)) / ln(1 + r) ⌉</p>
+            <p>Here, the monthly EMI remains unchanged, so a greater fraction of each subsequent installment repays principal, accelerating debt payoff and maximizing interest savings.</p>
+          </div>
+          <div class="border-t border-border/50 pt-3 text-sm text-text-muted space-y-2">
+            <p><strong>Strategy 2: EMI Reduction (Keep tenure constant)</strong></p>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">EMI_new = [P_new × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
+            <p>Here, the remaining tenure is preserved, recalculating a lower monthly installment to enhance immediate monthly household liquidity.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="loan-prepayment-worked-example">
+        <h2 id="loan-prepayment-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: ₹30 Lakh Loan</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider an outstanding home loan balance of <strong>₹30,00,000</strong> at an annual interest rate of <strong>8.5%</strong> with <strong>180 months (15 years)</strong> remaining. The current monthly EMI is <strong>₹29,542</strong>, with a cumulative remaining interest obligation of <strong>₹23,17,498</strong>. You decide to make a <strong>₹3,00,000</strong> lump-sum prepayment:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Outstanding Balance before Prepayment:</span>
+            <strong class="text-text-primary font-mono">₹30,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Lump-Sum Prepayment Amount:</span>
+            <strong class="text-text-primary font-mono">₹3,00,000 (10% of balance)</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Revised Principal Balance (P_new):</span>
+            <strong class="text-text-primary font-mono">₹27,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Original Monthly EMI:</span>
+            <strong class="text-text-primary font-mono">₹29,542</strong>
+          </div>
+          <div class="bg-canvas p-3 rounded space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-accent block">Strategy A: Reduce Tenure (Keep EMI at ₹29,542)</span>
+            <div class="flex justify-between text-xs">
+              <span>New Remaining Tenure:</span>
+              <strong class="text-text-primary font-mono">148 months (12.3 years)</strong>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span>Tenure Saved:</span>
+              <strong class="text-text-primary font-mono">32 months (2.7 years)</strong>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span>Total Interest Saved:</span>
+              <strong class="text-accent font-mono font-bold">₹6,45,333</strong>
+            </div>
+          </div>
+          <div class="bg-canvas p-3 rounded space-y-2">
+            <span class="text-xs font-semibold uppercase tracking-wider text-text-primary block">Strategy B: Reduce EMI (Keep Tenure at 180 Months)</span>
+            <div class="flex justify-between text-xs">
+              <span>Revised Monthly EMI:</span>
+              <strong class="text-text-primary font-mono">₹26,587 (saves ₹2,955/mo)</strong>
+            </div>
+            <div class="flex justify-between text-xs">
+              <span>Total Interest Saved:</span>
+              <strong class="text-text-primary font-mono">₹5,31,750</strong>
+            </div>
+          </div>
+          <p class="text-xs text-text-muted pt-1">
+            <strong>Key Comparison:</strong> Choosing tenure reduction saves an additional <strong>₹1,13,583</strong> in interest compared to EMI reduction because the debt is liquidated 32 months earlier.
           </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="loan-prepayment-strategy">
+        <h2 id="loan-prepayment-strategy" class="text-xl font-bold text-text-primary mb-4">Decision guide: Tenure reduction vs. lower EMI</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-2">When to Choose Tenure Reduction</h3>
+            <ul class="space-y-1.5 list-disc list-inside">
+              <li>Your regular monthly salary/cash flow comfortably accommodates the current EMI.</li>
+              <li>Your primary objective is minimizing total lifetime finance costs.</li>
+              <li>You want to achieve debt freedom before major milestones (e.g. child education, retirement).</li>
+              <li>Highest compounded interest savings over the life of the loan.</li>
+            </ul>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-2">When to Choose EMI Reduction</h3>
+            <ul class="space-y-1.5 list-disc list-inside">
+              <li>Household monthly budget is tight, or living expenses have escalated.</li>
+              <li>You are transitioning careers, starting a venture, or anticipating income variability.</li>
+              <li>You want to improve your debt-to-income (DTI) ratio to qualify for other credit facilities.</li>
+              <li>Provides immediate cash flow relief every single month.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="loan-prepayment-assumptions">
+        <h2 id="loan-prepayment-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions & practical considerations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Prepayment Penalty Rules</h3>
+            <p>Under Reserve Bank of India (RBI) regulations, banks and HFCs cannot levy foreclosure or prepayment charges on floating-rate individual home loans. However, fixed-rate loans and commercial facilities may carry penalties (2%–4%).</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Lender Processing Guidelines</h3>
+            <p>Lenders frequently specify minimum prepayment thresholds (such as minimum 1 or 2 EMIs or ₹10,000–₹25,000) and may restrict the frequency of partial payments per financial year.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Tax Shield Considerations</h3>
+            <p>Under the Old Tax Regime in India, Section 24(b) permits interest deduction up to ₹2,00,000 for self-occupied property. Substantially shrinking loan interest reduces this tax shield, which should be factored into net savings.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Guaranteed vs. Equity Returns</h3>
+            <p>Prepaying an 8.5% loan yields a guaranteed, tax-free return of 8.5%. Compare this risk-free hurdle rate against alternative long-term investment options before deploying surplus capital.</p>
+          </div>
         </div>
       </section>
 

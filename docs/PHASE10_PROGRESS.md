@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:59:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:00:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 13
-- **IN_PROGRESS:** 014. loan-prepayment-calculator
+- **COMPLETED:** 14
+- **IN_PROGRESS:** NONE
 - **NEXT:** 015. income-tax-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** car-loan-calculator
-- **LAST_COMMIT:** aeccd45
+- **LAST_COMPLETED_UNIT:** loan-prepayment-calculator
+- **LAST_COMMIT:** dc99ac1
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -31,7 +31,7 @@
 - [x] 011. emi-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 012. home-loan-calculator — DONE
 - [x] 013. car-loan-calculator — DONE
-- [ ] 014. loan-prepayment-calculator — IN PROGRESS
+- [x] 014. loan-prepayment-calculator — DONE
 - [ ] 015. income-tax-calculator — PENDING (Phase 5 Locked, India Tax Protected)
 - [ ] 016. gst-calculator — PENDING (India Tax Protected)
 - [ ] 017. hra-calculator — PENDING (India Tax Protected)
@@ -138,4 +138,10 @@
   - Audited: Vehicle reducing balance loan amortization model with down payment separation.
   - Changes: Added step-by-step worked example using default inputs (₹12L vehicle price, ₹2L down payment, ₹10L loan at 9.0% for 5 yrs → ₹20,758 EMI, ₹2,45,501 interest, ₹12,45,501 total repayment, ₹14,45,501 total acquisition cost), added result interpretation (depreciation vs loan amortization, negative equity/underwater loan warning, flat rate vs reducing balance APR trap), and added explicit assumptions/limitations (fixed interest rate assumption, loan origination fees, excluded vehicle operating costs, foreclosure/prepayment fees on fixed-rate auto loans).
   - Preserved: Clean interactive inputs with down payment slider, calculation engine `calcEMI`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **014. loan-prepayment-calculator (/loan-prepayment-calculator)**:
+  - Audited: Reducing-balance loan prepayment model with dual tenure-reduction vs EMI-reduction strategies.
+  - Changes: Added step-by-step worked example using default inputs (₹30L balance at 8.5% with 180 months remaining, ₹29,542 current EMI, ₹3L prepayment → Strategy A tenure reduction saves 32 months and ₹6,45,333 interest; Strategy B EMI reduction lowers payment to ₹26,587 saving ₹5,31,750 interest; highlighted ₹1,13,583 differential), added strategic decision guide comparing tenure reduction vs monthly liquidity relief, and added explicit assumptions/limitations (RBI zero-penalty rules for floating rate individual loans vs fixed/NBFC charges, bank minimum threshold rules, Old Regime Section 24(b) tax shield trade-offs, and guaranteed hurdle rate vs equity investment opportunity costs).
+  - Preserved: Dropdown strategy selector, calculation engine `calcLoanPrepayment`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
