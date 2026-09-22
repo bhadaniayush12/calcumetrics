@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:08:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:09:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 20
-- **IN_PROGRESS:** 021. markup-vs-margin-calculator
-- **NEXT:** 022. roi-calculator
+- **COMPLETED:** 21
+- **IN_PROGRESS:** 022. roi-calculator
+- **NEXT:** 023. eoq-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** profit-margin-calculator
-- **LAST_COMMIT:** 7fefb8c
+- **LAST_COMPLETED_UNIT:** markup-vs-margin-calculator
+- **LAST_COMMIT:** 0be2ec8
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -38,8 +38,8 @@
 - [x] 018. upi-mdr-calculator — DONE
 - [x] 019. break-even-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 020. profit-margin-calculator — DONE
-- [ ] 021. markup-vs-margin-calculator — IN PROGRESS
-- [ ] 022. roi-calculator — PENDING
+- [x] 021. markup-vs-margin-calculator — DONE
+- [ ] 022. roi-calculator — IN PROGRESS
 - [ ] 023. eoq-calculator — PENDING
 - [ ] 024. depreciation-calculator — PENDING
 - [ ] 025. working-capital-calculator — PENDING
@@ -176,4 +176,10 @@
   - Audited: Multi-tier profitability structure (Gross, Operating, Net margins) and expense waterfall.
   - Changes: Added step-by-step worked example table matching default inputs (₹10L revenue, ₹6L COGS, ₹1.5L OpEx, ₹50k taxes/interest → ₹4L gross profit / 40.0%, ₹2.5L EBIT / 25.0%, ₹2L net profit / 20.0%), added margin divergence diagnostics (evaluating high gross vs low net), added industry benchmark guidelines (SaaS, Services, Manufacturing, Grocery), and added explicit assumptions/limitations (accrual basis vs liquidity timing, CapEx capitalization, inventory costing variance).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcProfitMargin`, 5 FAQs matching JSON-LD schema, and curated related links (`markup-vs-margin-calculator`, `break-even-calculator`, `cogs-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **021. markup-vs-margin-calculator (/markup-vs-margin-calculator)**:
+  - Audited: Pricing model converting between markup on unit cost and gross margin on selling price.
+  - Changes: Added bidirectional conversion formulas with mathematical notation, quick reference conversion table spanning 10% to 300% markup tiers, dual worked examples for Cost-Plus Pricing (₹1,000 cost with 25% markup → ₹1,250 selling price, ₹250 profit, 20.0% margin) and Target Margin Pricing (₹1,200 cost with 40% margin → ₹2,000 selling price, ₹800 profit, 66.67% markup), an in-depth "Overhead Trap" analysis exposing how confusing markup with margin produces involuntary losses, and explicit pricing assumptions/limitations.
+  - Preserved: Dual-mode dropdown toggle, calculation engine `calcMarkupMargin`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `break-even-calculator`, `cogs-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
