@@ -17,7 +17,8 @@ const result = calcDCF(flows, DEFAULT.discountRate, DEFAULT.terminalGrowth);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'dcf-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['wacc-calculator', 'npv-calculator', 'irr-calculator'];
+const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/dcf-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -249,34 +250,157 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="dcf-calculator-how">
-        <h2 id="dcf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Discounted Cash Flow works</h2>
+      <section aria-labelledby="dcf-calculator-how" class="mb-8">
+        <h2 id="dcf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Discounted Cash Flow (DCF) Works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          DCF valuation discounts future cash flows back to the present day using the opportunity cost of capital:
+          Discounted Cash Flow (DCF) models the fundamental principle of corporate finance: <em>an asset's intrinsic value equals the sum of all future cash flows it will produce, discounted back to the present day using an appropriate risk-adjusted cost of capital</em>. The valuation bifurcates into two distinct stages:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>PV of Explicit Flows: </strong> &Sigma; [ FCF<sub>t</sub> / (1 + r)<sup>t</sup> ]<br />
-            <strong>Gordon Growth Terminal Value: </strong> TV = [ FCF<sub>n</sub> &times; (1 + g) ] / (r &minus; g)<br />
-            <strong>PV of Terminal Value: </strong> TV / (1 + r)<sup>n</sup><br />
-            <strong>Total Enterprise Value: </strong> PV of Flows + PV of Terminal Value
-          </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Stage 1: Explicit Forecast Horizon (Years 1–5)</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">PV = &sum; [ FCF<sub>t</sub> &divide; (1 + r)<sup>t</sup> ]</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Discounts discrete annual free cash flows across the predictable operating projection window using WACC (<em>r</em>).
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Stage 2: Gordon Growth Terminal Value</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">TV = [ FCF<sub>5</sub> &times; (1 + g) ] &divide; (r &minus; g)</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Values cash flows from Year 6 into perpetuity assuming perpetual growth (<em>g</em>) capped at long-term GDP expansion.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Worked Example: 5-Year Enterprise DCF Valuation Schedule</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Valuing an enterprise starting with Year 1 Free Cash Flow of ₹1,00,000 growing at 10% annually for 5 years, with a 12% WACC discount rate and 3% perpetual terminal growth rate:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-border bg-surface text-text-primary">
+                <th class="py-3 px-4 font-semibold">Projection Period</th>
+                <th class="py-3 px-4 font-semibold">Nominal FCF</th>
+                <th class="py-3 px-4 font-semibold">Discount Factor (12%)</th>
+                <th class="py-3 px-4 font-semibold">Present Value (PV)</th>
+                <th class="py-3 px-4 font-semibold">% of Enterprise Value</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 1 (Base Forecast)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">1 &divide; (1.12)<sup>1</sup> = 0.8929</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹89,286</td>
+                <td class="py-2.5 px-4 font-mono">6.46%</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 2 (+10% Growth)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,10,000</td>
+                <td class="py-2.5 px-4 font-mono">1 &divide; (1.12)<sup>2</sup> = 0.7972</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹87,691</td>
+                <td class="py-2.5 px-4 font-mono">6.35%</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 3 (+10% Growth)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,21,000</td>
+                <td class="py-2.5 px-4 font-mono">1 &divide; (1.12)<sup>3</sup> = 0.7118</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹86,126</td>
+                <td class="py-2.5 px-4 font-mono">6.23%</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 4 (+10% Growth)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,33,100</td>
+                <td class="py-2.5 px-4 font-mono">1 &divide; (1.12)<sup>4</sup> = 0.6355</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹84,589</td>
+                <td class="py-2.5 px-4 font-mono">6.12%</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 5 (+10% Growth)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,46,410</td>
+                <td class="py-2.5 px-4 font-mono">1 &divide; (1.12)<sup>5</sup> = 0.5674</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹83,080</td>
+                <td class="py-2.5 px-4 font-mono">6.01%</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Sum: 5-Year Explicit Cash Flows</td>
+                <td class="py-2.5 px-4 font-mono">₹6,10,510</td>
+                <td class="py-2.5 px-4 font-mono">—</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹4,30,771</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">31.18%</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Terminal Value (Year 5 Nominal)</td>
+                <td class="py-2.5 px-4 font-mono">[₹1,46,410 &times; 1.03] &divide; (0.12 &minus; 0.03)</td>
+                <td class="py-2.5 px-4 font-mono">₹16,75,581</td>
+                <td class="py-2.5 px-4 font-mono">—</td>
+                <td class="py-2.5 px-4 font-mono">—</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">PV of Terminal Value</td>
+                <td class="py-2.5 px-4 font-mono">₹16,75,581 &divide; (1.12)<sup>5</sup></td>
+                <td class="py-2.5 px-4 font-mono">0.5674</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹9,50,757</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">68.82%</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Total Intrinsic Enterprise Value</td>
+                <td class="py-3 px-4 font-mono">₹4,30,771 + ₹9,50,757</td>
+                <td class="py-3 px-4 font-mono">—</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹13,81,529</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">100.0%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Sensitivity: WACC vs. Perpetual Terminal Growth</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Because terminal value accounts for nearly 70% of total enterprise value, minor changes in assumptions dramatically move intrinsic value:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>+1% WACC (13%):</strong> Intrinsic value contracts from ₹13.82L to ~₹11.96L (&minus;13.5% reduction).</li>
+              <li><strong>&minus;1% WACC (11%):</strong> Intrinsic value expands from ₹13.82L to ~₹16.32L (+18.1% gain).</li>
+              <li><strong>Terminal Growth Cap (g &lt; r):</strong> Perpetual growth <em>must never exceed long-term GDP growth</em> (typically 2% to 4%), otherwise the company would mathematically consume the entire global economy.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Unlevered FCF (FCFF) vs. Levered FCF (FCFE)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Distinguishing the cash flow base dictates the appropriate discount rate:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>FCFF (Free Cash Flow to Firm):</strong> Cash flow available to all capital providers (debt + equity) before interest payments. Must be discounted at <strong>WACC</strong>. Yields Enterprise Value.</li>
+              <li><strong>FCFE (Free Cash Flow to Equity):</strong> Cash flow remaining after debt service (interest + principal repayments). Must be discounted at the <strong>Cost of Equity (Ke)</strong>. Yields Equity Value.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Analytical Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Terminal Value Dominance:</strong> With 65% to 80% of value residing in perpetuity assumptions, DCF is highly vulnerable to "garbage-in, garbage-out" modeling errors. Small tweaks in terminal spread (r &minus; g) overpower 5 years of operating forecasts.</li>
+            <li><strong>Reinvestment Rate Equilibrium:</strong> The Gordon Growth model assumes the firm reinvests capital at its exact cost of capital into perpetuity once high-growth winds down.</li>
+            <li><strong>Constant Capital Structure Assumption:</strong> Using a constant WACC discount rate presumes debt-to-equity proportions remain unchanged across the entire horizon.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="dcf-calculator-faq">
         <h2 id="dcf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['Why is terminal value often 70%+ of DCF value?', 'Because companies are assumed to exist as going concerns into perpetuity, all cash flows earned beyond year 5 accumulate into the terminal value, making it naturally the largest component of total value.'],
-            ['What discount rate should I use?', 'For firm valuation, use the Weighted Average Cost of Capital (WACC), which reflects the blended required returns of equity investors and debt lenders. Typically, WACC ranges between 8% to 15% depending on risk.'],
-            ['What is the Gordon Growth Model rule for terminal value?', 'The perpetual growth rate (g) must strictly be lower than the discount rate (r). If perpetual growth equals or exceeds the cost of capital, the enterprise is mathematically modeled to grow larger than the overall economy, rendering the valuation undefined.'],
-            ['What is a realistic perpetual terminal growth rate?', 'In practice, perpetual terminal growth rates are typically pegged to long-run nominal GDP growth or expected inflation rates, typically ranging between 2% and 4% for mature economies and up to 5% to 6% for rapidly expanding developing markets.'],
-            ['How does DCF differ from market multiples like P/E or EV/EBITDA?', 'DCF calculates fundamental intrinsic value derived from the firm\'s expected cash generation and risk profile, whereas market multiples reflect relative valuation based on current market sentiment and peer pricing.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
