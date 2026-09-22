@@ -230,19 +230,78 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="rd-calculator-how">
         <h2 id="rd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the RD calculator works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          The maturity value of a Recurring Deposit is determined by compounding each monthly installment from the deposit date until maturity:
+          A Recurring Deposit (RD) is a disciplined savings scheme where you deposit a fixed sum of money every month over a predetermined tenure. Per Indian Banks' Association (IBA) regulations, commercial banks compound interest on recurring deposits on a <strong>quarterly basis</strong>.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">M = P &times; (1 + r/4)<sup>(4 &times; t)</sup> for each monthly contribution</p>
-          <p class="text-sm text-text-muted">
-            The earliest deposit earns interest for the full tenure, while the last deposit earns interest for one month.
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Because contributions happen monthly while interest compounds quarterly, each monthly installment earns interest for the precise number of months it remains deposited until the maturity date:
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">M = &Sigma;<sub>i=1</sub><sup>N</sup> [ P &times; (1 + r / 4)<sup>4 &times; (N &minus; i + 1) / 12</sup> ]</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">M</strong> &mdash; Total maturity value at the end of the tenure</li>
+            <li><strong class="text-text-primary">P</strong> &mdash; Fixed monthly installment amount</li>
+            <li><strong class="text-text-primary">r</strong> &mdash; Annual nominal interest rate expressed as a decimal (e.g. 0.07 for 7.0%)</li>
+            <li><strong class="text-text-primary">N</strong> &mdash; Total number of monthly installments (e.g. 60 months for 5 years)</li>
+            <li><strong class="text-text-primary">i</strong> &mdash; The installment sequence index (from 1 to N)</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="rd-calculator-example">
+        <h2 id="rd-calculator-example" class="text-xl font-bold text-text-primary mb-4">Worked example: ₹5,000 monthly for 5 years (60 months) at 7.0%</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an individual opening an RD account with a monthly contribution of ₹5,000 at a fixed 7.0% annual interest rate for 5 years:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Monthly deposit (P):</strong> ₹5,000</p>
+          <p><strong class="text-text-primary">2. Number of installments (N):</strong> 60 months (5 years)</p>
+          <p><strong class="text-text-primary">3. Cumulative principal invested:</strong> 60 &times; ₹5,000 = <strong class="text-text-primary">₹3,00,000</strong></p>
+          <p><strong class="text-text-primary">4. Quarterly compounding mechanics:</strong> The 1st installment compounds across all 20 quarters; the 30th installment compounds for 10 quarters; the 60th installment compounds for 1 month.</p>
+          <p><strong class="text-text-primary">5. Total maturity corpus:</strong> <strong class="text-text-primary text-accent">₹3,61,746</strong></p>
+          <p><strong class="text-text-primary">6. Total interest earned:</strong> ₹3,61,746 &minus; ₹3,00,000 = <strong class="text-text-primary text-accent">₹61,746</strong> (an effective 20.6% total return on deposited capital)</p>
+        </div>
+      </section>
+
+      <!-- 3. Interpreting Your Results -->
+      <section aria-labelledby="rd-calculator-interpretation">
+        <h2 id="rd-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your results</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Guaranteed Capital and Returns:</strong> Unlike equity SIPs where maturity values depend on market cycles and sequence of returns, bank Recurring Deposits offer guaranteed capital protection and fixed interest rates locked at account inception. In India, bank deposits are insured up to ₹5,00,000 per depositor per bank by DICGC.
+          </p>
+          <p>
+            <strong class="text-text-primary">Tax Drag on Real Yield:</strong> RD interest is categorized as "Income from Other Sources" and taxed at your marginal income tax slab. For individuals in the 30% slab, a 7.0% nominal return yields an effective post-tax return of approximately ~4.9%, which may trail inflation.
           </p>
         </div>
       </section>
 
+      <!-- 4. Key Assumptions and Limitations -->
+      <section aria-labelledby="rd-calculator-assumptions">
+        <h2 id="rd-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Quarterly Compounding Standard:</strong> Calculation follows the standard Indian Banks' Association (IBA) quarterly compounding schedule.
+          </li>
+          <li>
+            <strong class="text-text-primary">Prompt Installment Payments:</strong> Assumes every monthly installment is paid on the exact due date without default or payment delay penalties.
+          </li>
+          <li>
+            <strong class="text-text-primary">Fixed Interest Rate:</strong> The interest rate remains uniform throughout the entire contracted duration.
+          </li>
+          <li>
+            <strong class="text-text-primary">TDS Excluded:</strong> Displays gross pre-tax maturity value. Banks deduct 10% TDS (with PAN) if total interest earned across deposits in a financial year exceeds ₹40,000 (₹50,000 for senior citizens).
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. Frequently Asked Questions -->
       <section aria-labelledby="rd-calculator-faq">
         <h2 id="rd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
