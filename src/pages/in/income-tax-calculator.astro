@@ -490,20 +490,13 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
+    // Jurisdiction lock: Income Tax is an India-specific calculator.
+    // currSym and currLocale are permanently fixed to ₹ / en-IN.
+    // This calculator intentionally ignores cm:currency-change events
+    // and does not restore any non-INR currency from localStorage.
+    window.addEventListener('cm:currency-change', () => {
+      // India-locked: currency change events are intentionally ignored here.
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initITCalc();
