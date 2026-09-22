@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:32:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:34:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 40
-- **IN_PROGRESS:** 041. interest-rate-calculator
-- **NEXT:** 042. tds-calculator
+- **COMPLETED:** 41
+- **IN_PROGRESS:** 042. tds-calculator
+- **NEXT:** 043. capital-gains-tax-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** loan-amortization-calculator
-- **LAST_COMMIT:** 1b728b6
+- **LAST_COMPLETED_UNIT:** interest-rate-calculator
+- **LAST_COMMIT:** 4662da9
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -58,8 +58,8 @@
 - [x] 038. debt-to-income-ratio-calculator — DONE
 - [x] 039. credit-card-payoff-calculator — DONE
 - [x] 040. loan-amortization-calculator — DONE
-- [ ] 041. interest-rate-calculator — IN PROGRESS
-- [ ] 042. tds-calculator — PENDING (India Tax Protected)
+- [x] 041. interest-rate-calculator — DONE
+- [ ] 042. tds-calculator — IN PROGRESS (India Tax Protected)
 - [ ] 043. capital-gains-tax-calculator — PENDING (India Tax Protected)
 - [ ] 044. advance-tax-calculator — PENDING (India Tax Protected)
 - [ ] 045. salary-ctc-calculator — PENDING (India Tax Protected)
@@ -291,3 +291,9 @@
   - Changes: Added complete 6-stage mathematical amortization equations (monthly periodic rate, EMI closed-form derivation, period interest accrual, principal component, ending balance), comprehensive step-by-step worked example schedule matching default inputs (₹10,00,000 principal, 9.50% annual interest rate over 5 years / 60 months → ₹21,002/month EMI, Month 1: ₹7,917 interest vs ₹13,085 principal, Year 1 cumulative: ₹1.65L principal / ₹87.5k interest, Year 3 midpoint balance ₹4.54L with interest down to 17%, ₹10,00,000 principal repaid (79.4%), ₹2,60,112 total interest payable (20.6%), ₹12,60,112 total repayment), critical analysis of the deceptive "Flat Interest Rate Trap" (a 9.5% flat rate costs ₹4,75,000 interest — nearly double reducing-balance interest — carrying an effective APR of 17.5%), prepayment timing impact (prepaying ₹1L in Month 12 saves 7 months and ₹42,000 interest), and practical lending assumptions (uniform monthly payment dates, floating rate benchmark adjustments, origination fee exclusions).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcAmortization`, 5 FAQs matching JSON-LD schema, and curated related links (`loan-prepayment-calculator`, `emi-calculator`, `mortgage-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **041. interest-rate-calculator (/interest-rate-calculator)**:
+  - Audited: Numerical root-finding loan engine solving for underlying annual percentage rate (APR) and Effective Annual Rate (EAR) given principal, EMI, and tenure.
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added Newton-Raphson numerical root-finding methodology and formula derivation, complete step-by-step worked example schedule matching default inputs (₹5,00,000 principal, ₹12,000 monthly payment, 5 years / 60 months → 15.40% solved nominal annual APR, 16.53% EAR, ₹7,20,000 total cash repaid, ₹2,20,000 total interest accrued / 30.6% of outflow), extensive exposure of the deceptive "Flat Rate" dealer pitch (where an 8.80% flat quote masks a 15.40% reducing rate), impact of upfront fee deduction on true net borrowing APR (2% fee escalates APR to 16.63%), and mathematical solvency constraints (`EMI × n > P` boundary requirement, &epsilon; &lt; 10<sup>&minus;7</sup> convergence guard).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcImpliedRate`, 5 FAQs matching JSON-LD schema, and curated related links (`loan-amortization-calculator`, `emi-calculator`, `loan-affordability-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection confirmed How section, Worked Example, FAQs, and Related links render in the DOM.

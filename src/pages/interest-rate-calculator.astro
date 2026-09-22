@@ -225,44 +225,155 @@ const jsonld = {
       </div>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>The implied reducing-balance monthly interest rate $r$ is solved numerically via the root of:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
-          P × r × (1 + r)ⁿ / [(1 + r)ⁿ − 1] − EMI = 0
+    <Fragment slot="below">
+      <section aria-labelledby="ir-calculator-how">
+        <h2 id="ir-calculator-how" class="text-xl font-bold text-text-primary mb-4">How implied loan interest rates are calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Because the periodic reducing-balance interest rate <code class="font-mono text-accent">r</code> appears both linearly and as an exponential power <code class="font-mono text-accent">(1 + r)<sup>n</sup></code> in the standard loan EMI formula, it cannot be isolated using simple algebraic operations. This calculator solves for the true underlying interest rate using the <strong>Newton-Raphson numerical algorithm</strong>:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Root-Finding Objective Function:</strong> f(r) = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ] &minus; EMI = 0<br /><br />
+            <strong>2. Iterative Newton Step:</strong> r<sub>k+1</sub> = r<sub>k</sub> &minus; [ f(r<sub>k</sub>) &divide; f&prime;(r<sub>k</sub>) ]<br /><br />
+            <strong>3. Nominal Annual Rate (APR):</strong> Annual Rate (%) = r &times; 12 &times; 100%<br /><br />
+            <strong>4. Effective Annual Rate (EAR):</strong> EAR (%) = [ (1 + r)<sup>12</sup> &minus; 1 ] &times; 100%<br /><br />
+            <strong>5. Total Loan Repayment:</strong> Total Outflow = EMI &times; n<br /><br />
+            <strong>6. Cumulative Financing Cost:</strong> Total Interest = Total Outflow &minus; Principal (P)
+          </p>
         </div>
-        <p>Where P is loan principal, EMI is fixed monthly installment, n is total months (years × 12), and nominal annual rate is r × 12 × 100%.</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a borrowing arrangement where a consumer borrows <strong>₹5,00,000</strong> and agrees to pay a fixed installment of <strong>₹12,000 per month</strong> for <strong>5 years (60 monthly payments)</strong>:
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Parameter / Metric</th>
+                <th class="py-2.5 px-4">Mathematical Basis</th>
+                <th class="py-2.5 px-4">Solved / Computed Value</th>
+                <th class="py-2.5 px-4">Financial Interpretation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Disbursed Loan Principal (P)</td>
+                <td class="py-2.5 px-4 font-mono">Net Proceeds Received</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹5,00,000</td>
+                <td class="py-2.5 px-4">Actual capital deposited in borrower's account.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Repayment (EMI)</td>
+                <td class="py-2.5 px-4 font-mono">Contractual Monthly Due</td>
+                <td class="py-2.5 px-4 font-mono">₹12,000 / Month</td>
+                <td class="py-2.5 px-4">Agreed installment debited for 60 consecutive billing cycles.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Cash Repaid over 5 Years</td>
+                <td class="py-2.5 px-4 font-mono">₹12,000 &times; 60 Months</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹7,20,000</td>
+                <td class="py-2.5 px-4">Gross cash outflow over the complete loan lifecycle.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Financing Interest Charges</td>
+                <td class="py-2.5 px-4 font-mono">₹7,20,000 &minus; ₹5,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹2,20,000 (30.6%)</td>
+                <td class="py-2.5 px-4">Pure interest charges accrued across the 5-year repayment window.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Solved Nominal Annual Rate (APR)</td>
+                <td class="py-2.5 px-4 font-mono">Newton-Raphson Numerical Root</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">15.40% p.a.</td>
+                <td class="py-2.5 px-4">The TRUE reducing-balance interest rate charged by the lender.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Compounding Rate (r)</td>
+                <td class="py-2.5 px-4 font-mono">15.40% &divide; 12</td>
+                <td class="py-2.5 px-4 font-mono">1.283% / Month</td>
+                <td class="py-2.5 px-4">Rate applied each month to the remaining loan balance.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Effective Annual Rate (EAR)</td>
+                <td class="py-3 px-4 font-mono">(1 + 0.01283)<sup>12</sup> &minus; 1</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">16.53% p.a.</td>
+                <td class="py-3 px-4">Actual compounded annual interest rate accounting for monthly compounding.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Unmasking the Deceptive "Flat Rate"</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Vehicle dealerships, electronics retailers, and non-bank lenders frequently advertise deceptive "flat rates":
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>The Dealer Pitch:</strong> "Total interest is ₹2,20,000 over 5 years, which is ₹44,000 per year on a ₹5,00,000 loan. That's only an <strong>8.80% Flat Rate</strong>!"</li>
+              <li><strong>The Mathematical Reality:</strong> You do NOT keep ₹5,00,000 for 5 years; you pay it back every single month. By Year 3, you owe less than half the initial principal.</li>
+              <li>Charging interest on the original ₹5L for all 5 years conceals a <strong>15.40% reducing-balance APR</strong> — 75% higher than the marketed flat rate!</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Incorporating Upfront Fees &amp; Net APR</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Upfront processing fees secretly inflate borrowing costs far beyond the contract rate:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Processing Fee Haircut:</strong> If the lender deducts a 2% processing fee (₹10,000 + GST = ₹11,800), you only receive <strong>₹4,88,200</strong> in hand.</li>
+              <li><strong>True Net APR:</strong> Entering ₹4,88,200 net principal with the same ₹12,000 EMI solves to a <strong>16.63% Net APR</strong>!</li>
+              <li>Always compute implied rate using net disbursed proceeds to identify the real cost of debt.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Boundary Conditions &amp; Mathematical Limits</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Minimum Repayment Bound:</strong> Total repayments (<code class="font-mono">EMI &times; n</code>) must strictly exceed the borrowed principal (<code class="font-mono">P</code>). If <code class="font-mono">12,000 &times; 60 &le; 500,000</code>, the interest rate is zero or negative (subsidized / 0% EMI financing), and standard reducing-balance math is undefined.</li>
+            <li><strong>Numerical Convergence Guarantee:</strong> The Newton-Raphson solver evaluates root convergence with an error threshold (&epsilon; &lt; 10<sup>&minus;7</sup>) and a 100-iteration guardrail to ensure instantaneous, deterministic browser execution.</li>
+            <li><strong>Balloon &amp; Step-Up Exclusions:</strong> This solver assumes strictly equal monthly installments (EMI). Loans featuring balloon payments or step-up interest schedules require custom cash flow IRR analysis.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="ir-calculator-faq">
+        <h2 id="ir-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="ir-calculator-related">
+        <h2 id="ir-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/loan-amortization-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Amortization Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Generate complete month-by-month principal and interest loan amortization schedules.</p>
           </a>
-        ))}
-      </div>
+          <a href="/emi-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">EMI Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate monthly loan installments, total interest, and loan amortization.</p>
+          </a>
+          <a href="/loan-affordability-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Affordability Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine maximum borrowing capacity based on monthly income and debt limits.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
