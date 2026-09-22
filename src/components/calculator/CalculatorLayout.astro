@@ -112,7 +112,25 @@ const {
 
         <!-- Sheet body (scrollable on mobile, natural on desktop) -->
         <div class="p-4 lg:p-0 flex-1 overflow-y-auto lg:overflow-visible">
-          <slot name="outputs" />
+          <slot name="outputs">
+            <!-- Generic layout-owned result presentation (Option A fallback) -->
+            <div id="calc-generic-outputs" class="space-y-5">
+              <div>
+                <span id="calc-desktop-hero-label" class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">
+                  {heroLabel}
+                </span>
+                <div
+                  id="calc-desktop-hero"
+                  class="text-[40px] leading-none font-semibold tabular-nums text-dark-text"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {heroValue}
+                </div>
+              </div>
+              <div id="calc-generic-metrics" class="space-y-0 border-t border-dark-border pt-4 empty:hidden"></div>
+            </div>
+          </slot>
         </div>
       </div>
     </div>
@@ -139,7 +157,7 @@ const {
   aria-label="Calculator result"
 >
   <div class="py-3 min-w-0 flex-1">
-    <p class="text-xs text-dark-muted leading-none mb-0.5">{heroLabel}</p>
+    <p id="calc-mobile-hero-label" class="text-xs text-dark-muted leading-none mb-0.5">{heroLabel}</p>
     <p
       id="calc-mobile-hero"
       class="text-xl font-bold text-dark-text tabular-nums truncate"
@@ -181,6 +199,90 @@ const {
 </style>
 
 <script>
+  /**
+   * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.
+   *
+   * Single Source of Truth Architecture:
+   *
+   *   recalc()
+   *       ↓
+   *   ONE canonical result state (_store._state)
+   *       ↓
+   *   desktop presentation (layout-owned hero / render adapter / fields)
+   *   mobile presentation (#calc-mobile-hero)
+   *
+   * API:
+   *   window.__cmResultStore.setResult({ heroValue, heroLabel?, rows?, fields?, meta? })
+   *   window.__cmResultStore.getResult()              → CalcResult | null
+   *   window.__cmResultStore.subscribeResult(fn)      → unsubscribe()
+   *   window.__cmResultStore.registerRenderAdapter(fn)→ unsubscribe()
+   *   window.__cmResultStore.resetResult()
+   *
+   * Legacy bridge:
+   *   window.dispatchEvent(new CustomEvent('cm:result', { detail: { heroValue } }))
+   *   is intercepted and routed through setResult() automatically.
+   */
+  type ResultRow = {
+    label: string;
+    value: string;
+    subValue?: string;
+    variant?: 'primary' | 'secondary' | 'accent' | 'muted';
+  };
+
+  type CalcResult = {
+    heroValue: string;
+    heroLabel?: string;
+    rows?: ResultRow[];
+    fields?: Record<string, string>;
+    meta?: Record<string, unknown>;
+  };
+
+  type ResultHandler = (r: CalcResult) => void;
+
+  interface CmResultStore {
+    _state: CalcResult | null;
+    _subs: Set<ResultHandler>;
+    setResult(r: CalcResult): void;
+    getResult(): CalcResult | null;
+    subscribeResult(fn: ResultHandler): () => void;
+    registerRenderAdapter(fn: ResultHandler): () => void;
+    resetResult(): void;
+  }
+
+  // Augment window type locally for this script
+  const _win = window as unknown as {
+    __cmResultStore?: CmResultStore;
+    __calcShellGlobalBound?: boolean;
+  };
+
+  // Bootstrap store once — persists across astro:page-load re-inits
+  if (!_win.__cmResultStore) {
+    _win.__cmResultStore = {
+      _state: null,
+      _subs: new Set<ResultHandler>(),
+      setResult(r: CalcResult) {
+        this._state = r;
+        this._subs.forEach((fn) => { try { fn(r); } catch {} });
+      },
+      getResult() { return this._state; },
+      subscribeResult(fn: ResultHandler) {
+        this._subs.add(fn);
+        return () => this._subs.delete(fn);
+      },
+      registerRenderAdapter(fn: ResultHandler) {
+        const unsub = this.subscribeResult(fn);
+        if (this._state) {
+          try { fn(this._state); } catch {}
+        }
+        return unsub;
+      },
+      resetResult() { this._state = null; },
+    };
+  }
+  const _store = _win.__cmResultStore;
+
+  // ──────────────────────────────────────────────────────────────────────────
+
   function initCalculatorShell() {
     const detailsBtn = document.getElementById('calc-details-btn');
     const sheet = document.getElementById('calc-bottom-sheet');
@@ -234,10 +336,60 @@ const {
       }
     });
 
-    // Delegated global Escape keydown listener — registered only once across app lifetime
-    const win = window as unknown as { __calcShellGlobalBound?: boolean };
-    if (!win.__calcShellGlobalBound) {
-      win.__calcShellGlobalBound = true;
+    // Helper to render/update DOM from canonical result state
+    const applyCanonicalResult = (result: CalcResult) => {
+      // 1. Mobile presentation
+      const mobileHero = document.getElementById('calc-mobile-hero');
+      if (mobileHero) mobileHero.textContent = result.heroValue;
+      const mobileLabel = document.getElementById('calc-mobile-hero-label');
+      if (mobileLabel && result.heroLabel) mobileLabel.textContent = result.heroLabel;
+
+      // 2. Desktop presentation (where layout owns generic presentation)
+      const desktopHero = document.getElementById('calc-desktop-hero');
+      if (desktopHero) desktopHero.textContent = result.heroValue;
+      const desktopLabel = document.getElementById('calc-desktop-hero-label');
+      if (desktopLabel && result.heroLabel) desktopLabel.textContent = result.heroLabel;
+
+      // Generic metrics/rows rendering (if generic container exists)
+      const metricsContainer = document.getElementById('calc-generic-metrics');
+      if (metricsContainer && result.rows) {
+        metricsContainer.innerHTML = '';
+        result.rows.forEach((row) => {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'flex items-center justify-between py-2.5 border-b border-dark-border last:border-b-0';
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'text-xs text-dark-muted';
+          labelSpan.textContent = row.label;
+          const valueSpan = document.createElement('span');
+          const colorClass = row.variant === 'accent' ? 'text-dark-accent font-semibold' : 'text-dark-text font-medium';
+          valueSpan.className = `text-sm tabular-nums ${colorClass}`;
+          valueSpan.textContent = row.value;
+          rowDiv.appendChild(labelSpan);
+          rowDiv.appendChild(valueSpan);
+          metricsContainer.appendChild(rowDiv);
+        });
+      }
+
+      // 3. Declarative field updates (render adapter pattern)
+      if (result.fields) {
+        for (const [id, val] of Object.entries(result.fields)) {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        }
+      }
+
+      // 4. Declarative data-attribute bindings: [data-cm-result]
+      document.querySelectorAll<HTMLElement>('[data-cm-result]').forEach((el) => {
+        const key = el.dataset.cmResult;
+        if (key === 'heroValue') el.textContent = result.heroValue;
+        else if (key === 'heroLabel' && result.heroLabel) el.textContent = result.heroLabel;
+        else if (key && result.fields && key in result.fields) el.textContent = result.fields[key];
+      });
+    };
+
+    // Global listeners — registered only once across app lifetime
+    if (!_win.__calcShellGlobalBound) {
+      _win.__calcShellGlobalBound = true;
 
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -254,7 +406,7 @@ const {
         }
       });
 
-      // Generic currency prefix updater across calculators — registered only once
+      // Generic currency prefix updater — registered only once
       window.addEventListener('cm:currency-change', (e: any) => {
         if (e.detail?.symbol) {
           document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
@@ -263,19 +415,36 @@ const {
         }
       });
 
-      // Result bus subscriber — updates mobile hero from the canonical cm:result
-      // event dispatched by any calculator's recalc(). This is the Phase 4.2
-      // single source-of-truth sync: one dispatch drives both desktop IDs (updated
-      // by the calculator page directly) and the mobile hero (updated here).
+      // ── Phase 4.2 Canonical Result Architecture ──────────────────────────
+      //
+      // 1. Legacy bridge: existing calcs dispatch raw cm:result CustomEvent.
+      //    Feed into canonical store → triggers all subscribers.
       window.addEventListener('cm:result', (e: any) => {
-        const mobileHero = document.getElementById('calc-mobile-hero');
-        if (mobileHero && e.detail?.heroValue) {
-          mobileHero.textContent = e.detail.heroValue;
+        if (e.detail?.heroValue) {
+          _store.setResult(e.detail);
         }
       });
-    }
 
-    // Sync currency prefix from localStorage on current page DOM
+      // 2. Canonical result subscriber: drives both desktop and mobile presentations.
+      _store.subscribeResult(applyCanonicalResult);
+
+      // 3. Catch-up: apply any result already in store before this guard ran.
+      const existing = _store.getResult();
+      if (existing) {
+        applyCanonicalResult(existing);
+      }
+    } else {
+      // On repeated page visits (e.g. astro:page-load), sync freshly rendered DOM
+      // with the current store state if one exists.
+      const existing = _store.getResult();
+      if (existing) {
+        applyCanonicalResult(existing);
+      }
+    }
+  }
+
+  // Sync currency prefix from localStorage on current page DOM
+  function syncCurrencyFromStorage() {
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
@@ -288,5 +457,14 @@ const {
   }
 
   initCalculatorShell();
-  document.addEventListener('astro:page-load', initCalculatorShell);
+  syncCurrencyFromStorage();
+
+  document.addEventListener('astro:page-load', () => {
+    initCalculatorShell();
+    syncCurrencyFromStorage();
+  });
+
+  // Reset canonical store on View Transitions navigation — prevents stale state
+  // from a previous calculator page bleeding into the next page's hero value.
+  document.addEventListener('astro:before-preparation', () => _store.resetResult());
 </script>
