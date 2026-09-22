@@ -1,4 +1,18 @@
 ---
+/**
+ * Compound Interest Calculator — /compound-interest-calculator
+ * Phase 5.2: Full Phase 4 architecture integration.
+ *
+ * Section 12 fixture: ₹1,00,000, 8% annual, 10 yrs → ₹2,15,892.50
+ * Formula: A = P × (1 + r/n)^(n×t)
+ *
+ * Architecture:
+ *   - CalculatorType.Advanced (multi-input, derived metrics, composition bar)
+ *   - Centralized validation via validate.ts
+ *   - Canonical result state via result-bus.ts setResult()
+ *   - URL hash state via url-state.ts serializeHash/restoreFromHash
+ */
+
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
 import CompositionBar from '../components/calculator/CompositionBar.astro';
@@ -7,6 +21,7 @@ import Input from '../components/ui/Input.astro';
 import Dropdown from '../components/ui/Dropdown.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import { CalculatorType } from '../lib/calculator-types';
 import { calcLumpSum } from '../lib/calculators/lumpsum';
 import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
@@ -35,7 +50,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -44,6 +59,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
         { '@type': 'ListItem', position: 3, name: 'Compound Interest Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is the difference between simple and compound interest?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the effective annual rate (EAR)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'EAR = (1 + r/n)^n − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year. For example, 8% compounded monthly gives an EAR of about 8.30%.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does compounding frequency affect returns?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'More frequent compounding yields higher returns because interest is added to the principal more often, creating a larger base for the next period. Daily compounding produces slightly more than monthly, which produces more than quarterly, and so on.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the Rule of 72?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The Rule of 72 is a quick estimation: divide 72 by the annual interest rate to approximate how many years it takes to double your money with compound interest. At 8% annual compounding, your money approximately doubles in 72 ÷ 8 = 9 years.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is the compound interest result guaranteed?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. This calculator provides a mathematical estimate based on a constant assumed rate. Actual returns from market-linked instruments vary. Fixed deposits offer guaranteed rates, but market-linked investments do not. The result is for information only and is not financial advice.',
+          },
+        },
       ],
     },
   ],
@@ -63,6 +123,7 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmt(result.maturity)}
     heroLabel="Future Value"
+    calcType={CalculatorType.Advanced}
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Compound Interest Calculator</h1>
@@ -191,43 +252,101 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="compound-interest-calculator-how">
-        <h2 id="compound-interest-calculator-how" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
+      <!-- 1. Formula -->
+      <section aria-labelledby="ci-formula">
+        <h2 id="ci-formula" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
           Compound interest is calculated using the exponential growth formula where interest earned in each period is added to the principal balance for the next period:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">A = P × (1 + r / n)^(n × t)</p>
+          <p class="text-base font-mono text-text-primary mb-2">A = P × (1 + r / n)<sup>n × t</sup></p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">A</strong> — Final maturity amount</li>
+            <li><strong class="text-text-primary">A</strong> — Final maturity amount (future value)</li>
             <li><strong class="text-text-primary">P</strong> — Initial principal balance</li>
-            <li><strong class="text-text-primary">r</strong> — Annual nominal interest rate (decimal)</li>
+            <li><strong class="text-text-primary">r</strong> — Annual nominal interest rate (as a decimal, e.g. 0.08 for 8%)</li>
             <li><strong class="text-text-primary">n</strong> — Number of times interest is compounded per year</li>
             <li><strong class="text-text-primary">t</strong> — Number of years</li>
           </ul>
         </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          The total interest earned is <strong class="text-text-primary">A − P</strong>. The effective annual rate (EAR) is <span class="font-mono">(1 + r/n)<sup>n</sup> − 1</span>, which shows the true annual yield accounting for compounding frequency.
+        </p>
       </section>
 
-      <section aria-labelledby="compound-interest-calculator-faq">
-        <h2 id="compound-interest-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <!-- 2. Worked Example -->
+      <section aria-labelledby="ci-example">
+        <h2 id="ci-example" class="text-xl font-bold text-text-primary mb-4">Worked example</h2>
+        <div class="bg-surface border border-border rounded-card p-5">
+          <p class="text-sm text-text-muted leading-relaxed mb-3">
+            <strong class="text-text-primary">Given:</strong> P = ₹1,00,000, r = 8% (0.08), n = 1 (annual), t = 10 years
+          </p>
+          <div class="space-y-2 text-sm text-text-muted leading-relaxed">
+            <p><strong class="text-text-primary">Step 1:</strong> Calculate the growth factor</p>
+            <p class="font-mono pl-4">(1 + 0.08 / 1)<sup>1 × 10</sup> = 1.08<sup>10</sup> = 2.15892</p>
+            <p><strong class="text-text-primary">Step 2:</strong> Calculate the future value</p>
+            <p class="font-mono pl-4">A = 1,00,000 × 2.15892 = ₹2,15,892</p>
+            <p><strong class="text-text-primary">Step 3:</strong> Calculate interest earned</p>
+            <p class="font-mono pl-4">Interest = ₹2,15,892 − ₹1,00,000 = ₹1,15,892</p>
+            <p><strong class="text-text-primary">Step 4:</strong> Calculate total return</p>
+            <p class="font-mono pl-4">Return = (₹1,15,892 / ₹1,00,000) × 100 = 115.9%</p>
+          </div>
+          <p class="text-sm text-text-muted leading-relaxed mt-3">
+            If the same investment were compounded <strong class="text-text-primary">monthly</strong> instead of annually, the future value would be ₹2,21,964 — an additional ₹6,072 from more frequent compounding.
+          </p>
+        </div>
+      </section>
+
+      <!-- 3. Assumptions -->
+      <section aria-labelledby="ci-assumptions">
+        <h2 id="ci-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions</h2>
+        <ul class="space-y-2 text-sm text-text-muted leading-relaxed list-disc pl-5">
+          <li>The interest rate remains constant throughout the investment period.</li>
+          <li>Interest is reinvested at the same rate — no withdrawals during the tenure.</li>
+          <li>The calculation does not account for taxes on interest earned, fees, or inflation.</li>
+          <li>Compounding occurs at the selected frequency (annually, semi-annually, quarterly, monthly, or daily).</li>
+        </ul>
+      </section>
+
+      <!-- 4. FAQ -->
+      <section aria-labelledby="ci-faq">
+        <h2 id="ci-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between simple and compound interest?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect.
+              Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect. For example, ₹1,00,000 at 8% for 10 years earns ₹80,000 with simple interest but ₹1,15,892 with annual compound interest.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the effective annual rate (EAR)?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              EAR = (1 + r/n)^n − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year.
+              EAR = (1 + r/n)<sup>n</sup> − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year. For example, a nominal rate of 8% compounded monthly gives an EAR of approximately 8.30%, meaning you effectively earn 8.30% per year rather than 8%.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does compounding frequency affect returns?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              More frequent compounding yields higher returns because interest is added to the principal more often, creating a larger base for the next period. For ₹1,00,000 at 8% over 10 years: annual compounding gives ₹2,15,893, quarterly gives ₹2,20,804, monthly gives ₹2,21,964, and daily gives ₹2,22,535. The difference between annual and daily compounding is ₹6,643 — significant over larger amounts and longer periods.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the Rule of 72?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The Rule of 72 is a quick estimation method: divide 72 by the annual interest rate to approximate how many years it takes to double your money with compound interest. At 8% annual compounding, your money approximately doubles in 72 ÷ 8 = 9 years. The exact answer (using the formula) is 9.006 years, making the Rule of 72 remarkably accurate for typical interest rates.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is the compound interest result guaranteed?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              No. This calculator provides a mathematical estimate based on a constant assumed rate. Fixed deposits and government bonds offer guaranteed rates, but market-linked instruments (mutual funds, equities) fluctuate and actual returns may differ substantially. The result is for educational and planning purposes only, not financial advice.
             </div>
           </details>
         </div>
       </section>
 
-      <section aria-labelledby="compound-interest-calculator-related">
-        <h2 id="compound-interest-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+      <!-- 5. Related calculators -->
+      <section aria-labelledby="ci-related">
+        <h2 id="ci-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
             <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
@@ -243,32 +362,87 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcCIClient(p: number, r: number, y: number, freq: string) {
-    const freqMap: Record<string, number> = { annually: 1, 'semi-annually': 2, quarterly: 4, monthly: 12, daily: 365 };
-    const n = freqMap[freq] || 1;
-    const rateDec = r / 100;
-    const maturity = p * Math.pow(1 + rateDec / n, n * y);
-    const gain = maturity - p;
-    const gainPct = p > 0 ? (gain / p) * 100 : 0;
-    return {
-      maturity,
-      gain,
-      gainPct,
-      principalFraction: maturity > 0 ? p / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
+  /**
+   * Compound Interest Calculator — Phase 5.2 client-side logic.
+   *
+   * Architecture:
+   *   - Centralized validation via validate() from src/lib/validate.ts
+   *   - URL hash state via serializeHash() / restoreFromHash() / readCurrentHash() / updateHash() from src/lib/url-state.ts
+   *   - Canonical result state via setResult() from src/lib/result-bus.ts
+   *   - Pure calculation via calcLumpSum() from src/lib/calculators/lumpsum.ts
+   *   - CalculatorLayout subscriber handles mobile hero updates automatically
+   */
 
+  import { validate, type ValidationRules } from '../lib/validate';
+  import { serializeHash, restoreFromHash, readCurrentHash, updateHash } from '../lib/url-state';
+  import { setResult } from '../lib/result-bus';
+  import { calcLumpSum, type CompoundFrequency } from '../lib/calculators/lumpsum';
+
+  // ── Currency state ──────────────────────────────────────────────────────────
   let currSym = '₹';
   let currLocale = 'en-IN';
+
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
+
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
   }
 
+  // ── Validation schema (Phase 4.3 Centralized Engine) ────────────────────────
+  const CI_RULES: Record<'principal' | 'rate' | 'years', ValidationRules> = {
+    principal: { required: true, min: 100, max: 100_000_000, decimal: false, negativeAllowed: false, label: 'Principal' },
+    rate: { required: true, min: 0.01, max: 100, decimal: true, negativeAllowed: false, label: 'Interest Rate' },
+    years: { required: true, min: 1, max: 50, integerOnly: true, negativeAllowed: false, label: 'Tenure' },
+  };
+
+  // URL Hash state schema mapping (Phase 4.4 URL State Engine)
+  const HASH_SCHEMA: Record<'p' | 'r' | 'y', ValidationRules> = {
+    p: CI_RULES.principal,
+    r: CI_RULES.rate,
+    y: CI_RULES.years,
+  };
+
+  // Valid compounding frequencies
+  const VALID_FREQUENCIES = new Set<CompoundFrequency>(['annually', 'semi-annually', 'quarterly', 'monthly', 'daily']);
+
+  // ── Field validation visual feedback ───────────────────────────────────────
+  function setFieldError(id: string, error?: string) {
+    const input = document.getElementById(id) as HTMLInputElement | null;
+    const helper = document.getElementById(`${id}-helper`);
+    const container = input?.closest('.rounded-control');
+    if (error) {
+      input?.setAttribute('aria-invalid', 'true');
+      if (container) {
+        container.classList.add('border-error-border', 'bg-error-bg', 'text-error-text');
+        container.classList.remove('border-border');
+      }
+      if (helper) {
+        helper.textContent = error;
+        helper.classList.add('text-error-text');
+        helper.classList.remove('text-text-muted');
+        helper.setAttribute('role', 'alert');
+      }
+    } else {
+      input?.removeAttribute('aria-invalid');
+      if (container) {
+        container.classList.remove('border-error-border', 'bg-error-bg', 'text-error-text');
+        container.classList.add('border-border');
+      }
+      if (helper) {
+        if (id === 'ci-principal') helper.textContent = 'Starting investment amount';
+        else if (id === 'ci-rate') helper.textContent = 'Nominal annual interest rate';
+        else if (id === 'ci-years') helper.textContent = 'Duration of compounding';
+        helper.classList.remove('text-error-text');
+        helper.classList.add('text-text-muted');
+        helper.removeAttribute('role');
+      }
+    }
+  }
+
+  // ── Main initialization ─────────────────────────────────────────────────────
   function initCICalc() {
     const pInput = document.getElementById('ci-principal') as HTMLInputElement | null;
     const rInput = document.getElementById('ci-rate') as HTMLInputElement | null;
@@ -278,37 +452,53 @@ const jsonld = {
     const rSlider = document.getElementById('ci-rate-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('ci-years-slider') as HTMLInputElement | null;
 
-    const resMaturity = document.getElementById('ci-result-maturity');
-    const resPrincipal = document.getElementById('ci-result-principal');
-    const resGain = document.getElementById('ci-result-gain');
-    const resGainPct = document.getElementById('ci-result-gainpct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
-
     if (!pInput || !rInput || !yInput) return;
 
-    const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' };
+    const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' as CompoundFrequency };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
-    }
-
     function recalc() {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseInt(yInput.value) || 0;
-      const f = fSelect ? fSelect.value : 'annually';
+      // ── Phase 4.3: Centralized validation engine ──────────────────────
+      const pResult = validate(pInput.value, CI_RULES.principal);
+      const rResult = validate(rInput.value, CI_RULES.rate);
+      const yResult = validate(yInput.value, CI_RULES.years);
 
-      if (p <= 0 || r <= 0 || y <= 0) return;
+      setFieldError('ci-principal', pResult.valid ? undefined : pResult.error.message);
+      setFieldError('ci-rate', rResult.valid ? undefined : rResult.error.message);
+      setFieldError('ci-years', yResult.valid ? undefined : yResult.error.message);
 
-      const res = calcCIClient(p, r, y, f);
+      if (!pResult.valid || !rResult.valid || !yResult.valid) return;
+      if (pResult.value === undefined || rResult.value === undefined || yResult.value === undefined) return;
 
-      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
-      if (resPrincipal) resPrincipal.textContent = fmtVal(p);
-      if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+      const p = pResult.value;
+      const r = rResult.value;
+      const y = yResult.value;
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
 
+      const res = calcLumpSum(p, r, y, f);
+
+      // ── Phase 4.2: Canonical result state (single source of truth) ─────
+      // Desktop DOM updates via fields mapping; Mobile hero updated automatically
+      setResult({
+        heroValue: fmtVal(res.maturity),
+        heroLabel: 'Future Value',
+        rows: [
+          { label: 'Initial Principal', value: fmtVal(p) },
+          { label: 'Total Interest Earned', value: fmtVal(res.gain), variant: 'accent' },
+          { label: 'Total Return', value: res.gainPct.toFixed(1) + '%' },
+        ],
+        fields: {
+          'ci-result-maturity': fmtVal(res.maturity),
+          'ci-result-principal': fmtVal(p),
+          'ci-result-gain': fmtVal(res.gain),
+          'ci-result-gainpct': res.gainPct.toFixed(1) + '%',
+        },
+      });
+
+      // ── Composition bar update (visual sub-component) ──────────────────
       const wrapper = document.getElementById('ci-composition-wrapper');
       if (wrapper) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
@@ -320,7 +510,8 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}&f=${f}`);
+      // ── Phase 4.4: URL hash state via shared utility ───────────────────
+      updateHash(serializeHash({ f, p, r, y }));
     }
 
     function debounce() {
@@ -328,6 +519,7 @@ const jsonld = {
       timer = setTimeout(recalc, 100);
     }
 
+    // ── Slider ↔ Input sync ─────────────────────────────────────────────────
     function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
       if (!slider) return;
       slider.addEventListener('input', () => {
@@ -354,8 +546,18 @@ const jsonld = {
     sync(ySlider, yInput, false);
     fSelect?.addEventListener('change', recalc);
 
-    document.getElementById('ci-calculate')?.addEventListener('click', recalc);
+    // ── Calculate & Reset ───────────────────────────────────────────────────
+    document.getElementById('ci-calculate')?.addEventListener('click', () => {
+      recalc();
+      if (window.innerWidth < 1024) {
+        document.getElementById('calc-mobile-bar')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+
     document.getElementById('ci-reset')?.addEventListener('click', () => {
+      setFieldError('ci-principal');
+      setFieldError('ci-rate');
+      setFieldError('ci-years');
       pInput.value = fmtLiveInput(String(DEFAULTS.principal));
       rInput.value = String(DEFAULTS.rate);
       yInput.value = String(DEFAULTS.years);
@@ -372,6 +574,8 @@ const jsonld = {
         ySlider.value = String(DEFAULTS.years);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1)) * 100}%`);
       }
+      // Clear hash on reset via shared url-state utility
+      updateHash('');
       recalc();
       pInput.focus();
     });
@@ -382,34 +586,111 @@ const jsonld = {
       });
     });
 
-    // Copy & Share
-    document.getElementById('ci-copy-btn')?.addEventListener('click', async () => {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseInt(yInput.value) || 0;
-      const f = fSelect ? fSelect.value : 'annually';
-      const res = calcCIClient(p, r, y, f);
-      const text = `Compound Interest: ${fmtVal(p)} at ${r}% for ${y} years (${f}) grows to ${fmtVal(res.maturity)} (gain: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
-      const btn = document.getElementById('ci-copy-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+    // ── Phase 4.4: Restore from URL hash via shared utility ──────────────────
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, HASH_SCHEMA);
+      let hashRestored = false;
+
+      if (restored.values.p !== undefined) {
+        pInput.value = fmtLiveInput(String(restored.values.p));
+        if (pSlider) {
+          const clamped = Math.min(Math.max(restored.values.p, 5000), 10000000);
+          pSlider.value = String(clamped);
+          pSlider.style.setProperty('--slider-pct', `${((clamped - 5000) / (10000000 - 5000)) * 100}%`);
+        }
+        hashRestored = true;
       }
+      if (restored.values.r !== undefined) {
+        rInput.value = String(restored.values.r);
+        if (rSlider) {
+          const clamped = Math.min(Math.max(restored.values.r, 1), 30);
+          rSlider.value = String(clamped);
+          rSlider.style.setProperty('--slider-pct', `${((clamped - 1) / (30 - 1)) * 100}%`);
+        }
+        hashRestored = true;
+      }
+      if (restored.values.y !== undefined) {
+        yInput.value = String(restored.values.y);
+        if (ySlider) {
+          const clamped = Math.min(Math.max(restored.values.y, 1), 40);
+          ySlider.value = String(clamped);
+          ySlider.style.setProperty('--slider-pct', `${((clamped - 1) / (40 - 1)) * 100}%`);
+        }
+        hashRestored = true;
+      }
+      const rawFreq = restored.raw['f'];
+      if (rawFreq && VALID_FREQUENCIES.has(rawFreq as CompoundFrequency) && fSelect) {
+        fSelect.value = rawFreq;
+        hashRestored = true;
+      }
+
+      if (hashRestored) recalc();
+    }
+
+    // ── Copy & Share ────────────────────────────────────────────────────────
+    async function flashBtn(btn: HTMLElement, label: string) {
+      const orig = btn.textContent;
+      btn.textContent = label;
+      await new Promise((r) => setTimeout(r, 2000));
+      btn.textContent = orig;
+    }
+
+    document.getElementById('ci-copy-btn')?.addEventListener('click', async () => {
+      const pRes = validate(pInput.value, CI_RULES.principal);
+      const rRes = validate(rInput.value, CI_RULES.rate);
+      const yRes = validate(yInput.value, CI_RULES.years);
+      if (!pRes.valid || !rRes.valid || !yRes.valid) return;
+      const p = pRes.value!, r = rRes.value!, y = yRes.value!;
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
+      const res = calcLumpSum(p, r, y, f);
+      const text = `Compound Interest: ${fmtVal(p)} at ${r}% for ${y} years (${f}) grows to ${fmtVal(res.maturity)} (gain: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      flashBtn(document.getElementById('ci-copy-btn')!, 'Copied!');
     });
 
     document.getElementById('ci-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
-      const btn = document.getElementById('ci-share-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied Link!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+      const pRes = validate(pInput.value, CI_RULES.principal);
+      const rRes = validate(rInput.value, CI_RULES.rate);
+      const yRes = validate(yInput.value, CI_RULES.years);
+      if (!pRes.valid || !rRes.valid || !yRes.valid) return;
+      const p = pRes.value!, r = rRes.value!, y = yRes.value!;
+      const freqRaw = fSelect ? fSelect.value : 'annually';
+      const f: CompoundFrequency = VALID_FREQUENCIES.has(freqRaw as CompoundFrequency)
+        ? (freqRaw as CompoundFrequency)
+        : 'annually';
+      const hash = serializeHash({ f, p, r, y });
+      const url = `${location.href.split('#')[0]}${hash}`;
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
       }
+      flashBtn(document.getElementById('ci-share-btn')!, 'Copied Link!');
     });
 
-    // Currency synchronization
+    // ── Currency synchronization ────────────────────────────────────────────
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
