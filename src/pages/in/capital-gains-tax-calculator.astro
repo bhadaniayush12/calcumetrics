@@ -255,44 +255,178 @@ const ASSET_OPTIONS = [
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">Reflects Budget 2024 changes: 20% STCG, 12.5% LTCG with ₹1.25L annual exemption on equity. Debt fund slab estimate uses 30% conservative rate.</p>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>Capital Gain computation under Chapter IV-E of the Income-tax Act:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
-          Capital Gain = Sale Consideration − Cost of Acquisition
+    <Fragment slot="below">
+      <section aria-labelledby="cgt-calculator-how">
+        <h2 id="cgt-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Indian Capital Gains Taxation Works (Post-Budget 2024)</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Capital gains tax is levied under Chapter IV-E (Sections 45 to 55A) of the Indian Income-tax Act, 1961, upon profits realized from the transfer of a capital asset. The Finance (No. 2) Act, 2024, enacted a historic structural overhaul of India's capital gains regime (effective July 23, 2024), standardizing holding periods and tax rates across asset classes while removing indexation benefits.
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Total Capital Gain:</strong> Gain = Full Value of Consideration (Sale Price) &minus; Cost of Acquisition &minus; Transfer Expenses<br /><br />
+            <strong>2. Holding Period Classification:</strong><br />
+            &bull; Listed Equities &amp; Equity Mutual Funds: Short-Term if &le;12 months; Long-Term if &gt;12 months.<br />
+            &bull; Real Estate, Physical Gold &amp; Unlisted Shares: Short-Term if &le;24 months; Long-Term if &gt;24 months.<br />
+            &bull; Debt Mutual Funds (&lt;35% equity): Deemed Short-Term under Section 50AA regardless of holding duration.<br /><br />
+            <strong>3. Statutory Tax Rates (Budget 2024):</strong><br />
+            &bull; Section 111A (Equity STCG): Flat 20.00% (raised from 15%).<br />
+            &bull; Section 112A (Equity LTCG): Flat 12.50% (raised from 10%) on gains exceeding annual exemption threshold of ₹1,25,000.<br />
+            &bull; Section 112 (Non-Equity LTCG): Flat 12.50% without indexation for assets acquired post-July 23, 2024.<br /><br />
+            <strong>4. Final Tax Obligation (with Cess):</strong> Total Tax = [ Base Tax Amount &times; 1.04 ] (reflecting mandatory 4% Health &amp; Education Cess)<br /><br />
+            <strong>5. Net Retained Capital Gain:</strong> Net Realized Gain = Total Capital Gain &minus; Total Tax
+          </p>
         </div>
-        <p>For equity LTCG (Section 112A), taxable gain is max(0, Gain − ₹1,25,000) @ 12.5%. Total Tax = (Taxable Gain × Rate) × 1.04 (4% Cess).</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an investor who sells listed equity mutual fund units for <strong>₹5,00,000</strong> after holding them for <strong>24 months</strong>, having originally purchased them for <strong>₹3,00,000</strong>:
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Statutory Step / Component</th>
+                <th class="py-2.5 px-4">Legal Basis / Calculation</th>
+                <th class="py-2.5 px-4">Computed Output</th>
+                <th class="py-2.5 px-4">Regulatory Explanation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Full Sale Consideration</td>
+                <td class="py-2.5 px-4 font-mono">Gross Redemption Value</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹5,00,000</td>
+                <td class="py-2.5 px-4">Total gross value realized upon redemption of units.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Cost of Acquisition</td>
+                <td class="py-2.5 px-4 font-mono">Original Purchase Capital</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹3,00,000</td>
+                <td class="py-2.5 px-4">Original purchase price paid by investor.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Gross Capital Gain</td>
+                <td class="py-2.5 px-4 font-mono">₹5,00,000 &minus; ₹3,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹2,00,000</td>
+                <td class="py-2.5 px-4">Gross capital profit before exemptions and deductions.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Classification &amp; Governing Section</td>
+                <td class="py-2.5 px-4 font-mono">24 Months &gt; 12-Month Threshold</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">LTCG (Section 112A)</td>
+                <td class="py-2.5 px-4">Exceeds the 12-month statutory threshold for listed equities/mutual funds.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Annual Statutory Exemption</td>
+                <td class="py-2.5 px-4 font-mono">Finance Act 2024 Threshold</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">&minus;₹1,25,000</td>
+                <td class="py-2.5 px-4">Expanded from ₹1,00,000 to ₹1,25,000 per financial year under Section 112A.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Net Taxable Capital Gain</td>
+                <td class="py-2.5 px-4 font-mono">₹2,00,000 &minus; ₹1,25,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹75,000</td>
+                <td class="py-2.5 px-4">Portion of capital gain subject to tax.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Base LTCG Tax (12.50%)</td>
+                <td class="py-2.5 px-4 font-mono">₹75,000 &times; 12.50%</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹9,375</td>
+                <td class="py-2.5 px-4">Rationalized uniform rate under Section 112A (formerly 10%).</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Health &amp; Education Cess (4%)</td>
+                <td class="py-2.5 px-4 font-mono">₹9,375 &times; 4.00%</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">₹375</td>
+                <td class="py-2.5 px-4">Statutory cess levied on all income tax liabilities under Indian tax law.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Total Capital Gains Tax Payable</td>
+                <td class="py-2.5 px-4 font-mono">₹9,375 + ₹375</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹9,750</td>
+                <td class="py-2.5 px-4">Final tax liability payable via advance tax or self-assessment tax.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Net Retained Gain (After Tax)</td>
+                <td class="py-3 px-4 font-mono">₹2,00,000 &minus; ₹9,750</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹1,90,250 (95.12%)</td>
+                <td class="py-3 px-4">Effective tax rate on gross capital gain is just 4.88% due to the ₹1.25L exemption.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Asset Class Comparison (Post-July 23, 2024)</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Listed Equity &amp; Equity Funds:</strong> STCG (&le;12 mos) taxed at <strong>20.00%</strong> (Sec 111A). LTCG (&gt;12 mos) taxed at <strong>12.50%</strong> above <strong>₹1.25 Lakh</strong> exemption (Sec 112A).</li>
+              <li><strong>Immovable Property (Real Estate):</strong> STCG (&le;24 mos) taxed at individual slab rates. LTCG (&gt;24 mos) taxed at <strong>12.50% without indexation</strong> for transfers post-July 23, 2024.</li>
+              <li><strong>Physical Gold &amp; Gold ETFs:</strong> STCG (&le;24 mos) taxed at slab rate. LTCG (&gt;24 mos) taxed at <strong>12.50%</strong> without indexation.</li>
+              <li><strong>Debt Mutual Funds (Sec 50AA):</strong> Funds with &le;35% equity acquired on/after April 1, 2023 are deemed STCG and taxed at marginal income tax slab rates regardless of holding period.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Exemptions &amp; Tax Reinvestment Options</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Taxpayers can legally eliminate or reduce long-term capital gains tax by reinvesting profits under statutory exemption sections:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Section 54 (Residential House):</strong> Reinvest LTCG from sale of a residential house into acquiring another residential house in India within 1 year before or 2 years after sale (3 years for construction).</li>
+              <li><strong>Section 54F (Any Non-House Asset):</strong> Reinvest the <em>net sale consideration</em> from equity, gold, or land into one residential property.</li>
+              <li><strong>Section 54EC (Capital Gains Bonds):</strong> Invest up to <strong>₹50,00,000</strong> within 6 months of sale in specified bonds (REC, PFC, NHAI) with a 5-year lock-in period.</li>
+              <li><strong>Capital Gains Account Scheme (CGAS):</strong> If unutilized before the ITR filing due date (July 31), deposit funds into a CGAS account to claim exemption.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Loss Set-Off &amp; Carry-Forward Framework</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Short-Term Capital Loss (STCL):</strong> Can be set off against both Short-Term and Long-Term Capital Gains in the same assessment year.</li>
+            <li><strong>Long-Term Capital Loss (LTCL):</strong> Can strictly be set off <em>only</em> against Long-Term Capital Gains; it cannot offset STCG or any other head of income.</li>
+            <li><strong>Carry-Forward Window:</strong> Unabsorbed capital losses can be carried forward for up to <strong>8 assessment years</strong>, provided the Income Tax Return (ITR) is filed on or before the statutory due date under Section 139(1).</li>
+            <li><strong>Surcharge Cap:</strong> Surcharge on capital gains arising under Sections 111A and 112A is statutorily capped at <strong>15.00%</strong>, even for high-net-worth individuals in the highest income brackets.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="cgt-calculator-faq">
+        <h2 id="cgt-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="cgt-calculator-related">
+        <h2 id="cgt-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related tax calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/in/income-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Income Tax Calculator (India)</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compare Old vs New Tax Regime tax liability per Finance Act 2024-25.</p>
           </a>
-        ))}
-      </div>
+          <a href="/in/advance-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Advance Tax Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate quarterly advance tax installments and Section 234B/234C interest liability.</p>
+          </a>
+          <a href="/in/tds-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">TDS Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine Tax Deducted at Source withholding amounts across commercial and professional sections.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
