@@ -31,6 +31,12 @@ interface Props {
   /** Pre-rendered hero value for mobile bottom bar (SSR) */
   heroValue: string;
   heroLabel?: string;
+  /**
+   * Declares the calculator archetype for tooling and future logic.
+   * Use values from `CalculatorType` in `src/lib/calculator-types.ts`.
+   * Optional — omit for legacy calculators; stamped as `data-calc-type` when set.
+   */
+  calcType?: string;
 }
 
 const {
@@ -40,6 +46,7 @@ const {
   breadcrumbs = [],
   heroValue,
   heroLabel = 'Estimated Maturity',
+  calcType,
 } = Astro.props;
 ---
 
@@ -68,7 +75,7 @@ const {
 </nav>
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->
-<div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+<div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8" data-calc-type={calcType}>
 
   <!-- Desktop: 12-col grid split -->
   <div class="lg:grid lg:grid-cols-12 lg:gap-6">
@@ -253,6 +260,17 @@ const {
           document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
             el.textContent = e.detail.symbol;
           });
+        }
+      });
+
+      // Result bus subscriber — updates mobile hero from the canonical cm:result
+      // event dispatched by any calculator's recalc(). This is the Phase 4.2
+      // single source-of-truth sync: one dispatch drives both desktop IDs (updated
+      // by the calculator page directly) and the mobile hero (updated here).
+      window.addEventListener('cm:result', (e: any) => {
+        const mobileHero = document.getElementById('calc-mobile-hero');
+        if (mobileHero && e.detail?.heroValue) {
+          mobileHero.textContent = e.detail.heroValue;
         }
       });
     }
