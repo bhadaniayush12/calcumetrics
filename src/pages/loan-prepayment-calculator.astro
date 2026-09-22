@@ -11,7 +11,7 @@ import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { principal: 3000000, rate: 8.5, months: 180, prepay: 300000, strategy: 'reduce-tenure' as const };
-const result = calcLoanPrepayment(DEFAULT.principal, DEFAULT.rate, DEFAULT.months, DEFAULT.prepay, DEFAULT.strategy);
+const initialResult = calcLoanPrepayment(DEFAULT.principal, DEFAULT.rate, DEFAULT.months, DEFAULT.prepay, DEFAULT.strategy);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -34,7 +34,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -43,6 +43,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
         { '@type': 'ListItem', position: 3, name: 'Loan Prepayment Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Should I choose tenure reduction or EMI reduction when prepaying?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If your current monthly cash flow is comfortable, reducing tenure saves significantly more interest because loan interest compounds over a shorter timeframe. If your monthly cash flow is strained, reducing EMI lowers your monthly obligation and improves liquidity.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does part-prepayment save interest on a reducing-balance loan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Every rupee of prepayment directly deducts from the outstanding principal balance. Since future monthly interest is computed strictly on the remaining principal, shrinking the principal immediately reduces monthly interest accumulation.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are there prepayment penalties on home loans?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under RBI rules in India, banks and housing finance companies cannot charge prepayment or foreclosure penalties on floating-rate individual home loans. For fixed-rate loans or non-individual borrowers, penalties of 2% to 4% may apply.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the best time during a loan tenure to make a prepayment?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Prepayments yield the highest financial benefit early in the loan tenure, when the principal balance is highest and the interest component forms the largest portion of each monthly EMI installment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is there a minimum amount required for loan prepayment?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Most lending institutions mandate that partial prepayments equal at least one or two monthly EMIs, or a minimum threshold such as ₹10,000 to ₹25,000. Refer to your loan sanction letter for specific bank guidelines.',
+          },
+        },
       ],
     },
   ],
@@ -60,12 +105,19 @@ const jsonld = {
     toolName="Loan Prepayment Calculator"
     category="Loans"
     categoryHref="/loans"
-    heroValue={fmt(result.interestSaved)}
+    heroValue={fmt(initialResult.interestSaved)}
     heroLabel="Total Interest Saved"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Loan Prepayment Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Evaluate the exact interest savings and tenure reduction from making a partial loan prepayment.</p>
+
+      <!-- Error alert -->
+      <div id="lp-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="lp-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
 
       <!-- Outstanding Principal -->
       <div class="mb-5">
@@ -78,6 +130,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Current remaining balance on your loan"
           inputmode="decimal"
+          aria-describedby="lp-error-msg"
         />
         <div class="mt-2">
           <Slider id="lp-principal-slider" min={100000} max={20000000} step={50000} value={3000000} ariaLabel="Principal balance slider" />
@@ -94,13 +147,14 @@ const jsonld = {
           isNumeric={true}
           helperText="Current annual interest rate"
           inputmode="decimal"
+          aria-describedby="lp-error-msg"
         />
         <div class="mt-2">
           <Slider id="lp-rate-slider" min={5.0} max={20.0} step={0.25} value={8.5} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
-      <!-- Remaining Tenure in Months -->
+      <!-- Remaining Tenure (Months) -->
       <div class="mb-5">
         <Input
           id="lp-months"
@@ -108,8 +162,9 @@ const jsonld = {
           suffix="Months"
           value="180"
           isNumeric={true}
-          helperText="Months remaining (180 months = 15 years)"
-          inputmode="decimal"
+          helperText="Total remaining monthly payments (e.g. 15 years = 180 months)"
+          inputmode="numeric"
+          aria-describedby="lp-error-msg"
         />
         <div class="mt-2">
           <Slider id="lp-months-slider" min={12} max={360} step={6} value={180} ariaLabel="Remaining months slider" />
@@ -120,36 +175,33 @@ const jsonld = {
       <div class="mb-5">
         <Input
           id="lp-prepay"
-          label="Prepayment Amount"
+          label="Part-Prepayment Amount"
           prefix="₹"
           value="3,00,000"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Lump-sum part-payment amount"
+          helperText="Lump-sum amount you plan to prepay"
           inputmode="decimal"
+          aria-describedby="lp-error-msg"
         />
         <div class="mt-2">
           <Slider id="lp-prepay-slider" min={10000} max={5000000} step={25000} value={300000} ariaLabel="Prepayment slider" />
         </div>
       </div>
 
-      <!-- Strategy -->
+      <!-- Prepayment Option -->
       <div class="mb-6">
         <Dropdown
           id="lp-strategy"
-          label="Prepayment Benefit Option"
+          label="Prepayment Benefit Strategy"
           options={[
-            { value: 'reduce-tenure', label: 'Reduce Tenure (Keep Same EMI) — Recommended' },
-            { value: 'reduce-emi', label: 'Reduce Monthly EMI (Keep Same Tenure)' },
+            { value: 'reduce-tenure', label: 'Reduce Loan Tenure (Keep EMI Same)' },
+            { value: 'reduce-emi',    label: 'Reduce Monthly EMI (Keep Tenure Same)' },
           ]}
           value="reduce-tenure"
-          helperText="Reducing tenure saves significantly more interest than reducing EMI"
+          helperText="Tenure reduction maximizes interest saved"
         />
       </div>
-
-      <Alert variant="info" title="RBI Rule">
-        Floating rate retail loans (home loans, personal loans) do not attract prepayment or foreclosure fees when paid by individual borrowers.
-      </Alert>
 
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="lp-calculate" type="button">Calculate</Button>
@@ -161,26 +213,30 @@ const jsonld = {
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Total Interest Saved</span>
         <div id="lp-result-saved" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
-          {fmt(result.interestSaved)}
+          {fmt(initialResult.interestSaved)}
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Current Monthly EMI</span>
-          <span id="lp-result-curremi" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.originalEMI)}</span>
+          <span id="lp-result-curremi" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.originalEMI)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Tenure Reduced By</span>
-          <span id="lp-result-savedmonths" class="text-sm font-semibold tabular-nums text-dark-accent">{result.monthsSaved} months ({(result.monthsSaved / 12).toFixed(1)} yrs)</span>
+          <span class="text-xs text-dark-muted">Tenure Saved</span>
+          <span id="lp-result-savedmonths" class="text-sm font-semibold tabular-nums text-dark-accent">
+            {initialResult.monthsSaved} months ({(initialResult.monthsSaved / 12).toFixed(1)} yrs)
+          </span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">New Remaining Tenure</span>
-          <span id="lp-result-newtenure" class="text-sm font-medium tabular-nums text-dark-text">{result.newMonthsRemaining} months ({(result.newMonthsRemaining / 12).toFixed(1)} yrs)</span>
+          <span class="text-xs text-dark-muted">Revised Remaining Tenure</span>
+          <span id="lp-result-newtenure" class="text-sm font-medium tabular-nums text-dark-text">
+            {initialResult.newMonths} months ({(initialResult.newMonths / 12).toFixed(1)} yrs)
+          </span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">New Monthly EMI</span>
-          <span id="lp-result-newemi" class="text-sm font-medium tabular-nums text-dark-text">{result.newEMI ? fmt(result.newEMI) : fmt(result.originalEMI)}</span>
+          <span class="text-xs text-dark-muted">Revised Monthly EMI</span>
+          <span id="lp-result-newemi" class="text-sm font-bold tabular-nums text-dark-text">{fmt(initialResult.newEMI)}</span>
         </div>
       </div>
 
@@ -193,7 +249,7 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes reducing balance interest calculation without prepayment penalties.</p>
     </Fragment>
 
     <Fragment slot="below">
@@ -205,7 +261,7 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
           <p class="text-base font-mono text-text-primary mb-2">New Principal = Outstanding Balance − Prepayment Amount</p>
           <p class="text-sm text-text-muted">
-            Opting for <strong>Tenure Reduction</strong> keeps your EMI the same, allowing more of every subsequent EMI to pay off principal. This yields 2x–3x more interest savings compared to choosing a reduced monthly EMI.
+            Opting for <strong>Tenure Reduction</strong> keeps your EMI the same, allowing more of every subsequent EMI to pay off principal. This yields substantially higher interest savings compared to choosing a reduced monthly EMI.
           </p>
         </div>
       </section>
@@ -213,18 +269,14 @@ const jsonld = {
       <section aria-labelledby="loan-prepayment-calculator-faq">
         <h2 id="loan-prepayment-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Should I reduce tenure or reduce EMI?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              If your monthly cash flow is comfortable, always choose <strong>Tenure Reduction</strong>. It dramatically cuts the total interest paid and frees you from debt years earlier. If you are experiencing cash flow strain, reducing EMI will free up monthly disposable income.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is there a minimum prepayment amount?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Most banks require part-prepayments to be at least equal to one month's EMI or a minimum of ₹10,000–₹25,000. Check your specific loan agreement.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -245,36 +297,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcPrepayClient(p: number, rate: number, months: number, prepay: number, opt: string) {
-    const r = rate / (12 * 100);
-    const emi = r === 0 ? p / months : (p * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
-    const origInterest = emi * months - p;
-    const newP = Math.max(0, p - prepay);
-
-    if (opt === 'reduce-tenure') {
-      const newMonths = r === 0 ? Math.ceil(newP / emi) : Math.ceil(-Math.log(1 - (r * newP) / emi) / Math.log(1 + r));
-      const newInterest = emi * newMonths - newP;
-      return {
-        originalEMI: emi,
-        newEMI: emi,
-        originalMonths: months,
-        newMonths: Math.max(0, newMonths),
-        monthsSaved: Math.max(0, months - newMonths),
-        interestSaved: Math.max(0, origInterest - newInterest),
-      };
-    } else {
-      const newEMI = r === 0 ? newP / months : (newP * r * Math.pow(1 + r, months)) / (Math.pow(1 + r, months) - 1);
-      const newInterest = newEMI * months - newP;
-      return {
-        originalEMI: emi,
-        newEMI,
-        originalMonths: months,
-        newMonths: months,
-        monthsSaved: 0,
-        interestSaved: Math.max(0, origInterest - newInterest),
-      };
-    }
-  }
+  import { calcLoanPrepayment } from '../lib/calculators/prepayment';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -287,6 +313,9 @@ const jsonld = {
   }
 
   function initLPCalc() {
+    if ((window as any).__cmLpBound) return;
+    (window as any).__cmLpBound = true;
+
     const pInput = document.getElementById('lp-principal') as HTMLInputElement | null;
     const rInput = document.getElementById('lp-rate') as HTMLInputElement | null;
     const mInput = document.getElementById('lp-months') as HTMLInputElement | null;
@@ -303,36 +332,71 @@ const jsonld = {
     const resSavedMonths = document.getElementById('lp-result-savedmonths');
     const resNewTenure = document.getElementById('lp-result-newtenure');
     const resNewEmi = document.getElementById('lp-result-newemi');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('lp-error-alert');
+    const errMsg = document.getElementById('lp-error-msg');
 
     if (!pInput || !rInput || !mInput || !prepayInput) return;
 
-    const DEFAULTS = { principal: 3000000, rate: 8.5, months: 180, prepay: 300000, strategy: 'reduce-tenure' };
+    const DEFAULTS = { principal: 3000000, rate: 8.5, months: 180, prepay: 300000, strategy: 'reduce-tenure' as const };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const m = parseInt(mInput.value) || 0;
-      const prepay = parse(prepayInput.value);
-      const strat = stratSelect ? stratSelect.value : 'reduce-tenure';
+      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawM = mInput!.value.replace(/[^0-9.]/g, '');
+      const rawPrepay = prepayInput!.value.replace(/[^0-9.]/g, '');
+      const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
 
-      if (p <= 0 || r <= 0 || m <= 0) return;
+      const vP = validate(rawP, { required: true, min: 10000, label: 'Principal' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Rate' });
+      const vM = validate(rawM, { required: true, min: 1, max: 480, integer: true, label: 'Months' });
+      const vPrepay = validate(rawPrepay, { required: true, min: 0, label: 'Prepayment' });
 
-      const res = calcPrepayClient(p, r, m, prepay, strat);
+      if (!vP.valid) { showError(vP.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vM.valid) { showError(vM.error!.message); return; }
+      if (!vPrepay.valid) { showError(vPrepay.error!.message); return; }
+
+      const p = vP.value!;
+      const r = vR.value!;
+      const m = vM.value!;
+      const prepay = vPrepay.value!;
+
+      if (prepay >= p) {
+        showError('Prepayment amount cannot exceed or equal outstanding principal balance.');
+        return;
+      }
+      clearError();
+
+      const res = calcLoanPrepayment(p, r, m, prepay, strat);
+
+      setResult({
+        heroValue: fmtVal(res.interestSaved),
+        heroLabel: 'Total Interest Saved',
+        rows: [
+          { label: 'Current Monthly EMI', value: fmtVal(res.originalEMI) },
+          { label: 'Tenure Saved', value: `${res.monthsSaved} months (${(res.monthsSaved / 12).toFixed(1)} yrs)` },
+          { label: 'Revised Remaining Tenure', value: `${res.newMonths} months (${(res.newMonths / 12).toFixed(1)} yrs)` },
+          { label: 'Revised Monthly EMI', value: fmtVal(res.newEMI) },
+        ],
+      });
 
       if (resSaved) resSaved.textContent = fmtVal(res.interestSaved);
       if (resCurrEmi) resCurrEmi.textContent = fmtVal(res.originalEMI);
       if (resSavedMonths) resSavedMonths.textContent = `${res.monthsSaved} months (${(res.monthsSaved / 12).toFixed(1)} yrs)`;
       if (resNewTenure) resNewTenure.textContent = `${res.newMonths} months (${(res.newMonths / 12).toFixed(1)} yrs)`;
       if (resNewEmi) resNewEmi.textContent = fmtVal(res.newEMI);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.interestSaved);
 
-      history.replaceState(null, '', `#p=${p}&r=${r}&m=${m}&prep=${prepay}&s=${strat}`);
+      serializeHash({ p, r, m, prep: prepay, s: strat });
     }
 
     function debounce() {
@@ -374,10 +438,23 @@ const jsonld = {
       mInput.value = String(DEFAULTS.months);
       prepayInput.value = fmtLiveInput(String(DEFAULTS.prepay));
       if (stratSelect) stratSelect.value = DEFAULTS.strategy;
-      if (pSlider) pSlider.value = String(DEFAULTS.principal);
-      if (rSlider) rSlider.value = String(DEFAULTS.rate);
-      if (mSlider) mSlider.value = String(DEFAULTS.months);
-      if (prepaySlider) prepaySlider.value = String(DEFAULTS.prepay);
+      if (pSlider) {
+        pSlider.value = String(DEFAULTS.principal);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 100000) / (20000000 - 100000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 5.0) / (20.0 - 5.0)) * 100}%`);
+      }
+      if (mSlider) {
+        mSlider.value = String(DEFAULTS.months);
+        mSlider.style.setProperty('--slider-pct', `${((DEFAULTS.months - 12) / (360 - 12)) * 100}%`);
+      }
+      if (prepaySlider) {
+        prepaySlider.value = String(DEFAULTS.prepay);
+        prepaySlider.style.setProperty('--slider-pct', `${((DEFAULTS.prepay - 10000) / (5000000 - 10000)) * 100}%`);
+      }
+      clearError();
       recalc();
       pInput.focus();
     });
@@ -389,13 +466,22 @@ const jsonld = {
     });
 
     document.getElementById('lp-copy-btn')?.addEventListener('click', async () => {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const m = parseInt(mInput.value) || 0;
-      const prepay = parse(prepayInput.value);
-      const strat = stratSelect ? stratSelect.value : 'reduce-tenure';
-      const res = calcPrepayClient(p, r, m, prepay, strat);
-      const text = `Loan Prepayment: Prepaying ${fmtVal(prepay)} on ${fmtVal(p)} balance saves ${fmtVal(res.interestSaved)} interest (${res.monthsSaved} months reduced). ${location.href.split('#')[0]}`;
+      const rawP = pInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawM = mInput.value.replace(/[^0-9.]/g, '');
+      const rawPrepay = prepayInput.value.replace(/[^0-9.]/g, '');
+      const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
+
+      const vP = validate(rawP, { required: true, min: 10000, label: 'Principal' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'Rate' });
+      const vM = validate(rawM, { required: true, min: 1, label: 'Months' });
+      const vPrepay = validate(rawPrepay, { required: true, min: 0, label: 'Prepayment' });
+
+      if (!vP.valid || !vR.valid || !vM.valid || !vPrepay.valid) return;
+      if (vPrepay.value! >= vP.value!) return;
+
+      const res = calcLoanPrepayment(vP.value!, vR.value!, vM.value!, vPrepay.value!, strat);
+      const text = `Loan Prepayment: Prepaying ${fmtVal(vPrepay.value!)} on ${fmtVal(vP.value!)} balance saves ${fmtVal(res.interestSaved)} interest (${res.monthsSaved} months reduced). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('lp-copy-btn');
       if (btn) {
@@ -415,6 +501,28 @@ const jsonld = {
       }
     });
 
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 10000, label: 'p' },
+      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+      m: { required: true, min: 1, max: 480, integer: true, label: 'm' },
+      prep: { required: true, min: 0, label: 'prep' },
+    });
+    if (restored.valid && restored.values.p && restored.values.r !== undefined && restored.values.m && restored.values.prep !== undefined) {
+      pInput.value = fmtLiveInput(String(restored.values.p));
+      rInput.value = String(restored.values.r);
+      mInput.value = String(restored.values.m);
+      prepayInput.value = fmtLiveInput(String(restored.values.prep));
+      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+      const s = hashParams.get('s');
+      if (s === 'reduce-emi' || s === 'reduce-tenure') {
+        if (stratSelect) stratSelect.value = s;
+      }
+      recalc();
+    } else {
+      recalc();
+    }
+
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
@@ -422,6 +530,13 @@ const jsonld = {
         recalc();
       }
     });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
   }
 
   initLPCalc();

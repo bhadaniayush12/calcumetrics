@@ -11,8 +11,8 @@ import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { price: 5000000, downPct: 20, rate: 8.5, years: 20 };
-const loanAmount = DEFAULT.price * (1 - DEFAULT.downPct / 100);
-const result = calcEMI(loanAmount, DEFAULT.rate, DEFAULT.years);
+const initialLoan = DEFAULT.price * (1 - DEFAULT.downPct / 100);
+const initialResult = calcEMI(initialLoan, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -28,14 +28,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Home Loan EMI Calculator',
       url: canonicalUrl,
-      description: 'Calculate your home loan EMI, total interest, and down payment requirements with detailed repayment insights.',
+      description: 'Calculate your home loan monthly EMI, down payment, total interest, and property repayment breakdown.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -44,6 +44,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
         { '@type': 'ListItem', position: 3, name: 'Home Loan Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How is home loan EMI calculated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Home loan EMI is calculated using the reducing balance method: EMI = [P × r × (1+r)^n] / [(1+r)^n − 1], where P is principal borrowed (property cost minus down payment), r is monthly interest rate, and n is tenure in months.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How much down payment should I make on a home loan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'While regulatory guidelines allow financing up to 80%–90% of property cost depending on the loan bracket, providing a higher down payment (e.g. 20% to 30%) substantially reduces your lifetime interest burden.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I prepay my home loan without penalty?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, per RBI guidelines, commercial banks and HFCs cannot levy foreclosure or prepayment charges on floating-rate home loans availed by individual borrowers.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What tax benefits are available on home loans?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the Old Tax Regime in India, borrowers can claim up to ₹1.5 lakh per year for principal repayment under Section 80C, and up to ₹2 lakh per year for interest paid under Section 24(b) for a self-occupied property.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does choosing a longer loan tenure affect total cost?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A longer loan tenure decreases your monthly EMI payment, making it more affordable in the short term. However, it significantly increases the total interest paid over the life of the loan.',
+          },
+        },
       ],
     },
   ],
@@ -61,12 +106,19 @@ const jsonld = {
     toolName="Home Loan EMI Calculator"
     category="Loans"
     categoryHref="/loans"
-    heroValue={fmt(result.emiRounded)}
+    heroValue={fmt(initialResult.emiRounded)}
     heroLabel="Monthly EMI"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Home Loan EMI Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Estimate your housing loan EMI, interest burden, and required down payment.</p>
+
+      <!-- Error alert -->
+      <div id="hl-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="hl-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
 
       <!-- Property Value -->
       <div class="mb-5">
@@ -79,6 +131,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Total cost of the home"
           inputmode="decimal"
+          aria-describedby="hl-error-msg"
         />
         <div class="mt-2">
           <Slider id="hl-price-slider" min={500000} max={50000000} step={100000} value={5000000} ariaLabel="Property value slider" />
@@ -95,6 +148,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Standard minimum is 10% to 20%"
           inputmode="decimal"
+          aria-describedby="hl-error-msg"
         />
         <div class="mt-2">
           <Slider id="hl-down-slider" min={10} max={80} step={1} value={20} ariaLabel="Down payment slider" />
@@ -111,6 +165,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Prevailing bank home loan rate"
           inputmode="decimal"
+          aria-describedby="hl-error-msg"
         />
         <div class="mt-2">
           <Slider id="hl-rate-slider" min={6.5} max={15} step={0.1} value={8.5} ariaLabel="Interest rate slider" />
@@ -126,7 +181,8 @@ const jsonld = {
           value="20"
           isNumeric={true}
           helperText="Duration of repayment (up to 30 years)"
-          inputmode="decimal"
+          inputmode="numeric"
+          aria-describedby="hl-error-msg"
         />
         <div class="mt-2">
           <Slider id="hl-years-slider" min={1} max={30} step={1} value={20} ariaLabel="Tenure slider" />
@@ -147,14 +203,14 @@ const jsonld = {
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly EMI</span>
         <div id="hl-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {fmt(result.emiRounded)}
+          {fmt(initialResult.emiRounded)}
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Loan Amount (Principal)</span>
-          <span id="hl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(loanAmount)}</span>
+          <span id="hl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialLoan)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Down Payment</span>
@@ -162,22 +218,22 @@ const jsonld = {
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Total Interest</span>
-          <span id="hl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalInterest)}</span>
+          <span id="hl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(initialResult.totalInterest)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
           <span class="text-xs text-dark-muted">Total Payment</span>
-          <span id="hl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalPayment)}</span>
+          <span id="hl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.totalPayment)}</span>
         </div>
       </div>
 
       <div class="mb-5" id="hl-composition-wrapper">
         <CompositionBar
-          principalFraction={result.principalFraction}
-          gainFraction={result.interestFraction}
+          principalFraction={initialResult.principalFraction}
+          gainFraction={initialResult.interestFraction}
           principalLabel="Principal"
           gainLabel="Interest"
-          principalValue={fmt(loanAmount)}
-          gainValue={fmt(result.totalInterest)}
+          principalValue={fmt(initialLoan)}
+          gainValue={fmt(initialResult.totalInterest)}
         />
       </div>
 
@@ -212,18 +268,14 @@ const jsonld = {
       <section aria-labelledby="home-loan-calculator-faq">
         <h2 id="home-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How much down payment should I make?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              While RBI permits financing up to 80%–90% of property cost depending on the loan bracket, providing a higher down payment (e.g. 20% to 30%) substantially reduces your lifetime interest burden.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I prepay my home loan without penalty?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, per RBI guidelines, commercial banks and HFCs cannot levy prepayment charges on floating-rate home loans availed by individual borrowers.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -244,21 +296,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcEMIClient(p: number, rate: number, years: number) {
-    const n = years * 12;
-    const r = rate / (12 * 100);
-    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    const totalPayment = emi * n;
-    const totalInterest = totalPayment - p;
-    return {
-      emi,
-      emiRounded: Math.round(emi),
-      totalPayment,
-      totalInterest,
-      principalFraction: totalPayment > 0 ? p / totalPayment : 0,
-      interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0,
-    };
-  }
+  import { calcEMI } from '../lib/calculators/emi';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -271,6 +312,9 @@ const jsonld = {
   }
 
   function initHLCalc() {
+    if ((window as any).__cmHlBound) return;
+    (window as any).__cmHlBound = true;
+
     const priceInput = document.getElementById('hl-price') as HTMLInputElement | null;
     const downInput = document.getElementById('hl-down') as HTMLInputElement | null;
     const rateInput = document.getElementById('hl-rate') as HTMLInputElement | null;
@@ -285,57 +329,85 @@ const jsonld = {
     const resDown = document.getElementById('hl-result-down');
     const resInterest = document.getElementById('hl-result-interest');
     const resTotal = document.getElementById('hl-result-total');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('hl-error-alert');
+    const errMsg = document.getElementById('hl-error-msg');
 
     if (!priceInput || !downInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { price: 5000000, downPct: 20, rate: 8.5, years: 20 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const price = parse(priceInput.value);
-      const downPct = parseFloat(downInput.value) || 0;
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
+      const rawPrice = priceInput!.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
 
-      if (price <= 0 || rate <= 0 || years <= 0) return;
+      const vPrice = validate(rawPrice, { required: true, min: 100000, label: 'Property Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, max: 95, decimal: true, label: 'Down Payment %' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 40, integer: true, label: 'Tenure' });
+
+      if (!vPrice.valid) { showError(vPrice.error!.message); return; }
+      if (!vDown.valid) { showError(vDown.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+      clearError();
+
+      const price = vPrice.value!;
+      const downPct = vDown.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
 
       const downAmt = price * (downPct / 100);
       const loan = Math.max(0, price - downAmt);
-      const res = calcEMIClient(loan, rate, years);
+      const res = calcEMI(loan, rate, years);
+
+      setResult({
+        heroValue: fmtVal(res.emiRounded),
+        heroLabel: 'Monthly EMI',
+        rows: [
+          { label: 'Loan Amount (Principal)', value: fmtVal(loan) },
+          { label: 'Down Payment', value: fmtVal(downAmt) },
+          { label: 'Total Interest', value: fmtVal(res.totalInterest) },
+          { label: 'Total Payment', value: fmtVal(res.totalPayment) },
+        ],
+      });
 
       if (resEMI) resEMI.textContent = fmtVal(res.emiRounded);
       if (resPrincipal) resPrincipal.textContent = fmtVal(loan);
       if (resDown) resDown.textContent = fmtVal(downAmt);
       if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
       if (resTotal) resTotal.textContent = fmtVal(res.totalPayment);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.emiRounded);
 
       const wrapper = document.getElementById('hl-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && res.totalPayment > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(loan);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+        if (bar) bar.style.width = `${Math.min(100, res.principalFraction * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(loan);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.totalInterest);
       }
 
-      history.replaceState(null, '', `#p=${price}&d=${downPct}&r=${rate}&y=${years}`);
+      serializeHash({ p: price, d: downPct, r: rate, y: years });
     }
 
     function debounce() {
       clearTimeout(timer);
-      timer = setTimeout(recalc, 100);
+      timer = setTimeout(recalc, 120);
     }
 
     function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
-      if (!slider) return;
+      if (!slider || !input) return;
       slider.addEventListener('input', () => {
         input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
         const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
@@ -382,6 +454,7 @@ const jsonld = {
         yearsSlider.value = String(DEFAULTS.years);
         yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
       }
+      clearError();
       recalc();
       priceInput.focus();
     });
@@ -393,13 +466,21 @@ const jsonld = {
     });
 
     document.getElementById('hl-copy-btn')?.addEventListener('click', async () => {
-      const price = parse(priceInput.value);
-      const downPct = parseFloat(downInput.value) || 0;
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
-      const loan = price * (1 - downPct / 100);
-      const res = calcEMIClient(loan, rate, years);
-      const text = `Home Loan EMI: ${fmtVal(res.emiRounded)}/month on property value of ${fmtVal(price)} (${downPct}% down, ${rate}% for ${years} yrs). ${location.href.split('#')[0]}`;
+      const rawPrice = priceInput.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vPrice = validate(rawPrice, { required: true, min: 100000, label: 'Property Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, max: 95, label: 'Down Payment' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, label: 'Tenure' });
+
+      if (!vPrice.valid || !vDown.valid || !vRate.valid || !vYears.valid) return;
+
+      const loan = vPrice.value! * (1 - vDown.value! / 100);
+      const res = calcEMI(loan, vRate.value!, vYears.value!);
+      const text = `Home Loan EMI: ${fmtVal(res.emiRounded)}/month on property value of ${fmtVal(vPrice.value!)} (${vDown.value}% down, ${vRate.value}% for ${vYears.value} yrs). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('hl-copy-btn');
       if (btn) {
@@ -418,6 +499,23 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 100000, label: 'p' },
+      d: { required: true, min: 0, max: 95, decimal: true, label: 'd' },
+      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 40, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.p && restored.values.d !== undefined && restored.values.r !== undefined && restored.values.y) {
+      priceInput.value = fmtLiveInput(String(restored.values.p));
+      downInput.value = String(restored.values.d);
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

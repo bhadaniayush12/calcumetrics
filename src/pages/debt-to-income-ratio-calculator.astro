@@ -1,0 +1,493 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { TOOLS } from '../config/site';
+
+// Architecture Note (Correction 3): DTI is a direct, pure ratio calculation independent of amortization engines
+function calcDTIInline(debt: number, income: number) {
+  const dtiPct = income > 0 ? (debt / income) * 100 : 0;
+  let assessment: string;
+  let colorClass: string;
+  if (dtiPct <= 20) { assessment = 'Excellent'; colorClass = 'text-dark-accent'; }
+  else if (dtiPct <= 28) { assessment = 'Good (Prime Lending)'; colorClass = 'text-dark-accent'; }
+  else if (dtiPct <= 36) { assessment = 'Fair (Healthy Maximum)'; colorClass = 'text-amber-400'; }
+  else if (dtiPct <= 43) { assessment = 'Stretched (Borderline)'; colorClass = 'text-amber-500'; }
+  else { assessment = 'Critical (High Risk)'; colorClass = 'text-red-400'; }
+  return { dtiPct, assessment, colorClass, remaining: Math.max(0, income - debt) };
+}
+
+const DEFAULT = { debt: 30000, income: 100000 };
+const result = calcDTIInline(DEFAULT.debt, DEFAULT.income);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'debt-to-income-ratio-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/debt-to-income-ratio-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Debt-to-Income (DTI) Ratio Calculator',
+      url: canonicalUrl,
+      description: 'Calculate your debt-to-income ratio from monthly debt obligations and gross monthly income to evaluate loan approval odds.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Debt-to-Income Ratio Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a Debt-to-Income (DTI) ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Your debt-to-income (DTI) ratio is the percentage of your gross pre-tax monthly income that goes toward paying recurring monthly debt obligations such as mortgages, car loans, personal loans, and minimum credit card payments.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a good DTI ratio for mortgage approval?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Most mortgage lenders prefer a back-end DTI ratio of 36% or lower. Lenders participating in qualified mortgage programs frequently allow up to 43%, and certain FHA or specialized loan programs may permit up to 50% with strong compensating factors.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between front-end and back-end DTI?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Front-end DTI includes only housing costs (mortgage principal, interest, taxes, and insurance). Back-end DTI encompasses all recurring debt obligations combined (housing plus auto loans, student loans, and credit cards).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How can I lower my DTI ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'You can lower your DTI by either paying down existing high-interest revolving balances (such as credit cards or short-term personal loans) or by increasing your verified gross monthly income through raises, overtime, or secondary revenue streams.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do living expenses like groceries and utilities count in DTI?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. Standard underwriting DTI calculations only include legally binding credit liabilities (debt contracts, minimum loan installments, and court-ordered obligations like child support), excluding day-to-day living expenses like utilities, groceries, and streaming services.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Debt-to-Income (DTI) Ratio Calculator | Calcumetrics"
+  description="Calculate your debt-to-income ratio (DTI) and see where your debt standing falls against standard mortgage underwriting guidelines."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Debt-to-Income Ratio Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={result.dtiPct.toFixed(1) + '%'}
+    heroLabel="Debt-to-Income (DTI) Ratio"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Debt-to-Income (DTI) Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate your debt-to-income ratio to evaluate financial health and borrowing eligibility.</p>
+
+      <!-- Error alert -->
+      <div id="dti-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="dti-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Monthly Debt -->
+      <div class="mb-5">
+        <Input
+          id="dti-debt"
+          label="Total Monthly Debt Obligations"
+          prefix="₹"
+          value="30,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="All monthly EMIs, minimum credit card bills, and loan payments"
+          inputmode="decimal"
+          aria-describedby="dti-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="dti-debt-slider" min={0} max={500000} step={2500} value={30000} ariaLabel="Monthly debt slider" />
+        </div>
+      </div>
+
+      <!-- Gross Monthly Income -->
+      <div class="mb-6">
+        <Input
+          id="dti-income"
+          label="Gross Monthly Income (Pre-Tax)"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total pre-tax monthly salary or business income"
+          inputmode="decimal"
+          aria-describedby="dti-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="dti-income-slider" min={10000} max={1000000} step={5000} value={100000} ariaLabel="Monthly income slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="dti-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="dti-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Your DTI Ratio</span>
+        <div id="dti-result-pct" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.dtiPct.toFixed(1)}%
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Underwriting Standing</span>
+          <span id="dti-result-assessment" class={`text-sm font-semibold tabular-nums ${result.colorClass}`}>{result.assessment}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Monthly Disposable Income</span>
+          <span id="dti-result-remaining" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.remaining)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Target Benchmark (36% Limit)</span>
+          <span id="dti-result-limit" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(DEFAULT.income * 0.36)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Prime Lending Cap (28% Front-End)</span>
+          <span id="dti-result-prime" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(DEFAULT.income * 0.28)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="dti-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.income > 0 ? DEFAULT.debt / DEFAULT.income : 0}
+          gainFraction={DEFAULT.income > 0 ? result.remaining / DEFAULT.income : 1}
+          principalLabel="Debt Service"
+          gainLabel="Disposable"
+          principalValue={fmtCurrency(DEFAULT.debt)}
+          gainValue={fmtCurrency(result.remaining)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="dti-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="dti-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Most mortgage underwriters cap total recurring debt service between 36% and 43% of gross income.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="dti-calculator-how">
+        <h2 id="dti-calculator-how" class="text-xl font-bold text-text-primary mb-4">Understanding Debt-to-Income benchmarks</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Lenders evaluate your borrowing capacity using simple proportional debt service analysis:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>DTI Formula: </strong> DTI = (Total Monthly Debt &divide; Gross Monthly Income) &times; 100%<br />
+            <strong>&le; 28%: </strong> Ideal range for prime conventional mortgages.<br />
+            <strong>29% &ndash; 36%: </strong> Healthy debt load; accepted by nearly all retail credit lenders.<br />
+            <strong>37% &ndash; 43%: </strong> Maximum debt ceiling for standard qualified mortgages.<br />
+            <strong>&gt; 43%: </strong> Significant financial friction; difficult to secure competitive mortgage rates.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="dti-calculator-faq">
+        <h2 id="dti-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What is a Debt-to-Income (DTI) ratio?', 'Your debt-to-income (DTI) ratio is the percentage of your gross pre-tax monthly income that goes toward paying recurring monthly debt obligations such as mortgages, car loans, personal loans, and minimum credit card payments.'],
+            ['What is a good DTI ratio for mortgage approval?', 'Most mortgage lenders prefer a back-end DTI ratio of 36% or lower. Lenders participating in qualified mortgage programs frequently allow up to 43%, and certain FHA or specialized loan programs may permit up to 50% with strong compensating factors.'],
+            ['What is the difference between front-end and back-end DTI?', 'Front-end DTI includes only housing costs (mortgage principal, interest, taxes, and insurance). Back-end DTI encompasses all recurring debt obligations combined (housing plus auto loans, student loans, and credit cards).'],
+            ['How can I lower my DTI ratio?', 'You can lower your DTI by either paying down existing high-interest revolving balances (such as credit cards or short-term personal loans) or by increasing your verified gross monthly income through raises, overtime, or secondary revenue streams.'],
+            ['Do living expenses like groceries and utilities count in DTI?', 'No. Standard underwriting DTI calculations only include legally binding credit liabilities (debt contracts, minimum loan installments, and court-ordered obligations like child support), excluding day-to-day living expenses like utilities, groceries, and streaming services.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="dti-calculator-related">
+        <h2 id="dti-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initDTICalc() {
+    if ((window as any).__cmDTIBound) return;
+    (window as any).__cmDTIBound = true;
+
+    const debtInput = document.getElementById('dti-debt') as HTMLInputElement | null;
+    const incomeInput = document.getElementById('dti-income') as HTMLInputElement | null;
+
+    const debtSlider = document.getElementById('dti-debt-slider') as HTMLInputElement | null;
+    const incomeSlider = document.getElementById('dti-income-slider') as HTMLInputElement | null;
+
+    const resPct = document.getElementById('dti-result-pct');
+    const resAssessment = document.getElementById('dti-result-assessment');
+    const resRemaining = document.getElementById('dti-result-remaining');
+    const resLimit = document.getElementById('dti-result-limit');
+    const resPrime = document.getElementById('dti-result-prime');
+
+    const errAlert = document.getElementById('dti-error-alert');
+    const errMsg = document.getElementById('dti-error-msg');
+
+    if (!debtInput || !incomeInput) return;
+
+    const DEFAULTS = { debt: 30000, income: 100000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawDebt = debtInput!.value.replace(/[^0-9.]/g, '');
+      const rawIncome = incomeInput!.value.replace(/[^0-9.]/g, '');
+
+      const vDebt = validate(rawDebt, { required: true, min: 0, label: 'Monthly Debt' });
+      const vIncome = validate(rawIncome, { required: true, min: 100, label: 'Monthly Income' });
+
+      if (!vDebt.valid) { showError(vDebt.error!.message); return; }
+      if (!vIncome.valid) { showError(vIncome.error!.message); return; }
+      clearError();
+
+      const debt = vDebt.value!;
+      const income = vIncome.value!;
+
+      const dtiPct = income > 0 ? (debt / income) * 100 : 0;
+      let assessment = '';
+      let colorClass = '';
+      if (dtiPct <= 20) { assessment = 'Excellent'; colorClass = 'text-dark-accent'; }
+      else if (dtiPct <= 28) { assessment = 'Good (Prime Lending)'; colorClass = 'text-dark-accent'; }
+      else if (dtiPct <= 36) { assessment = 'Fair (Healthy Maximum)'; colorClass = 'text-amber-400'; }
+      else if (dtiPct <= 43) { assessment = 'Stretched (Borderline)'; colorClass = 'text-amber-500'; }
+      else { assessment = 'Critical (High Risk)'; colorClass = 'text-red-400'; }
+
+      const remaining = Math.max(0, income - debt);
+      const limit36 = income * 0.36;
+      const prime28 = income * 0.28;
+
+      setResult({
+        heroValue: dtiPct.toFixed(1) + '%',
+        heroLabel: 'Debt-to-Income (DTI) Ratio',
+        rows: [
+          { label: 'Underwriting Standing', value: assessment },
+          { label: 'Monthly Disposable Income', value: fmtVal(remaining) },
+          { label: 'Target Benchmark (36% Limit)', value: fmtVal(limit36) },
+          { label: 'Prime Lending Cap (28% Front-End)', value: fmtVal(prime28) },
+        ],
+      });
+
+      if (resPct) resPct.textContent = dtiPct.toFixed(1) + '%';
+      if (resAssessment) {
+        resAssessment.textContent = assessment;
+        resAssessment.className = `text-sm font-semibold tabular-nums ${colorClass}`;
+      }
+      if (resRemaining) resRemaining.textContent = fmtVal(remaining);
+      if (resLimit) resLimit.textContent = fmtVal(limit36);
+      if (resPrime) resPrime.textContent = fmtVal(prime28);
+
+      const wrapper = document.getElementById('dti-composition-wrapper');
+      if (wrapper && income > 0) {
+        const debtFrac = Math.min(1, debt / income);
+        const remFrac = Math.max(0, 1 - debtFrac);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(debtFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(remFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(debt);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(remaining);
+      }
+
+      history.replaceState(null, '', serializeHash({ d: debt, i: income }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(debtSlider, debtInput, true);
+    sync(incomeSlider, incomeInput, true);
+
+    document.getElementById('dti-calculate')?.addEventListener('click', recalc);
+    document.getElementById('dti-reset')?.addEventListener('click', () => {
+      debtInput.value = fmtLiveInput(String(DEFAULTS.debt));
+      incomeInput.value = fmtLiveInput(String(DEFAULTS.income));
+
+      if (debtSlider) {
+        debtSlider.value = String(DEFAULTS.debt);
+        debtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.debt - 0) / (500000 - 0)) * 100}%`);
+      }
+      if (incomeSlider) {
+        incomeSlider.value = String(DEFAULTS.income);
+        incomeSlider.style.setProperty('--slider-pct', `${((DEFAULTS.income - 10000) / (1000000 - 10000)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      debtInput.focus();
+    });
+
+    [debtInput, incomeInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('dti-copy-btn')?.addEventListener('click', async () => {
+      const rawDebt = debtInput.value.replace(/[^0-9.]/g, '');
+      const rawIncome = incomeInput.value.replace(/[^0-9.]/g, '');
+
+      const vDebt = validate(rawDebt, { required: true, min: 0, label: 'Debt' });
+      const vIncome = validate(rawIncome, { required: true, min: 100, label: 'Income' });
+
+      if (!vDebt.valid || !vIncome.valid) return;
+
+      const dti = (vDebt.value! / vIncome.value!) * 100;
+      const text = `Debt-to-Income (DTI): ${dti.toFixed(1)}% (Monthly Debt: ${fmtVal(vDebt.value!)}, Gross Income: ${fmtVal(vIncome.value!)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('dti-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('dti-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('dti-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      d: { required: true, min: 0, label: 'd' },
+      i: { required: true, min: 100, label: 'i' },
+    });
+    if (restored.valid && restored.values.d !== undefined && restored.values.i) {
+      debtInput.value = fmtLiveInput(String(restored.values.d));
+      incomeInput.value = fmtLiveInput(String(restored.values.i));
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initDTICalc();
+  document.addEventListener('astro:page-load', initDTICalc);
+</script>

@@ -1,0 +1,504 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcImpliedRate } from '../lib/finance/amortization';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { principal: 500000, emi: 12000, years: 5 };
+const result = calcImpliedRate(DEFAULT.principal, DEFAULT.emi, DEFAULT.years);
+const totalRepayment = DEFAULT.emi * DEFAULT.years * 12;
+const totalInterest = Math.max(0, totalRepayment - DEFAULT.principal);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'interest-rate-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/interest-rate-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Interest Rate Calculator',
+      url: canonicalUrl,
+      description: 'Solve for the implied annual interest rate from loan principal, monthly EMI payment, and loan tenure.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Interest Rate Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How is the implied loan interest rate calculated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Because the loan EMI formula cannot be solved for interest rate using simple algebra, this calculator uses the Newton-Raphson numerical algorithm to iteratively find the exact annual percentage rate where the present value of all monthly payments equals the original loan principal.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why does the calculator show an error when monthly payment is too low?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If your monthly payment multiplied by total months is less than or equal to the loan principal, you are not even repaying the zero-interest principal amount. A valid positive interest rate requires the total payments to exceed the borrowed principal.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between nominal annual rate and effective rate?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The nominal annual rate is the simple annualized monthly rate (monthly rate × 12). The effective annual rate (EAR) takes into account monthly compounding throughout the year: EAR = (1 + r)^12 - 1.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can this calculator be used for flat rate loans?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes! If a lender quotes a flat rate (e.g., 5% flat per year), your total interest is fixed, leading to a specific monthly EMI. Entering your principal, loan tenure, and that EMI into this calculator reveals the true diminishing-balance interest rate, which is almost double the flat rate.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does the implied interest rate include processing fees and charges?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No, this calculates the pure amortization interest rate. To calculate the full Annual Percentage Rate (APR) including upfront processing fees, deduct the fee from the initial loan principal received and solve for the rate using the same monthly EMI.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Interest Rate Calculator: Find Implied Loan Rate from EMI | Calcumetrics"
+  description="Solve for the hidden or implied annual interest rate from loan amount, monthly EMI, and loan tenure. Free, fast, 100% client-side solver."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Interest Rate Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={result.valid ? `${result.annualRatePct.toFixed(2)}%` : '—'}
+    heroLabel="Annual Interest Rate"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Interest Rate Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Discover the exact annual percentage interest rate underlying any monthly loan payment.</p>
+
+      <!-- Error alert -->
+      <div id="ir-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Calculation Error">
+          <span id="ir-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Loan Principal -->
+      <div class="mb-5">
+        <Input
+          id="ir-principal"
+          label="Loan Principal Amount"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total borrowed sum"
+          inputmode="decimal"
+          aria-describedby="ir-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="ir-principal-slider" min={10000} max={10000000} step={10000} value={500000} ariaLabel="Principal slider" />
+        </div>
+      </div>
+
+      <!-- Monthly Payment (EMI) -->
+      <div class="mb-5">
+        <Input
+          id="ir-emi"
+          label="Monthly Payment (EMI)"
+          prefix="₹"
+          value="12,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Fixed monthly payment made toward the loan"
+          inputmode="decimal"
+          aria-describedby="ir-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="ir-emi-slider" min={1000} max={500000} step={500} value={12000} ariaLabel="Monthly EMI slider" />
+        </div>
+      </div>
+
+      <!-- Loan Term -->
+      <div class="mb-6">
+        <Input
+          id="ir-years"
+          label="Loan Term (Years)"
+          value="5"
+          isNumeric={true}
+          helperText="Duration of the loan in years"
+          inputmode="numeric"
+          aria-describedby="ir-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="ir-years-slider" min={1} max={30} step={1} value={5} ariaLabel="Loan term slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="ir-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="ir-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Implied Annual Interest Rate</span>
+        <div id="ir-result-rate" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {result.valid ? `${result.annualRatePct.toFixed(2)}%` : '—'}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Monthly Interest Rate</span>
+          <span id="ir-result-monthly-rate" class="text-sm font-medium tabular-nums text-dark-text">{result.valid ? `${result.monthlyRatePct.toFixed(3)}%` : '—'}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Loan Repayment</span>
+          <span id="ir-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(totalRepayment)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Paid</span>
+          <span id="ir-result-interest" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Principal Amount</span>
+          <span id="ir-result-principal" class="text-sm font-bold tabular-nums text-dark-text">{fmtCurrency(DEFAULT.principal)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="ir-composition-wrapper">
+        <CompositionBar
+          principalFraction={DEFAULT.principal / totalRepayment}
+          gainFraction={totalInterest / totalRepayment}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmtCurrency(DEFAULT.principal)}
+          gainValue={fmtCurrency(totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="ir-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="ir-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>The implied reducing-balance monthly interest rate $r$ is solved numerically via the root of:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
+          P × r × (1 + r)ⁿ / [(1 + r)ⁿ − 1] − EMI = 0
+        </div>
+        <p>Where P is loan principal, EMI is fixed monthly installment, n is total months (years × 12), and nominal annual rate is r × 12 × 100%.</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcImpliedRate } from '../lib/finance/amortization';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initInterestRateCalc() {
+    if ((window as any).__cmIrBound) return;
+    (window as any).__cmIrBound = true;
+
+    const principalInput = document.getElementById('ir-principal') as HTMLInputElement | null;
+    const emiInput = document.getElementById('ir-emi') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('ir-years') as HTMLInputElement | null;
+
+    const principalSlider = document.getElementById('ir-principal-slider') as HTMLInputElement | null;
+    const emiSlider = document.getElementById('ir-emi-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('ir-years-slider') as HTMLInputElement | null;
+
+    const resRate = document.getElementById('ir-result-rate');
+    const resMonthlyRate = document.getElementById('ir-result-monthly-rate');
+    const resTotal = document.getElementById('ir-result-total');
+    const resInterest = document.getElementById('ir-result-interest');
+    const resPrincipal = document.getElementById('ir-result-principal');
+
+    const errAlert = document.getElementById('ir-error-alert');
+    const errMsg = document.getElementById('ir-error-msg');
+
+    if (!principalInput || !emiInput || !yearsInput) return;
+
+    const DEFAULTS = { principal: 500000, emi: 12000, years: 5 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawPrincipal = principalInput!.value.replace(/[^0-9.]/g, '');
+      const rawEmi = emiInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+
+      const vPrincipal = validate(rawPrincipal, { required: true, min: 1000, label: 'Principal' });
+      const vEmi = validate(rawEmi, { required: true, min: 100, label: 'Monthly EMI' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integer: true, label: 'Loan Term' });
+
+      if (!vPrincipal.valid) { showError(vPrincipal.error!.message); return; }
+      if (!vEmi.valid) { showError(vEmi.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+
+      const principal = vPrincipal.value!;
+      const emi = vEmi.value!;
+      const years = vYears.value!;
+
+      const res = calcImpliedRate(principal, emi, years);
+      if (!res.valid) {
+        showError(res.error || 'Could not calculate interest rate.');
+        if (resRate) resRate.textContent = '—';
+        if (resMonthlyRate) resMonthlyRate.textContent = '—';
+        return;
+      }
+      clearError();
+
+      const totalRepay = emi * years * 12;
+      const totalInt = Math.max(0, totalRepay - principal);
+
+      setResult({
+        heroValue: `${res.annualRatePct.toFixed(2)}%`,
+        heroLabel: 'Annual Interest Rate',
+        rows: [
+          { label: 'Monthly Rate', value: `${res.monthlyRatePct.toFixed(3)}%` },
+          { label: 'Total Repayment', value: fmtVal(totalRepay) },
+          { label: 'Total Interest', value: fmtVal(totalInt) },
+          { label: 'Principal', value: fmtVal(principal) },
+        ],
+      });
+
+      if (resRate) resRate.textContent = `${res.annualRatePct.toFixed(2)}%`;
+      if (resMonthlyRate) resMonthlyRate.textContent = `${res.monthlyRatePct.toFixed(3)}%`;
+      if (resTotal) resTotal.textContent = fmtVal(totalRepay);
+      if (resInterest) resInterest.textContent = fmtVal(totalInt);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(principal);
+
+      const wrapper = document.getElementById('ir-composition-wrapper');
+      if (wrapper && totalRepay > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        if (bar) bar.style.width = `${Math.min(100, (principal / totalRepay) * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(principal);
+        if (valEls[1]) valEls[1].textContent = fmtVal(totalInt);
+      }
+
+      serializeHash({ p: principal, emi, y: years });
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 120);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider || !input) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(principalSlider, principalInput, true);
+    sync(emiSlider, emiInput, true);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('ir-calculate')?.addEventListener('click', recalc);
+    document.getElementById('ir-reset')?.addEventListener('click', () => {
+      principalInput.value = fmtLiveInput(String(DEFAULTS.principal));
+      emiInput.value = fmtLiveInput(String(DEFAULTS.emi));
+      yearsInput.value = String(DEFAULTS.years);
+      if (principalSlider) {
+        principalSlider.value = String(DEFAULTS.principal);
+        principalSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 10000) / (10000000 - 10000)) * 100}%`);
+      }
+      if (emiSlider) {
+        emiSlider.value = String(DEFAULTS.emi);
+        emiSlider.style.setProperty('--slider-pct', `${((DEFAULTS.emi - 1000) / (500000 - 1000)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+      clearError();
+      recalc();
+      principalInput.focus();
+    });
+
+    [principalInput, emiInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('ir-copy-btn')?.addEventListener('click', async () => {
+      const rawPrincipal = principalInput.value.replace(/[^0-9.]/g, '');
+      const rawEmi = emiInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vPrincipal = validate(rawPrincipal, { required: true, min: 1000, label: 'Principal' });
+      const vEmi = validate(rawEmi, { required: true, min: 100, label: 'Monthly EMI' });
+      const vYears = validate(rawYears, { required: true, min: 1, label: 'Years' });
+
+      if (!vPrincipal.valid || !vEmi.valid || !vYears.valid) return;
+
+      const res = calcImpliedRate(vPrincipal.value!, vEmi.value!, vYears.value!);
+      if (!res.valid) return;
+
+      const text = `Implied Interest Rate: ${res.annualRatePct.toFixed(2)}% on loan of ${fmtVal(vPrincipal.value!)} with ${fmtVal(vEmi.value!)}/mo for ${vYears.value} years. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('ir-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('ir-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('ir-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 1000, label: 'p' },
+      emi: { required: true, min: 100, label: 'emi' },
+      y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.p && restored.values.emi && restored.values.y) {
+      principalInput.value = fmtLiveInput(String(restored.values.p));
+      emiInput.value = fmtLiveInput(String(restored.values.emi));
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initInterestRateCalc();
+  document.addEventListener('astro:page-load', initInterestRateCalc);
+</script>

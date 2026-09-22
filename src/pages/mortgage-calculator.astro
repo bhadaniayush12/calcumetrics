@@ -1,0 +1,532 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcAmortization } from '../lib/finance/amortization';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { homePrice: 5000000, downPaymentPct: 20, rate: 8.5, years: 20 };
+const principal = DEFAULT.homePrice * (1 - DEFAULT.downPaymentPct / 100);
+const result = calcAmortization(principal, DEFAULT.rate, DEFAULT.years);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'mortgage-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/mortgage-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Mortgage Calculator',
+      url: canonicalUrl,
+      description: 'Calculate monthly mortgage payments, total interest, and loan amortization breakdown.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Mortgage Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What factors determine my monthly mortgage payment?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Your monthly mortgage payment depends on loan principal (home purchase price minus down payment), annual interest rate, and loan term duration. It may also include property taxes and home insurance.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does down payment size impact my mortgage?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A larger down payment lowers the total principal borrowed, reduces your monthly payment, decreases the total interest paid over the life of the loan, and frequently eliminates private mortgage insurance (PMI).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between a 15-year and 30-year mortgage?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A 15-year mortgage has higher monthly payments but allows you to build equity twice as fast and pay substantially less total interest over the life of the loan compared to a 30-year mortgage.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does amortization work in a mortgage?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under reducing-balance amortization, early mortgage payments consist predominantly of interest. As the loan principal balance steadily declines, a greater proportion of each payment goes toward paying down principal.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can extra principal prepayments shorten my mortgage?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Making regular additional principal prepayments directly reduces the outstanding balance, dramatically reducing future compound interest and shortening the loan payoff period by years.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Mortgage Calculator: Monthly Payments & Total Interest | Calcumetrics"
+  description="Calculate monthly mortgage payments, down payment impact, and total loan interest over 10 to 30 years."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Mortgage Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={fmtCurrency(result.emi)}
+    heroLabel="Monthly Mortgage Payment"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Mortgage Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Estimate your monthly mortgage repayment, loan principal, and total interest over time.</p>
+
+      <!-- Error alert -->
+      <div id="mort-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="mort-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Home Price -->
+      <div class="mb-5">
+        <Input
+          id="mort-price"
+          label="Home Purchase Price"
+          prefix="₹"
+          value="50,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total purchase price of the property"
+          inputmode="decimal"
+          aria-describedby="mort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="mort-price-slider" min={500000} max={50000000} step={50000} value={5000000} ariaLabel="Home price slider" />
+        </div>
+      </div>
+
+      <!-- Down Payment -->
+      <div class="mb-5">
+        <Input
+          id="mort-down"
+          label="Down Payment (%)"
+          suffix="%"
+          value="20"
+          isNumeric={true}
+          helperText="Upfront payment percentage"
+          inputmode="decimal"
+          aria-describedby="mort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="mort-down-slider" min={0} max={80} step={1} value={20} ariaLabel="Down payment slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="mort-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="8.5"
+          isNumeric={true}
+          helperText="Fixed annual mortgage rate"
+          inputmode="decimal"
+          aria-describedby="mort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="mort-rate-slider" min={3} max={18} step={0.1} value={8.5} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Loan Term -->
+      <div class="mb-6">
+        <Input
+          id="mort-years"
+          label="Loan Term (Years)"
+          value="20"
+          isNumeric={true}
+          helperText="Repayment period in years"
+          inputmode="numeric"
+          aria-describedby="mort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="mort-years-slider" min={5} max={30} step={1} value={20} ariaLabel="Loan term slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="mort-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="mort-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly Mortgage Payment</span>
+        <div id="mort-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtCurrency(result.emi)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Loan Amount (Principal)</span>
+          <span id="mort-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(principal)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Down Payment Amount</span>
+          <span id="mort-result-down" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(DEFAULT.homePrice * 0.2)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest</span>
+          <span id="mort-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Total Mortgage Repayment</span>
+          <span id="mort-result-total" class="text-sm font-bold tabular-nums text-dark-text">{fmtCurrency(result.totalPayment)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="mort-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmtCurrency(principal)}
+          gainValue={fmtCurrency(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="mort-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="mort-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes fixed interest rate with standard monthly reducing-balance amortization.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="mort-calculator-how">
+        <h2 id="mort-calculator-how" class="text-xl font-bold text-text-primary mb-4">How mortgage calculations work</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Mortgage loans are amortized using the reducing-balance method, where each installment covers monthly accrued interest and chips away at principal:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Principal Borrowed: </strong> P = Home Price &minus; Down Payment<br />
+            <strong>Monthly EMI Formula: </strong> EMI = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
+            <strong>Total Cost: </strong> Total Outflow = (EMI &times; n) + Down Payment
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="mort-calculator-faq">
+        <h2 id="mort-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What factors determine my monthly mortgage payment?', 'Your monthly mortgage payment depends on loan principal (home purchase price minus down payment), annual interest rate, and loan term duration. It may also include property taxes and home insurance.'],
+            ['How does down payment size impact my mortgage?', 'A larger down payment lowers the total principal borrowed, reduces your monthly payment, decreases the total interest paid over the life of the loan, and frequently eliminates private mortgage insurance (PMI).'],
+            ['What is the difference between a 15-year and 30-year mortgage?', 'A 15-year mortgage has higher monthly payments but allows you to build equity twice as fast and pay substantially less total interest over the life of the loan compared to a 30-year mortgage.'],
+            ['How does amortization work in a mortgage?', 'Under reducing-balance amortization, early mortgage payments consist predominantly of interest. As the loan principal balance steadily declines, a greater proportion of each payment goes toward paying down principal.'],
+            ['Can extra principal prepayments shorten my mortgage?', 'Yes. Making regular additional principal prepayments directly reduces the outstanding balance, dramatically reducing future compound interest and shortening the loan payoff period by years.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="mort-calculator-related">
+        <h2 id="mort-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcAmortization } from '../lib/finance/amortization';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initMortgageCalc() {
+    if ((window as any).__cmMortBound) return;
+    (window as any).__cmMortBound = true;
+
+    const priceInput = document.getElementById('mort-price') as HTMLInputElement | null;
+    const downInput = document.getElementById('mort-down') as HTMLInputElement | null;
+    const rateInput = document.getElementById('mort-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('mort-years') as HTMLInputElement | null;
+
+    const priceSlider = document.getElementById('mort-price-slider') as HTMLInputElement | null;
+    const downSlider = document.getElementById('mort-down-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('mort-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('mort-years-slider') as HTMLInputElement | null;
+
+    const resEmi = document.getElementById('mort-result-emi');
+    const resPrincipal = document.getElementById('mort-result-principal');
+    const resDown = document.getElementById('mort-result-down');
+    const resInterest = document.getElementById('mort-result-interest');
+    const resTotal = document.getElementById('mort-result-total');
+
+    const errAlert = document.getElementById('mort-error-alert');
+    const errMsg = document.getElementById('mort-error-msg');
+
+    if (!priceInput || !downInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { homePrice: 5000000, downPaymentPct: 20, rate: 8.5, years: 20 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawPrice = priceInput!.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+
+      const vPrice = validate(rawPrice, { required: true, min: 10000, label: 'Home Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, max: 99, decimal: true, label: 'Down Payment %' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integer: true, label: 'Loan Term' });
+
+      if (!vPrice.valid) { showError(vPrice.error!.message); return; }
+      if (!vDown.valid) { showError(vDown.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+      clearError();
+
+      const price = vPrice.value!;
+      const downPct = vDown.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+
+      const downAmount = price * (downPct / 100);
+      const principal = price - downAmount;
+      const res = calcAmortization(principal, rate, years);
+
+      setResult({
+        heroValue: fmtVal(res.emi),
+        heroLabel: 'Monthly Mortgage Payment',
+        rows: [
+          { label: 'Loan Amount (Principal)', value: fmtVal(principal) },
+          { label: 'Down Payment', value: fmtVal(downAmount) },
+          { label: 'Total Interest', value: fmtVal(res.totalInterest) },
+          { label: 'Total Mortgage Cost', value: fmtVal(res.totalPayment) },
+        ],
+      });
+
+      if (resEmi) resEmi.textContent = fmtVal(res.emi);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(principal);
+      if (resDown) resDown.textContent = fmtVal(downAmount);
+      if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
+      if (resTotal) resTotal.textContent = fmtVal(res.totalPayment);
+
+      const wrapper = document.getElementById('mort-composition-wrapper');
+      if (wrapper && res.totalPayment > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(principal);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', serializeHash({ p: price, d: downPct, r: rate, y: years }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(priceSlider, priceInput, true);
+    sync(downSlider, downInput, false);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('mort-calculate')?.addEventListener('click', recalc);
+    document.getElementById('mort-reset')?.addEventListener('click', () => {
+      priceInput.value = fmtLiveInput(String(DEFAULTS.homePrice));
+      downInput.value = String(DEFAULTS.downPaymentPct);
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+
+      if (priceSlider) {
+        priceSlider.value = String(DEFAULTS.homePrice);
+        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.homePrice - 500000) / (50000000 - 500000)) * 100}%`);
+      }
+      if (downSlider) {
+        downSlider.value = String(DEFAULTS.downPaymentPct);
+        downSlider.style.setProperty('--slider-pct', `${((DEFAULTS.downPaymentPct - 0) / (80 - 0)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (18 - 3)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 5) / (30 - 5)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      priceInput.focus();
+    });
+
+    [priceInput, downInput, rateInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('mort-copy-btn')?.addEventListener('click', async () => {
+      const rawPrice = priceInput.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vPrice = validate(rawPrice, { required: true, min: 10000, label: 'Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, max: 99, label: 'Down' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, label: 'Years' });
+
+      if (!vPrice.valid || !vDown.valid || !vRate.valid || !vYears.valid) return;
+
+      const p = vPrice.value! * (1 - vDown.value! / 100);
+      const res = calcAmortization(p, vRate.value!, vYears.value!);
+      const text = `Mortgage: ${fmtVal(vPrice.value!)} home (${vDown.value}% down) at ${vRate.value}% for ${vYears.value} years => Monthly Payment: ${fmtVal(res.emi)} (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('mort-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('mort-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('mort-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 10000, label: 'p' },
+      d: { required: true, min: 0, max: 99, decimal: true, label: 'd' },
+      r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.p && restored.values.d !== undefined && restored.values.r !== undefined && restored.values.y) {
+      priceInput.value = fmtLiveInput(String(restored.values.p));
+      downInput.value = String(restored.values.d);
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initMortgageCalc();
+  document.addEventListener('astro:page-load', initMortgageCalc);
+</script>

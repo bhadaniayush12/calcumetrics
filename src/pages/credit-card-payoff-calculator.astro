@@ -1,0 +1,508 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcCreditCardPayoff } from '../lib/finance/amortization';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { balance: 150000, apr: 36.0, payment: 10000 };
+const result = calcCreditCardPayoff(DEFAULT.balance, DEFAULT.apr, DEFAULT.payment);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'credit-card-payoff-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/credit-card-payoff-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Credit Card Payoff Calculator',
+      url: canonicalUrl,
+      description: 'Calculate how long it takes to pay off credit card debt, total interest paid, and required payments.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Credit Card Payoff Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What happens if I only pay the minimum due on my credit card?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Paying only the minimum due (usually 5% of the balance) prolongs debt repayment over decades because the vast majority of your payment covers finance charges and taxes, leaving principal virtually untouched while interest continues to compound.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why are credit card interest rates (APR) so high?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Credit cards represent unsecured revolving consumer debt without collateral. To offset high default and delinquency risks, banks charge APRs typically ranging between 24% and 42% per annum.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the debt avalanche method?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The debt avalanche strategy prioritizes paying down the credit card or loan with the highest interest rate first while making minimum required payments on others. Mathematically, this minimizes total interest paid across all liabilities.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does a balance transfer card or personal loan help?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Consolidating revolving 36%–42% card debt into a lower-interest personal loan (12%–15%) or a 0% introductory APR balance transfer card drastically lowers monthly finance charges, allowing 100% of your payment to extinguish principal faster.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What does "insufficient payment" mean in this calculator?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If your monthly payment is less than or equal to the monthly interest accrued on your balance, the loan balance will never decline and the payoff period becomes mathematically infinite.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Credit Card Payoff Calculator: Debt Free Timeline | Calcumetrics"
+  description="Calculate how many months it will take to pay off credit card debt and see total interest savings from larger monthly payments."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Credit Card Payoff Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={result.paymentSufficient ? `${result.payoffMonths} Months` : 'Infinite'}
+    heroLabel="Payoff Duration"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Credit Card Payoff Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Find out exactly how long it takes to pay off your card balance and how much interest you will save.</p>
+
+      <!-- Error alert -->
+      <div id="cc-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="cc-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Current Balance -->
+      <div class="mb-5">
+        <Input
+          id="cc-balance"
+          label="Current Outstanding Balance"
+          prefix="₹"
+          value="1,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total credit card balance to eliminate"
+          inputmode="decimal"
+          aria-describedby="cc-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cc-balance-slider" min={5000} max={2000000} step={5000} value={150000} ariaLabel="Card balance slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate (APR) -->
+      <div class="mb-5">
+        <Input
+          id="cc-apr"
+          label="Annual Interest Rate (APR)"
+          suffix="%"
+          value="36.0"
+          isNumeric={true}
+          helperText="Standard card APR (typically 36% to 42% p.a.)"
+          inputmode="decimal"
+          aria-describedby="cc-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cc-apr-slider" min={10} max={50} step={0.5} value={36.0} ariaLabel="APR slider" />
+        </div>
+      </div>
+
+      <!-- Monthly Payment -->
+      <div class="mb-6">
+        <Input
+          id="cc-payment"
+          label="Planned Monthly Payment"
+          prefix="₹"
+          value="10,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Fixed amount you plan to pay each month"
+          inputmode="decimal"
+          aria-describedby="cc-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cc-payment-slider" min={1000} max={100000} step={500} value={10000} ariaLabel="Monthly payment slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="cc-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="cc-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Time to Zero Debt</span>
+        <div id="cc-result-months" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {result.paymentSufficient ? `${result.payoffMonths} Months` : 'Infinite'}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Paid</span>
+          <span id="cc-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{isFinite(result.totalInterest) ? fmtCurrency(result.totalInterest) : 'Infinite'}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Amount Paid</span>
+          <span id="cc-result-total" class="text-sm font-medium tabular-nums text-dark-text">{isFinite(result.totalPaid) ? fmtCurrency(result.totalPaid) : 'Infinite'}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Original Balance</span>
+          <span id="cc-result-balance" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.balance)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Time in Years</span>
+          <span id="cc-result-years" class="text-sm font-bold tabular-nums text-dark-text">{isFinite(result.payoffMonths) ? (result.payoffMonths / 12).toFixed(1) + ' Years' : 'Never'}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="cc-composition-wrapper">
+        <CompositionBar
+          principalFraction={isFinite(result.totalPaid) && result.totalPaid > 0 ? result.balance / result.totalPaid : 0.5}
+          gainFraction={isFinite(result.totalPaid) && result.totalPaid > 0 ? result.totalInterest / result.totalPaid : 0.5}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmtCurrency(result.balance)}
+          gainValue={isFinite(result.totalInterest) ? fmtCurrency(result.totalInterest) : '—'}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="cc-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="cc-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes no additional purchases are made on the card while paying off the balance.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="cc-calculator-how">
+        <h2 id="cc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How credit card amortization works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Credit cards compute interest daily on unpaid balances. Each fixed monthly payment pays off the accrued monthly interest first:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Monthly Interest: </strong> I = Balance &times; (APR &divide; 12 &divide; 100)<br />
+            <strong>Payoff Formula: </strong> n = &minus;ln[ 1 &minus; (r &times; P &divide; PMT) ] &divide; ln(1 + r)<br />
+            <strong>Total Outflow: </strong> Total Paid = PMT &times; n
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="cc-calculator-faq">
+        <h2 id="cc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What happens if I only pay the minimum due on my credit card?', 'Paying only the minimum due (usually 5% of the balance) prolongs debt repayment over decades because the vast majority of your payment covers finance charges and taxes, leaving principal virtually untouched while interest continues to compound.'],
+            ['Why are credit card interest rates (APR) so high?', 'Credit cards represent unsecured revolving consumer debt without collateral. To offset high default and delinquency risks, banks charge APRs typically ranging between 24% and 42% per annum.'],
+            ['What is the debt avalanche method?', 'The debt avalanche strategy prioritizes paying down the credit card or loan with the highest interest rate first while making minimum required payments on others. Mathematically, this minimizes total interest paid across all liabilities.'],
+            ['How does a balance transfer card or personal loan help?', 'Consolidating revolving 36%–42% card debt into a lower-interest personal loan (12%–15%) or a 0% introductory APR balance transfer card drastically lowers monthly finance charges, allowing 100% of your payment to extinguish principal faster.'],
+            ['What does "insufficient payment" mean in this calculator?', 'If your monthly payment is less than or equal to the monthly interest accrued on your balance, the loan balance will never decline and the payoff period becomes mathematically infinite.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="cc-calculator-related">
+        <h2 id="cc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcCreditCardPayoff } from '../lib/finance/amortization';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initCCCalc() {
+    if ((window as any).__cmCCBound) return;
+    (window as any).__cmCCBound = true;
+
+    const bInput = document.getElementById('cc-balance') as HTMLInputElement | null;
+    const rInput = document.getElementById('cc-apr') as HTMLInputElement | null;
+    const pInput = document.getElementById('cc-payment') as HTMLInputElement | null;
+
+    const bSlider = document.getElementById('cc-balance-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('cc-apr-slider') as HTMLInputElement | null;
+    const pSlider = document.getElementById('cc-payment-slider') as HTMLInputElement | null;
+
+    const resMonths = document.getElementById('cc-result-months');
+    const resInterest = document.getElementById('cc-result-interest');
+    const resTotal = document.getElementById('cc-result-total');
+    const resBalance = document.getElementById('cc-result-balance');
+    const resYears = document.getElementById('cc-result-years');
+
+    const errAlert = document.getElementById('cc-error-alert');
+    const errMsg = document.getElementById('cc-error-msg');
+
+    if (!bInput || !rInput || !pInput) return;
+
+    const DEFAULTS = { balance: 150000, apr: 36.0, payment: 10000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawB = bInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
+
+      const vB = validate(rawB, { required: true, min: 100, label: 'Balance' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 100, decimal: true, label: 'APR' });
+      const vP = validate(rawP, { required: true, min: 10, label: 'Monthly Payment' });
+
+      if (!vB.valid) { showError(vB.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vP.valid) { showError(vP.error!.message); return; }
+
+      const balance = vB.value!;
+      const apr = vR.value!;
+      const payment = vP.value!;
+
+      const firstMonthInterest = balance * (apr / 100 / 12);
+      if (payment <= firstMonthInterest) {
+        showError(`Monthly payment must exceed monthly interest (${fmtVal(firstMonthInterest)}) to ever pay off the balance.`);
+        return;
+      }
+      clearError();
+
+      const res = calcCreditCardPayoff(balance, apr, payment);
+
+      const heroText = res.paymentSufficient ? `${res.payoffMonths} Months` : 'Infinite';
+      const yrsText = isFinite(res.payoffMonths) ? (res.payoffMonths / 12).toFixed(1) + ' Years' : 'Never';
+
+      setResult({
+        heroValue: heroText,
+        heroLabel: 'Payoff Duration',
+        rows: [
+          { label: 'Total Interest Paid', value: isFinite(res.totalInterest) ? fmtVal(res.totalInterest) : 'Infinite' },
+          { label: 'Total Amount Paid', value: isFinite(res.totalPaid) ? fmtVal(res.totalPaid) : 'Infinite' },
+          { label: 'Original Balance', value: fmtVal(balance) },
+          { label: 'Time in Years', value: yrsText },
+        ],
+      });
+
+      if (resMonths) resMonths.textContent = heroText;
+      if (resInterest) resInterest.textContent = isFinite(res.totalInterest) ? fmtVal(res.totalInterest) : 'Infinite';
+      if (resTotal) resTotal.textContent = isFinite(res.totalPaid) ? fmtVal(res.totalPaid) : 'Infinite';
+      if (resBalance) resBalance.textContent = fmtVal(balance);
+      if (resYears) resYears.textContent = yrsText;
+
+      const wrapper = document.getElementById('cc-composition-wrapper');
+      if (wrapper && isFinite(res.totalPaid) && res.totalPaid > 0) {
+        const pFrac = balance / res.totalPaid;
+        const iFrac = res.totalInterest / res.totalPaid;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(pFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(iFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(balance);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', serializeHash({ b: balance, r: apr, p: payment }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(bSlider, bInput, true);
+    sync(rSlider, rInput, false);
+    sync(pSlider, pInput, true);
+
+    document.getElementById('cc-calculate')?.addEventListener('click', recalc);
+    document.getElementById('cc-reset')?.addEventListener('click', () => {
+      bInput.value = fmtLiveInput(String(DEFAULTS.balance));
+      rInput.value = String(DEFAULTS.apr);
+      pInput.value = fmtLiveInput(String(DEFAULTS.payment));
+
+      if (bSlider) {
+        bSlider.value = String(DEFAULTS.balance);
+        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.balance - 5000) / (2000000 - 5000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.apr);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.apr - 10) / (50 - 10)) * 100}%`);
+      }
+      if (pSlider) {
+        pSlider.value = String(DEFAULTS.payment);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.payment - 1000) / (100000 - 1000)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      bInput.focus();
+    });
+
+    [bInput, rInput, pInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('cc-copy-btn')?.addEventListener('click', async () => {
+      const rawB = bInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawP = pInput.value.replace(/[^0-9.]/g, '');
+
+      const vB = validate(rawB, { required: true, min: 100, label: 'Balance' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'APR' });
+      const vP = validate(rawP, { required: true, min: 10, label: 'Payment' });
+
+      if (!vB.valid || !vR.valid || !vP.valid) return;
+
+      const res = calcCreditCardPayoff(vB.value!, vR.value!, vP.value!);
+      const text = `Credit Card Payoff: Balance ${fmtVal(vB.value!)} at ${vR.value}% APR paying ${fmtVal(vP.value!)}/mo takes ${res.payoffMonths} months (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('cc-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('cc-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('cc-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      b: { required: true, min: 100, label: 'b' },
+      r: { required: true, min: 0.1, max: 100, decimal: true, label: 'r' },
+      p: { required: true, min: 10, label: 'p' },
+    });
+    if (restored.valid && restored.values.b && restored.values.r !== undefined && restored.values.p) {
+      bInput.value = fmtLiveInput(String(restored.values.b));
+      rInput.value = String(restored.values.r);
+      pInput.value = fmtLiveInput(String(restored.values.p));
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initCCCalc();
+  document.addEventListener('astro:page-load', initCCCalc);
+</script>

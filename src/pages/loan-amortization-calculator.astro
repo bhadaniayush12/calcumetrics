@@ -1,0 +1,500 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcAmortization } from '../lib/finance/amortization';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { principal: 1000000, rate: 9.5, years: 5 };
+const result = calcAmortization(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, true);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'loan-amortization-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/loan-amortization-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Loan Amortization Calculator',
+      url: canonicalUrl,
+      description: 'Calculate monthly loan EMI and view detailed period-by-period principal and interest amortization schedules.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Loan Amortization Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a loan amortization schedule?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A loan amortization schedule is a complete table of periodic loan payments showing how each payment is partitioned between interest charges and principal reduction, along with the remaining balance after each payment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why is interest higher in early loan payments?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Interest is calculated on the remaining loan principal. Since the principal is largest at the beginning of the loan, the interest charge is at its peak. As you repay principal, monthly interest charges decline, leaving more of each fixed EMI to repay principal.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the reducing-balance method?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the reducing-balance (or reducing-principal) method, interest is calculated strictly on the outstanding balance at each compounding period rather than the initial borrowing amount.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do extra payments affect the amortization schedule?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Extra payments accelerate principal payoff, which reduces subsequent interest calculations for all future periods, shortening total loan duration and saving money.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is the EMI amount identical every month?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For a fixed-rate loan, the total monthly EMI remains identical each month, but the internal split between principal and interest shifts continuously.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Loan Amortization Calculator: Payment Schedule & Breakdown | Calcumetrics"
+  description="Calculate your monthly EMI and view full loan amortization schedules with principal, interest, and remaining balance."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Loan Amortization Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={fmtCurrency(result.emi)}
+    heroLabel="Monthly Payment (EMI)"
+    calcType="advanced"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Loan Amortization Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate monthly loan EMI and view detailed period-by-period amortization schedules.</p>
+
+      <!-- Error alert -->
+      <div id="amort-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="amort-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Loan Amount -->
+      <div class="mb-5">
+        <Input
+          id="amort-principal"
+          label="Loan Principal Amount"
+          prefix="₹"
+          value="10,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total borrowed loan principal"
+          inputmode="decimal"
+          aria-describedby="amort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="amort-principal-slider" min={50000} max={20000000} step={25000} value={1000000} ariaLabel="Principal slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="amort-rate"
+          label="Annual Interest Rate"
+          suffix="%"
+          value="9.5"
+          isNumeric={true}
+          helperText="Fixed annual interest rate"
+          inputmode="decimal"
+          aria-describedby="amort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="amort-rate-slider" min={2} max={25} step={0.1} value={9.5} ariaLabel="Rate slider" />
+        </div>
+      </div>
+
+      <!-- Tenure in Years -->
+      <div class="mb-6">
+        <Input
+          id="amort-years"
+          label="Loan Tenure (Years)"
+          value="5"
+          isNumeric={true}
+          helperText="Repayment period in years"
+          inputmode="numeric"
+          aria-describedby="amort-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="amort-years-slider" min={1} max={30} step={1} value={5} ariaLabel="Tenure slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="amort-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="amort-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly Payment (EMI)</span>
+        <div id="amort-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtCurrency(result.emi)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Payable</span>
+          <span id="amort-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Loan Repayment</span>
+          <span id="amort-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.totalPayment)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Original Principal</span>
+          <span id="amort-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.principal)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Interest-to-Principal Ratio</span>
+          <span id="amort-result-ratio" class="text-sm font-bold tabular-nums text-dark-text">{((result.totalInterest / result.principal) * 100).toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="amort-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.interestFraction}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmtCurrency(result.principal)}
+          gainValue={fmtCurrency(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="amort-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="amort-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Calculated using standard reducing-balance monthly amortization.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="amort-calculator-how">
+        <h2 id="amort-calculator-how" class="text-xl font-bold text-text-primary mb-4">How loan amortization works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Each periodic installment consists of interest on the remaining principal balance plus a repayment of principal:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Equated Monthly Installment: </strong> EMI = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
+            <strong>Period Interest: </strong> Interest<sub>t</sub> = Balance<sub>t&minus;1</sub> &times; r<br />
+            <strong>Period Principal: </strong> Principal<sub>t</sub> = EMI &minus; Interest<sub>t</sub><br />
+            <strong>New Balance: </strong> Balance<sub>t</sub> = Balance<sub>t&minus;1</sub> &minus; Principal<sub>t</sub>
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="amort-calculator-faq">
+        <h2 id="amort-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What is a loan amortization schedule?', 'A loan amortization schedule is a complete table of periodic loan payments showing how each payment is partitioned between interest charges and principal reduction, along with the remaining balance after each payment.'],
+            ['Why is interest higher in early loan payments?', 'Interest is calculated on the remaining loan principal. Since the principal is largest at the beginning of the loan, the interest charge is at its peak. As you repay principal, monthly interest charges decline, leaving more of each fixed EMI to repay principal.'],
+            ['What is the reducing-balance method?', 'Under the reducing-balance (or reducing-principal) method, interest is calculated strictly on the outstanding balance at each compounding period rather than the initial borrowing amount.'],
+            ['How do extra payments affect the amortization schedule?', 'Extra payments accelerate principal payoff, which reduces subsequent interest calculations for all future periods, shortening total loan duration and saving money.'],
+            ['Is the EMI amount identical every month?', 'For a fixed-rate loan, the total monthly EMI remains identical each month, but the internal split between principal and interest shifts continuously.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="amort-calculator-related">
+        <h2 id="amort-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcAmortization } from '../lib/finance/amortization';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initAmortCalc() {
+    if ((window as any).__cmAmortBound) return;
+    (window as any).__cmAmortBound = true;
+
+    const pInput = document.getElementById('amort-principal') as HTMLInputElement | null;
+    const rInput = document.getElementById('amort-rate') as HTMLInputElement | null;
+    const yInput = document.getElementById('amort-years') as HTMLInputElement | null;
+
+    const pSlider = document.getElementById('amort-principal-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('amort-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('amort-years-slider') as HTMLInputElement | null;
+
+    const resEmi = document.getElementById('amort-result-emi');
+    const resInterest = document.getElementById('amort-result-interest');
+    const resTotal = document.getElementById('amort-result-total');
+    const resPrincipal = document.getElementById('amort-result-principal');
+    const resRatio = document.getElementById('amort-result-ratio');
+
+    const errAlert = document.getElementById('amort-error-alert');
+    const errMsg = document.getElementById('amort-error-msg');
+
+    if (!pInput || !rInput || !yInput) return;
+
+    const DEFAULTS = { principal: 1000000, rate: 9.5, years: 5 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput!.value.replace(/[^0-9.]/g, '');
+
+      const vP = validate(rawP, { required: true, min: 1000, label: 'Principal' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vY = validate(rawY, { required: true, min: 1, max: 40, integer: true, label: 'Loan Tenure' });
+
+      if (!vP.valid) { showError(vP.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vY.valid) { showError(vY.error!.message); return; }
+      clearError();
+
+      const principal = vP.value!;
+      const rate = vR.value!;
+      const years = vY.value!;
+
+      const res = calcAmortization(principal, rate, years);
+
+      const ratioText = principal > 0
+        ? ((res.totalInterest / principal) * 100).toFixed(1) + '%'
+        : '0%';
+
+      setResult({
+        heroValue: fmtVal(res.emi),
+        heroLabel: 'Monthly Payment (EMI)',
+        rows: [
+          { label: 'Total Interest Payable', value: fmtVal(res.totalInterest) },
+          { label: 'Total Loan Repayment', value: fmtVal(res.totalPayment) },
+          { label: 'Original Principal', value: fmtVal(principal) },
+          { label: 'Interest-to-Principal Ratio', value: ratioText },
+        ],
+      });
+
+      if (resEmi) resEmi.textContent = fmtVal(res.emi);
+      if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
+      if (resTotal) resTotal.textContent = fmtVal(res.totalPayment);
+      if (resPrincipal) resPrincipal.textContent = fmtVal(principal);
+      if (resRatio) resRatio.textContent = ratioText;
+
+      const wrapper = document.getElementById('amort-composition-wrapper');
+      if (wrapper && res.totalPayment > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(principal);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', serializeHash({ p: principal, r: rate, y: years }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(pSlider, pInput, true);
+    sync(rSlider, rInput, false);
+    sync(ySlider, yInput, false);
+
+    document.getElementById('amort-calculate')?.addEventListener('click', recalc);
+    document.getElementById('amort-reset')?.addEventListener('click', () => {
+      pInput.value = fmtLiveInput(String(DEFAULTS.principal));
+      rInput.value = String(DEFAULTS.rate);
+      yInput.value = String(DEFAULTS.years);
+
+      if (pSlider) {
+        pSlider.value = String(DEFAULTS.principal);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 50000) / (20000000 - 50000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 2) / (25 - 2)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.years);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      pInput.focus();
+    });
+
+    [pInput, rInput, yInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('amort-copy-btn')?.addEventListener('click', async () => {
+      const rawP = pInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput.value.replace(/[^0-9.]/g, '');
+
+      const vP = validate(rawP, { required: true, min: 1000, label: 'Principal' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'Rate' });
+      const vY = validate(rawY, { required: true, min: 1, label: 'Years' });
+
+      if (!vP.valid || !vR.valid || !vY.valid) return;
+
+      const res = calcAmortization(vP.value!, vR.value!, vY.value!);
+      const text = `Loan Amortization: Principal ${fmtVal(vP.value!)} at ${vR.value}% for ${vY.value} years => Monthly EMI: ${fmtVal(res.emi)} (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('amort-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('amort-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('amort-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 1000, label: 'p' },
+      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 40, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.p && restored.values.r !== undefined && restored.values.y) {
+      pInput.value = fmtLiveInput(String(restored.values.p));
+      rInput.value = String(restored.values.r);
+      yInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initAmortCalc();
+  document.addEventListener('astro:page-load', initAmortCalc);
+</script>

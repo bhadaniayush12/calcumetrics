@@ -11,8 +11,8 @@ import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { price: 1200000, down: 200000, rate: 9.0, years: 5 };
-const loanAmount = DEFAULT.price - DEFAULT.down;
-const result = calcEMI(loanAmount, DEFAULT.rate, DEFAULT.years);
+const initialLoan = DEFAULT.price - DEFAULT.down;
+const initialResult = calcEMI(initialLoan, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -35,7 +35,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -44,6 +44,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
         { '@type': 'ListItem', position: 3, name: 'Car Loan Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a recommended tenure for a car loan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Financial advisors generally recommend keeping auto loan tenures between 3 to 5 years (36 to 60 months). Because vehicles depreciate rapidly, extended tenures (such as 7 or 8 years) increase the risk of becoming upside down on your loan, where you owe more than the car is worth.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are car loan interest rates fixed or floating?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Unlike home loans which are predominantly floating, most vehicle loans are issued on fixed interest rates. A fixed rate locks your monthly EMI throughout the tenure, protecting against benchmark rate hikes.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How much down payment should I make when buying a car?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A standard financial recommendation is to put down at least 15% to 20% of the vehicle on-road price. A larger down payment reduces total interest burden, decreases monthly EMI, and protects against depreciation losses.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between ex-showroom price and on-road price?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Ex-showroom price is the dealer base cost. On-road price includes mandatory state registration and road tax (RTO), motor insurance, municipal taxes, and dealer handling charges. Lenders often finance 85% to 100% of the ex-showroom price.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I foreclose or prepay my car loan early?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, most banks permit loan foreclosure or partial prepayments after an initial lock-in period (typically 6 months). For fixed-rate car loans, check if your lender levies a foreclosure penalty (often 2% to 5% on the remaining balance).',
+          },
+        },
       ],
     },
   ],
@@ -61,12 +106,19 @@ const jsonld = {
     toolName="Car Loan EMI Calculator"
     category="Loans"
     categoryHref="/loans"
-    heroValue={fmt(result.emiRounded)}
+    heroValue={fmt(initialResult.emiRounded)}
     heroLabel="Monthly EMI"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Car Loan EMI Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Estimate your vehicle loan EMI, down payment impact, and total interest.</p>
+
+      <!-- Error alert -->
+      <div id="cl-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="cl-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
 
       <!-- Vehicle Price -->
       <div class="mb-5">
@@ -79,6 +131,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Total purchase price including registration and insurance"
           inputmode="decimal"
+          aria-describedby="cl-error-msg"
         />
         <div class="mt-2">
           <Slider id="cl-price-slider" min={200000} max={10000000} step={25000} value={1200000} ariaLabel="Vehicle price slider" />
@@ -96,6 +149,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Upfront payment from savings or vehicle exchange"
           inputmode="decimal"
+          aria-describedby="cl-error-msg"
         />
         <div class="mt-2">
           <Slider id="cl-down-slider" min={0} max={5000000} step={25000} value={200000} ariaLabel="Down payment slider" />
@@ -110,11 +164,12 @@ const jsonld = {
           suffix="%"
           value="9.0"
           isNumeric={true}
-          helperText="Bank or NBFC auto loan interest rate"
+          helperText="Prevailing commercial vehicle finance rate"
           inputmode="decimal"
+          aria-describedby="cl-error-msg"
         />
         <div class="mt-2">
-          <Slider id="cl-rate-slider" min={7.0} max={18.0} step={0.25} value={9.0} ariaLabel="Interest rate slider" />
+          <Slider id="cl-rate-slider" min={6} max={20} step={0.1} value={9.0} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -126,17 +181,14 @@ const jsonld = {
           suffix="Years"
           value="5"
           isNumeric={true}
-          helperText="Standard auto loan duration (1 to 7 years)"
-          inputmode="decimal"
+          helperText="Typical duration is 3 to 7 years"
+          inputmode="numeric"
+          aria-describedby="cl-error-msg"
         />
         <div class="mt-2">
-          <Slider id="cl-years-slider" min={1} max={7} step={1} value={5} ariaLabel="Tenure slider" />
+          <Slider id="cl-years-slider" min={1} max={8} step={1} value={5} ariaLabel="Tenure slider" />
         </div>
       </div>
-
-      <Alert variant="info" title="Depreciation Tip">
-        Cars depreciate 15%–20% in their first year. Aim to keep your car loan tenure under 5 years to avoid owing more than the vehicle is worth (negative equity).
-      </Alert>
 
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="cl-calculate" type="button">Calculate</Button>
@@ -148,14 +200,14 @@ const jsonld = {
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Monthly EMI</span>
         <div id="cl-result-emi" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {fmt(result.emiRounded)}
+          {fmt(initialResult.emiRounded)}
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Loan Amount (Principal)</span>
-          <span id="cl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(loanAmount)}</span>
+          <span class="text-xs text-dark-muted">Loan Principal</span>
+          <span id="cl-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialLoan)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Down Payment</span>
@@ -163,22 +215,22 @@ const jsonld = {
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Total Interest</span>
-          <span id="cl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalInterest)}</span>
+          <span id="cl-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(initialResult.totalInterest)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Total Cost of Car</span>
-          <span id="cl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.down + result.totalPayment)}</span>
+          <span class="text-xs text-dark-muted">Total Payment</span>
+          <span id="cl-result-total" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.totalPayment)}</span>
         </div>
       </div>
 
       <div class="mb-5" id="cl-composition-wrapper">
         <CompositionBar
-          principalFraction={result.principalFraction}
-          gainFraction={result.interestFraction}
+          principalFraction={initialResult.principalFraction}
+          gainFraction={initialResult.interestFraction}
           principalLabel="Principal"
           gainLabel="Interest"
-          principalValue={fmt(loanAmount)}
-          gainValue={fmt(result.totalInterest)}
+          principalValue={fmt(initialLoan)}
+          gainValue={fmt(initialResult.totalInterest)}
         />
       </div>
 
@@ -213,18 +265,14 @@ const jsonld = {
       <section aria-labelledby="car-loan-calculator-faq">
         <h2 id="car-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good tenure for a car loan?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Financial advisors generally recommend a 3 to 5 year tenure. Longer tenures (like 7 years) lower the monthly payment but significantly increase the total interest paid on a depreciating asset.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Are fixed rate car loans common?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, unlike home loans which are predominantly floating rate, many car loans in India are offered on fixed interest rates. Always verify whether prepayment penalties apply.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -245,21 +293,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcEMIClient(p: number, rate: number, years: number) {
-    const n = years * 12;
-    const r = rate / (12 * 100);
-    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    const totalPayment = emi * n;
-    const totalInterest = totalPayment - p;
-    return {
-      emi,
-      emiRounded: Math.round(emi),
-      totalPayment,
-      totalInterest,
-      principalFraction: totalPayment > 0 ? p / totalPayment : 0,
-      interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0,
-    };
-  }
+  import { calcEMI } from '../lib/calculators/emi';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -272,6 +309,9 @@ const jsonld = {
   }
 
   function initCLCalc() {
+    if ((window as any).__cmClBound) return;
+    (window as any).__cmClBound = true;
+
     const priceInput = document.getElementById('cl-price') as HTMLInputElement | null;
     const downInput = document.getElementById('cl-down') as HTMLInputElement | null;
     const rateInput = document.getElementById('cl-rate') as HTMLInputElement | null;
@@ -286,56 +326,89 @@ const jsonld = {
     const resDown = document.getElementById('cl-result-down');
     const resInterest = document.getElementById('cl-result-interest');
     const resTotal = document.getElementById('cl-result-total');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('cl-error-alert');
+    const errMsg = document.getElementById('cl-error-msg');
 
     if (!priceInput || !downInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { price: 1200000, down: 200000, rate: 9.0, years: 5 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const price = parse(priceInput.value);
-      const down = parse(downInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
+      const rawPrice = priceInput!.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
 
-      if (price <= 0 || rate <= 0 || years <= 0) return;
+      const vPrice = validate(rawPrice, { required: true, min: 50000, label: 'Vehicle Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, label: 'Down Payment' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 15, integer: true, label: 'Tenure' });
 
-      const loan = Math.max(0, price - down);
-      const res = calcEMIClient(loan, rate, years);
+      if (!vPrice.valid) { showError(vPrice.error!.message); return; }
+      if (!vDown.valid) { showError(vDown.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+
+      const price = vPrice.value!;
+      const downAmt = vDown.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+
+      if (downAmt >= price) {
+        showError('Down payment cannot exceed or equal vehicle price.');
+        return;
+      }
+      clearError();
+
+      const loan = price - downAmt;
+      const res = calcEMI(loan, rate, years);
+
+      setResult({
+        heroValue: fmtVal(res.emiRounded),
+        heroLabel: 'Monthly EMI',
+        rows: [
+          { label: 'Loan Principal', value: fmtVal(loan) },
+          { label: 'Down Payment', value: fmtVal(downAmt) },
+          { label: 'Total Interest', value: fmtVal(res.totalInterest) },
+          { label: 'Total Payment', value: fmtVal(res.totalPayment) },
+        ],
+      });
 
       if (resEMI) resEMI.textContent = fmtVal(res.emiRounded);
       if (resPrincipal) resPrincipal.textContent = fmtVal(loan);
-      if (resDown) resDown.textContent = fmtVal(down);
+      if (resDown) resDown.textContent = fmtVal(downAmt);
       if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
-      if (resTotal) resTotal.textContent = fmtVal(down + res.totalPayment);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.emiRounded);
+      if (resTotal) resTotal.textContent = fmtVal(res.totalPayment);
 
       const wrapper = document.getElementById('cl-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && res.totalPayment > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(loan);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+        if (bar) bar.style.width = `${Math.min(100, res.principalFraction * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(loan);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.totalInterest);
       }
 
-      history.replaceState(null, '', `#p=${price}&d=${down}&r=${rate}&y=${years}`);
+      serializeHash({ p: price, d: downAmt, r: rate, y: years });
     }
 
     function debounce() {
       clearTimeout(timer);
-      timer = setTimeout(recalc, 100);
+      timer = setTimeout(recalc, 120);
     }
 
     function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
-      if (!slider) return;
+      if (!slider || !input) return;
       slider.addEventListener('input', () => {
         input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
         const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
@@ -376,12 +449,13 @@ const jsonld = {
       }
       if (rateSlider) {
         rateSlider.value = String(DEFAULTS.rate);
-        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 7.0) / (18.0 - 7.0)) * 100}%`);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 6) / (20 - 6)) * 100}%`);
       }
       if (yearsSlider) {
         yearsSlider.value = String(DEFAULTS.years);
-        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (7 - 1)) * 100}%`);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (8 - 1)) * 100}%`);
       }
+      clearError();
       recalc();
       priceInput.focus();
     });
@@ -393,13 +467,22 @@ const jsonld = {
     });
 
     document.getElementById('cl-copy-btn')?.addEventListener('click', async () => {
-      const price = parse(priceInput.value);
-      const down = parse(downInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
-      const loan = price - down;
-      const res = calcEMIClient(loan, rate, years);
-      const text = `Car Loan EMI: ${fmtVal(res.emiRounded)}/month on car price ${fmtVal(price)} (down: ${fmtVal(down)}, ${rate}% for ${years} yrs). ${location.href.split('#')[0]}`;
+      const rawPrice = priceInput.value.replace(/[^0-9.]/g, '');
+      const rawDown = downInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vPrice = validate(rawPrice, { required: true, min: 50000, label: 'Vehicle Price' });
+      const vDown = validate(rawDown, { required: true, min: 0, label: 'Down Payment' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, label: 'Tenure' });
+
+      if (!vPrice.valid || !vDown.valid || !vRate.valid || !vYears.valid) return;
+      if (vDown.value! >= vPrice.value!) return;
+
+      const loan = vPrice.value! - vDown.value!;
+      const res = calcEMI(loan, vRate.value!, vYears.value!);
+      const text = `Car Loan EMI: ${fmtVal(res.emiRounded)}/month on car price of ${fmtVal(vPrice.value!)} (${fmtVal(vDown.value!)} down, ${vRate.value}% for ${vYears.value} yrs). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('cl-copy-btn');
       if (btn) {
@@ -419,6 +502,23 @@ const jsonld = {
       }
     });
 
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      p: { required: true, min: 50000, label: 'p' },
+      d: { required: true, min: 0, label: 'd' },
+      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 15, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.p && restored.values.d !== undefined && restored.values.r !== undefined && restored.values.y) {
+      priceInput.value = fmtLiveInput(String(restored.values.p));
+      downInput.value = fmtLiveInput(String(restored.values.d));
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
@@ -426,6 +526,13 @@ const jsonld = {
         recalc();
       }
     });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
   }
 
   initCLCalc();

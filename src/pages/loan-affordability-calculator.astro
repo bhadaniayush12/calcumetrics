@@ -1,0 +1,501 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcAffordability } from '../lib/finance/amortization';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { monthlyBudget: 40000, rate: 9.0, years: 15 };
+const result = calcAffordability(DEFAULT.monthlyBudget, DEFAULT.rate, DEFAULT.years);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'loan-affordability-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/loan-affordability-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Loan Affordability Calculator',
+      url: canonicalUrl,
+      description: 'Estimate the maximum loan principal amount you can afford based on your monthly repayment budget.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
+        { '@type': 'ListItem', position: 3, name: 'Loan Affordability Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How is maximum loan affordability calculated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'It inverts the standard loan EMI formula by calculating the present value of an annuity. Given your maximum affordable monthly installment, loan tenure, and prevailing interest rate, it solves for the maximum principal sum a lender would sanction.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What percentage of my monthly income should go toward loan EMIs?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Prudent financial planning guidelines suggest keeping total debt obligations (including home loan, car loan, and credit cards) under 35% to 40% of gross monthly income (the Debt-to-Income or DTI benchmark).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does interest rate affect my borrowing capacity?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Interest rates have an inverse relationship with borrowing capacity. A 1% increase in loan interest rate typically reduces your maximum affordable loan amount by approximately 6% to 9% for the same monthly payment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does increasing loan tenure increase borrowing power?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, spreading the loan over a longer duration (e.g. 25 years instead of 15 years) lowers each monthly installment, enabling a larger total loan principal for the same monthly budget. However, total interest paid over the life of the loan increases significantly.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What other costs should I budget for besides loan EMI?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Borrowers should budget for loan processing fees, legal verification costs, stamp duty, mandatory property or loan insurance, and future maintenance or property taxes.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Loan Affordability Calculator: How Much Can I Borrow? | Calcumetrics"
+  description="Calculate your maximum affordable borrowing amount based on monthly payment budget, interest rate, and repayment tenure."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Loan Affordability Calculator"
+    category="Loans"
+    categoryHref="/loans"
+    heroValue={fmtCurrency(result.maxLoanAmount)}
+    heroLabel="Maximum Affordable Loan"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Loan Affordability Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Discover how much loan principal you can qualify for given your target monthly payment budget.</p>
+
+      <!-- Error alert -->
+      <div id="afford-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="afford-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Monthly Repayment Budget -->
+      <div class="mb-5">
+        <Input
+          id="afford-budget"
+          label="Monthly Repayment Budget"
+          prefix="₹"
+          value="40,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Maximum monthly EMI you can comfortably afford"
+          inputmode="decimal"
+          aria-describedby="afford-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="afford-budget-slider" min={5000} max={500000} step={2500} value={40000} ariaLabel="Monthly budget slider" />
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="mb-5">
+        <Input
+          id="afford-rate"
+          label="Expected Annual Interest Rate"
+          suffix="%"
+          value="9.0"
+          isNumeric={true}
+          helperText="Anticipated loan interest rate"
+          inputmode="decimal"
+          aria-describedby="afford-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="afford-rate-slider" min={3} max={20} step={0.1} value={9.0} ariaLabel="Interest rate slider" />
+        </div>
+      </div>
+
+      <!-- Loan Term -->
+      <div class="mb-6">
+        <Input
+          id="afford-years"
+          label="Loan Term (Years)"
+          value="15"
+          isNumeric={true}
+          helperText="Planned duration of the loan in years"
+          inputmode="numeric"
+          aria-describedby="afford-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="afford-years-slider" min={1} max={30} step={1} value={15} ariaLabel="Loan term slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="afford-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="afford-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maximum Affordable Loan</span>
+        <div id="afford-result-loan" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtCurrency(result.maxLoanAmount)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Monthly EMI Budget</span>
+          <span id="afford-result-budget" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.monthlyBudget)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Loan Repayment</span>
+          <span id="afford-result-repayment" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.totalRepayment)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Interest Payable</span>
+          <span id="afford-result-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Principal Share</span>
+          <span id="afford-result-share" class="text-sm font-bold tabular-nums text-dark-text">{(result.maxLoanAmount / result.totalRepayment * 100).toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="afford-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.maxLoanAmount / result.totalRepayment}
+          gainFraction={result.totalInterest / result.totalRepayment}
+          principalLabel="Principal"
+          gainLabel="Interest"
+          principalValue={fmtCurrency(result.maxLoanAmount)}
+          gainValue={fmtCurrency(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="afford-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="afford-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Based on reducing-balance amortization. Actual sanctioned loan amount depends on lender credit policies.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="afford-calculator-how">
+        <h2 id="afford-calculator-how" class="text-xl font-bold text-text-primary mb-4">How loan affordability is determined</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Borrowing capacity is calculated by inverting the equated monthly installment (EMI) formula using the present value of an ordinary annuity:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Affordable Principal: </strong> P<sub>max</sub> = EMI &times; [ (1 + r)<sup>n</sup> &minus; 1 ] &divide; [ r &times; (1 + r)<sup>n</sup> ]<br />
+            <strong>Total Outflow: </strong> Repayment = EMI &times; n<br />
+            <strong>Interest Burden: </strong> Total Interest = Repayment &minus; P<sub>max</sub>
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="afford-calculator-faq">
+        <h2 id="afford-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['How is maximum loan affordability calculated?', 'It inverts the standard loan EMI formula by calculating the present value of an annuity. Given your maximum affordable monthly installment, loan tenure, and prevailing interest rate, it solves for the maximum principal sum a lender would sanction.'],
+            ['What percentage of my monthly income should go toward loan EMIs?', 'Prudent financial planning guidelines suggest keeping total debt obligations (including home loan, car loan, and credit cards) under 35% to 40% of gross monthly income (the Debt-to-Income or DTI benchmark).'],
+            ['How does interest rate affect my borrowing capacity?', 'Interest rates have an inverse relationship with borrowing capacity. A 1% increase in loan interest rate typically reduces your maximum affordable loan amount by approximately 6% to 9% for the same monthly payment.'],
+            ['Does increasing loan tenure increase borrowing power?', 'Yes, spreading the loan over a longer duration (e.g. 25 years instead of 15 years) lowers each monthly installment, enabling a larger total loan principal for the same monthly budget. However, total interest paid over the life of the loan increases significantly.'],
+            ['What other costs should I budget for besides loan EMI?', 'Borrowers should budget for loan processing fees, legal verification costs, stamp duty, mandatory property or loan insurance, and future maintenance or property taxes.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="afford-calculator-related">
+        <h2 id="afford-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcAffordability } from '../lib/finance/amortization';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initAffordCalc() {
+    if ((window as any).__cmAffordBound) return;
+    (window as any).__cmAffordBound = true;
+
+    const bInput = document.getElementById('afford-budget') as HTMLInputElement | null;
+    const rInput = document.getElementById('afford-rate') as HTMLInputElement | null;
+    const yInput = document.getElementById('afford-years') as HTMLInputElement | null;
+
+    const bSlider = document.getElementById('afford-budget-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('afford-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('afford-years-slider') as HTMLInputElement | null;
+
+    const resLoan = document.getElementById('afford-result-loan');
+    const resBudget = document.getElementById('afford-result-budget');
+    const resRepayment = document.getElementById('afford-result-repayment');
+    const resInterest = document.getElementById('afford-result-interest');
+    const resShare = document.getElementById('afford-result-share');
+
+    const errAlert = document.getElementById('afford-error-alert');
+    const errMsg = document.getElementById('afford-error-msg');
+
+    if (!bInput || !rInput || !yInput) return;
+
+    const DEFAULTS = { monthlyBudget: 40000, rate: 9.0, years: 15 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawB = bInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput!.value.replace(/[^0-9.]/g, '');
+
+      const vB = validate(rawB, { required: true, min: 100, label: 'Monthly Repayment Budget' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vY = validate(rawY, { required: true, min: 1, max: 40, integer: true, label: 'Loan Term' });
+
+      if (!vB.valid) { showError(vB.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vY.valid) { showError(vY.error!.message); return; }
+      clearError();
+
+      const budget = vB.value!;
+      const rate = vR.value!;
+      const years = vY.value!;
+
+      const res = calcAffordability(budget, rate, years);
+
+      const shareText = res.totalRepayment > 0
+        ? ((res.maxLoanAmount / res.totalRepayment) * 100).toFixed(1) + '%'
+        : '0%';
+
+      setResult({
+        heroValue: fmtVal(res.maxLoanAmount),
+        heroLabel: 'Maximum Affordable Loan',
+        rows: [
+          { label: 'Monthly EMI Budget', value: fmtVal(budget) },
+          { label: 'Total Loan Repayment', value: fmtVal(res.totalRepayment) },
+          { label: 'Total Interest Payable', value: fmtVal(res.totalInterest) },
+          { label: 'Principal Share', value: shareText },
+        ],
+      });
+
+      if (resLoan) resLoan.textContent = fmtVal(res.maxLoanAmount);
+      if (resBudget) resBudget.textContent = fmtVal(budget);
+      if (resRepayment) resRepayment.textContent = fmtVal(res.totalRepayment);
+      if (resInterest) resInterest.textContent = fmtVal(res.totalInterest);
+      if (resShare) resShare.textContent = shareText;
+
+      const wrapper = document.getElementById('afford-composition-wrapper');
+      if (wrapper && res.totalRepayment > 0) {
+        const pFrac = res.maxLoanAmount / res.totalRepayment;
+        const iFrac = res.totalInterest / res.totalRepayment;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(pFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(iFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.maxLoanAmount);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', serializeHash({ b: budget, r: rate, y: years }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(bSlider, bInput, true);
+    sync(rSlider, rInput, false);
+    sync(ySlider, yInput, false);
+
+    document.getElementById('afford-calculate')?.addEventListener('click', recalc);
+    document.getElementById('afford-reset')?.addEventListener('click', () => {
+      bInput.value = fmtLiveInput(String(DEFAULTS.monthlyBudget));
+      rInput.value = String(DEFAULTS.rate);
+      yInput.value = String(DEFAULTS.years);
+
+      if (bSlider) {
+        bSlider.value = String(DEFAULTS.monthlyBudget);
+        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthlyBudget - 5000) / (500000 - 5000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (20 - 3)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.years);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      bInput.focus();
+    });
+
+    [bInput, rInput, yInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('afford-copy-btn')?.addEventListener('click', async () => {
+      const rawB = bInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput.value.replace(/[^0-9.]/g, '');
+
+      const vB = validate(rawB, { required: true, min: 100, label: 'Budget' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'Rate' });
+      const vY = validate(rawY, { required: true, min: 1, label: 'Years' });
+
+      if (!vB.valid || !vR.valid || !vY.valid) return;
+
+      const res = calcAffordability(vB.value!, vR.value!, vY.value!);
+      const text = `Loan Affordability: Budget of ${fmtVal(vB.value!)}/mo at ${vR.value}% for ${vY.value} years gives maximum loan of ${fmtVal(res.maxLoanAmount)} (Total interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('afford-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('afford-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('afford-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      b: { required: true, min: 100, label: 'b' },
+      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 40, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.b && restored.values.r !== undefined && restored.values.y) {
+      bInput.value = fmtLiveInput(String(restored.values.b));
+      rInput.value = String(restored.values.r);
+      yInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initAffordCalc();
+  document.addEventListener('astro:page-load', initAffordCalc);
+</script>
