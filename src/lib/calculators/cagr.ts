@@ -7,10 +7,13 @@ export interface CAGRResult {
   cagrPct: number;    // As percentage (e.g. 20.11)
   absoluteReturn: number;
   absoluteReturnPct: number;
+  multiple: number;
 }
 
 export function calcCAGR(presentValue: number, futureValue: number, years: number): CAGRResult {
-  if (presentValue <= 0 || years <= 0) return { cagr: 0, cagrPct: 0, absoluteReturn: 0, absoluteReturnPct: 0 };
+  if (presentValue <= 0 || futureValue <= 0 || years <= 0) {
+    return { cagr: 0, cagrPct: 0, absoluteReturn: 0, absoluteReturnPct: 0, multiple: 0 };
+  }
   const cagr = Math.pow(futureValue / presentValue, 1 / years) - 1;
   const absoluteReturn = futureValue - presentValue;
   return {
@@ -18,5 +21,6 @@ export function calcCAGR(presentValue: number, futureValue: number, years: numbe
     cagrPct: cagr * 100,
     absoluteReturn,
     absoluteReturnPct: (absoluteReturn / presentValue) * 100,
+    multiple: futureValue / presentValue,
   };
 }

@@ -14,7 +14,19 @@ export interface FDResult {
 }
 
 export function calcFD(principal: number, ratePercent: number, years: number, freq: FDCompoundFreq = 'quarterly'): FDResult {
-  const n = FD_FREQ[freq];
+  if (principal <= 0 || ratePercent < 0 || years < 0) {
+    return { maturity: 0, principal: 0, interest: 0, principalFraction: 0, interestFraction: 0 };
+  }
+  const n = FD_FREQ[freq] || 4;
+  if (ratePercent === 0 || years === 0) {
+    return {
+      maturity: principal,
+      principal,
+      interest: 0,
+      principalFraction: 1,
+      interestFraction: 0,
+    };
+  }
   const maturity = principal * Math.pow(1 + (ratePercent / 100) / n, n * years);
   const interest = maturity - principal;
   return {

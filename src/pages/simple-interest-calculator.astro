@@ -42,6 +42,35 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Simple Interest Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Where is simple interest typically used in banking?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Simple interest is commonly used for short-term personal loans, auto loans, commercial promissory notes, and certain certificates of deposit where interest is disbursed periodically.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the formula for simple interest?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Simple interest formula is SI = (P × R × T) / 100, where P is the principal amount, R is the annual interest rate, and T is the tenure in years. Total maturity value is P + SI.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why do savings accounts use compound interest instead?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Compound interest pays interest on previously accumulated interest, allowing savings to grow exponentially over time rather than linearly.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -59,6 +88,7 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmt(result.totalAmount)}
     heroLabel="Maturity Value"
+    calcType="simple"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Simple Interest Calculator</h1>
@@ -93,7 +123,7 @@ const jsonld = {
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="si-rate-slider" min={1} max={30} step={0.25} value={7.5} ariaLabel="Interest rate slider" />
+          <Slider id="si-rate-slider" min={0} max={30} step={0.25} value={7.5} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -109,8 +139,15 @@ const jsonld = {
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="si-years-slider" min={1} max={30} step={0.5} value={5} ariaLabel="Years slider" />
+          <Slider id="si-years-slider" min={0.5} max={30} step={0.5} value={5} ariaLabel="Years slider" />
         </div>
+      </div>
+
+      <!-- Validation Error Container -->
+      <div id="si-error-alert" class="hidden mb-5">
+        <Alert variant="error" title="Validation Error">
+          <span id="si-error-message">Please check your inputs.</span>
+        </Alert>
       </div>
 
       <Alert variant="info" title="Simple vs Compound Interest">
@@ -189,6 +226,18 @@ const jsonld = {
             <li><strong class="text-text-primary">Total Maturity</strong> = P + SI</li>
           </ul>
         </div>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2">Worked Example</h3>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Consider a principal of <strong class="text-text-primary">₹1,00,000</strong> deposited at an annual rate of <strong class="text-text-primary">7.5%</strong> for <strong class="text-text-primary">5 years</strong>:
+          </p>
+          <p class="text-sm font-mono text-text-primary my-2">
+            SI = (1,00,000 &times; 7.5 &times; 5) / 100 = ₹37,500
+          </p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Total Maturity Value = ₹1,00,000 + ₹37,500 = <strong class="text-text-primary">₹1,37,500</strong>. Over the same period with annual compounding, the investment would grow to ₹1,43,563, giving a compounding advantage of +₹6,063.
+          </p>
+        </div>
       </section>
 
       <section aria-labelledby="si-calculator-faq">
@@ -198,6 +247,12 @@ const jsonld = {
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Where is simple interest typically used in banking?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
               Simple interest is commonly used for short-term personal loans, car loans, auto financing, installment loans, and certificates of deposit where interest is paid out periodically rather than reinvested into the principal.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the formula for simple interest?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The formula is SI = (P &times; R &times; T) / 100. P is principal, R is annual rate, and T is tenure in years. Total maturity value is P + SI.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
@@ -218,26 +273,18 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcSIClient(p: number, r: number, y: number) {
-    const interest = (p * r * y) / 100;
-    const totalAmount = p + interest;
-    const compoundAmount = p * Math.pow(1 + r / 100, y);
-    const compoundingAdvantage = Math.max(0, compoundAmount - totalAmount);
-    return {
-      interest,
-      totalAmount,
-      compoundAmount,
-      compoundingAdvantage,
-      pFrac: totalAmount > 0 ? p / totalAmount : 1,
-      iFrac: totalAmount > 0 ? interest / totalAmount : 0,
-    };
-  }
+  import { calcSimpleInterest } from '../lib/calculators/simple-interest';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
+
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
+
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
@@ -259,43 +306,118 @@ const jsonld = {
     const resAdvantage = document.getElementById('si-result-advantage');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errorAlert = document.getElementById('si-error-alert');
+    const errorMessage = document.getElementById('si-error-message');
+
     if (!pInput || !rInput || !yInput) return;
 
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
+
     const DEFAULTS = { p: 100000, r: 7.5, y: 5 };
+    const siSchema = {
+      p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
+      r: { required: true, min: 0, max: 100, decimal: true, label: 'Annual Interest Rate' },
+      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Time Period (Tenure)' },
+    };
+
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errorAlert && errorMessage) {
+        errorMessage.textContent = msg;
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function hideError() {
+      if (errorAlert) {
+        errorAlert.classList.add('hidden');
+      }
     }
 
     function recalc() {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseFloat(yInput.value) || 0;
+      // Phase 4.3 Centralized Validation Engine
+      const valP = validate(pInput.value, siSchema.p);
+      if (!valP.valid) {
+        showError(valP.error.message);
+        return;
+      }
 
-      if (p <= 0 || r <= 0 || y <= 0) return;
+      const valR = validate(rInput.value, siSchema.r);
+      if (!valR.valid) {
+        showError(valR.error.message);
+        return;
+      }
 
-      const res = calcSIClient(p, r, y);
+      const valY = validate(yInput.value, siSchema.y);
+      if (!valY.valid) {
+        showError(valY.error.message);
+        return;
+      }
 
-      if (resMaturity) resMaturity.textContent = fmtVal(res.totalAmount);
-      if (resPrincipal) resPrincipal.textContent = fmtVal(p);
-      if (resInterest) resInterest.textContent = fmtVal(res.interest);
-      if (resCompound) resCompound.textContent = fmtVal(res.compoundAmount);
-      if (resAdvantage) resAdvantage.textContent = '+' + fmtVal(res.compoundingAdvantage);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.totalAmount);
+      hideError();
+
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+
+      const res = calcSimpleInterest(p, r, y);
+
+      // Phase 4.2 Canonical Result State — Single Store Write
+      const heroVal = fmtVal(res.totalAmount);
+      const interestVal = fmtVal(res.interest);
+      const principalVal = fmtVal(p);
+      const compoundVal = fmtVal(res.compoundInterestAmount);
+      const advantageVal = '+' + fmtVal(res.compoundingAdvantage);
+
+      const canonicalResult = {
+        heroValue: heroVal,
+        heroLabel: 'Maturity Value',
+        rows: [
+          { label: 'Initial Principal', value: principalVal },
+          { label: 'Total Simple Interest', value: interestVal, variant: 'accent' as const },
+          { label: 'Compounded Equivalent', value: compoundVal },
+          { label: 'Compounding Advantage', value: advantageVal, variant: 'accent' as const },
+        ],
+        fields: {
+          'si-result-maturity': heroVal,
+          'si-result-principal': principalVal,
+          'si-result-interest': interestVal,
+          'si-result-compound': compoundVal,
+          'si-result-advantage': advantageVal,
+        },
+        meta: { p, r, y, interest: res.interest, totalAmount: res.totalAmount },
+      };
+
+      setResult(canonicalResult);
+
+      // Update Desktop fallback and composition bar
+      if (resMaturity) resMaturity.textContent = heroVal;
+      if (resPrincipal) resPrincipal.textContent = principalVal;
+      if (resInterest) resInterest.textContent = interestVal;
+      if (resCompound) resCompound.textContent = compoundVal;
+      if (resAdvantage) resAdvantage.textContent = advantageVal;
+      if (mobileHero) mobileHero.textContent = heroVal;
 
       const wrapper = document.getElementById('si-composition-wrapper');
       if (wrapper && res.totalAmount > 0) {
+        const pFrac = p / res.totalAmount;
+        const iFrac = res.interest / res.totalAmount;
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.pFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.iFrac * 100).toFixed(2)}%`;
+        if (bar) bar.style.width = `${(pFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(iFrac * 100).toFixed(2)}%`;
         const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(p);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.interest);
+        if (legendEls[0]) legendEls[0].textContent = principalVal;
+        if (legendEls[1]) legendEls[1].textContent = interestVal;
       }
 
-      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}`);
+      // Phase 4.4 URL State Serialization
+      updateHash(serializeHash({ p, r, y }));
     }
 
     function debounce() {
@@ -307,7 +429,8 @@ const jsonld = {
       if (!slider) return;
       slider.addEventListener('input', () => {
         input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
-        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
+        const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         debounce();
       });
@@ -340,13 +463,14 @@ const jsonld = {
       }
       if (rSlider) {
         rSlider.value = String(DEFAULTS.r);
-        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.r - 1) / (30 - 1)) * 100}%`);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.r - 0) / (30 - 0)) * 100}%`);
       }
       if (ySlider) {
         ySlider.value = String(DEFAULTS.y);
-        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.y - 1) / (30 - 1)) * 100}%`);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.y - 0.5) / (30 - 0.5)) * 100}%`);
       }
 
+      hideError();
       recalc();
       pInput.focus();
     });
@@ -359,12 +483,30 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('si-copy-btn')?.addEventListener('click', async () => {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseFloat(yInput.value) || 0;
-      const res = calcSIClient(p, r, y);
-      const text = `Simple Interest: Principal ${fmtVal(p)} at ${r}% for ${y} years => Total Interest: ${fmtVal(res.interest)}, Maturity: ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      const valP = validate(pInput.value, siSchema.p);
+      const valR = validate(rInput.value, siSchema.r);
+      const valY = validate(yInput.value, siSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const res = calcSimpleInterest(p, r, y);
+      const text = `Simple Interest: Principal ${fmtVal(p)} at ${r}% for ${y} years => Total Interest: ${fmtVal(res.interest)}, Maturity: ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('si-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -374,7 +516,29 @@ const jsonld = {
     });
 
     document.getElementById('si-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      const valP = validate(pInput.value, siSchema.p);
+      const valR = validate(rInput.value, siSchema.r);
+      const valY = validate(yInput.value, siSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const shareUrl = `${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('si-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -383,13 +547,17 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmSICurrencyBound) {
+      win.__cmSICurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
@@ -397,6 +565,37 @@ const jsonld = {
         currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
       }
     } catch (e) {}
+
+    // Phase 4.4 URL State Restoration
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, siSchema);
+      if (restored.valid) {
+        if (restored.values.p !== undefined) {
+          pInput.value = fmtLiveInput(String(restored.values.p));
+          if (pSlider) {
+            pSlider.value = String(restored.values.p);
+            pSlider.style.setProperty('--slider-pct', `${((restored.values.p - 5000) / (5000000 - 5000)) * 100}%`);
+          }
+        }
+        if (restored.values.r !== undefined) {
+          rInput.value = String(restored.values.r);
+          if (rSlider) {
+            rSlider.value = String(restored.values.r);
+            rSlider.style.setProperty('--slider-pct', `${((restored.values.r - 0) / (30 - 0)) * 100}%`);
+          }
+        }
+        if (restored.values.y !== undefined) {
+          yInput.value = String(restored.values.y);
+          if (ySlider) {
+            ySlider.value = String(restored.values.y);
+            ySlider.style.setProperty('--slider-pct', `${((restored.values.y - 0.5) / (30 - 0.5)) * 100}%`);
+          }
+        }
+      }
+    }
+
+    recalc();
   }
 
   initSICalc();

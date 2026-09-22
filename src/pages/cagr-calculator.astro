@@ -12,7 +12,7 @@ import { TOOLS } from '../config/site';
 const DEFAULT = { pv: 100000, fv: 250000, years: 5 };
 const result = calcCAGR(DEFAULT.pv, DEFAULT.fv, DEFAULT.years);
 
-const fmt = (n: number) => '₹' + formatIndian(n);
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter(
   (t) => t.category === 'Investments' && t.slug !== 'cagr-calculator' && t.status === 'published'
@@ -44,6 +44,35 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'CAGR Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is CAGR and when should I use it?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'CAGR (Compound Annual Growth Rate) represents the annualized constant return rate required for an investment to grow from its initial value to its final value over a given period, smoothing out year-over-year market fluctuations.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the formula for CAGR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The formula is CAGR = (Ending Value / Beginning Value)^(1 / Years) − 1. The result is multiplied by 100 to express it as an annual percentage.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can CAGR be negative?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. If the final value is less than the beginning value, the investment suffered a loss, resulting in a negative CAGR reflecting the annualized rate of loss.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -61,6 +90,7 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={result.cagrPct.toFixed(2) + '%'}
     heroLabel="CAGR"
+    calcType="simple"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">CAGR Calculator</h1>
@@ -114,6 +144,13 @@ const jsonld = {
         <div class="mt-2">
           <Slider id="cagr-years-slider" min={1} max={30} step={0.5} value={5} ariaLabel="Years slider" />
         </div>
+      </div>
+
+      <!-- Validation Error Container -->
+      <div id="cagr-error-alert" class="hidden mb-5">
+        <Alert variant="error" title="Validation Error">
+          <span id="cagr-error-message">Please check your inputs.</span>
+        </Alert>
       </div>
 
       <Alert variant="info" title="How CAGR Works">
@@ -183,6 +220,18 @@ const jsonld = {
             <li><strong class="text-text-primary">n</strong> — Number of years</li>
           </ul>
         </div>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2">Worked Example</h3>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Suppose you invested <strong class="text-text-primary">₹1,00,000</strong> and after <strong class="text-text-primary">5 years</strong> your portfolio reached <strong class="text-text-primary">₹2,50,000</strong>:
+          </p>
+          <p class="text-sm font-mono text-text-primary my-2">
+            CAGR = (2,50,000 / 1,00,000)^(1 / 5) − 1 = (2.5)^(0.2) − 1 ≈ 0.2011 (20.11%)
+          </p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Total absolute gain is ₹1,50,000 (+150.0%), representing a 2.50x growth multiple over the 5-year investment duration.
+          </p>
+        </div>
       </section>
 
       <section aria-labelledby="cagr-calculator-faq">
@@ -198,6 +247,12 @@ const jsonld = {
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the limitations of CAGR?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
               CAGR assumes a smooth annual rate and ignores volatility and drawdowns during intermediate years. Two investments with identical CAGRs could have experienced wildly different levels of risk.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can CAGR be negative?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes. If an investment declines in value (e.g. ₹1,00,000 drops to ₹80,000 over 3 years), the CAGR formula yields a negative annual rate (-7.17%), accurately reflecting the annualized capital loss.
             </div>
           </details>
         </div>
@@ -220,25 +275,18 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcCAGRClient(pv: number, fv: number, years: number) {
-    if (pv <= 0 || years <= 0) return { cagrPct: 0, absoluteReturn: 0, absoluteReturnPct: 0, multiple: 0 };
-    const cagr = Math.pow(fv / pv, 1 / years) - 1;
-    const absoluteReturn = fv - pv;
-    const absoluteReturnPct = (absoluteReturn / pv) * 100;
-    const multiple = fv / pv;
-    return {
-      cagrPct: cagr * 100,
-      absoluteReturn,
-      absoluteReturnPct,
-      multiple,
-    };
-  }
+  import { calcCAGR } from '../lib/calculators/cagr';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
+
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
+
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
@@ -248,6 +296,7 @@ const jsonld = {
     const pvInput = document.getElementById('cagr-pv') as HTMLInputElement | null;
     const fvInput = document.getElementById('cagr-fv') as HTMLInputElement | null;
     const yInput = document.getElementById('cagr-years') as HTMLInputElement | null;
+
     const pvSlider = document.getElementById('cagr-pv-slider') as HTMLInputElement | null;
     const fvSlider = document.getElementById('cagr-fv-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('cagr-years-slider') as HTMLInputElement | null;
@@ -260,33 +309,109 @@ const jsonld = {
     const resMult = document.getElementById('cagr-result-multiple');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errorAlert = document.getElementById('cagr-error-alert');
+    const errorMessage = document.getElementById('cagr-error-message');
+
     if (!pvInput || !fvInput || !yInput) return;
 
+    if (pvInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pvInput.dataset.bound = 'true';
+
     const DEFAULTS = { pv: 100000, fv: 250000, years: 5 };
+    const cagrSchema = {
+      pv: { required: true, min: 100, max: 1000000000, label: 'Initial Investment' },
+      fv: { required: true, min: 1, max: 1000000000, label: 'Final Value' },
+      y: { required: true, min: 0.1, max: 100, decimal: true, label: 'Time Period (Years)' },
+    };
+
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errorAlert && errorMessage) {
+        errorMessage.textContent = msg;
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function hideError() {
+      if (errorAlert) {
+        errorAlert.classList.add('hidden');
+      }
     }
 
     function recalc() {
-      const pv = parse(pvInput.value);
-      const fv = parse(fvInput.value);
-      const y = parseFloat(yInput.value) || 0;
+      // Phase 4.3 Centralized Validation Engine
+      const valPv = validate(pvInput.value, cagrSchema.pv);
+      if (!valPv.valid) {
+        showError(valPv.error.message);
+        return;
+      }
 
-      if (pv <= 0 || fv <= 0 || y <= 0) return;
+      const valFv = validate(fvInput.value, cagrSchema.fv);
+      if (!valFv.valid) {
+        showError(valFv.error.message);
+        return;
+      }
 
-      const res = calcCAGRClient(pv, fv, y);
+      const valY = validate(yInput.value, cagrSchema.y);
+      if (!valY.valid) {
+        showError(valY.error.message);
+        return;
+      }
 
-      if (resPct) resPct.textContent = res.cagrPct.toFixed(2) + '%';
-      if (resPv) resPv.textContent = fmtVal(pv);
-      if (resFv) resFv.textContent = fmtVal(fv);
-      if (resGain) resGain.textContent = fmtVal(res.absoluteReturn);
-      if (resAbsRet) resAbsRet.textContent = res.absoluteReturnPct.toFixed(1) + '%';
-      if (resMult) resMult.textContent = res.multiple.toFixed(2) + 'x';
-      if (mobileHero) mobileHero.textContent = res.cagrPct.toFixed(2) + '%';
+      hideError();
 
-      history.replaceState(null, '', `#pv=${pv}&fv=${fv}&y=${y}`);
+      const pv = valPv.value!;
+      const fv = valFv.value!;
+      const y = valY.value!;
+
+      const res = calcCAGR(pv, fv, y);
+
+      const cagrPctStr = res.cagrPct.toFixed(2) + '%';
+      const pvStr = fmtVal(pv);
+      const fvStr = fmtVal(fv);
+      const gainStr = fmtVal(res.absoluteReturn);
+      const absRetStr = res.absoluteReturnPct.toFixed(1) + '%';
+      const multStr = res.multiple.toFixed(2) + 'x';
+
+      // Phase 4.2 Canonical Result State
+      const canonicalResult = {
+        heroValue: cagrPctStr,
+        heroLabel: 'CAGR',
+        rows: [
+          { label: 'Initial Investment', value: pvStr },
+          { label: 'Final Value', value: fvStr },
+          { label: 'Absolute Gain', value: gainStr, variant: 'accent' as const },
+          { label: 'Total Absolute Return', value: absRetStr },
+          { label: 'Growth Multiple', value: multStr },
+        ],
+        fields: {
+          'cagr-result-pct': cagrPctStr,
+          'cagr-result-pv': pvStr,
+          'cagr-result-fv': fvStr,
+          'cagr-result-gain': gainStr,
+          'cagr-result-absret': absRetStr,
+          'cagr-result-multiple': multStr,
+        },
+        meta: { pv, fv, y, cagr: res.cagr, cagrPct: res.cagrPct, multiple: res.multiple },
+      };
+
+      setResult(canonicalResult);
+
+      // Desktop fallback updates
+      if (resPct) resPct.textContent = cagrPctStr;
+      if (resPv) resPv.textContent = pvStr;
+      if (resFv) resFv.textContent = fvStr;
+      if (resGain) resGain.textContent = gainStr;
+      if (resAbsRet) resAbsRet.textContent = absRetStr;
+      if (resMult) resMult.textContent = multStr;
+      if (mobileHero) mobileHero.textContent = cagrPctStr;
+
+      // Phase 4.4 URL State Serialization
+      updateHash(serializeHash({ pv, fv, y }));
     }
 
     function debounce() {
@@ -298,7 +423,8 @@ const jsonld = {
       if (!slider) return;
       slider.addEventListener('input', () => {
         input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
-        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
+        const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         debounce();
       });
@@ -324,6 +450,7 @@ const jsonld = {
       pvInput.value = fmtLiveInput(String(DEFAULTS.pv));
       fvInput.value = fmtLiveInput(String(DEFAULTS.fv));
       yInput.value = String(DEFAULTS.years);
+
       if (pvSlider) {
         pvSlider.value = String(DEFAULTS.pv);
         pvSlider.style.setProperty('--slider-pct', `${((DEFAULTS.pv - 5000) / (10000000 - 5000)) * 100}%`);
@@ -336,6 +463,8 @@ const jsonld = {
         ySlider.value = String(DEFAULTS.years);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
       }
+
+      hideError();
       recalc();
       pvInput.focus();
     });
@@ -347,12 +476,30 @@ const jsonld = {
     });
 
     document.getElementById('cagr-copy-btn')?.addEventListener('click', async () => {
-      const pv = parse(pvInput.value);
-      const fv = parse(fvInput.value);
-      const y = parseFloat(yInput.value) || 0;
-      const res = calcCAGRClient(pv, fv, y);
-      const text = `CAGR: ${fmtVal(pv)} to ${fmtVal(fv)} over ${y} years is ${res.cagrPct.toFixed(2)}% CAGR (${res.multiple.toFixed(2)}x return). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      const valPv = validate(pvInput.value, cagrSchema.pv);
+      const valFv = validate(fvInput.value, cagrSchema.fv);
+      const valY = validate(yInput.value, cagrSchema.y);
+      if (!valPv.valid || !valFv.valid || !valY.valid) {
+        showError((!valPv.valid && valPv.error.message) || (!valFv.valid && valFv.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const pv = valPv.value!;
+      const fv = valFv.value!;
+      const y = valY.value!;
+      const res = calcCAGR(pv, fv, y);
+      const text = `CAGR: ${fmtVal(pv)} to ${fmtVal(fv)} over ${y} years is ${res.cagrPct.toFixed(2)}% CAGR (${res.multiple.toFixed(2)}x return). ${location.href.split('#')[0]}#pv=${pv}&fv=${fv}&y=${y}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cagr-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -362,7 +509,29 @@ const jsonld = {
     });
 
     document.getElementById('cagr-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      const valPv = validate(pvInput.value, cagrSchema.pv);
+      const valFv = validate(fvInput.value, cagrSchema.fv);
+      const valY = validate(yInput.value, cagrSchema.y);
+      if (!valPv.valid || !valFv.valid || !valY.valid) {
+        showError((!valPv.valid && valPv.error.message) || (!valFv.valid && valFv.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const pv = valPv.value!;
+      const fv = valFv.value!;
+      const y = valY.value!;
+      const shareUrl = `${location.href.split('#')[0]}#pv=${pv}&fv=${fv}&y=${y}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cagr-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -372,13 +541,17 @@ const jsonld = {
     });
 
     // Currency synchronization
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmCAGRCurrencyBound) {
+      win.__cmCAGRCurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
@@ -386,6 +559,37 @@ const jsonld = {
         currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
       }
     } catch (e) {}
+
+    // Phase 4.4 URL State Restoration
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, cagrSchema);
+      if (restored.valid) {
+        if (restored.values.pv !== undefined) {
+          pvInput.value = fmtLiveInput(String(restored.values.pv));
+          if (pvSlider) {
+            pvSlider.value = String(restored.values.pv);
+            pvSlider.style.setProperty('--slider-pct', `${((restored.values.pv - 5000) / (10000000 - 5000)) * 100}%`);
+          }
+        }
+        if (restored.values.fv !== undefined) {
+          fvInput.value = fmtLiveInput(String(restored.values.fv));
+          if (fvSlider) {
+            fvSlider.value = String(restored.values.fv);
+            fvSlider.style.setProperty('--slider-pct', `${((restored.values.fv - 5000) / (50000000 - 5000)) * 100}%`);
+          }
+        }
+        if (restored.values.y !== undefined) {
+          yInput.value = String(restored.values.y);
+          if (ySlider) {
+            ySlider.value = String(restored.values.y);
+            ySlider.style.setProperty('--slider-pct', `${((restored.values.y - 1) / (30 - 1)) * 100}%`);
+          }
+        }
+      }
+    }
+
+    recalc();
   }
 
   initCAGRCalc();

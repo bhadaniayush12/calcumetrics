@@ -15,6 +15,17 @@ export interface EMIResult {
 }
 
 export function calcEMI(principal: number, ratePercent: number, years: number): EMIResult {
+  if (principal <= 0 || ratePercent < 0 || years <= 0) {
+    return {
+      emi: 0,
+      emiRounded: 0,
+      totalPayment: 0,
+      totalInterest: 0,
+      principal: 0,
+      principalFraction: 0,
+      interestFraction: 0,
+    };
+  }
   const n = years * 12;
   const r = ratePercent / (12 * 100);
 
