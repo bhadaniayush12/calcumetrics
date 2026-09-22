@@ -199,6 +199,9 @@ const jsonld = {
         Results are estimates; returns are not guaranteed.
       </Alert>
 
+      <!-- Validation alert (shown when an input violates validation rules) -->
+      <div id="sip-error-alert" class="hidden text-xs text-error font-medium bg-error-bg border border-error-border rounded-control p-2.5 mt-4" role="alert"></div>
+
       <!-- Action buttons -->
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="sip-calculate" type="button">Calculate</Button>
@@ -439,28 +442,23 @@ const jsonld = {
 <script>
   /**
    * SIP Calculator client-side logic.
-   * All computations mirrored from src/lib/calculators/sip.ts (pure TS, re-implemented
-   * inline here to avoid a module bundler dependency in a plain Astro island).
+   * Integrates Phase 4 Architecture:
+   * - Pure calculation engine (src/lib/calculators/sip.ts)
+   * - Canonical single-source-of-truth result store (src/lib/result-bus.ts)
+   * - Centralized validation engine (src/lib/validate.ts)
+   * - URL hash state serialization and restoration (src/lib/url-state.ts)
    */
+  import { calcSIP } from '../lib/calculators/sip';
+  import { setResult } from '../lib/result-bus';
+  import { validate, type ValidationRules } from '../lib/validate';
+  import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
 
-  function calcSIPClient(monthly: number, ratePercent: number, years: number) {
-    const n = years * 12;
-    const i = ratePercent / (12 * 100);
-    const invested = monthly * n;
-    const maturity = i === 0
-      ? invested
-      : monthly * (((Math.pow(1 + i, n) - 1) / i) * (1 + i));
-    const gain = maturity - invested;
-    const gainPct = invested > 0 ? (gain / invested) * 100 : 0;
-    return {
-      maturity,
-      invested,
-      gain,
-      gainPct,
-      principalFraction: maturity > 0 ? invested / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
+  // Declarative validation schema for SIP inputs
+  const sipSchema = {
+    monthly: { required: true, min: 500, max: 2000000, integerOnly: true, label: 'Monthly Investment' },
+    rate: { required: true, min: 1, max: 30, decimal: true, label: 'Expected Return Rate' },
+    years: { required: true, min: 1, max: 40, integerOnly: true, label: 'Time Period' },
+  } as const;
 
   let currentCurrencySymbol = '₹';
   let currentNumberLocale = 'en-IN';
@@ -473,6 +471,12 @@ const jsonld = {
     return currentCurrencySymbol + fmtNumber(n);
   }
 
+  function fmtLiveIndian(raw: string): string {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(num)) return '';
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
   function initSIPCalc() {
     const monthlyInput = document.getElementById('sip-monthly') as HTMLInputElement | null;
     const monthlySlider = document.getElementById('sip-monthly-slider') as HTMLInputElement | null;
@@ -481,32 +485,16 @@ const jsonld = {
     const yearsInput = document.getElementById('sip-years') as HTMLInputElement | null;
     const yearsSlider = document.getElementById('sip-years-slider') as HTMLInputElement | null;
 
-    const resultMaturity = document.getElementById('sip-result-maturity');
-    const resultInvested = document.getElementById('sip-result-invested');
-    const resultGain = document.getElementById('sip-result-gain');
-    const resultGainPct = document.getElementById('sip-result-gain-pct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
     const copyBtn = document.getElementById('sip-copy-btn');
     const shareBtn = document.getElementById('sip-share-btn');
+    const calculateBtn = document.getElementById('sip-calculate');
+    const resetBtn = document.getElementById('sip-reset');
+    const currencyDropdown = document.getElementById('sip-currency') as HTMLSelectElement | null;
+    const errorAlert = document.getElementById('sip-error-alert');
 
     if (!monthlyInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { monthly: 25000, rate: 12, years: 15 };
-
-    function getVal(input: HTMLInputElement): number {
-      return parseFloat(input.value.replace(/[^0-9.-]/g, '')) || 0;
-    }
-
-    function parseInput(raw: string): number {
-      return parseFloat(raw.replace(/[^0-9.]/g, '')) || 0;
-    }
-
-    function fmtLiveIndian(raw: string): string {
-      const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-      if (isNaN(num)) return '';
-      return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
-    }
-
     let debounceTimer: ReturnType<typeof setTimeout>;
 
     function updateCompositionBar(pFraction: number, gFraction: number, invested: number, gain: number) {
@@ -522,40 +510,114 @@ const jsonld = {
       if (legendEls[1]) legendEls[1].textContent = fmtCurrency(gain);
     }
 
+    function showValidationFeedback(errorMsg?: string) {
+      if (errorAlert) {
+        if (errorMsg) {
+          errorAlert.textContent = errorMsg;
+          errorAlert.classList.remove('hidden');
+        } else {
+          errorAlert.textContent = '';
+          errorAlert.classList.add('hidden');
+        }
+      }
+    }
+
     function recalc() {
-      const monthly = parseInput(monthlyInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
+      // 1. Validation via Phase 4.3 Centralized Validation Engine
+      const vMonthly = validate(monthlyInput.value, sipSchema.monthly);
+      const vRate = validate(rateInput.value, sipSchema.rate);
+      const vYears = validate(yearsInput.value, sipSchema.years);
 
-      if (monthly <= 0 || rate <= 0 || years <= 0) return;
+      if (!vMonthly.valid) {
+        showValidationFeedback(vMonthly.error.message);
+        monthlyInput.setAttribute('aria-invalid', 'true');
+        return;
+      }
+      monthlyInput.removeAttribute('aria-invalid');
 
-      const r = calcSIPClient(monthly, rate, years);
+      if (!vRate.valid) {
+        showValidationFeedback(vRate.error.message);
+        rateInput.setAttribute('aria-invalid', 'true');
+        return;
+      }
+      rateInput.removeAttribute('aria-invalid');
 
-      if (resultMaturity) resultMaturity.textContent = fmtCurrency(r.maturity);
-      if (resultInvested) resultInvested.textContent = fmtCurrency(r.invested);
-      if (resultGain) resultGain.textContent = fmtCurrency(r.gain);
-      if (resultGainPct) resultGainPct.textContent = r.gainPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtCurrency(r.maturity);
+      if (!vYears.valid) {
+        showValidationFeedback(vYears.error.message);
+        yearsInput.setAttribute('aria-invalid', 'true');
+        return;
+      }
+      yearsInput.removeAttribute('aria-invalid');
 
+      showValidationFeedback(); // Clear error
+
+      const monthly = vMonthly.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+
+      // 2. Pure Calculation
+      const r = calcSIP(monthly, rate, years);
+
+      // 3. Phase 4.2 Canonical Result State Architecture
+      // A single source-of-truth call drives desktop output IDs, mobile hero, and layout-managed presentation
+      const canonicalResult = {
+        heroValue: fmtCurrency(r.maturity),
+        heroLabel: 'Estimated Total Maturity',
+        rows: [
+          { label: 'Total Invested', value: fmtCurrency(r.invested) },
+          { label: 'Total Gain', value: fmtCurrency(r.gain), variant: 'accent' as const },
+          { label: 'Gain %', value: r.gainPct.toFixed(1) + '%' },
+        ],
+        fields: {
+          'sip-result-maturity': fmtCurrency(r.maturity),
+          'sip-result-invested': fmtCurrency(r.invested),
+          'sip-result-gain': fmtCurrency(r.gain),
+          'sip-result-gain-pct': r.gainPct.toFixed(1) + '%',
+        },
+        meta: {
+          principalFraction: r.principalFraction,
+          gainFraction: r.gainFraction,
+          invested: r.invested,
+          gain: r.gain,
+          maturity: r.maturity,
+        },
+      };
+
+      setResult(canonicalResult);
+      if ((window as any).__cmResultStore) {
+        (window as any).__cmResultStore.setResult(canonicalResult);
+      }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
+
+      // Desktop DOM elements
+      const resMaturity = document.getElementById('sip-result-maturity');
+      const resInvested = document.getElementById('sip-result-invested');
+      const resGain = document.getElementById('sip-result-gain');
+      const resGainPct = document.getElementById('sip-result-gain-pct');
+      if (resMaturity) resMaturity.textContent = fmtCurrency(r.maturity);
+      if (resInvested) resInvested.textContent = fmtCurrency(r.invested);
+      if (resGain) resGain.textContent = fmtCurrency(r.gain);
+      if (resGainPct) resGainPct.textContent = r.gainPct.toFixed(1) + '%';
+
+      // 4. Update Composition Bar
       updateCompositionBar(r.principalFraction, r.gainFraction, r.invested, r.gain);
 
-      // Sync hash (Section 25: share link)
-      const hash = `#p=${monthly}&r=${rate}&y=${years}`;
-      history.replaceState(null, '', hash);
+      // 5. Phase 4.4 URL State Architecture
+      const hash = serializeHash({ p: monthly, r: rate, y: years });
+      updateHash(hash, true);
     }
 
     function debounceRecalc() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(recalc, 100);
+      debounceTimer = setTimeout(recalc, 80);
     }
 
     // ── Slider ↔ Input sync ──────────────────────────────────────────────────
-    function syncSlider(slider: HTMLInputElement, input: HTMLInputElement, isIndian: boolean) {
+    function syncSlider(slider: HTMLInputElement, input: HTMLInputElement, isFormatted: boolean) {
       slider.addEventListener('input', () => {
-        input.value = isIndian
+        input.value = isFormatted
           ? fmtLiveIndian(slider.value)
           : slider.value;
-        // Update CSS variable for filled track
         const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
         const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
@@ -563,19 +625,26 @@ const jsonld = {
       });
 
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
-          slider.value = String(num);
-          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
-        }
-        if (isIndian) {
-          const formatted = fmtLiveIndian(raw);
-          // Preserve caret by keeping value length
-          input.value = formatted;
+        const v = validate(input.value, { decimal: true, negativeAllowed: false });
+        if (v.valid && v.value !== undefined) {
+          const num = v.value;
+          if (num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+            slider.value = String(num);
+            const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+            slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+          }
         }
         debounceRecalc();
+      });
+
+      // On blur, format the input nicely if valid
+      input.addEventListener('blur', () => {
+        if (isFormatted) {
+          const v = validate(input.value, { integerOnly: true });
+          if (v.valid && v.value !== undefined) {
+            input.value = fmtLiveIndian(String(v.value));
+          }
+        }
       });
     }
 
@@ -583,48 +652,96 @@ const jsonld = {
     if (rateSlider) syncSlider(rateSlider, rateInput, false);
     if (yearsSlider) syncSlider(yearsSlider, yearsInput, false);
 
+    // Initial slider track percentages
+    if (monthlySlider) {
+      const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max), val = parseFloat(monthlySlider.value);
+      monthlySlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (rateSlider) {
+      const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max), val = parseFloat(rateSlider.value);
+      rateSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (yearsSlider) {
+      const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max), val = parseFloat(yearsSlider.value);
+      yearsSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+
     // ── Calculate button ─────────────────────────────────────────────────────
-    document.getElementById('sip-calculate')?.addEventListener('click', () => {
+    calculateBtn?.addEventListener('click', () => {
       recalc();
-      // On mobile, scroll to bottom bar
       if (window.innerWidth < 1024) {
         document.getElementById('calc-mobile-bar')?.scrollIntoView({ behavior: 'smooth' });
-        if (resultMaturity) resultMaturity.setAttribute('tabindex', '-1');
-        resultMaturity?.focus();
+        const resEl = document.getElementById('sip-result-maturity');
+        resEl?.setAttribute('tabindex', '-1');
+        resEl?.focus();
       }
     });
 
-    // Enter in any input triggers calculate
     [monthlyInput, rateInput, yearsInput].forEach((el) => {
       el.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') recalc();
       });
     });
 
-    // ── Reset ────────────────────────────────────────────────────────────────
-    document.getElementById('sip-reset')?.addEventListener('click', () => {
+    // ── Reset button ─────────────────────────────────────────────────────────
+    resetBtn?.addEventListener('click', () => {
       monthlyInput.value = fmtLiveIndian(String(DEFAULTS.monthly));
       rateInput.value = String(DEFAULTS.rate);
       yearsInput.value = String(DEFAULTS.years);
-      if (monthlySlider) { monthlySlider.value = String(DEFAULTS.monthly); monthlySlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthly - 500) / (200000 - 500) * 100).toFixed(2)}%`); }
-      if (rateSlider) { rateSlider.value = String(DEFAULTS.rate); rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (30 - 1) * 100).toFixed(2)}%`); }
-      if (yearsSlider) { yearsSlider.value = String(DEFAULTS.years); yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`); }
+      if (monthlySlider) {
+        monthlySlider.value = String(DEFAULTS.monthly);
+        monthlySlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthly - 500) / (200000 - 500) * 100).toFixed(2)}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (30 - 1) * 100).toFixed(2)}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`);
+      }
+      showValidationFeedback();
       recalc();
       monthlyInput.focus();
     });
 
-    // ── Restore from hash ────────────────────────────────────────────────────
-    const hash = new URLSearchParams(location.hash.slice(1));
-    const hp = parseFloat(hash.get('p') ?? '');
-    const hr = parseFloat(hash.get('r') ?? '');
-    const hy = parseInt(hash.get('y') ?? '');
-    if (!isNaN(hp) && hp > 0) { monthlyInput.value = fmtLiveIndian(String(hp)); if (monthlySlider) monthlySlider.value = String(Math.min(hp, 200000)); }
-    if (!isNaN(hr) && hr > 0) { rateInput.value = String(hr); if (rateSlider) rateSlider.value = String(Math.min(hr, 30)); }
-    if (!isNaN(hy) && hy > 0) { yearsInput.value = String(hy); if (yearsSlider) yearsSlider.value = String(Math.min(hy, 40)); }
-    if (!isNaN(hp) && !isNaN(hr) && !isNaN(hy)) recalc();
+    // ── Restore from URL Hash (Phase 4.4 Architecture) ─────────────────────────
+    const restored = restoreFromHash(location.hash, {
+      p: sipSchema.monthly,
+      r: sipSchema.rate,
+      y: sipSchema.years,
+    });
 
-    // ── Copy Result ──────────────────────────────────────────────────────────
-    async function flashBtn(btn: HTMLButtonElement, label: string) {
+    if (restored.values.p !== undefined) {
+      monthlyInput.value = fmtLiveIndian(String(restored.values.p));
+      if (monthlySlider) {
+        monthlySlider.value = String(Math.min(restored.values.p, 200000));
+        const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max);
+        monthlySlider.style.setProperty('--slider-pct', `${((parseFloat(monthlySlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+    if (restored.values.r !== undefined) {
+      rateInput.value = String(restored.values.r);
+      if (rateSlider) {
+        rateSlider.value = String(Math.min(restored.values.r, 30));
+        const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+        rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+    if (restored.values.y !== undefined) {
+      yearsInput.value = String(restored.values.y);
+      if (yearsSlider) {
+        yearsSlider.value = String(Math.min(restored.values.y, 40));
+        const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+        yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+
+    // Initial calculation or restore
+    recalc();
+
+    // ── Copy & Share ─────────────────────────────────────────────────────────
+    async function flashBtn(btn: HTMLElement, label: string) {
       const orig = btn.textContent;
       btn.textContent = label;
       btn.setAttribute('aria-label', label);
@@ -634,15 +751,16 @@ const jsonld = {
     }
 
     copyBtn?.addEventListener('click', async () => {
-      const monthly = parseInput(monthlyInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
-      const r = calcSIPClient(monthly, rate, years);
-      const text = `SIP Calculator: ${currentCurrencySymbol}${fmtNumber(monthly)}/month at ${rate}% p.a. for ${years} years gives ${fmtCurrency(r.maturity)} (estimate). ${location.href.split('#')[0]}`;
+      const vM = validate(monthlyInput.value, sipSchema.monthly);
+      const vR = validate(rateInput.value, sipSchema.rate);
+      const vY = validate(yearsInput.value, sipSchema.years);
+      if (!vM.valid || !vR.valid || !vY.valid) return;
+
+      const r = calcSIP(vM.value!, vR.value!, vY.value!);
+      const text = `SIP Calculator: ${currentCurrencySymbol}${fmtNumber(vM.value!)}/month at ${vR.value!}% p.a. for ${vY.value!} years gives ${fmtCurrency(r.maturity)} (estimate). ${location.href.split('#')[0]}${serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
-        // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
         ta.style.position = 'fixed';
@@ -652,14 +770,17 @@ const jsonld = {
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      flashBtn(copyBtn as HTMLButtonElement, 'Copied!');
+      flashBtn(copyBtn, 'Copied!');
     });
 
     shareBtn?.addEventListener('click', async () => {
-      const monthly = parseInput(monthlyInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
-      const years = parseInt(yearsInput.value) || 0;
-      const url = `${location.href.split('#')[0]}#p=${monthly}&r=${rate}&y=${years}`;
+      const vM = validate(monthlyInput.value, sipSchema.monthly);
+      const vR = validate(rateInput.value, sipSchema.rate);
+      const vY = validate(yearsInput.value, sipSchema.years);
+      const hash = vM.valid && vR.valid && vY.valid
+        ? serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })
+        : location.hash;
+      const url = `${location.href.split('#')[0]}${hash}`;
       try {
         await navigator.clipboard.writeText(url);
       } catch {
@@ -672,12 +793,10 @@ const jsonld = {
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      flashBtn(shareBtn as HTMLButtonElement, 'Copied!');
+      flashBtn(shareBtn, 'Copied!');
     });
 
     // ── Currency synchronization ─────────────────────────────────────────────
-    const currencyDropdown = document.getElementById('sip-currency') as HTMLSelectElement | null;
-
     function setSIPCurrency(code: string, symbol: string) {
       currentCurrencySymbol = symbol;
       if (code === 'USD') currentNumberLocale = 'en-US';
