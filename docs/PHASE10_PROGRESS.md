@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:17:45+05:30
+- **LAST_UPDATED:** 2026-09-23T04:19:15+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 27
-- **IN_PROGRESS:** 028. liquidity-ratios-calculator
-- **NEXT:** 029. wacc-calculator
+- **COMPLETED:** 28
+- **IN_PROGRESS:** 029. wacc-calculator (Phase 5 Locked)
+- **NEXT:** 030. npv-calculator (Phase 5 Locked)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** inventory-turnover-calculator
-- **LAST_COMMIT:** bcbf22f
+- **LAST_COMPLETED_UNIT:** liquidity-ratios-calculator
+- **LAST_COMMIT:** 229e3c8
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -45,8 +45,8 @@
 - [x] 025. working-capital-calculator — DONE
 - [x] 026. cogs-calculator — DONE
 - [x] 027. inventory-turnover-calculator — DONE
-- [ ] 028. liquidity-ratios-calculator — IN PROGRESS
-- [ ] 029. wacc-calculator — PENDING (Phase 5 Locked)
+- [x] 028. liquidity-ratios-calculator — DONE
+- [ ] 029. wacc-calculator — IN PROGRESS (Phase 5 Locked)
 - [ ] 030. npv-calculator — PENDING (Phase 5 Locked)
 - [ ] 031. irr-calculator — PENDING (Phase 5 Locked)
 - [ ] 032. payback-period-calculator — PENDING
@@ -218,4 +218,10 @@
   - Audited: Supply chain velocity model computing Inventory Turnover Ratio, Average Inventory, and Days Sales of Inventory (DSI / DIO).
   - Changes: Added mathematical formula progression, step-by-step worked example schedule matching default inputs (₹8L COGS, ₹1.2L beginning inventory, ₹80k ending inventory → ₹1L average inventory, 8.00x inventory turnover ratio, 45.6 days ~46 days DSI/DIO, Balanced velocity rating), industry turnover and DSI benchmarks (Grocery 14–22x vs Electronics 6–10x vs Apparel 4–6x vs Heavy Industrial 2–4x), operational diagnostics on the "High Turnover Trap" (stockouts, freight expediting) vs low turnover carrying costs, connection to Cash Conversion Cycle (DIO in CCC), and measurement assumptions/limitations (2-point average distortion, costing methods, product-mix aggregation).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcInventoryTurnover`, 5 FAQs matching JSON-LD schema, and curated related links (`cogs-calculator`, `eoq-calculator`, `cash-conversion-cycle-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **028. liquidity-ratios-calculator (/liquidity-ratios-calculator)**:
+  - Audited: Solvency architecture computing the three core liquidity metrics (Current Ratio, Quick/Acid-Test Ratio, and Cash Ratio) alongside Net Working Capital cushion.
+  - Changes: Added mathematical formulas across all three tiers, step-by-step worked example schedule matching default inputs (₹3L cash + ₹1L securities + ₹4L AR + ₹4.5L inventory = ₹12.5L CA vs ₹5L CL → ₹7.5L NWC cushion, 2.50x Current Ratio, 1.60x Quick Ratio, 0.80x Cash Ratio, Optimal liquidity profile), institutional credit underwriting norms (RBI / Tandon Committee 1.33x MPBF minimum threshold, commercial debt covenants), analysis of the "Excess Liquidity Trap" (capital misallocation vs debt default risk), and balance sheet snapshot limitations (window dressing, unprovisioned trade receivables, off-balance sheet commitments).
+  - Preserved: Multi-asset interactive inputs with sliders, calculation engine `calcLiquidityRatios`, 5 FAQs matching JSON-LD schema, and curated related links (`working-capital-calculator`, `cash-conversion-cycle-calculator`, `dscr-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
