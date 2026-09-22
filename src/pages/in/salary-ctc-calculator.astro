@@ -1,0 +1,418 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { calcSalaryCTC } from '../../lib/tax/india';
+import { formatIndian } from '../../lib/formatters';
+import { TOOLS } from '../../config/site';
+
+const DEFAULT_CTC = 1200000;
+const initialResult = calcSalaryCTC(DEFAULT_CTC);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Taxes' && t.slug !== 'salary-ctc-calculator' && t.status === 'published'
+).slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/in/salary-ctc-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Salary / CTC Calculator India',
+      url: canonicalUrl,
+      description: 'Convert annual Cost to Company (CTC) into monthly in-hand take-home salary, EPF, HRA, and gross pay components.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'Salary / CTC Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is the difference between CTC and take-home salary?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Cost to Company (CTC) is the total annual amount an employer spends on an employee, including employer EPF contributions, gratuity provisions, insurance, and perks. Take-home (net in-hand) salary is what is credited to your bank account each month after deducting employee EPF, professional tax, and income tax (TDS).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is Employee Provident Fund (EPF) calculated on CTC?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the EPF Act, mandatory contribution is 12% of Basic Salary. While the statutory wage ceiling is ₹15,000/month (yielding a mandatory contribution of ₹1,800/month each for employer and employee), many private employers contribute 12% on full basic salary unless capped.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why does Basic Salary typically equal 40% to 50% of CTC?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Companies benchmark Basic Salary at 40% (non-metro) or 50% (metro) to optimize employee tax savings through HRA exemptions while maintaining reasonable statutory retirement liability for EPF and gratuity.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is Special Allowance in a salary slip?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Special Allowance is a residual balancing component used by HR to match the agreed gross CTC after allocating specific components like Basic Pay, HRA, and statutory retirals. It is fully taxable under Indian income tax laws.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Gratuity included in monthly in-hand salary?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. While gratuity is often included in annual CTC figures by companies as a statutory retention benefit (4.81% of basic), it is only payable to an employee upon separation after completing 5 continuous years of service.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Salary / CTC Calculator India: CTC to Monthly In-Hand Salary | Calcumetrics"
+  description="Break down annual Cost to Company (CTC) into monthly take-home salary, Basic, HRA, Special Allowance, and EPF contributions. Free & instant."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Salary / CTC Calculator"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={fmt(initialResult.netMonthlySalary)}
+    heroLabel="Estimated Monthly In-Hand Salary"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Salary / CTC Calculator (India)</h1>
+      <p class="text-sm text-text-muted mb-6">Decompose your annual Cost to Company (CTC) into monthly take-home pay, allowances, and EPF.</p>
+
+      <!-- Error alert -->
+      <div id="ctc-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="ctc-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Annual CTC -->
+      <div class="mb-6">
+        <Input
+          id="ctc-amount"
+          label="Annual Cost to Company (CTC)"
+          prefix="₹"
+          value="12,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total annual package offered by your employer"
+          inputmode="decimal"
+          aria-describedby="ctc-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="ctc-amount-slider" min={300000} max={10000000} step={25000} value={1200000} ariaLabel="Annual CTC slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="ctc-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="ctc-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Estimated In-Hand Salary (Monthly)</span>
+        <div id="ctc-result-takehome" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {fmt(initialResult.netMonthlySalary)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gross Monthly Salary</span>
+          <span id="ctc-result-gross-monthly" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.grossMonthlySalary)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Annual Basic Salary (40%)</span>
+          <span id="ctc-result-basic" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.basic)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">House Rent Allowance (HRA)</span>
+          <span id="ctc-result-hra" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.hra)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Special Allowance (Annual)</span>
+          <span id="ctc-result-special" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.specialAllowance)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Employer EPF (Annual)</span>
+          <span id="ctc-result-employer-epf" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.employerEPF)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Employee EPF Deduction (Monthly)</span>
+          <span id="ctc-result-employee-epf" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.employeeEPF / 12)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="ctc-composition-wrapper">
+        <CompositionBar
+          principalFraction={(initialResult.netMonthlySalary * 12) / initialResult.ctc}
+          gainFraction={1 - ((initialResult.netMonthlySalary * 12) / initialResult.ctc)}
+          principalLabel="Annual Take-Home"
+          gainLabel="Deductions & Retirals"
+          principalValue={fmt(initialResult.netMonthlySalary * 12)}
+          gainValue={fmt(initialResult.ctc - (initialResult.netMonthlySalary * 12))}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="ctc-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Breakdown
+        </button>
+        <button type="button" id="ctc-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes standard 40% Basic, 40% HRA, and statutory ₹15,000 EPF ceiling. Net take-home excludes voluntary deductions and income tax TDS.</p>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>CTC to In-Hand Salary conversion formula:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
+          Net Monthly Take-Home = (Annual CTC − Employer EPF) / 12 − Employee EPF − Professional Tax − Income Tax TDS
+        </div>
+        <p>Basic Salary = 40% of CTC; HRA = 40% of Basic; EPF is 12% of capped basic wage (₹1,800/mo).</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcSalaryCTC } from '../../lib/tax/india';
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+
+  const currSym = '₹';
+  const currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initSalaryCTCCalc() {
+    if ((window as any).__cmCtcBound) return;
+    (window as any).__cmCtcBound = true;
+
+    const ctcInput = document.getElementById('ctc-amount') as HTMLInputElement | null;
+    const ctcSlider = document.getElementById('ctc-amount-slider') as HTMLInputElement | null;
+
+    const resTakeHome = document.getElementById('ctc-result-takehome');
+    const resGrossMonthly = document.getElementById('ctc-result-gross-monthly');
+    const resBasic = document.getElementById('ctc-result-basic');
+    const resHra = document.getElementById('ctc-result-hra');
+    const resSpecial = document.getElementById('ctc-result-special');
+    const resEmployerEPF = document.getElementById('ctc-result-employer-epf');
+    const resEmployeeEPF = document.getElementById('ctc-result-employee-epf');
+
+    const errAlert = document.getElementById('ctc-error-alert');
+    const errMsg = document.getElementById('ctc-error-msg');
+
+    if (!ctcInput) return;
+
+    const DEFAULTS = { ctc: 1200000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawCTC = ctcInput!.value.replace(/[^0-9.]/g, '');
+      const vCTC = validate(rawCTC, { required: true, min: 100000, label: 'Annual CTC' });
+
+      if (!vCTC.valid) { showError(vCTC.error!.message); return; }
+      clearError();
+
+      const ctc = vCTC.value!;
+      const res = calcSalaryCTC(ctc);
+
+      setResult({
+        heroValue: fmtVal(res.netMonthlySalary),
+        heroLabel: 'Monthly In-Hand Salary',
+        rows: [
+          { label: 'Gross Monthly Salary', value: fmtVal(res.grossMonthlySalary) },
+          { label: 'Basic Salary (Annual)', value: fmtVal(res.basic) },
+          { label: 'HRA (Annual)', value: fmtVal(res.hra) },
+          { label: 'Special Allowance', value: fmtVal(res.specialAllowance) },
+          { label: 'Employer EPF (Annual)', value: fmtVal(res.employerEPF) },
+          { label: 'Employee EPF (Monthly)', value: fmtVal(res.employeeEPF / 12) },
+        ],
+      });
+
+      if (resTakeHome) resTakeHome.textContent = fmtVal(res.netMonthlySalary);
+      if (resGrossMonthly) resGrossMonthly.textContent = fmtVal(res.grossMonthlySalary);
+      if (resBasic) resBasic.textContent = fmtVal(res.basic);
+      if (resHra) resHra.textContent = fmtVal(res.hra);
+      if (resSpecial) resSpecial.textContent = fmtVal(res.specialAllowance);
+      if (resEmployerEPF) resEmployerEPF.textContent = fmtVal(res.employerEPF);
+      if (resEmployeeEPF) resEmployeeEPF.textContent = fmtVal(res.employeeEPF / 12);
+
+      const wrapper = document.getElementById('ctc-composition-wrapper');
+      if (wrapper && res.ctc > 0) {
+        const takehomeAnnual = res.netMonthlySalary * 12;
+        const takehomePct = Math.min(100, (takehomeAnnual / res.ctc) * 100);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        if (bar) bar.style.width = `${takehomePct.toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(takehomeAnnual);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.ctc - takehomeAnnual);
+      }
+
+      serializeHash({ ctc });
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 120);
+    }
+
+    if (ctcSlider) {
+      ctcSlider.addEventListener('input', () => {
+        ctcInput.value = fmtLiveInput(ctcSlider.value);
+        const pct = ((parseFloat(ctcSlider.value) - parseFloat(ctcSlider.min)) / (parseFloat(ctcSlider.max) - parseFloat(ctcSlider.min))) * 100;
+        ctcSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      ctcInput.addEventListener('input', () => {
+        const raw = ctcInput.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(ctcSlider.min) && num <= parseFloat(ctcSlider.max)) {
+          ctcSlider.value = String(num);
+          const pct = ((num - parseFloat(ctcSlider.min)) / (parseFloat(ctcSlider.max) - parseFloat(ctcSlider.min))) * 100;
+          ctcSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        ctcInput.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    document.getElementById('ctc-calculate')?.addEventListener('click', recalc);
+    document.getElementById('ctc-reset')?.addEventListener('click', () => {
+      ctcInput.value = fmtLiveInput(String(DEFAULTS.ctc));
+      if (ctcSlider) {
+        ctcSlider.value = String(DEFAULTS.ctc);
+        ctcSlider.style.setProperty('--slider-pct', `${((DEFAULTS.ctc - 300000) / (10000000 - 300000)) * 100}%`);
+      }
+      clearError();
+      recalc();
+      ctcInput.focus();
+    });
+
+    ctcInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') recalc();
+    });
+
+    document.getElementById('ctc-copy-btn')?.addEventListener('click', async () => {
+      const rawCTC = ctcInput.value.replace(/[^0-9.]/g, '');
+      const vCTC = validate(rawCTC, { required: true, min: 100000, label: 'CTC' });
+      if (!vCTC.valid) return;
+      const res = calcSalaryCTC(vCTC.value!);
+      const text = `Salary Breakdown for ${fmtVal(res.ctc)} CTC: Net In-Hand: ${fmtVal(res.netMonthlySalary)}/mo (Gross: ${fmtVal(res.grossMonthlySalary)}/mo, Basic: ${fmtVal(res.basic)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('ctc-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('ctc-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('ctc-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      ctc: { required: true, min: 100000, label: 'ctc' },
+    });
+    if (restored.valid && restored.values.ctc) {
+      ctcInput.value = fmtLiveInput(String(restored.values.ctc));
+      recalc();
+    } else {
+      recalc();
+    }
+  }
+
+  initSalaryCTCCalc();
+  document.addEventListener('astro:page-load', initSalaryCTCCalc);
+</script>

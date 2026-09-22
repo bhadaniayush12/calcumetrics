@@ -1,0 +1,383 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { calcAdvanceTax } from '../../lib/tax/india';
+import { formatIndian } from '../../lib/formatters';
+import { TOOLS } from '../../config/site';
+
+const DEFAULT_TAX = 100000;
+const initialResult = calcAdvanceTax(DEFAULT_TAX);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Taxes' && t.slug !== 'advance-tax-calculator' && t.status === 'published'
+).slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/in/advance-tax-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Advance Tax Calculator India',
+      url: canonicalUrl,
+      description: 'Calculate advance tax quarterly instalment amounts and statutory due dates under Section 208 and 211 of the Income-tax Act.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'Advance Tax Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Who is required to pay advance tax in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under Section 208 of the Income-tax Act, 1961, every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the financial year (after deducting TDS and TCS) is ₹10,000 or more must pay advance tax.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are senior citizens exempt from paying advance tax?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Under Section 207(2), a resident senior citizen (aged 60 years or above) who does not have any income chargeable under the head "Profits and gains of business or profession" is fully exempt from paying advance tax.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What interest penalty is levied for missing advance tax deadlines?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Failure to pay installments or paying less than statutory percentages attracts simple interest at 1% per month under Section 234C. If less than 90% of assessed tax is paid by 31st March, interest at 1% per month is also charged under Section 234B from 1st April of the assessment year until full payment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What are the four advance tax due dates for individual taxpayers?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The statutory due dates are: 15% on or before 15 June; 45% cumulative on or before 15 September; 75% cumulative on or before 15 December; and 100% on or before 15 March.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do salaried employees pay advance tax?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Salaried employees whose employer deducts TDS on salary generally do not need to pay advance tax unless they have substantial additional income (such as capital gains, rental income, or dividend income) that was not reported to the employer on Form 12BB.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Advance Tax Calculator India: Instalments & Due Dates | Calcumetrics"
+  description="Calculate your advance tax quarterly installment schedule and due dates under Section 208/211 of the Indian Income-tax Act. Instant, free, and accurate."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Advance Tax Calculator"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={initialResult.required ? fmt(initialResult.annualTaxLiability) : '₹0 (Exempt)'}
+    heroLabel="Total Advance Tax Due"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Advance Tax Calculator (India)</h1>
+      <p class="text-sm text-text-muted mb-6">Determine your quarterly installment schedule and compliance dates under Section 208 of the Income-tax Act.</p>
+
+      <!-- Error alert -->
+      <div id="at-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="at-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Annual Tax Liability -->
+      <div class="mb-6">
+        <Input
+          id="at-tax"
+          label="Estimated Annual Tax Liability"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total income tax payable for the financial year after deducting TDS/TCS"
+          inputmode="decimal"
+          aria-describedby="at-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="at-tax-slider" min={5000} max={2000000} step={5000} value={100000} ariaLabel="Tax liability slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="at-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="at-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Advance Tax Status</span>
+        <div id="at-result-hero" class="text-[36px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {initialResult.required ? fmt(initialResult.annualTaxLiability) : 'Exempt (&lt; ₹10,000)'}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="text-xs font-semibold uppercase tracking-wider text-dark-muted mb-3">Quarterly Instalment Breakdown</div>
+        
+        {initialResult.instalments.map((inst, idx) => (
+          <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+            <div>
+              <span class="text-xs font-medium text-dark-text block">{inst.dueDate}</span>
+              <span class="text-[11px] text-dark-muted">Cumulative: {inst.cumulativePct}%</span>
+            </div>
+            <span id={`at-inst-${idx}`} class="text-sm font-semibold tabular-nums text-dark-text">
+              {fmt(inst.instalment)}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="at-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Schedule
+        </button>
+        <button type="button" id="at-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Threshold: Required only when net tax liability exceeds ₹10,000. Non-business resident senior citizens (60+) are exempt.</p>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>Advance Tax Installment Schedule under Section 211 of the Income-tax Act:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-left space-y-1">
+          <div>1. On or before 15 June: 15% of total tax liability</div>
+          <div>2. On or before 15 September: 45% cumulative (less prior installment)</div>
+          <div>3. On or before 15 December: 75% cumulative (less prior installments)</div>
+          <div>4. On or before 15 March: 100% cumulative (less prior installments)</div>
+        </div>
+        <p>Shortfall or delay attracts interest under Section 234C @ 1% per month for the period of default.</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcAdvanceTax } from '../../lib/tax/india';
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+
+  const currSym = '₹';
+  const currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initAdvanceTaxCalc() {
+    if ((window as any).__cmAdvTaxBound) return;
+    (window as any).__cmAdvTaxBound = true;
+
+    const taxInput = document.getElementById('at-tax') as HTMLInputElement | null;
+    const taxSlider = document.getElementById('at-tax-slider') as HTMLInputElement | null;
+
+    const resHero = document.getElementById('at-result-hero');
+    const instEls = [
+      document.getElementById('at-inst-0'),
+      document.getElementById('at-inst-1'),
+      document.getElementById('at-inst-2'),
+      document.getElementById('at-inst-3'),
+    ];
+
+    const errAlert = document.getElementById('at-error-alert');
+    const errMsg = document.getElementById('at-error-msg');
+
+    if (!taxInput) return;
+
+    const DEFAULTS = { tax: 100000 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawTax = taxInput!.value.replace(/[^0-9.]/g, '');
+      const vTax = validate(rawTax, { required: true, min: 0, label: 'Tax Liability' });
+
+      if (!vTax.valid) { showError(vTax.error!.message); return; }
+      clearError();
+
+      const tax = vTax.value!;
+      const res = calcAdvanceTax(tax);
+
+      setResult({
+        heroValue: res.required ? fmtVal(res.annualTaxLiability) : 'Exempt (< ₹10k)',
+        heroLabel: 'Total Advance Tax',
+        rows: res.instalments.map((inst) => ({
+          label: `${inst.dueDate} (${inst.cumulativePct}%)`,
+          value: fmtVal(inst.instalment),
+        })),
+      });
+
+      if (resHero) {
+        resHero.textContent = res.required ? fmtVal(res.annualTaxLiability) : 'Exempt (< ₹10,000)';
+      }
+
+      res.instalments.forEach((inst, idx) => {
+        if (instEls[idx]) instEls[idx]!.textContent = fmtVal(inst.instalment);
+      });
+
+      serializeHash({ tax });
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 120);
+    }
+
+    if (taxSlider) {
+      taxSlider.addEventListener('input', () => {
+        taxInput.value = fmtLiveInput(taxSlider.value);
+        const pct = ((parseFloat(taxSlider.value) - parseFloat(taxSlider.min)) / (parseFloat(taxSlider.max) - parseFloat(taxSlider.min))) * 100;
+        taxSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      taxInput.addEventListener('input', () => {
+        const raw = taxInput.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(taxSlider.min) && num <= parseFloat(taxSlider.max)) {
+          taxSlider.value = String(num);
+          const pct = ((num - parseFloat(taxSlider.min)) / (parseFloat(taxSlider.max) - parseFloat(taxSlider.min))) * 100;
+          taxSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        taxInput.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    document.getElementById('at-calculate')?.addEventListener('click', recalc);
+    document.getElementById('at-reset')?.addEventListener('click', () => {
+      taxInput.value = fmtLiveInput(String(DEFAULTS.tax));
+      if (taxSlider) {
+        taxSlider.value = String(DEFAULTS.tax);
+        taxSlider.style.setProperty('--slider-pct', `${((DEFAULTS.tax - 5000) / (2000000 - 5000)) * 100}%`);
+      }
+      clearError();
+      recalc();
+      taxInput.focus();
+    });
+
+    taxInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') recalc();
+    });
+
+    document.getElementById('at-copy-btn')?.addEventListener('click', async () => {
+      const rawTax = taxInput.value.replace(/[^0-9.]/g, '');
+      const vTax = validate(rawTax, { required: true, min: 0, label: 'Tax' });
+      if (!vTax.valid) return;
+      const res = calcAdvanceTax(vTax.value!);
+      const text = `Advance Tax Schedule (Total: ${fmtVal(res.annualTaxLiability)}): 15 June: ${fmtVal(res.instalments[0].instalment)}, 15 Sept: ${fmtVal(res.instalments[1].instalment)}, 15 Dec: ${fmtVal(res.instalments[2].instalment)}, 15 March: ${fmtVal(res.instalments[3].instalment)}. ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('at-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('at-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('at-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      tax: { required: true, min: 0, label: 'tax' },
+    });
+    if (restored.valid && restored.values.tax !== undefined) {
+      taxInput.value = fmtLiveInput(String(restored.values.tax));
+      recalc();
+    } else {
+      recalc();
+    }
+  }
+
+  initAdvanceTaxCalc();
+  document.addEventListener('astro:page-load', initAdvanceTaxCalc);
+</script>

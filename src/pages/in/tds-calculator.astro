@@ -1,0 +1,437 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Dropdown from '../../components/ui/Dropdown.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { calcTDS, TDS_RATES, type TDSSection } from '../../lib/tax/india';
+import { formatIndian } from '../../lib/formatters';
+import { TOOLS } from '../../config/site';
+
+const DEFAULT_AMOUNT = 100000;
+const DEFAULT_SECTION: TDSSection = '194J';
+const initialResult = calcTDS(DEFAULT_AMOUNT, DEFAULT_SECTION);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Taxes' && t.slug !== 'tds-calculator' && t.status === 'published'
+).slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/in/tds-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'TDS Calculator India',
+      url: canonicalUrl,
+      description: 'Calculate Tax Deducted at Source (TDS), net receivable amount, and exemption threshold under the Income-tax Act, 1961.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'TDS Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What happens if the payment is below the TDS threshold?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If the aggregate or single payment does not exceed the statutory threshold specified under that section of the Income-tax Act, no TDS is deducted and the payee receives 100% of the gross invoice amount.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What TDS rate applies if the payee does not furnish a PAN?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under Section 206AA of the Income-tax Act, if the deductee fails to furnish a valid Permanent Account Number (PAN) to the deductor, TDS must be deducted at higher of the prescribed rate or 20%.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can TDS deducted be claimed back during income tax filing?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. TDS is advance tax withheld on your behalf. When you file your annual Income Tax Return (ITR), the TDS reflected in your Form 26AS / Annual Information Statement (AIS) is adjusted against your final tax liability, and any excess is refunded directly to your bank account with interest.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between Section 194J for professional vs technical services?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under Section 194J, fees for professional services (such as legal, medical, engineering, accountancy) attract 10% TDS, whereas fees for purely technical services or call center operations attract a reduced rate of 2%, both sharing the ₹30,000 threshold.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do surcharge and Health & Education Cess apply to TDS on domestic payments?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No, for domestic resident individuals and entities, TDS on non-salary payments is deducted at the flat rate specified by the Finance Act without adding surcharge or the 4% Health and Education Cess.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
+const SECTION_OPTIONS = [
+  { value: '194J', label: 'Section 194J — Professional Services (10%, threshold ₹30k)' },
+  { value: '194C', label: 'Section 194C — Contractor / Sub-contractor (1%, threshold ₹30k)' },
+  { value: '194I', label: 'Section 194I — Rent on Land / Building (10%, threshold ₹2.4L)' },
+  { value: '194A', label: 'Section 194A — Interest on Bank FDs / Securities (10%, threshold ₹40k)' },
+  { value: '194H', label: 'Section 194H — Commission / Brokerage (5%, threshold ₹15k)' },
+  { value: '194',  label: 'Section 194 — Dividend from Domestic Company (10%, threshold ₹5k)' },
+  { value: '194Q', label: 'Section 194Q — Purchase of Goods > ₹50 Lakh (0.1%, threshold ₹50L)' },
+];
+---
+
+<Layout
+  title="TDS Calculator India: Calculate Tax Deducted at Source & Net Payout | Calcumetrics"
+  description="Calculate TDS deduction, net receivable payment, and statutory exemption thresholds under the Indian Income-tax Act. Instant, free, and accurate."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="TDS Calculator"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={fmt(initialResult.tdsAmount)}
+    heroLabel="TDS Deducted"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">TDS Calculator (India)</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate Tax Deducted at Source and net receivable amount under applicable Income-tax Act sections.</p>
+
+      <!-- Error alert -->
+      <div id="tds-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="tds-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="mb-5">
+        <Dropdown
+          id="tds-section"
+          label="TDS Section & Payment Nature"
+          options={SECTION_OPTIONS}
+          value="194J"
+          helperText="Select the category of transaction under Income-tax Act"
+        />
+      </div>
+
+      <!-- Gross Payment Amount -->
+      <div class="mb-6">
+        <Input
+          id="tds-amount"
+          label="Gross Payment / Bill Amount"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total invoice or transaction value before tax"
+          inputmode="decimal"
+          aria-describedby="tds-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="tds-amount-slider" min={5000} max={2000000} step={5000} value={100000} ariaLabel="Gross amount slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="tds-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="tds-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">TDS Amount Withheld</span>
+        <div id="tds-result-tds" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {fmt(initialResult.tdsAmount)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Amount Payable / Receivable</span>
+          <span id="tds-result-net" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.netAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gross Invoice Amount</span>
+          <span id="tds-result-gross" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.grossAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">TDS Rate Applied</span>
+          <span id="tds-result-rate" class="text-sm font-medium tabular-nums text-dark-text">{initialResult.ratePct}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Statutory Threshold</span>
+          <span id="tds-result-threshold" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.threshold)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="tds-composition-wrapper">
+        <CompositionBar
+          principalFraction={initialResult.netAmount / initialResult.grossAmount}
+          gainFraction={initialResult.tdsAmount / initialResult.grossAmount}
+          principalLabel="Net Payout"
+          gainLabel="TDS Deducted"
+          principalValue={fmt(initialResult.netAmount)}
+          gainValue={fmt(initialResult.tdsAmount)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="tds-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="tds-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes resident deductee with PAN furnished. Higher rate of 20% applies under Sec 206AA if PAN is missing.</p>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>Tax Deducted at Source is computed per statutory thresholds:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
+          TDS = (Gross Amount × Section Rate) / 100 &nbsp;[if Gross &gt; Section Threshold, else 0]
+        </div>
+        <p>Net Payout = Gross Amount − TDS. Deducted tax is deposited with the Central Government under the deductee's PAN via quarterly TDS returns (Form 24Q / 26Q).</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcTDS, type TDSSection } from '../../lib/tax/india';
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+
+  const currSym = '₹';
+  const currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initTDSCalc() {
+    if ((window as any).__cmTdsBound) return;
+    (window as any).__cmTdsBound = true;
+
+    const amtInput = document.getElementById('tds-amount') as HTMLInputElement | null;
+    const secSelect = document.getElementById('tds-section') as HTMLSelectElement | null;
+    const amtSlider = document.getElementById('tds-amount-slider') as HTMLInputElement | null;
+
+    const resTds = document.getElementById('tds-result-tds');
+    const resNet = document.getElementById('tds-result-net');
+    const resGross = document.getElementById('tds-result-gross');
+    const resRate = document.getElementById('tds-result-rate');
+    const resThreshold = document.getElementById('tds-result-threshold');
+
+    const errAlert = document.getElementById('tds-error-alert');
+    const errMsg = document.getElementById('tds-error-msg');
+
+    if (!amtInput || !secSelect) return;
+
+    const DEFAULTS = { amount: 100000, section: '194J' as TDSSection };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawAmt = amtInput!.value.replace(/[^0-9.]/g, '');
+      const section = secSelect!.value as TDSSection;
+
+      const vAmt = validate(rawAmt, { required: true, min: 100, label: 'Payment Amount' });
+
+      if (!vAmt.valid) { showError(vAmt.error!.message); return; }
+      clearError();
+
+      const amount = vAmt.value!;
+      const res = calcTDS(amount, section);
+
+      setResult({
+        heroValue: fmtVal(res.tdsAmount),
+        heroLabel: 'TDS Deducted',
+        rows: [
+          { label: 'Net Payable Amount', value: fmtVal(res.netAmount) },
+          { label: 'Gross Invoice Amount', value: fmtVal(res.grossAmount) },
+          { label: 'TDS Rate Applied', value: `${res.ratePct}%` },
+          { label: 'Statutory Threshold', value: fmtVal(res.threshold) },
+        ],
+      });
+
+      if (resTds) resTds.textContent = fmtVal(res.tdsAmount);
+      if (resNet) resNet.textContent = fmtVal(res.netAmount);
+      if (resGross) resGross.textContent = fmtVal(res.grossAmount);
+      if (resRate) resRate.textContent = `${res.ratePct}%`;
+      if (resThreshold) resThreshold.textContent = fmtVal(res.threshold);
+
+      const wrapper = document.getElementById('tds-composition-wrapper');
+      if (wrapper && res.grossAmount > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        if (bar) bar.style.width = `${Math.min(100, (res.netAmount / res.grossAmount) * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(res.netAmount);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.tdsAmount);
+      }
+
+      serializeHash({ amt: amount, sec: section });
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 120);
+    }
+
+    if (amtSlider) {
+      amtSlider.addEventListener('input', () => {
+        amtInput.value = fmtLiveInput(amtSlider.value);
+        const pct = ((parseFloat(amtSlider.value) - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
+        amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      amtInput.addEventListener('input', () => {
+        const raw = amtInput.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
+          amtSlider.value = String(num);
+          const pct = ((num - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
+          amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        amtInput.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    secSelect.addEventListener('change', recalc);
+
+    document.getElementById('tds-calculate')?.addEventListener('click', recalc);
+    document.getElementById('tds-reset')?.addEventListener('click', () => {
+      amtInput.value = fmtLiveInput(String(DEFAULTS.amount));
+      secSelect.value = DEFAULTS.section;
+      if (amtSlider) {
+        amtSlider.value = String(DEFAULTS.amount);
+        amtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.amount - 5000) / (2000000 - 5000)) * 100}%`);
+      }
+      clearError();
+      recalc();
+      amtInput.focus();
+    });
+
+    amtInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') recalc();
+    });
+
+    document.getElementById('tds-copy-btn')?.addEventListener('click', async () => {
+      const rawAmt = amtInput.value.replace(/[^0-9.]/g, '');
+      const sec = secSelect.value as TDSSection;
+      const vAmt = validate(rawAmt, { required: true, min: 100, label: 'Amount' });
+      if (!vAmt.valid) return;
+      const res = calcTDS(vAmt.value!, sec);
+      const text = `TDS Deducted: ${fmtVal(res.tdsAmount)} under Section ${res.section} on gross payment of ${fmtVal(res.grossAmount)} (Net Payout: ${fmtVal(res.netAmount)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('tds-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('tds-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('tds-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      amt: { required: true, min: 100, label: 'amt' },
+    });
+    if (restored.valid && restored.values.amt) {
+      amtInput.value = fmtLiveInput(String(restored.values.amt));
+      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+      const sec = hashParams.get('sec');
+      if (sec && ['194J', '194C', '194I', '194A', '194H', '194', '194Q'].includes(sec)) {
+        secSelect.value = sec;
+      }
+      recalc();
+    } else {
+      recalc();
+    }
+  }
+
+  initTDSCalc();
+  document.addEventListener('astro:page-load', initTDSCalc);
+</script>

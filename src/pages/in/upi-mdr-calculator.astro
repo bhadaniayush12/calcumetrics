@@ -18,7 +18,7 @@ const DEFAULT = {
   gstRate: 18,
 };
 
-const result = calcUPIMDR(
+const initialResult = calcUPIMDR(
   DEFAULT.monthlyVolume,
   DEFAULT.ticketSize,
   DEFAULT.chargeableShare,
@@ -29,7 +29,7 @@ const result = calcUPIMDR(
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'upi-mdr-calculator' && t.status === 'published').slice(0, 3);
-const canonicalUrl = 'https://calcumetrics.com/in/upi-mdr-calculator' as string;
+const canonicalUrl = 'https://calcumetrics.com/in/upi-mdr-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -42,9 +42,9 @@ const jsonld = {
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -53,6 +53,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
         { '@type': 'ListItem', position: 3, name: 'UPI MDR Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Does a consumer ever pay MDR on UPI transactions in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. Per NPCI regulations, customers are never charged any fee or surcharge for paying via UPI, RuPay credit cards on UPI, or prepaid digital wallets. The MDR fee is strictly borne by the receiving merchant.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What UPI transactions are subject to MDR in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Normal peer-to-peer (P2P) and person-to-merchant (P2M) bank-to-bank UPI transfers carry zero MDR. Interchange fees apply to merchant transactions over ₹2,000 made via Prepaid Payment Instruments (wallets like Paytm/PhonePe Wallet) or RuPay Credit Cards linked to UPI.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can businesses claim Input Tax Credit (ITC) on the 18% GST charged on MDR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. If your business has an active GST registration, you can claim the 18% GST charged by your payment aggregator on MDR fees as Input Tax Credit (ITC) in your monthly GSTR-3B filings.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the standard interchange rate for PPI wallet merchant transactions?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'NPCI guidelines prescribe an interchange fee of up to 1.1% on PPI merchant transactions above ₹2,000, depending on the merchant category code (MCC), with lower tiered rates for essential sectors like utilities, fuel, and education.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does ticket size impact merchant interchange costs?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Small transactions of ₹2,000 or less have zero interchange fee for merchants under PPI wallet guidelines. Businesses with high-volume, low-ticket sales (like tea stalls or convenience stores) face effectively zero MDR costs.',
+          },
+        },
       ],
     },
   ],
@@ -70,12 +115,19 @@ const jsonld = {
     toolName="UPI MDR Calculator"
     category="Business"
     categoryHref="/business"
-    heroValue={fmt(result.netSettlement)}
+    heroValue={fmt(initialResult.netSettlement)}
     heroLabel="Net Merchant Settlement"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">UPI MDR Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate interchange fees, 18% GST, and net merchant payouts on UPI and RuPay credit transactions.</p>
+
+      <!-- Error alert -->
+      <div id="mdr-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="mdr-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
 
       <!-- Monthly Volume -->
       <div class="mb-5">
@@ -88,6 +140,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Gross value of UPI merchant transactions processed monthly"
           inputmode="decimal"
+          aria-describedby="mdr-error-msg"
         />
         <div class="mt-2">
           <Slider id="mdr-volume-slider" min={25000} max={5000000} step={25000} value={500000} ariaLabel="Monthly volume slider" />
@@ -98,15 +151,16 @@ const jsonld = {
       <div class="mb-5">
         <Input
           id="mdr-share"
-          label="Chargeable Volume Share (PPI &amp; RuPay Credit &gt; ₹2,000)"
+          label="Chargeable Share (PPI / RuPay Credit %)"
           suffix="%"
           value="20"
           isNumeric={true}
-          helperText="Standard bank-to-bank UPI has 0% MDR. PPI wallets and RuPay Credit have interchange fees."
+          helperText="Percentage of volume from interchange-eligible methods (> ₹2,000)"
           inputmode="decimal"
+          aria-describedby="mdr-error-msg"
         />
         <div class="mt-2">
-          <Slider id="mdr-share-slider" min={0} max={100} step={5} value={20} ariaLabel="Chargeable share slider" />
+          <Slider id="mdr-share-slider" min={0} max={100} step={1} value={20} ariaLabel="Chargeable share slider" />
         </div>
       </div>
 
@@ -114,37 +168,32 @@ const jsonld = {
       <div class="mb-5">
         <Input
           id="mdr-rate"
-          label="Interchange / MDR Rate"
+          label="MDR / Interchange Fee Rate"
           suffix="%"
           value="1.1"
           isNumeric={true}
-          helperText="Standard NPCI interchange cap is 1.1% on transactions above ₹2,000"
+          helperText="Standard interchange fee rate (typically 0.9% to 1.1%)"
           inputmode="decimal"
+          aria-describedby="mdr-error-msg"
         />
         <div class="mt-2">
           <Slider id="mdr-rate-slider" min={0.5} max={2.5} step={0.05} value={1.1} ariaLabel="MDR rate slider" />
         </div>
       </div>
 
-      <!-- GST on MDR -->
+      <!-- GST Rate -->
       <div class="mb-6">
         <Input
           id="mdr-gst"
-          label="GST on Processing Fee"
+          label="GST on MDR Fee"
           suffix="%"
           value="18"
           isNumeric={true}
-          helperText="Standard 18% GST applied on merchant financial services"
+          helperText="Standard statutory GST levied on payment processing services"
           inputmode="decimal"
+          aria-describedby="mdr-error-msg"
         />
-        <div class="mt-2">
-          <Slider id="mdr-gst-slider" min={0} max={28} step={1} value={18} ariaLabel="GST rate slider" />
-        </div>
       </div>
-
-      <Alert variant="info" title="Zero MDR on Peer-to-Merchant (P2M)">
-        Normal UPI payments from customer savings bank accounts to merchant QR codes continue to have <strong>0% MDR</strong> under Indian government regulations.
-      </Alert>
 
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="mdr-calculate" type="button">Calculate</Button>
@@ -154,39 +203,39 @@ const jsonld = {
 
     <Fragment slot="outputs">
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Merchant Settlement</span>
-        <div id="mdr-result-settlement" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {fmt(result.netSettlement)}
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Monthly Settlement</span>
+        <div id="mdr-result-settlement" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {fmt(initialResult.netSettlement)}
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Deductions (Fee + GST)</span>
-          <span id="mdr-result-deductions" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.totalDeductions)}</span>
+          <span class="text-xs text-dark-muted">Total Fee Deductions</span>
+          <span id="mdr-result-deductions" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.totalDeductions)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Base Interchange Fee</span>
-          <span id="mdr-result-basefee" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.baseMdrFee)}</span>
+          <span class="text-xs text-dark-muted">Base MDR Fee</span>
+          <span id="mdr-result-basefee" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.baseMdrFee)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">GST on Fee (18%)</span>
-          <span id="mdr-result-gstamt" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.gstAmount)}</span>
+          <span class="text-xs text-dark-muted">GST (18% on MDR)</span>
+          <span id="mdr-result-gstamt" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.gstAmount)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Effective Blended Fee Rate</span>
-          <span id="mdr-result-effective" class="text-sm font-bold tabular-nums text-dark-text">{result.effectiveRatePct.toFixed(3)}%</span>
+          <span class="text-xs text-dark-muted">Effective Processing Cost</span>
+          <span id="mdr-result-effective" class="text-sm font-bold tabular-nums text-dark-text">{initialResult.effectiveRatePct.toFixed(3)}%</span>
         </div>
       </div>
 
       <div class="mb-5" id="mdr-composition-wrapper">
         <CompositionBar
-          principalFraction={result.netSettlement / DEFAULT.monthlyVolume}
-          gainFraction={result.totalDeductions / DEFAULT.monthlyVolume}
-          principalLabel="Net Settlement"
-          gainLabel="MDR &amp; GST"
-          principalValue={fmt(result.netSettlement)}
-          gainValue={fmt(result.totalDeductions)}
+          principalFraction={initialResult.monthlyVolume > 0 ? initialResult.netSettlement / initialResult.monthlyVolume : 1}
+          gainFraction={initialResult.monthlyVolume > 0 ? initialResult.totalDeductions / initialResult.monthlyVolume : 0}
+          principalLabel="Settlement"
+          gainLabel="MDR + GST"
+          principalValue={fmt(initialResult.netSettlement)}
+          gainValue={fmt(initialResult.totalDeductions)}
         />
       </div>
 
@@ -199,7 +248,7 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">NPCI guidelines: Zero surcharge can be passed onto consumers.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Jurisdiction: India (INR locked). Compliant with NPCI circulars; zero surcharge can be passed onto consumers.</p>
     </Fragment>
 
     <Fragment slot="below">
@@ -221,51 +270,41 @@ const jsonld = {
       <section aria-labelledby="mdr-calculator-faq">
         <h2 id="mdr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Does a customer ever pay MDR on UPI?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. Customers are never charged any fee or surcharge for paying via UPI, RuPay credit cards, or digital wallets. The interchange fee is absorbed strictly by the merchant and deducted by the acquiring payment aggregator.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can businesses claim Input Tax Credit (ITC) on the 18% GST?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes. If your business has an active GST registration, you can claim the 18% GST charged on MDR fees as Input Tax Credit (ITC) on your monthly GSTR-3B filings to offset output tax liabilities.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
       <section aria-labelledby="mdr-calculator-related">
         <h2 id="mdr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  function calcUPIMDRClient(vol: number, sharePct: number, mdrPct: number, gstPct: number) {
-    const chargeableVol = vol * (Math.min(100, Math.max(0, sharePct)) / 100);
-    const baseFee = chargeableVol * (mdrPct / 100);
-    const gstAmt = baseFee * (gstPct / 100);
-    const deductions = baseFee + gstAmt;
-    const settlement = Math.max(0, vol - deductions);
-    const effRate = vol > 0 ? (deductions / vol) * 100 : 0;
-    return {
-      chargeableVol,
-      baseFee,
-      gstAmt,
-      deductions,
-      settlement,
-      effRate,
-      setFrac: vol > 0 ? settlement / vol : 1,
-      dedFrac: vol > 0 ? deductions / vol : 0,
-    };
-  }
+  import { calcUPIMDR } from '../../lib/calculators/upi-mdr';
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  const currSym = '₹';
+  const currLocale = 'en-IN';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -275,6 +314,9 @@ const jsonld = {
   }
 
   function initMDRCalc() {
+    if ((window as any).__cmMdrBound) return;
+    (window as any).__cmMdrBound = true;
+
     const volInput = document.getElementById('mdr-volume') as HTMLInputElement | null;
     const shareInput = document.getElementById('mdr-share') as HTMLInputElement | null;
     const rateInput = document.getElementById('mdr-rate') as HTMLInputElement | null;
@@ -283,53 +325,81 @@ const jsonld = {
     const volSlider = document.getElementById('mdr-volume-slider') as HTMLInputElement | null;
     const shareSlider = document.getElementById('mdr-share-slider') as HTMLInputElement | null;
     const rateSlider = document.getElementById('mdr-rate-slider') as HTMLInputElement | null;
-    const gstSlider = document.getElementById('mdr-gst-slider') as HTMLInputElement | null;
 
     const resSettlement = document.getElementById('mdr-result-settlement');
     const resDeductions = document.getElementById('mdr-result-deductions');
     const resBaseFee = document.getElementById('mdr-result-basefee');
     const resGstAmt = document.getElementById('mdr-result-gstamt');
     const resEffRate = document.getElementById('mdr-result-effective');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('mdr-error-alert');
+    const errMsg = document.getElementById('mdr-error-msg');
 
     if (!volInput || !shareInput) return;
 
     const DEFAULTS = { vol: 500000, share: 20, rate: 1.1, gst: 18 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const vol = parse(volInput.value);
-      const share = parseFloat(shareInput.value) || 0;
-      const rate = parseFloat(rateInput ? rateInput.value : '1.1') || 1.1;
-      const gst = parseFloat(gstInput ? gstInput.value : '18') || 18;
+      const rawVol = volInput!.value.replace(/[^0-9.]/g, '');
+      const rawShare = shareInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
+      const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
 
-      if (vol <= 0) return;
+      const vVol = validate(rawVol, { required: true, min: 1000, label: 'Monthly Volume' });
+      const vShare = validate(rawShare, { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
+      const vGst = validate(rawGst, { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
 
-      const res = calcUPIMDRClient(vol, share, rate, gst);
+      if (!vVol.valid) { showError(vVol.error!.message); return; }
+      if (!vShare.valid) { showError(vShare.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vGst.valid) { showError(vGst.error!.message); return; }
+      clearError();
 
-      if (resSettlement) resSettlement.textContent = fmtVal(res.settlement);
-      if (resDeductions) resDeductions.textContent = fmtVal(res.deductions);
-      if (resBaseFee) resBaseFee.textContent = fmtVal(res.baseFee);
-      if (resGstAmt) resGstAmt.textContent = fmtVal(res.gstAmt);
-      if (resEffRate) resEffRate.textContent = res.effRate.toFixed(3) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.settlement);
+      const vol = vVol.value!;
+      const share = vShare.value!;
+      const rate = vRate.value!;
+      const gst = vGst.value!;
+
+      const res = calcUPIMDR(vol, 1500, share, rate, gst);
+
+      setResult({
+        heroValue: fmtVal(res.netSettlement),
+        heroLabel: 'Net Settlement',
+        rows: [
+          { label: 'Total Fee Deductions', value: fmtVal(res.totalDeductions) },
+          { label: 'Base MDR Fee', value: fmtVal(res.baseMdrFee) },
+          { label: 'GST on MDR', value: fmtVal(res.gstAmount) },
+          { label: 'Effective MDR Rate', value: `${res.effectiveRatePct.toFixed(3)}%` },
+        ],
+      });
+
+      if (resSettlement) resSettlement.textContent = fmtVal(res.netSettlement);
+      if (resDeductions) resDeductions.textContent = fmtVal(res.totalDeductions);
+      if (resBaseFee) resBaseFee.textContent = fmtVal(res.baseMdrFee);
+      if (resGstAmt) resGstAmt.textContent = fmtVal(res.gstAmount);
+      if (resEffRate) resEffRate.textContent = `${res.effectiveRatePct.toFixed(3)}%`;
 
       const wrapper = document.getElementById('mdr-composition-wrapper');
       if (wrapper && vol > 0) {
+        const setFrac = res.netSettlement / vol;
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.setFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.dedFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.settlement);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.deductions);
+        if (bar) bar.style.width = `${(setFrac * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(res.netSettlement);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.totalDeductions);
       }
 
-      history.replaceState(null, '', `#v=${vol}&s=${share}&r=${rate}&g=${gst}`);
+      serializeHash({ v: vol, s: share, r: rate, g: gst });
     }
 
     function debounce() {
@@ -361,7 +431,6 @@ const jsonld = {
     sync(volSlider, volInput, true);
     sync(shareSlider, shareInput, false);
     sync(rateSlider, rateInput!, false);
-    sync(gstSlider, gstInput!, false);
 
     document.getElementById('mdr-calculate')?.addEventListener('click', recalc);
     document.getElementById('mdr-reset')?.addEventListener('click', () => {
@@ -382,11 +451,8 @@ const jsonld = {
         rateSlider.value = String(DEFAULTS.rate);
         rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 0.5) / (2.5 - 0.5)) * 100}%`);
       }
-      if (gstSlider) {
-        gstSlider.value = String(DEFAULTS.gst);
-        gstSlider.style.setProperty('--slider-pct', `${(DEFAULTS.gst / 28) * 100}%`);
-      }
 
+      clearError();
       recalc();
       volInput.focus();
     });
@@ -399,12 +465,20 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('mdr-copy-btn')?.addEventListener('click', async () => {
-      const vol = parse(volInput.value);
-      const share = parseFloat(shareInput.value) || 0;
-      const rate = parseFloat(rateInput ? rateInput.value : '1.1') || 1.1;
-      const gst = parseFloat(gstInput ? gstInput.value : '18') || 18;
-      const res = calcUPIMDRClient(vol, share, rate, gst);
-      const text = `UPI MDR: Volume ${fmtVal(vol)} (${share}% chargeable at ${rate}%) => Fee+GST: ${fmtVal(res.deductions)}, Net Settlement: ${fmtVal(res.settlement)}. ${location.href.split('#')[0]}`;
+      const rawVol = volInput.value.replace(/[^0-9.]/g, '');
+      const rawShare = shareInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
+      const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
+
+      const vVol = validate(rawVol, { required: true, min: 1000, label: 'Volume' });
+      const vShare = validate(rawShare, { required: true, min: 0, max: 100, label: 'Share' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
+      const vGst = validate(rawGst, { required: true, min: 0, label: 'GST' });
+
+      if (!vVol.valid || !vShare.valid || !vRate.valid || !vGst.valid) return;
+
+      const res = calcUPIMDR(vVol.value!, 1500, vShare.value!, vRate.value!, vGst.value!);
+      const text = `UPI MDR: Volume ${fmtVal(vVol.value!)} (${vShare.value}% chargeable at ${vRate.value}%) => Fee+GST: ${fmtVal(res.totalDeductions)}, Net Settlement: ${fmtVal(res.netSettlement)}. ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('mdr-copy-btn');
       if (btn) {
@@ -424,20 +498,22 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      v: { required: true, min: 1000, label: 'v' },
+      s: { required: true, min: 0, max: 100, decimal: true, label: 's' },
+      r: { required: true, min: 0.1, max: 5, decimal: true, label: 'r' },
+      g: { required: true, min: 0, max: 28, decimal: true, label: 'g' },
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
+    if (restored.valid && restored.values.v && restored.values.s !== undefined && restored.values.r !== undefined && restored.values.g !== undefined) {
+      volInput.value = fmtLiveInput(String(restored.values.v));
+      shareInput.value = String(restored.values.s);
+      if (rateInput) rateInput.value = String(restored.values.r);
+      if (gstInput) gstInput.value = String(restored.values.g);
+      recalc();
+    } else {
+      recalc();
+    }
   }
 
   initMDRCalc();

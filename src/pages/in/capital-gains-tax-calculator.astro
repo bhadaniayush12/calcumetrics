@@ -1,0 +1,524 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Dropdown from '../../components/ui/Dropdown.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { calcCapitalGains, type AssetType } from '../../lib/tax/india';
+import { formatIndian } from '../../lib/formatters';
+import { TOOLS } from '../../config/site';
+
+const DEFAULT = { sale: 500000, purchase: 300000, months: 24, asset: 'equity' as AssetType };
+const initialResult = calcCapitalGains(DEFAULT.sale, DEFAULT.purchase, DEFAULT.months, DEFAULT.asset);
+
+const fmt = (n: number) => '₹' + formatIndian(n);
+
+const related = TOOLS.filter(
+  (t) => t.category === 'Taxes' && t.slug !== 'capital-gains-tax-calculator' && t.status === 'published'
+).slice(0, 3);
+
+const canonicalUrl = 'https://calcumetrics.com/in/capital-gains-tax-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Capital Gains Tax Calculator India',
+      url: canonicalUrl,
+      description: 'Calculate STCG and LTCG tax on equity, real estate, gold, and mutual funds reflecting Finance Act 2024 amendments.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Taxes', item: 'https://calcumetrics.com/taxes' },
+        { '@type': 'ListItem', position: 3, name: 'Capital Gains Tax Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What are the capital gains tax rates after Budget 2024?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Effective July 23, 2024, Short-Term Capital Gains (STCG) on listed equity and equity mutual funds are taxed at 20% (Section 111A). Long-Term Capital Gains (LTCG) on all financial and non-financial assets are taxed at 12.5% (Section 112A), with the annual equity LTCG exemption limit increased to ₹1.25 lakh.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is holding period determined for LTCG vs STCG?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the simplified holding period framework, listed equities and equity mutual funds qualify as long-term if held for more than 12 months. All other assets (including real estate, physical gold, and unlisted shares) qualify as long-term if held for more than 24 months.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is indexation benefit still available for real estate?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For properties acquired on or after 23 July 2024, indexation benefit is eliminated and LTCG is taxed at a flat 12.5%. For properties acquired before 23 July 2024 by resident individuals/HUFs, taxpayers can compute tax under both 12.5% without indexation and 20% with indexation, paying whichever is lower.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How are debt mutual funds taxed in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Per Section 50AA introduced in Finance Act 2023, gains from mutual funds investing less than 35% in domestic equities (pure debt funds) purchased after 1 April 2023 are treated as deemed short-term capital gains and taxed at the investor applicable slab rate regardless of holding duration.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Health and Education Cess added to capital gains tax?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, a mandatory 4% Health and Education Cess is levied on the aggregate amount of capital gains income tax and applicable surcharge.',
+          },
+        },
+      ],
+    },
+  ],
+};
+
+const ASSET_OPTIONS = [
+  { value: 'equity', label: 'Listed Equity Shares / Equity Mutual Funds' },
+  { value: 'real-estate', label: 'Immovable Property (Real Estate)' },
+  { value: 'gold', label: 'Physical Gold / Gold ETFs / SGBs' },
+  { value: 'debt-fund', label: 'Debt Mutual Funds (Taxed at Slab Rate)' },
+];
+---
+
+<Layout
+  title="Capital Gains Tax Calculator India: LTCG & STCG (Budget 2024 Rates) | Calcumetrics"
+  description="Calculate your Indian capital gains tax under updated post-Budget 2024 tax rules (12.5% LTCG, 20% STCG). Free, instant, and accurate."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Capital Gains Tax Calculator"
+    category="Taxes"
+    categoryHref="/taxes"
+    heroValue={fmt(initialResult.totalTax)}
+    heroLabel="Total Capital Gains Tax"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Capital Gains Tax Calculator (India)</h1>
+      <p class="text-sm text-text-muted mb-6">Estimate your capital gains tax liability under Section 111A, 112, and 112A reflecting current Finance Act rules.</p>
+
+      <!-- Error alert -->
+      <div id="cgt-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="cgt-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Asset Type -->
+      <div class="mb-5">
+        <Dropdown
+          id="cgt-asset"
+          label="Asset Category"
+          options={ASSET_OPTIONS}
+          value="equity"
+          helperText="Determines statutory LTCG threshold and applicable tax rate"
+        />
+      </div>
+
+      <!-- Sale Price -->
+      <div class="mb-5">
+        <Input
+          id="cgt-sale"
+          label="Selling Price / Total Consideration"
+          prefix="₹"
+          value="5,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Gross value realized upon sale or redemption"
+          inputmode="decimal"
+          aria-describedby="cgt-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cgt-sale-slider" min={10000} max={5000000} step={10000} value={500000} ariaLabel="Selling price slider" />
+        </div>
+      </div>
+
+      <!-- Purchase Price -->
+      <div class="mb-5">
+        <Input
+          id="cgt-purchase"
+          label="Purchase Price / Cost of Acquisition"
+          prefix="₹"
+          value="3,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Original cost incurred to buy the asset"
+          inputmode="decimal"
+          aria-describedby="cgt-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cgt-purchase-slider" min={10000} max={5000000} step={10000} value={300000} ariaLabel="Purchase price slider" />
+        </div>
+      </div>
+
+      <!-- Holding Period -->
+      <div class="mb-6">
+        <Input
+          id="cgt-months"
+          label="Holding Period (Months)"
+          suffix="Months"
+          value="24"
+          isNumeric={true}
+          helperText="Total months held from acquisition date to transfer date"
+          inputmode="numeric"
+          aria-describedby="cgt-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="cgt-months-slider" min={1} max={120} step={1} value={24} ariaLabel="Holding period slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="cgt-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="cgt-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Total Tax Liability (with Cess)</span>
+        <div id="cgt-result-tax" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {fmt(initialResult.totalTax)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Gain After Tax</span>
+          <span id="cgt-result-netgain" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.netGain)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Capital Gain</span>
+          <span id="cgt-result-gain" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.gain)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Gain Classification</span>
+          <span id="cgt-result-type" class="text-sm font-bold tabular-nums text-dark-text">{initialResult.gainType}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Applicable Tax Rate</span>
+          <span id="cgt-result-rate" class="text-sm font-medium tabular-nums text-dark-text">{initialResult.taxRatePct}%</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Health & Education Cess (4%)</span>
+          <span id="cgt-result-cess" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.cess)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Statutory Provision</span>
+          <span id="cgt-result-section" class="text-xs font-mono text-dark-muted">Section {initialResult.section}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="cgt-composition-wrapper">
+        <CompositionBar
+          principalFraction={initialResult.gain > 0 ? initialResult.netGain / initialResult.gain : 1}
+          gainFraction={initialResult.gain > 0 ? initialResult.totalTax / initialResult.gain : 0}
+          principalLabel="Net Retained Gain"
+          gainLabel="Tax Paid"
+          principalValue={fmt(initialResult.netGain)}
+          gainValue={fmt(initialResult.totalTax)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="cgt-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="cgt-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Reflects Budget 2024 changes: 20% STCG, 12.5% LTCG with ₹1.25L annual exemption on equity. Debt fund slab estimate uses 30% conservative rate.</p>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>Capital Gain computation under Chapter IV-E of the Income-tax Act:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
+          Capital Gain = Sale Consideration − Cost of Acquisition
+        </div>
+        <p>For equity LTCG (Section 112A), taxable gain is max(0, Gain − ₹1,25,000) @ 12.5%. Total Tax = (Taxable Gain × Rate) × 1.04 (4% Cess).</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcCapitalGains, type AssetType } from '../../lib/tax/india';
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+
+  const currSym = '₹';
+  const currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initCGTCalc() {
+    if ((window as any).__cmCgtBound) return;
+    (window as any).__cmCgtBound = true;
+
+    const saleInput = document.getElementById('cgt-sale') as HTMLInputElement | null;
+    const purchaseInput = document.getElementById('cgt-purchase') as HTMLInputElement | null;
+    const monthsInput = document.getElementById('cgt-months') as HTMLInputElement | null;
+    const assetSelect = document.getElementById('cgt-asset') as HTMLSelectElement | null;
+
+    const saleSlider = document.getElementById('cgt-sale-slider') as HTMLInputElement | null;
+    const purchaseSlider = document.getElementById('cgt-purchase-slider') as HTMLInputElement | null;
+    const monthsSlider = document.getElementById('cgt-months-slider') as HTMLInputElement | null;
+
+    const resTax = document.getElementById('cgt-result-tax');
+    const resNetGain = document.getElementById('cgt-result-netgain');
+    const resGain = document.getElementById('cgt-result-gain');
+    const resType = document.getElementById('cgt-result-type');
+    const resRate = document.getElementById('cgt-result-rate');
+    const resCess = document.getElementById('cgt-result-cess');
+    const resSection = document.getElementById('cgt-result-section');
+
+    const errAlert = document.getElementById('cgt-error-alert');
+    const errMsg = document.getElementById('cgt-error-msg');
+
+    if (!saleInput || !purchaseInput || !monthsInput || !assetSelect) return;
+
+    const DEFAULTS = { sale: 500000, purchase: 300000, months: 24, asset: 'equity' as AssetType };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawSale = saleInput!.value.replace(/[^0-9.]/g, '');
+      const rawPurchase = purchaseInput!.value.replace(/[^0-9.]/g, '');
+      const rawMonths = monthsInput!.value.replace(/[^0-9.]/g, '');
+      const asset = assetSelect!.value as AssetType;
+
+      const vSale = validate(rawSale, { required: true, min: 0, label: 'Sale Price' });
+      const vPurchase = validate(rawPurchase, { required: true, min: 0, label: 'Purchase Price' });
+      const vMonths = validate(rawMonths, { required: true, min: 1, max: 600, integer: true, label: 'Holding Period' });
+
+      if (!vSale.valid) { showError(vSale.error!.message); return; }
+      if (!vPurchase.valid) { showError(vPurchase.error!.message); return; }
+      if (!vMonths.valid) { showError(vMonths.error!.message); return; }
+      clearError();
+
+      const sale = vSale.value!;
+      const purchase = vPurchase.value!;
+      const months = vMonths.value!;
+
+      const res = calcCapitalGains(sale, purchase, months, asset);
+
+      setResult({
+        heroValue: fmtVal(res.totalTax),
+        heroLabel: 'Capital Gains Tax',
+        rows: [
+          { label: 'Net Gain After Tax', value: fmtVal(res.netGain) },
+          { label: 'Total Capital Gain', value: fmtVal(res.gain) },
+          { label: 'Gain Type', value: res.gainType },
+          { label: 'Tax Rate', value: `${res.taxRatePct}%` },
+          { label: 'Cess (4%)', value: fmtVal(res.cess) },
+          { label: 'Statutory Section', value: res.section },
+        ],
+      });
+
+      if (resTax) resTax.textContent = fmtVal(res.totalTax);
+      if (resNetGain) resNetGain.textContent = fmtVal(res.netGain);
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      if (resType) resType.textContent = res.gainType;
+      if (resRate) resRate.textContent = `${res.taxRatePct}%`;
+      if (resCess) resCess.textContent = fmtVal(res.cess);
+      if (resSection) resSection.textContent = `Section ${res.section}`;
+
+      const wrapper = document.getElementById('cgt-composition-wrapper');
+      if (wrapper && res.gain > 0) {
+        const retainedPct = Math.max(0, Math.min(100, (res.netGain / res.gain) * 100));
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        if (bar) bar.style.width = `${retainedPct.toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(res.netGain);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.totalTax);
+      }
+
+      serializeHash({ s: sale, p: purchase, m: months, a: asset });
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 120);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(saleSlider, saleInput, true);
+    sync(purchaseSlider, purchaseInput, true);
+    sync(monthsSlider, monthsInput, false);
+    assetSelect.addEventListener('change', recalc);
+
+    document.getElementById('cgt-calculate')?.addEventListener('click', recalc);
+    document.getElementById('cgt-reset')?.addEventListener('click', () => {
+      saleInput.value = fmtLiveInput(String(DEFAULTS.sale));
+      purchaseInput.value = fmtLiveInput(String(DEFAULTS.purchase));
+      monthsInput.value = String(DEFAULTS.months);
+      assetSelect.value = DEFAULTS.asset;
+      if (saleSlider) {
+        saleSlider.value = String(DEFAULTS.sale);
+        saleSlider.style.setProperty('--slider-pct', `${((DEFAULTS.sale - 10000) / (5000000 - 10000)) * 100}%`);
+      }
+      if (purchaseSlider) {
+        purchaseSlider.value = String(DEFAULTS.purchase);
+        purchaseSlider.style.setProperty('--slider-pct', `${((DEFAULTS.purchase - 10000) / (5000000 - 10000)) * 100}%`);
+      }
+      if (monthsSlider) {
+        monthsSlider.value = String(DEFAULTS.months);
+        monthsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.months - 1) / (120 - 1)) * 100}%`);
+      }
+      clearError();
+      recalc();
+      saleInput.focus();
+    });
+
+    [saleInput, purchaseInput, monthsInput].forEach((el) => {
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('cgt-copy-btn')?.addEventListener('click', async () => {
+      const rawSale = saleInput.value.replace(/[^0-9.]/g, '');
+      const rawPurchase = purchaseInput.value.replace(/[^0-9.]/g, '');
+      const rawMonths = monthsInput.value.replace(/[^0-9.]/g, '');
+      const asset = assetSelect.value as AssetType;
+
+      const vSale = validate(rawSale, { required: true, min: 0, label: 'Sale' });
+      const vPurchase = validate(rawPurchase, { required: true, min: 0, label: 'Purchase' });
+      const vMonths = validate(rawMonths, { required: true, min: 1, label: 'Months' });
+
+      if (!vSale.valid || !vPurchase.valid || !vMonths.valid) return;
+
+      const res = calcCapitalGains(vSale.value!, vPurchase.value!, vMonths.value!, asset);
+      const text = `Capital Gains Tax (${res.gainType}): ${fmtVal(res.totalTax)} on gain of ${fmtVal(res.gain)} (Net retained: ${fmtVal(res.netGain)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('cgt-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('cgt-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('cgt-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      s: { required: true, min: 0, label: 's' },
+      p: { required: true, min: 0, label: 'p' },
+      m: { required: true, min: 1, max: 600, integer: true, label: 'm' },
+    });
+    if (restored.valid && restored.values.s !== undefined && restored.values.p !== undefined && restored.values.m) {
+      saleInput.value = fmtLiveInput(String(restored.values.s));
+      purchaseInput.value = fmtLiveInput(String(restored.values.p));
+      monthsInput.value = String(restored.values.m);
+      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+      const a = hashParams.get('a');
+      if (a && ['equity', 'real-estate', 'gold', 'debt-fund'].includes(a)) {
+        assetSelect.value = a;
+      }
+      recalc();
+    } else {
+      recalc();
+    }
+  }
+
+  initCGTCalc();
+  document.addEventListener('astro:page-load', initCGTCalc);
+</script>
