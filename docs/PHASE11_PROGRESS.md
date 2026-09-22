@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:22:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:25:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 5
-- **IN_PROGRESS:** 006. npv-vs-irr
-- **NEXT:** 007. flat-vs-reducing-interest-rate
+- **COMPLETED_ARTICLES:** 6
+- **IN_PROGRESS:** 007. flat-vs-reducing-interest-rate
+- **NEXT:** 008. cash-conversion-cycle
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** markup-vs-margin
-- **LAST_COMMIT:** 17f13c3
+- **LAST_COMPLETED_ARTICLE:** npv-vs-irr
+- **LAST_COMMIT:** 9711551
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (70 pages)
+- **BUILD_STATUS:** PASS (71 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -23,8 +23,8 @@
 - [x] 003. old-vs-new-tax-regime — DONE (Trending/Hybrid)
 - [x] 004. capital-gains-tax-rules — DONE (Trending/Hybrid)
 - [x] 005. markup-vs-margin — DONE (Evergreen)
-- [ ] 006. npv-vs-irr — IN PROGRESS (Evergreen)
-- [ ] 007. flat-vs-reducing-interest-rate — PENDING (Evergreen)
+- [x] 006. npv-vs-irr — DONE (Evergreen)
+- [ ] 007. flat-vs-reducing-interest-rate — IN PROGRESS (Evergreen)
 - [ ] 008. cash-conversion-cycle — PENDING (Evergreen)
 - [ ] 009. advance-tax-guide — PENDING (Evergreen/Statutory)
 - [ ] 010. real-rate-of-return — PENDING (Evergreen)
@@ -109,3 +109,12 @@
   - Key Content: The ₹1,000 product pricing illusion, algebraic proofs for `Margin = Markup / (1 + Markup)` and `Markup = Margin / (1 - Margin)`, comprehensive Quick-Reference Conversion Matrix (10% to 900% markup), worked e-commerce overhead schedule (leather boot D2C brand: 35% markup on cost triggers ₹110 net loss per order vs 45% margin creating ₹545 net profit per order), Keystone pricing conventions, and 3 bulletproof commercial pricing rules.
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (71 pages built), `git diff --check` PASS.
+
+- **006. npv-vs-irr (/blog/npv-vs-irr)**:
+  - Title: NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting
+  - Intent: Resolve capital budgeting conflicts between Net Present Value and Internal Rate of Return for corporate decision-makers, detailing the fatal reinvestment rate assumption flaw in IRR and Fisher's crossover rate methodology.
+  - Linked Calculators: `/npv-calculator`, `/irr-calculator`, `/wacc-calculator`, `/dcf-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/npv-calculator` and `/irr-calculator`.
+  - Key Content: Mathematical definitions of NPV and IRR, the reinvestment rate assumption flaw (reinvesting at IRR vs WACC), scale disparity and cash flow timing traps, worked 3-year incremental cash flow schedule determining Fisher's crossover discount rate (14.5%) and showing how Project B ($NPV_B = ₹26,371$) creates more value than Project A ($NPV_A = ₹21,638$) despite Project A's higher IRR (24.0% vs 21.2%), Descartes' Rule of Signs multiple-root hazard for non-conventional cash flows, and 4-step executive decision protocol.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (72 pages built), `git diff --check` PASS.
