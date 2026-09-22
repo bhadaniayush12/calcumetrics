@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:03:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:03:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 16
-- **IN_PROGRESS:** 017. hra-calculator
+- **COMPLETED:** 17
+- **IN_PROGRESS:** NONE
 - **NEXT:** 018. upi-mdr-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** gst-calculator
-- **LAST_COMMIT:** 7ad5fdd
+- **LAST_COMPLETED_UNIT:** hra-calculator
+- **LAST_COMMIT:** 95e64ac
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -34,7 +34,7 @@
 - [x] 014. loan-prepayment-calculator — DONE
 - [x] 015. income-tax-calculator — DONE (Phase 5 Locked, India Tax Protected, Intentionally Preserved)
 - [x] 016. gst-calculator — DONE (India Tax Protected)
-- [ ] 017. hra-calculator — IN PROGRESS (India Tax Protected)
+- [x] 017. hra-calculator — DONE (India Tax Protected)
 - [ ] 018. upi-mdr-calculator — PENDING
 - [ ] 019. break-even-calculator — PENDING (Phase 5 Locked)
 - [ ] 020. profit-margin-calculator — PENDING
@@ -152,6 +152,12 @@
 
 - **016. gst-calculator (/in/gst-calculator)**:
   - Audited: India Goods and Services Tax model with inclusive/exclusive modes and intra-state (CGST+SGST) vs inter-state (IGST) supply classification.
-  - Changes: Added step-by-step dual worked examples for both B2B exclusive invoice (₹10,000 base at 18% → ₹900 CGST + ₹900 SGST = ₹11,800 total) and retail inclusive MRP (₹10,000 gross at 18% → ₹8,475 base + ₹1,525 GST split into ₹762.50 CGST + ₹762.50 SGST), added comprehensive statutory GST rate slabs table across 0%, 5%, 12%, 18%, and 28% tiers with representative goods/services, and added statutory compliance guidance (Input Tax Credit / GSTR-2B matching, GST Compensation Cess rules, mandatory ₹40L/₹20L turnover registration thresholds, and legal Place of Supply rules).
+  - Changes: Added step-by-step dual worked examples for both B2B exclusive invoice (₹10,00,00 base at 18% → ₹900 CGST + ₹900 SGST = ₹11,800 total) and retail inclusive MRP (₹10,000 gross at 18% → ₹8,475 base + ₹1,525 GST split into ₹762.50 CGST + ₹762.50 SGST), added comprehensive statutory GST rate slabs table across 0%, 5%, 12%, 18%, and 28% tiers with representative goods/services, and added statutory compliance guidance (Input Tax Credit / GSTR-2B matching, GST Compensation Cess rules, mandatory ₹40L/₹20L turnover registration thresholds, and legal Place of Supply rules).
   - Preserved: Strict INR jurisdiction lock, Phase 7/8 regulatory baseline, authoritative CBIC source link, verified date, statutory disclaimers, calculation engine `calcGST`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **017. hra-calculator (/in/hra-calculator)**:
+  - Audited: Section 10(13A) and Rule 2A House Rent Allowance tax exemption tripartite model.
+  - Changes: Added step-by-step worked example for metro resident (₹6L basic, ₹2.4L HRA received, ₹1.8L rent paid in Mumbai → Limit 1: ₹2.4L, Limit 2: ₹1.2L, Limit 3: ₹3L → statutory exemption is ₹1.2L, taxable HRA is ₹1.2L), added statutory city classification guidance explaining the strict 4-metro definition (Delhi, Mumbai, Kolkata, Chennai as 50% vs Bengaluru, Hyderabad, Pune as 40%), and added compliance rules (mandatory landlord PAN threshold above ₹1 Lakh annual rent, requirements for legally paying rent to parents, and simultaneous Section 24(b) home loan interest + HRA exemption rules).
+  - Preserved: Strict INR jurisdiction lock, Phase 7/8 regulatory baseline, authoritative CBDT source link, verified date, statutory disclaimers, calculation engine `calcHRA`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.

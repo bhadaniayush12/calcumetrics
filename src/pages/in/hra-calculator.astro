@@ -243,16 +243,80 @@ const jsonld = {
 
     <Fragment slot="below">
       <section aria-labelledby="hra-calculator-how">
-        <h2 id="hra-calculator-how" class="text-xl font-bold text-text-primary mb-4">How HRA exemption is calculated</h2>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed mb-3">
-            Under Section 10(13A) of the Income-tax Act, 1961, the tax-exempt portion of House Rent Allowance is the <strong>lowest</strong> of the following three limits:
-          </p>
-          <ol class="list-decimal pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
-            <li><strong>Actual HRA received</strong> from your employer during the financial year.</li>
-            <li><strong>Actual rent paid minus 10% of basic salary</strong> (+ Dearness Allowance).</li>
-            <li><strong>50% of basic salary</strong> for metro cities (Delhi, Mumbai, Kolkata, Chennai) or <strong>40% of basic salary</strong> for non-metro cities.</li>
-          </ol>
+        <h2 id="hra-calculator-how" class="text-xl font-bold text-text-primary mb-4">How HRA exemption is computed</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Under Section 10(13A) read with Rule 2A of the Income-tax Rules, 1962, the tax-exempt portion of House Rent Allowance is the <strong>least</strong> of the following three statutory limits:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3">
+          <div class="space-y-1">
+            <p class="font-bold text-text-primary text-sm">Limit 1: Actual HRA Received</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Total HRA paid by employer in the financial year</p>
+          </div>
+          <div class="space-y-1 border-t border-border/50 pt-2">
+            <p class="font-bold text-text-primary text-sm">Limit 2: Rent Paid in Excess of 10% of Salary</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Actual Rent Paid − (10% × [Basic Salary + Dearness Allowance])</p>
+          </div>
+          <div class="space-y-1 border-t border-border/50 pt-2">
+            <p class="font-bold text-text-primary text-sm">Limit 3: Statutory Percentage Ceiling</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">50% of Basic Salary (Delhi, Mumbai, Kolkata, Chennai) OR 40% (All Other Cities)</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="hra-worked-example">
+        <h2 id="hra-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: Metro resident</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Suppose an employee living in a rented apartment in Mumbai receives an annual basic salary of <strong>₹6,00,000</strong>, receives an annual HRA of <strong>₹2,40,000</strong> from their employer, and pays <strong>₹15,000/month</strong> (₹1,80,000/year) in actual house rent:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Annual Basic Salary (+ DA):</span>
+            <strong class="text-text-primary font-mono">₹6,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Annual HRA Received from Employer:</span>
+            <strong class="text-text-primary font-mono">₹2,40,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Actual Rent Paid (₹15,000 × 12):</span>
+            <strong class="text-text-primary font-mono">₹1,80,000</strong>
+          </div>
+          <div class="bg-canvas p-3 rounded space-y-2 text-xs">
+            <span class="font-semibold text-text-primary uppercase tracking-wider block">Evaluating the Three Statutory Limits:</span>
+            <div class="flex justify-between"><span>1. Actual HRA received:</span><strong class="font-mono text-text-primary">₹2,40,000</strong></div>
+            <div class="flex justify-between"><span>2. Rent Paid − 10% of Basic (₹1,80,000 − ₹60,000):</span><strong class="font-mono text-text-primary">₹1,20,000</strong></div>
+            <div class="flex justify-between"><span>3. 50% of Basic Salary (Mumbai Metro):</span><strong class="font-mono text-text-primary">₹3,00,000</strong></div>
+          </div>
+          <div class="flex justify-between border-t border-border/50 pt-2 font-semibold">
+            <span>Statutory Tax Exemption (Lowest of 1, 2, and 3):</span>
+            <strong class="text-accent font-mono font-bold">₹1,20,000</strong>
+          </div>
+          <div class="flex justify-between border-t border-border/50 pt-2">
+            <span>Taxable HRA Added to Gross Income (₹2,40,000 − ₹1,20,000):</span>
+            <strong class="text-text-primary font-mono">₹1,20,000</strong>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="hra-metro-rules">
+        <h2 id="hra-metro-rules" class="text-xl font-bold text-text-primary mb-4">Statutory city classification & compliance guidelines</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">The 4 Metro Cities Rule</h3>
+            <p>Under Rule 2A, only <strong>New Delhi, Mumbai, Kolkata, and Chennai</strong> qualify for the 50% basic salary ceiling. Major tech hubs such as Bengaluru, Hyderabad, Pune, Gurugram, and Noida legally fall under the 40% non-metro category.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Landlord PAN Mandate</h3>
+            <p>Per CBDT circulars, if annual rent paid exceeds <strong>₹1,00,000</strong> (over ₹8,333/month), submitting your landlord's Permanent Account Number (PAN) or a signed Form 60 declaration to your employer is mandatory.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Paying Rent to Parents</h3>
+            <p>Salaried individuals can claim HRA by paying rent to parents if the parents are legal title owners of the property, rental agreements and bank transfer trails exist, and parents declare the rent under House Property income in their ITR.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Dual Home Loan + HRA Benefits</h3>
+            <p>Taxpayers who own a residential home but live in rented accommodation due to employment in another city can claim both Section 24(b) home loan interest deduction (up to ₹2 Lakh) and Section 10(13A) HRA exemption simultaneously.</p>
+          </div>
         </div>
       </section>
 
