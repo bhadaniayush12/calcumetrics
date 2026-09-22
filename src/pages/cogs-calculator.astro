@@ -30,7 +30,8 @@ const result = calcCOGS(
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'cogs-calculator' && t.status === 'published').slice(0, 3);
+const relatedSlugs = ['profit-margin-calculator', 'inventory-turnover-calculator', 'break-even-calculator'];
+const related = TOOLS.filter((t) => relatedSlugs.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/cogs-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -258,52 +259,146 @@ const jsonld = {
     <Fragment slot="below">
       <section aria-labelledby="cogs-calculator-how">
         <h2 id="cogs-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Cost of Goods Sold is calculated</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          COGS measures direct costs attributable to the production or acquisition of goods sold by a company:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Goods Available for Sale = </strong> Beginning Inventory + Purchases + Direct Labor + Factory Overhead<br />
-            <strong>Cost of Goods Sold (COGS) = </strong> Goods Available for Sale − Ending Inventory<br />
-            <strong>Gross Profit = </strong> Sales Revenue − COGS<br />
-            <strong>Gross Margin % = </strong> (Gross Profit ÷ Sales Revenue) × 100
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed mb-4">
+            Cost of Goods Sold (COGS) measures the direct expenditures incurred to manufacture, purchase, or package products that were successfully sold to customers during an accounting period:
           </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono mb-4">
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Goods Available for Sale</span>
+              <span class="text-text-muted">Total Additions = Purchases + Direct Labor + Factory Overhead</span><br />
+              <span class="text-accent font-semibold">Available for Sale = Beginning Inventory + Total Additions</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">COGS & Gross Profit</span>
+              <span class="text-accent font-semibold">COGS = Goods Available for Sale − Ending Inventory</span><br />
+              <span class="text-text-muted">Gross Profit = Sales Revenue − COGS</span><br />
+              <span class="text-text-muted">Gross Margin % = (Gross Profit ÷ Sales Revenue) × 100</span>
+            </div>
+          </div>
+          <p class="text-xs text-text-muted leading-relaxed">
+            <strong>The Matching Principle:</strong> Under accrual accounting (GAAP &amp; IFRS), inventory costs remain on the balance sheet as an asset until the goods are actually sold, at which point they are expensed on the income statement as COGS to match sales revenue.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-step worked example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider a manufacturing business with the default baseline parameters: beginning stock of <strong>₹1,50,000</strong>, raw material purchases of <strong>₹4,50,000</strong>, direct manufacturing wages of <strong>₹1,00,000</strong>, factory overhead of <strong>₹50,000</strong>, ending physical inventory of <strong>₹1,20,000</strong>, and sales revenue of <strong>₹9,50,000</strong>:
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Cost Flow Step</th>
+                <th class="py-3 px-4">Amount</th>
+                <th class="py-3 px-4">% of Revenue</th>
+                <th class="py-3 px-4">Accounting Function</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">1. Beginning Inventory</td>
+                <td class="py-2.5 px-4 font-mono">₹1,50,000</td>
+                <td class="py-2.5 px-4 font-mono">15.79%</td>
+                <td class="py-2.5 px-4">Unsold inventory carried forward from prior period closing.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">2. Add: Raw Material Purchases</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">+₹4,50,000</td>
+                <td class="py-2.5 px-4 font-mono">47.37%</td>
+                <td class="py-2.5 px-4">Direct inventory stock and raw components procured.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">3. Add: Direct Labor Wages</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">+₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">10.53%</td>
+                <td class="py-2.5 px-4">Assembly-line workers directly fabricating the product.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">4. Add: Direct Factory Overhead</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">+₹50,000</td>
+                <td class="py-2.5 px-4 font-mono">5.26%</td>
+                <td class="py-2.5 px-4">Plant machinery electricity, machine lubrication, and packaging.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">5. Goods Available for Sale</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹7,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent">78.95%</td>
+                <td class="py-2.5 px-4">Total pool of physical inventory available for customer shipment.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">6. Less: Ending Physical Inventory</td>
+                <td class="py-2.5 px-4 font-mono text-error">−₹1,20,000</td>
+                <td class="py-2.5 px-4 font-mono">12.63%</td>
+                <td class="py-2.5 px-4">Physical count of unsold finished stock remaining in warehouse.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">7. Cost of Goods Sold (COGS)</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹6,30,000</td>
+                <td class="py-3 px-4 font-mono text-accent">66.32%</td>
+                <td class="py-3 px-4">Direct manufacturing cost of units sold to buyers.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">8. Gross Sales Revenue</td>
+                <td class="py-2.5 px-4 font-mono">₹9,50,000</td>
+                <td class="py-2.5 px-4 font-mono">100.0%</td>
+                <td class="py-2.5 px-4">Total top-line billings from product sales.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">9. Resulting Gross Profit</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹3,20,000</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">33.68% Margin</td>
+                <td class="py-3 px-4">Available gross contribution to cover SG&amp;A and taxes.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Cost Models: Retail vs. Manufacturing vs. Services</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Retail &amp; Merchandising:</strong> Simple formula: <em>Beginning Inventory + Purchases + Inbound Freight − Ending Inventory</em>. No labor or factory overhead.</li>
+              <li><strong>Manufacturing:</strong> Incorporates 3 distinct inventory accounts: Raw Materials, Work-in-Progress (WIP), and Finished Goods, factoring in machine depreciation.</li>
+              <li><strong>Professional Services &amp; SaaS:</strong> Reported as <em>Cost of Services (COS)</em> or <em>Cost of Revenue</em>. Includes cloud server hosting (AWS/Azure), third-party API costs, and billable engineering salaries, with zero physical inventory.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Costs That Must Be EXCLUDED From COGS</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Mistakenly including operational overhead in COGS distorts gross margins:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Selling Expenses:</strong> Google/Meta advertising, sales commissions, outbound customer shipping, and marketing team payroll.</li>
+              <li><strong>General &amp; Administrative (G&amp;A):</strong> Corporate headquarters lease, executive C-suite salaries, legal retainers, and audit fees.</li>
+              <li><strong>Financing Costs:</strong> Bank overdraft interest and corporate income tax deductions.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Inventory Valuation Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Inventory Valuation Method Sensitivity:</strong> During inflationary cycles, FIFO (First-In, First-Out) reports lower COGS and higher taxable income, whereas Weighted Average Cost smooths pricing surges. (Note: LIFO is banned under IFRS and Indian AS 2).</li>
+            <li><strong>Shrinkage, Breakage &amp; Theft:</strong> Unrecorded inventory theft or warehouse damage artificially increases reported COGS because ending inventory count comes in lower than accounting records predict.</li>
+            <li><strong>Periodic vs. Perpetual Inventory Systems:</strong> This calculator models the periodic inventory method where COGS is established after a physical inventory count at period close.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="cogs-calculator-faq">
         <h2 id="cogs-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What costs are excluded from COGS?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Operating expenses such as sales commissions, marketing and advertising, administrative legal fees, corporate office rent, and corporate executive salaries are operating expenses (OpEx), not direct manufacturing costs, and must be excluded from COGS.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inventory accounting method impact COGS?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              In inflationary environments, FIFO (First-In, First-Out) yields lower COGS and higher reported gross profit, whereas LIFO (Last-In, First-Out) or Weighted Average Cost yields higher COGS and lower taxable income.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is COGS calculated for a service business?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Service companies report Cost of Services (COS), which includes billable employee salaries, contractor fees, and direct software licenses required to deliver client deliverables, with zero physical inventory components.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between direct labor and indirect labor?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Direct labor includes wages of employees directly assembling or fabricating products. Indirect labor includes plant supervisors, maintenance staff, and security guards, which are categorized as factory overhead.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is ending inventory subtracted in the COGS formula?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Under the matching principle, costs must be matched to revenues in the period earned. Goods remaining in ending inventory were not sold, so their costs are capitalized on the balance sheet rather than expensed in COGS.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 

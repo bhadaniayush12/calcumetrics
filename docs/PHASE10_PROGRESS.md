@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:14:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:16:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 25
-- **IN_PROGRESS:** 026. cogs-calculator
-- **NEXT:** 027. inventory-turnover-calculator
+- **COMPLETED:** 26
+- **IN_PROGRESS:** 027. inventory-turnover-calculator
+- **NEXT:** 028. liquidity-ratios-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** working-capital-calculator
-- **LAST_COMMIT:** 3a245ed
+- **LAST_COMPLETED_UNIT:** cogs-calculator
+- **LAST_COMMIT:** e42c5a7
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -43,8 +43,8 @@
 - [x] 023. eoq-calculator — DONE
 - [x] 024. depreciation-calculator — DONE
 - [x] 025. working-capital-calculator — DONE
-- [ ] 026. cogs-calculator — IN PROGRESS
-- [ ] 027. inventory-turnover-calculator — PENDING
+- [x] 026. cogs-calculator — DONE
+- [ ] 027. inventory-turnover-calculator — IN PROGRESS
 - [ ] 028. liquidity-ratios-calculator — PENDING
 - [ ] 029. wacc-calculator — PENDING (Phase 5 Locked)
 - [ ] 030. npv-calculator — PENDING (Phase 5 Locked)
@@ -206,4 +206,10 @@
   - Audited: Balance sheet liquidity model calculating Net Working Capital (NWC), Current Ratio, and Quick (Acid-Test) Ratio.
   - Changes: Added comprehensive multi-tier liquidity definitions, step-by-step worked example matching default inputs (₹10L current assets vs ₹4.5L current liabilities → ₹5.5L NWC cushion, 2.22x Current Ratio, 1.33x Quick Ratio), balance sheet classification table, operating working capital (OWC) concepts for DCF valuation, analysis of why negative working capital can be a massive operational advantage for retail platforms (free vendor financing float), Indian banking Maximum Permissible Bank Finance (MPBF) credit norms (1.33x minimum ratio requirement), and balance sheet snapshot limitations.
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcWorkingCapital`, 5 FAQs matching JSON-LD schema, and curated related links (`cash-conversion-cycle-calculator`, `liquidity-ratios-calculator`, `inventory-turnover-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **026. cogs-calculator (/cogs-calculator)**:
+  - Audited: Cost of Goods Sold (COGS) model calculating direct production costs, cost additions waterfall, and gross margin.
+  - Changes: Added mathematical formula and direct vs indirect cost breakdown, step-by-step worked example accounting schedule matching default inputs (₹1.5L beginning inventory + ₹4.5L purchases + ₹1L direct labor + ₹50k overhead − ₹1.2L ending inventory = ₹6.3L COGS; yielding ₹3.2L gross profit / 33.68% margin on ₹9.5L revenue), sector-specific cost models (retail vs manufacturing vs SaaS Cost of Revenue), explicit exclusions list (SG&A, executive salaries, advertising), and inventory valuation assumptions/limitations (FIFO vs Weighted Average cost, shrinkage, periodic system).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcCOGS`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `markup-vs-margin-calculator`, `inventory-turnover-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
