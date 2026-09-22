@@ -1,0 +1,21 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "ppf",
+  "effectiveFrom": "2020-04-01",
+  "taxYear": "Current (FY 2020-21 onward)",
+  "governingFramework": "Public Provident Fund Scheme, 2019 / Government Savings Promotion Act, 1873",
+  "framework": "Public Provident Fund Scheme, 2019",
+  "source": "Ministry of Finance, Government of India",
+  "sourceUrl": "https://dea.gov.in",
+  "sourceTitle": "Ministry of Finance — Small Savings Schemes Interest Rates",
+  "verifiedOn": "2026-09-23",
+  "notes": "Statutory interest rate of 7.1% per annum compounded annually. Sourced from Ministry of Finance quarterly small savings notifications. Mandatory 15-year tenure with 5-year extension blocks. Minimum annual deposit is ₹500, maximum ₹1,50,000. Interest is calculated on the lowest balance between the 5th and the end of each calendar month.",
+  "values": {
+    "annualInterestRatePct": 7.1,
+    "lockInYears": 15,
+    "minAnnualDeposit": 500,
+    "maxAnnualDeposit": 150000,
+    "compoundingFrequency": "annual",
+    "interestCalcRule": "lowest balance between 5th and end of calendar month"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "income-tax",
+  "effectiveFrom": "2024-04-01",
+  "applicableTo": "2025-03-31",
+  "financialYear": "FY 2024-25",
+  "assessmentYear": "AY 2025-26",
+  "governingFramework": "Income-tax Act, 1961",
+  "framework": "Income-tax Act, 1961",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometax.gov.in/iec/foportal/sites/default/files/2025-07/CBDT__e-Filing_ITR%202_Validation%20Rules_AY%202025-26_V1.0.pdf",
+  "sourceTitle": "CBDT e-Filing ITR-2 Validation Rules AY 2025-26",
+  "verifiedOn": "2026-09-23",
+  "notes": "Rules per Finance Act 2024 (enacted July 2024). Governed by Income-tax Act, 1961. Standard deduction under New Regime is ₹75,000 and Section 87A rebate applies up to taxable income of ₹7,00,000.",
+  "values": {
+    "newRegime": {
+      "standardDeduction": 75000,
+      "rebate87AMaxTaxable": 700000,
+      "cessRatePct": 4,
+      "slabs": [
+        { "min": 0, "max": 300000, "ratePct": 0 },
+        { "min": 300000, "max": 700000, "ratePct": 5 },
+        { "min": 700000, "max": 1000000, "ratePct": 10 },
+        { "min": 1000000, "max": 1200000, "ratePct": 15 },
+        { "min": 1200000, "max": 1500000, "ratePct": 20 },
+        { "min": 1500000, "max": null, "ratePct": 30 }
+      ]
+    },
+    "oldRegime": {
+      "standardDeduction": 50000,
+      "cap80C": 150000,
+      "cap80D": 100000,
+      "rebate87AMaxTaxable": 500000,
+      "cessRatePct": 4,
+      "slabs": [
+        { "min": 0, "max": 250000, "ratePct": 0 },
+        { "min": 250000, "max": 500000, "ratePct": 5 },
+        { "min": 500000, "max": 1000000, "ratePct": 20 },
+        { "min": 1000000, "max": null, "ratePct": 30 }
+      ]
+    }
+  }
+}

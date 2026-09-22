@@ -1,0 +1,27 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "income-tax",
+  "effectiveFrom": "2026-04-01",
+  "taxYear": "TY 2026-27",
+  "governingFramework": "Income-tax Act, 2025",
+  "framework": "Income-tax Act, 2025",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometax.gov.in",
+  "sourceTitle": "Income-tax Act, 2025 Statutory Framework",
+  "verifiedOn": "2026-09-23",
+  "notes": "Governed by the Income-tax Act, 2025 (in force 1 April 2026). Succeeded the legacy Income-tax Act, 1961. Adopts Tax Year (TY) terminology instead of Assessment Year (AY).",
+  "values": {
+    "frameworkType": "Income-tax Act, 2025",
+    "standardDeduction": 75000,
+    "rebateLimit": 700000,
+    "cessRatePct": 4,
+    "slabs": [
+      { "min": 0, "max": 300000, "ratePct": 0 },
+      { "min": 300000, "max": 700000, "ratePct": 5 },
+      { "min": 700000, "max": 1000000, "ratePct": 10 },
+      { "min": 1000000, "max": 1200000, "ratePct": 15 },
+      { "min": 1200000, "max": 1500000, "ratePct": 20 },
+      { "min": 1500000, "max": null, "ratePct": 30 }
+    ]
+  }
+}

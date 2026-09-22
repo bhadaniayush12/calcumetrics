@@ -1,0 +1,22 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "hra",
+  "effectiveFrom": "2025-04-01",
+  "applicableTo": "2026-03-31",
+  "financialYear": "FY 2025-26",
+  "assessmentYear": "AY 2026-27",
+  "governingFramework": "Income-tax Act, 1961",
+  "framework": "Income-tax Act, 1961 (Section 10(13A) & Rule 2A)",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-06/CBDT_e-filing_ITR-3_Validation%20Rules_V1.0_AY%2026-27.pdf",
+  "sourceTitle": "CBDT e-Filing ITR-3 Validation Rules AY 2026-27",
+  "verifiedOn": "2026-09-23",
+  "notes": "HRA exemption is claimable under the Old Tax Regime only as the minimum of (1) actual HRA received, (2) rent paid minus 10% of basic salary, (3) 50% of basic (Delhi, Mumbai, Kolkata, Chennai) or 40% (other cities).",
+  "values": {
+    "metroCities": ["delhi", "mumbai", "kolkata", "chennai"],
+    "metroBasicRatePct": 50,
+    "nonMetroBasicRatePct": 40,
+    "rentMinusBasicFraction": 0.10,
+    "regimeApplicability": "Old Tax Regime only"
+  }
+}

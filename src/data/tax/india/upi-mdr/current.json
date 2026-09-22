@@ -1,0 +1,19 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "upi-mdr",
+  "effectiveFrom": "2023-04-01",
+  "taxYear": "Current (FY 2023-24 onward)",
+  "governingFramework": "Payment and Settlement Systems Act, 2007 / NPCI Circulars",
+  "framework": "NPCI Operating Guidelines & Ministry of Finance Directives",
+  "source": "National Payments Corporation of India (NPCI)",
+  "sourceUrl": "https://www.npci.org.in",
+  "sourceTitle": "NPCI Circular on Interchange Fee on UPI PPI Merchant Transactions",
+  "verifiedOn": "2026-09-23",
+  "notes": "Per NPCI circular, an interchange fee up to 1.1% applies on merchant transactions conducted via Prepaid Payment Instruments (PPI wallets) on UPI for transaction values exceeding ₹2,000. Standard bank account-to-bank account UPI transactions remain at 0% MDR per Ministry of Finance directives. GST on interchange/MDR is 18%.",
+  "values": {
+    "standardAccountToAccountMDR": 0,
+    "ppiWalletInterchangeRatePct": 1.1,
+    "ppiExemptionThreshold": 2000,
+    "gstRatePct": 18
+  }
+}

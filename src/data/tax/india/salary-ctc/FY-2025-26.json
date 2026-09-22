@@ -1,0 +1,22 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "salary-ctc",
+  "effectiveFrom": "2025-04-01",
+  "applicableTo": "2026-03-31",
+  "financialYear": "FY 2025-26",
+  "governingFramework": "Employees' Provident Funds and Miscellaneous Provisions Act, 1952",
+  "framework": "EPF & MP Act 1952; Payment of Gratuity Act 1972",
+  "source": "Employees' Provident Fund Organisation (EPFO)",
+  "sourceUrl": "https://www.epfindia.gov.in/site_docs/PDFs/MiscPDFs/ContributionRate.pdf",
+  "sourceTitle": "Employees' Provident Fund Organisation (EPFO) — Present Contribution Rates",
+  "verifiedOn": "2026-09-23",
+  "notes": "Salary package assumptions for FY 2025-26. Standard basic salary assumed at 40% of CTC, HRA at 40% of basic. EPF statutory ceiling is ₹15,000 monthly with 12% employer and 12% employee contribution. State-specific professional tax and income-tax TDS deductions are not included.",
+  "values": {
+    "epfCeilingMonthly": 15000,
+    "epfEmployerContributionPct": 12,
+    "epfEmployeeContributionPct": 12,
+    "assumedBasicFractionOfCTC": 0.40,
+    "assumedHRAFractionOfBasic": 0.40,
+    "defaultProfessionalTax": 0
+  }
+}

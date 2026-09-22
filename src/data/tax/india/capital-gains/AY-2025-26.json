@@ -1,0 +1,30 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "capital-gains",
+  "effectiveFrom": "2024-07-23",
+  "applicableTo": "2025-03-31",
+  "financialYear": "FY 2024-25",
+  "assessmentYear": "AY 2025-26",
+  "governingFramework": "Income-tax Act, 1961",
+  "framework": "Finance Act 2024 (effective 23 July 2024) / Income-tax Act, 1961",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometax.gov.in/iec/foportal/sites/default/files/2025-07/CBDT__e-Filing_ITR%202_Validation%20Rules_AY%202025-26_V1.0.pdf",
+  "sourceTitle": "CBDT e-Filing ITR-2 Validation Rules AY 2025-26",
+  "verifiedOn": "2026-09-23",
+  "notes": "Rates revised under Finance Act 2024 for transfers executed on or after 23 July 2024. STCG on listed equity/equity funds increased to 20% (Section 111A); LTCG increased to 12.5% with annual exemption of ₹1,25,000 (Section 112A); immovable property LTCG set at 12.5% without indexation (24 months holding). Cess is 4%.",
+  "values": {
+    "equitySTCGRatePct": 20,
+    "equityLTCGRatePct": 12.5,
+    "equityLTCGExemption": 125000,
+    "realEstateLTCGRatePct": 12.5,
+    "cessRatePct": 4,
+    "holdingMonthsThresholds": {
+      "equity": 12,
+      "equity-fund": 12,
+      "debt-fund": 24,
+      "real-estate": 24,
+      "gold": 24,
+      "other": 24
+    }
+  }
+}

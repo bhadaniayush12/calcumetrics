@@ -1,0 +1,43 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "income-tax",
+  "effectiveFrom": "2025-04-01",
+  "applicableTo": "2026-03-31",
+  "financialYear": "FY 2025-26",
+  "assessmentYear": "AY 2026-27",
+  "governingFramework": "Income-tax Act, 1961",
+  "framework": "Income-tax Act, 1961",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-06/CBDT_e-filing_ITR-3_Validation%20Rules_V1.0_AY%2026-27.pdf",
+  "sourceTitle": "CBDT e-Filing ITR-3 Validation Rules AY 2026-27",
+  "verifiedOn": "2026-09-23",
+  "notes": "Rules for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961 transitional framework prior to full cutover to the Income-tax Act, 2025.",
+  "values": {
+    "newRegime": {
+      "standardDeduction": 75000,
+      "rebate87AMaxTaxable": 700000,
+      "cessRatePct": 4,
+      "slabs": [
+        { "min": 0, "max": 300000, "ratePct": 0 },
+        { "min": 300000, "max": 700000, "ratePct": 5 },
+        { "min": 700000, "max": 1000000, "ratePct": 10 },
+        { "min": 1000000, "max": 1200000, "ratePct": 15 },
+        { "min": 1200000, "max": 1500000, "ratePct": 20 },
+        { "min": 1500000, "max": null, "ratePct": 30 }
+      ]
+    },
+    "oldRegime": {
+      "standardDeduction": 50000,
+      "cap80C": 150000,
+      "cap80D": 100000,
+      "rebate87AMaxTaxable": 500000,
+      "cessRatePct": 4,
+      "slabs": [
+        { "min": 0, "max": 250000, "ratePct": 0 },
+        { "min": 250000, "max": 500000, "ratePct": 5 },
+        { "min": 500000, "max": 1000000, "ratePct": 20 },
+        { "min": 1000000, "max": null, "ratePct": 30 }
+      ]
+    }
+  }
+}

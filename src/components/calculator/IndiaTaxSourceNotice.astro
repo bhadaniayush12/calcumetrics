@@ -1,75 +1,78 @@
 ---
 /**
- * A build-time disclosure for the India tax calculators.  Keeping this in the
- * shared shell lets the Phase 5 Income Tax page remain byte-for-byte untouched.
+ * IndiaTaxSourceNotice.astro — Section 12 & 13 authoritative tax source disclosure.
+ *
+ * Sourced dynamically from versioned tax-data metadata in src/data/tax/india/.
+ * Keeping this in the shared CalculatorLayout shell allows the Phase 5 Income Tax
+ * page and engine to remain byte-for-byte untouched (Constraint C3 & C6).
  */
-type Notice = {
-  sourceLabel: string;
-  sourceUrl: string;
-  applicablePeriod: string;
-  scopeNote?: string;
-};
-
-const notices: Record<string, Notice> = {
-  '/in/income-tax-calculator': {
-    sourceLabel: 'Income Tax Department — ITR-2 validation rules for AY 2025-26',
-    sourceUrl: 'https://www.incometax.gov.in/iec/foportal/sites/default/files/2025-07/CBDT__e-Filing_ITR%202_Validation%20Rules_AY%202025-26_V1.0.pdf',
-    applicablePeriod: 'Financial Year 2024-25 (Assessment Year 2025-26).',
-  },
-  '/in/gst-calculator': {
-    sourceLabel: 'Central Board of Indirect Taxes and Customs (CBIC) — GST goods and services rates',
-    sourceUrl: 'https://cbic-gst.gov.in/gst-goods-services-rates.html',
-    applicablePeriod: 'GST rate schedules and notifications in force when checked on 23 September 2026.',
-  },
-  '/in/hra-calculator': {
-    sourceLabel: 'Income Tax Department — ITR-3 validation rules for AY 2026-27 (Schedule Salary, section 10(13A))',
-    sourceUrl: 'https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-06/CBDT_e-filing_ITR-3_Validation%20Rules_V1.0_AY%2026-27.pdf',
-    applicablePeriod: 'Financial Year 2025-26 (Assessment Year 2026-27), old tax regime only.',
-  },
-  '/in/tds-calculator': {
-    sourceLabel: 'Income Tax Department — TDS Compliance FAQs',
-    sourceUrl: 'https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tds-compliance',
-    applicablePeriod: 'Financial Year 2025-26: payments or credits on or before 31 March 2026 under the Income-tax Act, 1961.',
-    scopeNote: 'This calculator uses the legacy section labels it displays. For payments or credits from 1 April 2026, consult the Income Tax Act, 2025 and its corresponding section 392/393 tables.',
-  },
-  '/in/capital-gains-tax-calculator': {
-    sourceLabel: 'Income Tax Department — ITR-2 validation rules for AY 2025-26',
-    sourceUrl: 'https://www.incometax.gov.in/iec/foportal/sites/default/files/2025-07/CBDT__e-Filing_ITR%202_Validation%20Rules_AY%202025-26_V1.0.pdf',
-    applicablePeriod: 'Financial Year 2024-25 (Assessment Year 2025-26), including transfers on or after 23 July 2024.',
-  },
-  '/in/advance-tax-calculator': {
-    sourceLabel: 'Income Tax Department — ITR-1 (Sahaj) FAQs on advance tax',
-    sourceUrl: 'https://www.incometax.gov.in/iec/foportal/help/e-filing-itr1-form-sahaj-faq',
-    applicablePeriod: 'Financial Year 2025-26 (Assessment Year 2026-27) instalment schedule under the Income-tax Act, 1961.',
-  },
-  '/in/salary-ctc-calculator': {
-    sourceLabel: 'Employees’ Provident Fund Organisation (EPFO) — present contribution rates',
-    sourceUrl: 'https://www.epfindia.gov.in/site_docs/PDFs/MiscPDFs/ContributionRate.pdf',
-    applicablePeriod: 'Financial Year 2025-26 salary-package assumptions; this breakdown excludes income-tax TDS.',
-  },
-};
+import { resolveTaxRecordForRoute } from '../../lib/tax/schema';
 
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-const notice = notices[pathname];
+const record = resolveTaxRecordForRoute(pathname);
+
+const periodLabel = record
+  ? record.assessmentYear
+    ? `${record.financialYear ? record.financialYear + ' (' + record.assessmentYear + ')' : record.assessmentYear}`
+    : record.taxYear
+    ? record.taxYear
+    : record.financialYear
+    ? record.financialYear
+    : `In force since ${record.effectiveFrom}`
+  : '';
 ---
 
-{notice && (
-  <section id="tax-source-verification" aria-labelledby="tax-source-verification-heading" class="border border-border rounded-card bg-surface p-5">
-    <h2 id="tax-source-verification-heading" class="text-lg font-bold text-text-primary mb-3">Tax source and period</h2>
-    <dl class="space-y-2 text-sm text-text-muted leading-relaxed">
+{record && (
+  <section
+    id="tax-source-verification"
+    aria-labelledby="tax-source-verification-heading"
+    class="border border-border rounded-card bg-surface p-5 space-y-3"
+  >
+    <div class="flex items-center justify-between gap-2 flex-wrap">
+      <h2 id="tax-source-verification-heading" class="text-base font-bold text-text-primary">
+        Tax source & regulatory provenance
+      </h2>
+      <span class="text-xs font-mono px-2 py-0.5 rounded bg-surface-muted text-text-muted border border-border">
+        Verified {record.verifiedOn}
+      </span>
+    </div>
+
+    <dl class="space-y-1.5 text-sm text-text-muted leading-relaxed">
       <div>
         <dt class="font-semibold text-text-primary inline">Authoritative source: </dt>
-        <dd class="inline"><a href={notice.sourceUrl} class="text-accent underline underline-offset-2 hover:text-accent-hover" rel="noopener noreferrer" target="_blank">{notice.sourceLabel}</a></dd>
+        <dd class="inline">
+          <a
+            href={record.sourceUrl}
+            class="text-accent underline underline-offset-2 hover:text-accent-hover"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            {record.sourceTitle}
+          </a>
+          <span class="text-xs text-text-muted"> ({record.source})</span>
+        </dd>
       </div>
+
+      <div>
+        <dt class="font-semibold text-text-primary inline">Governing framework: </dt>
+        <dd class="inline">{record.governingFramework}</dd>
+      </div>
+
       <div>
         <dt class="font-semibold text-text-primary inline">Applicable period: </dt>
-        <dd class="inline">{notice.applicablePeriod}</dd>
-      </div>
-      <div>
-        <dt class="font-semibold text-text-primary inline">Rates last verified: </dt>
-        <dd class="inline">23 September 2026.</dd>
+        <dd class="inline">{periodLabel}</dd>
       </div>
     </dl>
-    {notice.scopeNote && <p class="mt-3 text-xs text-text-muted leading-relaxed">{notice.scopeNote}</p>}
+
+    <div class="pt-2 border-t border-border/60 text-xs text-text-muted space-y-1">
+      <p class="font-medium text-text-primary">
+        This calculator uses the rules/data published by {record.source} for {periodLabel}. Estimated result based on the inputs and assumptions provided.
+      </p>
+      {record.notes && (
+        <p class="leading-relaxed">
+          {record.notes}
+        </p>
+      )}
+    </div>
   </section>
 )}
