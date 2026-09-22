@@ -127,6 +127,55 @@ export function calcNPV(discountRatePct: number, cashFlows: number[]): number {
   return cashFlows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t), 0);
 }
 
+export interface NPVDetailsResult {
+  npv: number;
+  initialOutflow: number;
+  totalDiscountedInflows: number;
+  totalUndiscountedInflows: number;
+  netUndiscountedGain: number;
+  profitabilityIndex: number;
+  isViable: boolean;
+  yearlyDiscounted: Array<{ year: number; inflow: number; discounted: number; pvCumulative: number }>;
+}
+
+/**
+ * Calculate comprehensive NPV metrics including period-by-period discounted cash flows.
+ */
+export function calcNPVDetails(
+  discountRatePct: number,
+  initialOutflow: number,
+  annualCashFlows: number[]
+): NPVDetailsResult {
+  const r = discountRatePct / 100;
+  let totalDiscountedInflows = 0;
+  let totalUndiscountedInflows = 0;
+  let pvCumulative = 0;
+
+  const yearlyDiscounted = annualCashFlows.map((cf, idx) => {
+    const year = idx + 1;
+    const discounted = cf / Math.pow(1 + r, year);
+    totalDiscountedInflows += discounted;
+    totalUndiscountedInflows += cf;
+    pvCumulative += discounted;
+    return { year, inflow: cf, discounted, pvCumulative };
+  });
+
+  const npv = totalDiscountedInflows - initialOutflow;
+  const profitabilityIndex = initialOutflow > 0 ? totalDiscountedInflows / initialOutflow : 0;
+  const netUndiscountedGain = totalUndiscountedInflows - initialOutflow;
+
+  return {
+    npv,
+    initialOutflow,
+    totalDiscountedInflows,
+    totalUndiscountedInflows,
+    netUndiscountedGain,
+    profitabilityIndex,
+    isViable: npv >= 0,
+    yearlyDiscounted,
+  };
+}
+
 // ── IRR (Newton-Raphson) ──────────────────────────────────────────────────────
 export interface IRRResult {
   irr: number;
@@ -139,22 +188,33 @@ export function calcIRR(cashFlows: number[], maxIter = 1000, tol = 1e-7): IRRRes
   const hasNeg = cashFlows.some((c) => c < 0);
   const hasPos = cashFlows.some((c) => c > 0);
   if (!hasNeg || !hasPos) {
-    return { irr: 0, irrPct: 0, valid: false, error: 'Need at least one negative and one positive cash flow.' };
+    return { irr: 0, irrPct: 0, valid: false, error: 'Requires at least one negative outflow and one positive inflow.' };
   }
 
-  let rate = 0.1;
-  for (let i = 0; i < maxIter; i++) {
-    const npv = calcNPV(rate * 100, cashFlows);
-    const npvDelta = calcNPV((rate + 1e-6) * 100, cashFlows);
-    const derivative = (npvDelta - npv) / 1e-6;
-    if (Math.abs(derivative) < 1e-12) break;
-    const newRate = rate - npv / derivative;
-    if (Math.abs(newRate - rate) < tol) {
-      return { irr: newRate, irrPct: newRate * 100, valid: true };
+  const startRates = [0.1, 0.05, 0.2, -0.05, 0.5];
+  for (const start of startRates) {
+    let rate = start;
+    for (let i = 0; i < maxIter; i++) {
+      if (rate <= -0.999) {
+        rate = -0.99;
+      }
+      const npv = calcNPV(rate * 100, cashFlows);
+      const npvDelta = calcNPV((rate + 1e-6) * 100, cashFlows);
+      const derivative = (npvDelta - npv) / 1e-6;
+      if (Math.abs(derivative) < 1e-12 || !Number.isFinite(derivative)) break;
+      const newRate = rate - npv / derivative;
+      if (Math.abs(newRate - rate) < tol && Number.isFinite(newRate)) {
+        const checkNPV = calcNPV(newRate * 100, cashFlows);
+        const maxFlow = Math.max(...cashFlows.map(Math.abs));
+        if (Math.abs(checkNPV) < Math.max(1, maxFlow * 1e-4)) {
+          return { irr: newRate, irrPct: newRate * 100, valid: true };
+        }
+      }
+      rate = newRate;
     }
-    rate = newRate;
   }
-  return { irr: rate, irrPct: rate * 100, valid: true };
+
+  return { irr: 0, irrPct: 0, valid: false, error: 'IRR did not converge to a finite real rate.' };
 }
 
 // ── Payback Period ────────────────────────────────────────────────────────────
