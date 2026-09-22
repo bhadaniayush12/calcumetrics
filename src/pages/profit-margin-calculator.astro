@@ -15,7 +15,8 @@ const initialResult = calcProfitMargin(DEFAULT.revenue, DEFAULT.cogs, DEFAULT.op
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'profit-margin-calculator' && t.status === 'published').slice(0, 3);
+const relatedSlugs = ['markup-vs-margin-calculator', 'break-even-calculator', 'cogs-calculator'];
+const related = TOOLS.filter((t) => relatedSlugs.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/profit-margin-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
@@ -247,14 +248,126 @@ const jsonld = {
     <Fragment slot="below">
       <section aria-labelledby="pm-calculator-how">
         <h2 id="pm-calculator-how" class="text-xl font-bold text-text-primary mb-4">How profit margins are calculated</h2>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Gross Profit:</strong> Revenue − Cost of Goods Sold (COGS)<br />
-            <strong>Gross Margin %:</strong> (Gross Profit ÷ Revenue) × 100<br />
-            <strong>Operating Profit:</strong> Gross Profit − Operating Expenses (OpEx)<br />
-            <strong>Net Profit:</strong> Operating Profit − Taxes & Interest<br />
-            <strong>Net Margin %:</strong> (Net Profit ÷ Revenue) × 100
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed mb-4">
+            Profit margin measures the percentage of revenue a business retains across three distinct levels of the income statement: <strong>Gross Profit</strong> (production efficiency), <strong>Operating Profit</strong> (overhead management), and <strong>Net Profit</strong> (true bottom-line viability).
           </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Gross Margin</span>
+              <span class="text-text-muted">Gross Profit = Revenue − COGS</span><br />
+              <span class="text-accent font-semibold">Margin % = (Gross Profit ÷ Revenue) × 100</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Operating Margin (EBIT)</span>
+              <span class="text-text-muted">EBIT = Gross Profit − OpEx</span><br />
+              <span class="text-accent font-semibold">Margin % = (EBIT ÷ Revenue) × 100</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Net Margin</span>
+              <span class="text-text-muted">Net Profit = EBIT − Taxes & Interest</span><br />
+              <span class="text-accent font-semibold">Margin % = (Net Profit ÷ Revenue) × 100</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-step worked example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider a growing enterprise with the baseline inputs populated in this calculator: annual revenue of <strong>₹10,00,000</strong>, Cost of Goods Sold (COGS) of <strong>₹6,00,000</strong>, operating expenses (OpEx) of <strong>₹1,50,000</strong>, and taxes/interest expense of <strong>₹50,000</strong>.
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Income Statement Line</th>
+                <th class="py-3 px-4">Amount</th>
+                <th class="py-3 px-4">% of Revenue</th>
+                <th class="py-3 px-4">Operational Interpretation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">1. Gross Revenue</td>
+                <td class="py-2.5 px-4 font-mono">₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono">100.0%</td>
+                <td class="py-2.5 px-4">Total top-line billings from goods or services sold.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">2. Less: COGS</td>
+                <td class="py-2.5 px-4 font-mono text-error">−₹6,00,000</td>
+                <td class="py-2.5 px-4 font-mono">60.0%</td>
+                <td class="py-2.5 px-4">Direct materials, manufacturing payroll, and fulfillment.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">3. Gross Profit</td>
+                <td class="py-2.5 px-4 font-mono text-accent">₹4,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent">40.0%</td>
+                <td class="py-2.5 px-4">Surplus remaining to cover all commercial overhead and expansion.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">4. Less: Operating Expenses (OpEx)</td>
+                <td class="py-2.5 px-4 font-mono text-error">−₹1,50,000</td>
+                <td class="py-2.5 px-4 font-mono">15.0%</td>
+                <td class="py-2.5 px-4">Office rent, software licenses, marketing, and sales salaries.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">5. Operating Profit (EBIT)</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">25.0%</td>
+                <td class="py-2.5 px-4">Pure operating earning power before financing capital structure and tax.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">6. Less: Taxes & Interest</td>
+                <td class="py-2.5 px-4 font-mono text-error">−₹50,000</td>
+                <td class="py-2.5 px-4 font-mono">5.0%</td>
+                <td class="py-2.5 px-4">Bank loan debt service interest charges and corporate income tax.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">7. Net Profit (Bottom Line)</td>
+                <td class="py-3 px-4 font-mono text-accent">₹2,00,000</td>
+                <td class="py-3 px-4 font-mono text-accent">20.0%</td>
+                <td class="py-3 px-4">Final free cash generation distributable to equity owners or reinvestment.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Analyzing Margin Divergence</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              A high gross margin paired with an anemic net margin highlights operational friction between product delivery and corporate governance.
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>High Gross / Low Net:</strong> Product pricing is strong, but excessive customer acquisition costs (CAC), bloated administrative payroll, or heavy bank debt service are eroding earnings.</li>
+              <li><strong>Low Gross / Strong Net:</strong> Found in high-volume commodity distributors where thin product margins (8–15%) are protected by razor-sharp lean operations and minimal overhead.</li>
+              <li><strong>Markup vs Margin Pitfall:</strong> A 50% markup on cost generates only a 33.3% gross margin. Confusing markup with margin frequently causes underpricing.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Industry Net Margin Benchmarks</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Acceptable margins depend on business capital intensity and working capital velocity:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Software & SaaS:</strong> 70–85% Gross | 20–30% Net (near-zero replication cost).</li>
+              <li><strong>Professional Services:</strong> 40–60% Gross | 15–25% Net (labor-driven capacity).</li>
+              <li><strong>Manufacturing & Industrial:</strong> 25–40% Gross | 8–15% Net (raw material and equipment overhead).</li>
+              <li><strong>Grocery & Supermarket Retail:</strong> 15–22% Gross | 2–4% Net (compensated by high inventory turns).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Financial Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Accrual Accounting vs. Cash Flow:</strong> Profit margins are recognized on an accrual basis when revenue is billed and costs are incurred. A business with a healthy 20% net margin can still face liquidity crises if customer receivables remain uncollected.</li>
+            <li><strong>Exclusion of Capital Expenditures:</strong> Long-term asset acquisitions (machinery, real estate) are capitalized on the balance sheet and expensed gradually as depreciation rather than an immediate COGS/OpEx deduction.</li>
+            <li><strong>Inventory Costing Variations:</strong> COGS fluctuates based on whether inventory is accounted for under FIFO (First-In, First-Out), LIFO, or Weighted Average Costing during inflationary cycles.</li>
+            <li><strong>Non-Operating Items:</strong> This model assumes stable recurring operations and excludes one-off asset sales, restructuring provisions, or currency translation windfalls.</li>
+          </ul>
         </div>
       </section>
 

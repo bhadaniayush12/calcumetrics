@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:06:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:08:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 19
-- **IN_PROGRESS:** 020. profit-margin-calculator
-- **NEXT:** 021. markup-vs-margin-calculator
+- **COMPLETED:** 20
+- **IN_PROGRESS:** 021. markup-vs-margin-calculator
+- **NEXT:** 022. roi-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** break-even-calculator
-- **LAST_COMMIT:** 477a175
+- **LAST_COMPLETED_UNIT:** profit-margin-calculator
+- **LAST_COMMIT:** 7fefb8c
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -37,8 +37,8 @@
 - [x] 017. hra-calculator — DONE (India Tax Protected)
 - [x] 018. upi-mdr-calculator — DONE
 - [x] 019. break-even-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
-- [ ] 020. profit-margin-calculator — IN PROGRESS
-- [ ] 021. markup-vs-margin-calculator — PENDING
+- [x] 020. profit-margin-calculator — DONE
+- [ ] 021. markup-vs-margin-calculator — IN PROGRESS
 - [ ] 022. roi-calculator — PENDING
 - [ ] 023. eoq-calculator — PENDING
 - [ ] 024. depreciation-calculator — PENDING
@@ -171,3 +171,9 @@
 - **019. break-even-calculator (/break-even-calculator)**:
   - Audited: Phase 5 Locked Calculator. Verified unit break-even and revenue break-even formulas (BEP units = Fixed Costs / CM, BEP Revenue = Fixed Costs / CM Ratio), contribution margin per unit and ratio analysis, worked example matching defaults (₹5L fixed costs, ₹500 price, ₹300 variable cost → ₹200 CM, 40.0% CM ratio, 2,500 break-even units, ₹12.5L break-even revenue), key assumptions/limitations (linearity, constant overhead, inventory parity, single product mix), 5 targeted FAQs, and related calculators.
   - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **020. profit-margin-calculator (/profit-margin-calculator)**:
+  - Audited: Multi-tier profitability structure (Gross, Operating, Net margins) and expense waterfall.
+  - Changes: Added step-by-step worked example table matching default inputs (₹10L revenue, ₹6L COGS, ₹1.5L OpEx, ₹50k taxes/interest → ₹4L gross profit / 40.0%, ₹2.5L EBIT / 25.0%, ₹2L net profit / 20.0%), added margin divergence diagnostics (evaluating high gross vs low net), added industry benchmark guidelines (SaaS, Services, Manufacturing, Grocery), and added explicit assumptions/limitations (accrual basis vs liquidity timing, CapEx capitalization, inventory costing variance).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcProfitMargin`, 5 FAQs matching JSON-LD schema, and curated related links (`markup-vs-margin-calculator`, `break-even-calculator`, `cogs-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
