@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:02:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:03:00+05:30
 - **TOTAL:** 50
 - **COMPLETED:** 16
-- **IN_PROGRESS:** NONE
-- **NEXT:** 017. hra-calculator
+- **IN_PROGRESS:** 017. hra-calculator
+- **NEXT:** 018. upi-mdr-calculator
 - **BLOCKER:** NONE
 - **LAST_COMPLETED_UNIT:** gst-calculator
-- **LAST_COMMIT:** e73f182
+- **LAST_COMMIT:** 7ad5fdd
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -34,7 +34,7 @@
 - [x] 014. loan-prepayment-calculator — DONE
 - [x] 015. income-tax-calculator — DONE (Phase 5 Locked, India Tax Protected, Intentionally Preserved)
 - [x] 016. gst-calculator — DONE (India Tax Protected)
-- [ ] 017. hra-calculator — PENDING (India Tax Protected)
+- [ ] 017. hra-calculator — IN PROGRESS (India Tax Protected)
 - [ ] 018. upi-mdr-calculator — PENDING
 - [ ] 019. break-even-calculator — PENDING (Phase 5 Locked)
 - [ ] 020. profit-margin-calculator — PENDING
