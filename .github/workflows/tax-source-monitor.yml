@@ -1,0 +1,37 @@
+name: Tax Source Regulatory Monitor
+
+on:
+  schedule:
+    # Daily run at 03:00 UTC (08:30 IST)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    # Manual trigger support for ad-hoc compliance audits
+
+# Absolute rule (Constraint C4 & Section 6):
+# This workflow ONLY creates review artifacts (issues/comments).
+# It has NO permission to push commits, auto-merge PRs, or trigger deployments.
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-tax-sources:
+    name: Check Authoritative Tax Sources
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tax source change detection
+        run: node scripts/monitor-tax-sources.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
