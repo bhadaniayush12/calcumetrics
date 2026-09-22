@@ -160,8 +160,8 @@ const jsonld = {
     const searchInput = document.getElementById('calc-search') as HTMLInputElement | null;
     const countEl = document.getElementById('calc-count');
     const filterBtns = document.querySelectorAll<HTMLButtonElement>('.chip-filter');
-    const toolCards = document.querySelectorAll<HTMLAnchorElement>('[data-tool-name]');
-    const sections = document.querySelectorAll<HTMLElement>('[data-category]');
+    const toolCards = document.querySelectorAll<HTMLAnchorElement>('#calc-grid [data-tool-name]');
+    const sections = document.querySelectorAll<HTMLElement>('#calc-grid [data-category]');
 
     let activeFilter = 'all';
     let searchQuery = '';
