@@ -7,10 +7,17 @@
 
 // ── WACC ──────────────────────────────────────────────────────────────────────
 export interface WACCResult {
-  wacc: number;
-  waccPct: number;
-  equityComponent: number;
-  debtComponent: number;
+  wacc: number;              // blended rate as decimal e.g. 0.118525
+  waccPct: number;           // blended rate as percent e.g. 11.8525
+  equityWeight: number;      // E / V decimal e.g. 0.70
+  debtWeight: number;        // D / V decimal e.g. 0.30
+  equityComponent: number;   // (E / V) * (Re / 100) decimal
+  debtComponent: number;     // (D / V) * (Rd / 100) * (1 - T / 100) decimal
+  equityComponentPct: number;// equity contribution in percent e.g. 9.94
+  debtComponentPct: number;  // debt contribution in percent e.g. 1.9125
+  taxShieldPct: number;      // interest tax shield percentage
+  afterTaxCostOfDebt: number;// Rd * (1 - T / 100)
+  totalCapital: number;      // V = E + D
 }
 
 export function calcWACC(
@@ -20,10 +27,98 @@ export function calcWACC(
   costOfDebt: number,      // as percent e.g. 8.5
   taxRate: number          // as percent e.g. 25
 ): WACCResult {
+  if (equityWeight < 0 || debtWeight < 0 || costOfEquity < 0 || costOfDebt < 0 || taxRate < 0) {
+    return {
+      wacc: 0,
+      waccPct: 0,
+      equityWeight: 0,
+      debtWeight: 0,
+      equityComponent: 0,
+      debtComponent: 0,
+      equityComponentPct: 0,
+      debtComponentPct: 0,
+      taxShieldPct: 0,
+      afterTaxCostOfDebt: 0,
+      totalCapital: 0,
+    };
+  }
+
   const equityComponent = equityWeight * (costOfEquity / 100);
-  const debtComponent = debtWeight * (costOfDebt / 100) * (1 - taxRate / 100);
+  const afterTaxCostOfDebt = costOfDebt * (1 - taxRate / 100);
+  const debtComponent = debtWeight * (afterTaxCostOfDebt / 100);
   const wacc = equityComponent + debtComponent;
-  return { wacc, waccPct: wacc * 100, equityComponent, debtComponent };
+  const taxShieldPct = debtWeight * (costOfDebt / 100) * (taxRate / 100) * 100;
+
+  return {
+    wacc,
+    waccPct: wacc * 100,
+    equityWeight,
+    debtWeight,
+    equityComponent,
+    debtComponent,
+    equityComponentPct: equityComponent * 100,
+    debtComponentPct: debtComponent * 100,
+    taxShieldPct,
+    afterTaxCostOfDebt,
+    totalCapital: 0,
+  };
+}
+
+/**
+ * Calculate WACC directly from market value of equity and debt.
+ *
+ * Formula:
+ * V = E + D
+ * WACC = (E / V × Re) + (D / V × Rd × (1 − T))
+ */
+export function calcWACCFromValues(
+  equityValue: number,     // Market value of equity (E)
+  debtValue: number,       // Market value of debt (D)
+  costOfEquityPct: number, // Cost of equity (Re) as % e.g. 14.2
+  costOfDebtPct: number,   // Cost of debt (Rd) as % e.g. 8.5
+  taxRatePct: number       // Corporate tax rate (T) as % e.g. 25
+): WACCResult {
+  if (equityValue < 0 || debtValue < 0 || costOfEquityPct < 0 || costOfDebtPct < 0 || taxRatePct < 0) {
+    return {
+      wacc: 0,
+      waccPct: 0,
+      equityWeight: 0,
+      debtWeight: 0,
+      equityComponent: 0,
+      debtComponent: 0,
+      equityComponentPct: 0,
+      debtComponentPct: 0,
+      taxShieldPct: 0,
+      afterTaxCostOfDebt: 0,
+      totalCapital: 0,
+    };
+  }
+
+  const totalCapital = equityValue + debtValue;
+  if (totalCapital <= 0) {
+    return {
+      wacc: 0,
+      waccPct: 0,
+      equityWeight: 0,
+      debtWeight: 0,
+      equityComponent: 0,
+      debtComponent: 0,
+      equityComponentPct: 0,
+      debtComponentPct: 0,
+      taxShieldPct: 0,
+      afterTaxCostOfDebt: 0,
+      totalCapital: 0,
+    };
+  }
+
+  const equityWeight = equityValue / totalCapital;
+  const debtWeight = debtValue / totalCapital;
+
+  const res = calcWACC(equityWeight, costOfEquityPct, debtWeight, costOfDebtPct, taxRatePct);
+  return {
+    ...res,
+    totalCapital,
+  };
 }
 
 // ── NPV ───────────────────────────────────────────────────────────────────────
