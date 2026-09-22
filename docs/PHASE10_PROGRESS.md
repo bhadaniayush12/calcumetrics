@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:19:15+05:30
+- **LAST_UPDATED:** 2026-09-23T04:22:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 28
-- **IN_PROGRESS:** 029. wacc-calculator (Phase 5 Locked)
-- **NEXT:** 030. npv-calculator (Phase 5 Locked)
+- **COMPLETED:** 32
+- **IN_PROGRESS:** 033. dcf-calculator
+- **NEXT:** 034. inflation-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** liquidity-ratios-calculator
-- **LAST_COMMIT:** 229e3c8
+- **LAST_COMPLETED_UNIT:** payback-period-calculator
+- **LAST_COMMIT:** 24f00cb
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -46,11 +46,11 @@
 - [x] 026. cogs-calculator — DONE
 - [x] 027. inventory-turnover-calculator — DONE
 - [x] 028. liquidity-ratios-calculator — DONE
-- [ ] 029. wacc-calculator — IN PROGRESS (Phase 5 Locked)
-- [ ] 030. npv-calculator — PENDING (Phase 5 Locked)
-- [ ] 031. irr-calculator — PENDING (Phase 5 Locked)
-- [ ] 032. payback-period-calculator — PENDING
-- [ ] 033. dcf-calculator — PENDING
+- [x] 029. wacc-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
+- [x] 030. npv-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
+- [x] 031. irr-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
+- [x] 032. payback-period-calculator — DONE
+- [ ] 033. dcf-calculator — IN PROGRESS
 - [ ] 034. inflation-calculator — PENDING
 - [ ] 035. savings-goal-calculator — PENDING
 - [ ] 036. mortgage-calculator — PENDING
@@ -224,4 +224,22 @@
   - Audited: Solvency architecture computing the three core liquidity metrics (Current Ratio, Quick/Acid-Test Ratio, and Cash Ratio) alongside Net Working Capital cushion.
   - Changes: Added mathematical formulas across all three tiers, step-by-step worked example schedule matching default inputs (₹3L cash + ₹1L securities + ₹4L AR + ₹4.5L inventory = ₹12.5L CA vs ₹5L CL → ₹7.5L NWC cushion, 2.50x Current Ratio, 1.60x Quick Ratio, 0.80x Cash Ratio, Optimal liquidity profile), institutional credit underwriting norms (RBI / Tandon Committee 1.33x MPBF minimum threshold, commercial debt covenants), analysis of the "Excess Liquidity Trap" (capital misallocation vs debt default risk), and balance sheet snapshot limitations (window dressing, unprovisioned trade receivables, off-balance sheet commitments).
   - Preserved: Multi-asset interactive inputs with sliders, calculation engine `calcLiquidityRatios`, 5 FAQs matching JSON-LD schema, and curated related links (`working-capital-calculator`, `cash-conversion-cycle-calculator`, `dscr-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **029. wacc-calculator (/wacc-calculator)**:
+  - Audited: Phase 5 Locked Calculator. Verified blended cost of capital formula (`WACC = (E/V × Re) + [D/V × Rd × (1 - T)]`), worked capital structure example matching defaults (₹70L equity @ 14.2%, ₹30L debt @ 8.5%, 25% tax → 11.85% blended hurdle rate verified to fourth decimal place), key assumptions/limitations (constant capital structure, similar risk profile, marginal tax advantage, market volatility), 5 targeted FAQs, and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **030. npv-calculator (/npv-calculator)**:
+  - Audited: Phase 5 Locked Calculator. Verified multi-year discounted cash flow summation formula (`NPV = −CF0 + ∑ [CFt ÷ (1 + r)^t]`), Profitability Index (PI) formula, worked machinery upgrade example matching defaults (₹1L outlay, 10% rate, inflows ₹30k/₹40k/₹50k/₹60k → ₹1,38,877 PV of inflows, ₹38,877 NPV, 1.39 PI verified to the exact cent), key assumptions/limitations (reinvestment at cost of capital, rate stability, projection risk, post-tax cash flows), 5 targeted FAQs, and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **031. irr-calculator (/irr-calculator)**:
+  - Audited: Phase 5 Locked Calculator. Verified numerical root-finding equation (`0 = −CF0 + ∑ [CFt ÷ (1 + IRR)^t]`), worked commercial fleet example matching defaults (₹1L outlay, 4-year inflows ₹30k/₹40k/₹50k/₹60k, 12% hurdle → 24.89% solved IRR, +12.89% excess spread, ₹33,838 NPV at 12% hurdle verified to engine), key assumptions/limitations (reinvestment rate trap, scale insensitivity, multiple sign changes, equal intervals), 5 targeted FAQs, and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **032. payback-period-calculator (/payback-period-calculator)**:
+  - Audited: Capital recoupment velocity model computing Simple Payback Period across even and uneven cash flow streams.
+  - Changes: Added mathematical formula breakdown for even and uneven cash flows, step-by-step 5-year capital recovery schedule matching default inputs (₹5L initial outlay with ₹1.5L annual inflow → 30% Year 1, 60% Year 2, 90% Year 3, full recovery at 3.33 years / 3 years 4 months, ₹2.5L cumulative net profit after 5 years), industry payback benchmarks (SaaS 12–18 mos, Solar 3–5 yrs, Machinery 3–6 yrs, Real Estate 7–12 yrs), strategic analysis of the "Liquidity Bias" vs wealth maximization, and analytical limitations (zero discounting, post-payback cash blindness, linear inflow assumption).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcPayback`, expanded FAQs to 5 matching JSON-LD schema, and curated related links (`discounted-payback-period-calculator`, `npv-calculator`, `roi-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
