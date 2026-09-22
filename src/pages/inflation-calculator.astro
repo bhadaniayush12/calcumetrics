@@ -15,7 +15,8 @@ const result = calcInflation(DEFAULT.amount, DEFAULT.rate, DEFAULT.years);
 const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'inflation-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['future-value-calculator', 'present-value-calculator', 'sip-calculator'];
+const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/inflation-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
@@ -225,33 +226,132 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="inf-calculator-how">
-        <h2 id="inf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How inflation impacts your finances</h2>
+      <section aria-labelledby="inf-calculator-how" class="mb-8">
+        <h2 id="inf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Inflation Impacts Your Wealth &amp; Purchasing Power</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Inflation acts as an invisible tax on cash. Over time, each unit of currency buys a smaller percentage of a good or service:
+          Inflation is the annualized rate at which the general price level of goods and services rises, eroding the quantity of goods that each unit of currency can purchase. Financial planners analyze inflation from two reciprocal perspectives:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Future Cost Formula: </strong> FV = PV &times; (1 + i)<sup>t</sup><br />
-            <strong>Future Purchasing Power Formula: </strong> Purchasing Power = PV &divide; (1 + i)<sup>t</sup><br />
-            <strong>Cumulative Price Increase: </strong> [(FV &divide; PV) &minus; 1] &times; 100%
-          </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Perspective 1: Future Cost Escalation</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">FV = PV &times; (1 + i)<sup>t</sup></div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Calculates how much money you will need in year <em>t</em> to purchase the exact basket of goods that costs <em>PV</em> today.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Perspective 2: Real Purchasing Power Decay</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">Real Value = PV &divide; (1 + i)<sup>t</sup></div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Calculates the real economic purchasing capacity of a fixed sum of uninvested cash stored in a bank locker or low-yield account.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Worked Example: 10-Year Purchasing Power Erosion at 6% Inflation</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Examining a baseline sum of ₹1,00,000 subjected to a steady 6.0% annual inflation rate over a 10-year horizon:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-border bg-surface text-text-primary">
+                <th class="py-3 px-4 font-semibold">Economic Metric</th>
+                <th class="py-3 px-4 font-semibold">Formula / Derivation</th>
+                <th class="py-3 px-4 font-semibold">Value</th>
+                <th class="py-3 px-4 font-semibold">Real-World Meaning</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Present Starting Capital</td>
+                <td class="py-2.5 px-4 font-mono">PV (Year 0)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000</td>
+                <td class="py-2.5 px-4">Cost of goods or uninvested cash today.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Annual Inflation Rate (i)</td>
+                <td class="py-2.5 px-4 font-mono">Assumed Benchmark</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">6.0% p.a.</td>
+                <td class="py-2.5 px-4">Representative long-run CPI inflation rate.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Measurement Horizon (t)</td>
+                <td class="py-2.5 px-4 font-mono">Time Period</td>
+                <td class="py-2.5 px-4 font-mono">10 Years</td>
+                <td class="py-2.5 px-4">One decade of compounded price increases.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">1. Future Equivalent Cost</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000 &times; (1.06)<sup>10</sup></td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹1,79,085</td>
+                <td class="py-2.5 px-4">You will need ₹1.79L in 10 years to afford today's ₹1.0L basket (+79.1%).</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t border-border">
+                <td class="py-3 px-4">2. Residual Purchasing Power</td>
+                <td class="py-3 px-4 font-mono">₹1,00,000 &divide; (1.06)<sup>10</sup></td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹55,839</td>
+                <td class="py-3 px-4">₹1.0L in uninvested cash will only buy ₹55,839 worth of today's goods.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary">
+                <td class="py-3 px-4">3. Total Real Value Lost</td>
+                <td class="py-3 px-4 font-mono">₹1,00,000 &minus; ₹55,839</td>
+                <td class="py-3 px-4 font-mono text-red-400 font-bold">₹44,161 (&minus;44.2%)</td>
+                <td class="py-3 px-4">Inflation silently confiscated nearly 45% of your money's real purchasing capacity.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The "Rule of 72" Price Doubling Benchmark</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              A quick mental rule to estimate how many years it takes for general price levels to double:
+            </p>
+            <div class="font-mono text-xs text-accent font-bold mb-2">Doubling Horizon (Years) = 72 ÷ Annual Inflation Rate</div>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li>At <strong>4.0% inflation:</strong> Prices double every 18.0 years.</li>
+              <li>At <strong>6.0% inflation:</strong> Prices double every 12.0 years.</li>
+              <li>At <strong>8.0% inflation:</strong> Prices double every 9.0 years.</li>
+              <li>At <strong>10.0% inflation (Higher Education/Healthcare):</strong> Costs double every 7.2 years!</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Asset Classes: Real Returns vs. Nominal Returns</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Real wealth creation requires earning a return above the rate of inflation (<em>Real Return = Nominal Yield &minus; Inflation &minus; Taxes</em>):
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Bank Fixed Deposits (6.5% gross):</strong> After 30% tax slab (4.55% net) and 6% inflation, real return is <strong>&minus;1.45%</strong> (wealth is shrinking).</li>
+              <li><strong>Diversified Equities (12% CAGR):</strong> Provides a strong positive real buffer of <strong>+5% to +6%</strong> above inflation.</li>
+              <li><strong>Real Estate &amp; Gold:</strong> Historically provide reliable structural hedges matching or slightly exceeding baseline CPI inflation.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Analytical Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Headline CPI vs. Personal Inflation Rate:</strong> Official headline Consumer Price Index (CPI) reflects a generalized national basket. Families with children in private schools or members with recurring medical needs experience personal inflation rates 3% to 5% higher than official statistics.</li>
+            <li><strong>Constant Compounding Rate:</strong> In reality, inflation is volatile and cyclical, fluctuating in response to monetary policy, commodity shocks, and exchange rate movements.</li>
+            <li><strong>Exclusion of Tax Drag:</strong> Inflation calculators show gross erosion. When savings interest is taxed at ordinary income slabs, the destructive impact on purchasing power is amplified.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="inf-calculator-faq">
         <h2 id="inf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What does an inflation calculator measure?', 'An inflation calculator measures two fundamental economic impacts: (1) what a basket of goods costing a certain amount today will cost in the future, and (2) how much the purchasing power of a fixed amount of cash diminishes over time.'],
-            ['What is purchasing power risk?', 'Purchasing power risk, also known as inflation risk, is the danger that cash holdings or fixed-income investment returns will fail to keep pace with the rate of inflation, resulting in a net decline in the real value of your wealth over time.'],
-            ['What average inflation rate should I assume?', 'Historical inflation benchmarks vary by economy. For developing economies like India, long-term CPI inflation typically oscillates around 5.5% to 6.5%. For mature economies like the United States, central banks target approximately 2.0% to 3.0% long-term inflation.'],
-            ['How do I protect my savings against inflation?', 'To preserve purchasing power, investments need to generate a real return (nominal return minus inflation). Common inflation hedges include equity equities, equity mutual funds, real estate, inflation-indexed bonds, and commodities like gold.'],
-            ['What is the Rule of 72 regarding inflation?', 'The Rule of 72 estimates how long it takes prices to double at a constant inflation rate: divide 72 by the annual inflation rate. For example, at 6% annual inflation, general price levels double in approximately 72 ÷ 6 = 12 years.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
