@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:20:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:22:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 4
-- **IN_PROGRESS:** 005. markup-vs-margin
-- **NEXT:** 006. npv-vs-irr
+- **COMPLETED_ARTICLES:** 5
+- **IN_PROGRESS:** 006. npv-vs-irr
+- **NEXT:** 007. flat-vs-reducing-interest-rate
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** capital-gains-tax-rules
-- **LAST_COMMIT:** 509618d
+- **LAST_COMPLETED_ARTICLE:** markup-vs-margin
+- **LAST_COMMIT:** 17f13c3
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (69 pages)
+- **BUILD_STATUS:** PASS (70 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -22,8 +22,8 @@
 - [x] 002. home-loan-prepayment-vs-sip — DONE (Hybrid)
 - [x] 003. old-vs-new-tax-regime — DONE (Trending/Hybrid)
 - [x] 004. capital-gains-tax-rules — DONE (Trending/Hybrid)
-- [ ] 005. markup-vs-margin — IN PROGRESS (Evergreen)
-- [ ] 006. npv-vs-irr — PENDING (Evergreen)
+- [x] 005. markup-vs-margin — DONE (Evergreen)
+- [ ] 006. npv-vs-irr — IN PROGRESS (Evergreen)
 - [ ] 007. flat-vs-reducing-interest-rate — PENDING (Evergreen)
 - [ ] 008. cash-conversion-cycle — PENDING (Evergreen)
 - [ ] 009. advance-tax-guide — PENDING (Evergreen/Statutory)
@@ -99,3 +99,13 @@
   - Key Content: Two-tier holding period classification (12m listed vs 24m all other), comprehensive asset-by-asset tax rate schedule (equity, unlisted shares, gold, debt funds), worked side-by-side legacy real estate case study showing ₹3.80 Lakh tax savings using the 20% indexed grandfathering option vs 12.5% unindexed, Section 54/54EC/54F exemption pathways, and Section 234C advance tax safe harbor rules.
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (70 pages built), `git diff --check` PASS.
+
+- **005. markup-vs-margin (/blog/markup-vs-margin)**:
+  - Title: Markup vs. Margin: The Math Mistake That Silently Erases Business Profits
+  - Intent: Explain the mathematical distinction between cost markup and sales margin, prevent inadvertent negative net operating cash flow, provide algebraic conversion derivations, and guide retail and e-commerce pricing strategy.
+  - Linked Calculators: `/markup-vs-margin-calculator`, `/profit-margin-calculator`, `/break-even-calculator`, `/cogs-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/markup-vs-margin-calculator` and `/profit-margin-calculator`.
+  - Header Nav Flag: `SHOW_BLOG_NAV = true` enabled in `src/config/site.ts` (milestone reached: 5 live articles).
+  - Key Content: The ₹1,000 product pricing illusion, algebraic proofs for `Margin = Markup / (1 + Markup)` and `Markup = Margin / (1 - Margin)`, comprehensive Quick-Reference Conversion Matrix (10% to 900% markup), worked e-commerce overhead schedule (leather boot D2C brand: 35% markup on cost triggers ₹110 net loss per order vs 45% margin creating ₹545 net profit per order), Keystone pricing conventions, and 3 bulletproof commercial pricing rules.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (71 pages built), `git diff --check` PASS.

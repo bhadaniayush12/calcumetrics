@@ -6,7 +6,7 @@ export const SITE_NAME = 'Calcumetrics';
 export const SITE_EMAIL = 'hello@calcumetrics.com';
 
 // ── Feature flags (Section 26.6) ──────────────────────────────────────────────
-export const SHOW_BLOG_NAV = false;    // Show Blog in header only when 5+ posts are live
+export const SHOW_BLOG_NAV = true;     // Show Blog in header now that 5+ posts are live
 export const SHOW_LANGUAGE = false;    // Language selector off until translated pages exist
 export const ENABLE_DARK_MODE = false; // Theme toggle off until dark palette is built & tested
 export const ADS_ENABLED = false;      // Ad slots rendered only after AdSense is approved
