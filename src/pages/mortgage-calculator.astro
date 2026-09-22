@@ -246,30 +246,132 @@ const jsonld = {
       <section aria-labelledby="mort-calculator-how">
         <h2 id="mort-calculator-how" class="text-xl font-bold text-text-primary mb-4">How mortgage calculations work</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Mortgage loans are amortized using the reducing-balance method, where each installment covers monthly accrued interest and chips away at principal:
+          A mortgage is an amortizing loan secured by real property. Repayments follow the reducing-balance (French amortization) methodology, where each fixed periodic installment covers that month's accrued interest with the residual balance paying down loan principal:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Principal Borrowed: </strong> P = Home Price &minus; Down Payment<br />
-            <strong>Monthly EMI Formula: </strong> EMI = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
-            <strong>Total Cost: </strong> Total Outflow = (EMI &times; n) + Down Payment
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Net Principal Borrowed:</strong> P = Home Purchase Price &minus; Upfront Down Payment<br /><br />
+            <strong>2. Periodic Monthly Rate:</strong> r = Annual Interest Rate (%) &divide; 12 &divide; 100<br /><br />
+            <strong>3. Total Repayment Periods:</strong> n = Loan Term (Years) &times; 12<br /><br />
+            <strong>4. Monthly Payment (EMI):</strong> M = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br /><br />
+            <strong>5. Total Loan Interest:</strong> Total Interest = (M &times; n) &minus; P<br /><br />
+            <strong>6. Total Property Outlay:</strong> Total Cash Outflow = Down Payment + (M &times; n)
           </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a property purchased for <strong>₹50,00,000</strong> with a <strong>20% down payment</strong> (₹10,00,000) funded upfront, leaving a net loan balance of <strong>₹40,00,000</strong> borrowed at an annual fixed rate of <strong>8.50%</strong> over <strong>20 years (240 months)</strong>:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Milestone / Component</th>
+                <th class="py-2.5 px-4">Mathematical Calculation</th>
+                <th class="py-2.5 px-4">Computed Output</th>
+                <th class="py-2.5 px-4">Strategic Impact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Home Purchase Price</td>
+                <td class="py-2.5 px-4 font-mono">Agreed Contract Price</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹50,00,000</td>
+                <td class="py-2.5 px-4">Total gross real estate transaction value.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Upfront Down Payment (20%)</td>
+                <td class="py-2.5 px-4 font-mono">₹50,00,000 &times; 20%</td>
+                <td class="py-2.5 px-4 font-mono">₹10,00,000</td>
+                <td class="py-2.5 px-4">Instant equity buffer; eliminates private mortgage insurance (PMI) mandates.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Net Principal Borrowed (P)</td>
+                <td class="py-2.5 px-4 font-mono">₹50,00,000 &minus; ₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹40,00,000</td>
+                <td class="py-2.5 px-4">Total bank debt disbursed and amortized.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Monthly Mortgage Payment (EMI)</td>
+                <td class="py-2.5 px-4 font-mono">Amortization Formula (n=240, r=0.70833%)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹34,713 / Month</td>
+                <td class="py-2.5 px-4">Fixed monthly payment due every 30 days for 20 continuous years.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
+                <td class="py-2.5 px-4 font-mono">Interest: ₹40L &times; 0.70833% = ₹28,333<br />Principal: ₹34,713 &minus; ₹28,333 = ₹6,380</td>
+                <td class="py-2.5 px-4 font-mono">81.6% Interest / 18.4% Principal</td>
+                <td class="py-2.5 px-4">Notice that early installments almost exclusively service interest overhead.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Repaid</td>
+                <td class="py-2.5 px-4 font-mono">Original Principal</td>
+                <td class="py-2.5 px-4 font-mono">₹40,00,000 (48.0%)</td>
+                <td class="py-2.5 px-4">Retires the entirety of debt obligation.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Paid to Bank</td>
+                <td class="py-2.5 px-4 font-mono">(₹34,713 &times; 240) &minus; ₹40,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹43,31,103 (52.0%)</td>
+                <td class="py-2.5 px-4">Financing cost exceeds the entire original borrowed principal!</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Total Real Estate Outlay</td>
+                <td class="py-3 px-4 font-mono">₹10,00,000 (Down) + ₹83,31,103 (Debt)</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹93,31,103</td>
+                <td class="py-3 px-4">1.87&times; the original property purchase price.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Loan Term Trade-off: 15 vs 20 vs 30 Years</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              On the same ₹40,00,000 loan at 8.50% interest, choosing loan tenure changes the total financing burden radically:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>15-Year Term:</strong> EMI is ₹39,403 (+₹4,690/mo), but total interest drops to ₹30,92,492 — saving <strong>₹12,38,611 in interest</strong> and retiring debt 5 years earlier.</li>
+              <li><strong>20-Year Term (Default):</strong> Balanced EMI of ₹34,713 with total interest of ₹43,31,103.</li>
+              <li><strong>30-Year Term:</strong> EMI falls to ₹30,757 (saving ₹3,956/mo), but total interest explodes to ₹70,72,374 — costing an extra <strong>₹27,41,271 in pure bank interest</strong>!</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The Equity "Crossover Point"</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Because of reducing-balance mechanics, your monthly payments shift from interest-heavy to principal-heavy over time:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Years 1–5:</strong> Over 75% of your cumulative payments go toward interest. Home equity grows very slowly.</li>
+              <li><strong>The Crossover Point:</strong> At Month 137 (~Year 11.5), the interest portion falls below 50% for the first time.</li>
+              <li><strong>Prepayment Acceleration:</strong> Adding just 1 extra EMI payment per year directly to principal shortens a 20-year mortgage by nearly 3.5 years and saves over ₹7.5 Lakhs in interest.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Exclusions</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>PITI vs Principal &amp; Interest:</strong> This calculator models pure Principal &amp; Interest (PI). Full housing outlays (PITI) also include municipal property taxes, homeowner's insurance, and private mortgage insurance (PMI).</li>
+            <li><strong>Floating vs Fixed Rates:</strong> Most residential mortgages are floating-rate (repo-linked in India, or adjustable-rate ARM in the US). If central bank benchmark rates rise by 100 bps, your tenure or EMI will automatically increase.</li>
+            <li><strong>Closing &amp; Acquisition Costs:</strong> Stamp duty, registration charges, legal title vetting, and loan origination fees (typically 4% to 8% of property value) must be funded out-of-pocket and are not included in the loan balance.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="mort-calculator-faq">
         <h2 id="mort-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What factors determine my monthly mortgage payment?', 'Your monthly mortgage payment depends on loan principal (home purchase price minus down payment), annual interest rate, and loan term duration. It may also include property taxes and home insurance.'],
-            ['How does down payment size impact my mortgage?', 'A larger down payment lowers the total principal borrowed, reduces your monthly payment, decreases the total interest paid over the life of the loan, and frequently eliminates private mortgage insurance (PMI).'],
-            ['What is the difference between a 15-year and 30-year mortgage?', 'A 15-year mortgage has higher monthly payments but allows you to build equity twice as fast and pay substantially less total interest over the life of the loan compared to a 30-year mortgage.'],
-            ['How does amortization work in a mortgage?', 'Under reducing-balance amortization, early mortgage payments consist predominantly of interest. As the loan principal balance steadily declines, a greater proportion of each payment goes toward paying down principal.'],
-            ['Can extra principal prepayments shorten my mortgage?', 'Yes. Making regular additional principal prepayments directly reduces the outstanding balance, dramatically reducing future compound interest and shortening the loan payoff period by years.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
@@ -277,7 +379,23 @@ const jsonld = {
 
       <section aria-labelledby="mort-calculator-related">
         <h2 id="mort-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/home-loan-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Home Loan Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate residential property EMI, loan interest, and amortization schedule.</p>
+          </a>
+          <a href="/loan-affordability-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Affordability Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine maximum borrowing capacity based on monthly income and debt limits.</p>
+          </a>
+          <a href="/loan-prepayment-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Prepayment Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">See how extra principal prepayments reduce interest and shorten loan term.</p>
+          </a>
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>

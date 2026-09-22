@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:26:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:28:15+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 35
-- **IN_PROGRESS:** 036. mortgage-calculator
-- **NEXT:** 037. loan-affordability-calculator
+- **COMPLETED:** 36
+- **IN_PROGRESS:** 037. loan-affordability-calculator
+- **NEXT:** 038. debt-to-income-ratio-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** savings-goal-calculator
-- **LAST_COMMIT:** 9cf2b5d
+- **LAST_COMPLETED_UNIT:** mortgage-calculator
+- **LAST_COMMIT:** 1d7863a
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -53,8 +53,8 @@
 - [x] 033. dcf-calculator — DONE
 - [x] 034. inflation-calculator — DONE
 - [x] 035. savings-goal-calculator — DONE
-- [ ] 036. mortgage-calculator — IN PROGRESS
-- [ ] 037. loan-affordability-calculator — PENDING
+- [x] 036. mortgage-calculator — DONE
+- [ ] 037. loan-affordability-calculator — IN PROGRESS
 - [ ] 038. debt-to-income-ratio-calculator — PENDING
 - [ ] 039. credit-card-payoff-calculator — PENDING
 - [ ] 040. loan-amortization-calculator — PENDING
@@ -260,4 +260,10 @@
   - Audited: Target wealth accumulation and reverse sinking-fund model calculating required periodic savings to bridge current wealth to future targets.
   - Changes: Added mathematical sinking-fund annuity formula breakdown with compounded seed capital deduction, complete step-by-step 5-year capital accumulation schedule matching default inputs (₹25L target, ₹2L initial seed, 10% expected annual return over 5 years → ₹3,29,062 compounded seed growth, ₹21,70,938 net deficit, ₹28,035/month or ₹3,36,418/year contribution, ₹18,82,092 total out-of-pocket investment (75.3%), ₹6,17,908 compound interest earned (24.7%)), horizon asset allocation framework (&lt;3 yrs capital preservation, 3–7 yrs balanced hybrid, &gt;7 yrs equity compounding), the "Cost of Delay" procrastination penalty (+94% monthly jump if delayed 2 yrs), and practical execution limitations (sequence of returns risk near maturity, tax drag on redemption, inflation escalation).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcSavingsGoal`, 5 FAQs matching JSON-LD schema, and curated related links (`sip-calculator`, `compound-interest-calculator`, `inflation-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **036. mortgage-calculator (/mortgage-calculator)**:
+  - Audited: Long-term residential real estate debt amortization model computing monthly reducing-balance installments (EMI), interest/principal split, and total lifetime cash outflows.
+  - Changes: Added complete 6-stage mathematical formula breakdown, comprehensive step-by-step worked example schedule matching default inputs (₹50L purchase price, 20% down payment = ₹10L, ₹40L loan at 8.50% over 20 years → ₹34,713/month EMI, Month 1 interest heavy split: 81.6% interest / 18.4% principal, ₹40L principal repaid (48.0%), ₹43,31,103 interest paid to bank (52.0%), ₹83,31,103 total loan repayment, ₹93,31,103 total property cash outlay / 1.87x original purchase price), loan term trade-off analysis comparing 15 vs 20 vs 30-year mortgages (15-yr term saves ₹12.39L interest; 30-yr term explodes interest by +₹27.41L), analysis of the equity "Crossover Point" (Month 137 / Year 11.5) and annual prepayment acceleration power, and real-world exclusions (PITI components, floating rate benchmark volatility, closing/acquisition charges).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcAmortization`, 5 FAQs matching JSON-LD schema, and curated related links (`home-loan-calculator`, `loan-affordability-calculator`, `loan-prepayment-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
