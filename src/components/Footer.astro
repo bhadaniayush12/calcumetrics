@@ -31,6 +31,7 @@ const columns = [
     title: 'Taxes',
     href: '/taxes',
     links: [
+      { label: 'Income Tax Calculator (IN)', href: '/in/income-tax-calculator' },
       { label: 'GST Calculator (IN)', href: '/in/gst-calculator' },
       { label: 'HRA Calculator (IN)', href: '/in/hra-calculator' },
     ],
@@ -115,23 +116,28 @@ const columns = [
 
     <!-- Bottom Bar: Branding, Disclaimer & Copyright per Section 6 & 16 -->
     <div class="pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-text-muted">
-      <div class="flex items-center gap-2.5">
-        <img
-          src="/logo.svg"
-          alt="Calcumetrics"
-          width="20"
-          height="20"
-          class="w-5 h-5 rounded"
-        />
-        <span class="font-semibold text-text-primary">Calcumetrics</span>
-        <span>— Free, 100% client-side financial calculations.</span>
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-2.5">
+          <img
+            src="/logo.svg"
+            alt="Calcumetrics"
+            width="20"
+            height="20"
+            class="w-5 h-5 rounded"
+          />
+          <span class="font-semibold text-text-primary">Calcumetrics</span>
+          <span>— Free, 100% client-side financial calculations.</span>
+        </div>
+        <a href="/calculators" class="text-accent font-medium hover:underline focus-visible:outline-accent transition-standard w-fit">
+          View All Calculators &rarr;
+        </a>
       </div>
 
       <div class="flex flex-col md:items-end gap-1">
         <p class="leading-relaxed">
           For information only. Not financial advice. Results are estimates; returns are not guaranteed.
         </p>
-        <p>© {new Date().getFullYear()} Calcumetrics. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Calcumetrics. All rights reserved.</p>
       </div>
     </div>
   </div>
