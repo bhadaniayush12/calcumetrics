@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:52:45+05:30
+- **LAST_UPDATED:** 2026-09-23T03:53:35+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 8
-- **IN_PROGRESS:** ppf-calculator
+- **COMPLETED:** 9
+- **IN_PROGRESS:** NONE
 - **NEXT:** 010. 401k-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** rd-calculator
-- **LAST_COMMIT:** bd7fc5c
+- **LAST_COMPLETED_UNIT:** ppf-calculator
+- **LAST_COMMIT:** c69b1e7
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -26,7 +26,7 @@
 - [x] 006. xirr-calculator — DONE
 - [x] 007. fd-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 008. rd-calculator — DONE
-- [ ] 009. ppf-calculator — IN PROGRESS
+- [x] 009. ppf-calculator — DONE
 - [ ] 010. 401k-calculator — PENDING
 - [ ] 011. emi-calculator — PENDING (Phase 5 Locked)
 - [ ] 012. home-loan-calculator — PENDING
@@ -110,4 +110,10 @@
   - Audited: Indian Banks' Association (IBA) quarterly compounding for recurring deposits.
   - Changes: Added step-by-step worked example using default inputs (₹5,000 monthly for 5 years at 7.0% p.a. → ₹3,00,000 principal, ₹61,746 interest, ₹3,61,746 maturity), added result interpretation (capital guarantee via DICGC insurance vs marginal tax bracket drag), and added explicit assumptions/limitations (standard quarterly compounding, timely deposits, fixed contracted rate, TDS thresholds).
   - Preserved: Clean UI with tenure slider, calculation engine `calcRD`, 5 calculator-specific FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **009. ppf-calculator (/in/ppf-calculator)**:
+  - Audited: India small savings scheme (Public Provident Fund Scheme, 2019 / Government Savings Promotion Act, 1873).
+  - Changes: Added step-by-step worked example using statutory maximum contribution (₹1,50,000 annually for 15 years at 7.1% p.a. → ₹22,50,000 deposited, ₹18,18,209 interest, ₹40,68,209 maturity, with 5/10/15 yr milestones), added result interpretation (Exempt-Exempt-Exempt EEE tax equivalence of 10.32% pre-tax yield, 5-year extension block mechanics), and aligned explicit assumptions/limitations with versioned data (`src/data/tax/india/ppf/current.json`).
+  - Preserved: Sourced statutory rate (7.1%), EEE notice, INR currency lock, calculation engine `calcPPF`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.

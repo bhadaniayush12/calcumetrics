@@ -229,22 +229,84 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="ppf-calculator-how">
         <h2 id="ppf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the PPF calculator works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Public Provident Fund interest is compounded annually and calculated on the minimum balance between the 5th and the end of each calendar month.
+          The Public Provident Fund (PPF) is a government-backed, long-term small savings scheme established under the Public Provident Fund Scheme, 2019. Interest is compounded annually and calculated on the minimum balance in the account between the close of the 5th day and the end of each calendar month.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">F = P &times; [((1 + i)<sup>n</sup> &minus; 1) &divide; i] &times; (1 + i)</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Assuming annual deposits are made on or before the 5th of April each financial year, the maturity amount follows the standard annuity-due compound accumulation equation:
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">F = P &times; [((1 + i)<sup>n</sup> &minus; 1) &divide; i] &times; (1 + i)</p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">F</strong> — Maturity amount</li>
-            <li><strong class="text-text-primary">P</strong> — Annual installment deposited before the 5th of April</li>
-            <li><strong class="text-text-primary">i</strong> — Annual interest rate (decimal)</li>
-            <li><strong class="text-text-primary">n</strong> — Total tenure in years (15, 20, 25, 30)</li>
+            <li><strong class="text-text-primary">F</strong> &mdash; Total maturity value at the end of the lock-in tenure</li>
+            <li><strong class="text-text-primary">P</strong> &mdash; Annual deposit amount (statutory maximum ₹1,50,000 per financial year)</li>
+            <li><strong class="text-text-primary">i</strong> &mdash; Annual statutory interest rate as a decimal (e.g. 0.071 for 7.1% p.a.)</li>
+            <li><strong class="text-text-primary">n</strong> &mdash; Account tenure in complete financial years (mandatory 15 years; extendable in 5-year blocks)</li>
           </ul>
         </div>
       </section>
 
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="ppf-calculator-example">
+        <h2 id="ppf-calculator-example" class="text-xl font-bold text-text-primary mb-4">Worked example: ₹1,50,000 annual deposit for 15 years at 7.1% p.a.</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an individual maximizing their statutory limit with an annual deposit of ₹1,50,000 deposited before April 5th every year for the full 15-year tenure:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Annual Contribution:</strong> ₹1,50,000 deposited annually on or before April 5th</p>
+          <p><strong class="text-text-primary">2. Tenure:</strong> 15 complete financial years (180 months)</p>
+          <p><strong class="text-text-primary">3. Cumulative Capital Invested:</strong> 15 &times; ₹1,50,000 = <strong class="text-text-primary">₹22,50,000</strong></p>
+          <p><strong class="text-text-primary">4. Milestone Growth:</strong></p>
+          <ul class="list-disc pl-5 space-y-1 text-xs">
+            <li><strong class="text-text-primary">Year 5:</strong> Invested ₹7,50,000 &rarr; Balance: ₹9,74,383 (Interest earned: ₹2,24,383)</li>
+            <li><strong class="text-text-primary">Year 10:</strong> Invested ₹15,00,000 &rarr; Balance: ₹23,54,482 (Interest earned: ₹8,54,482)</li>
+            <li><strong class="text-text-primary">Year 15 (Maturity):</strong> Invested ₹22,50,000 &rarr; Balance: <strong class="text-text-primary text-accent">₹40,68,209</strong></li>
+          </ul>
+          <p><strong class="text-text-primary">5. Total Accumulated Interest:</strong> ₹40,68,209 &minus; ₹22,50,000 = <strong class="text-text-primary text-accent">₹18,18,209</strong></p>
+        </div>
+      </section>
+
+      <!-- 3. Interpreting Your Results -->
+      <section aria-labelledby="ppf-calculator-interpretation">
+        <h2 id="ppf-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your PPF results</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Exempt-Exempt-Exempt (EEE) Advantage:</strong> PPF is one of India's few financial instruments enjoying complete EEE tax status. Contributions qualify for deduction under Section 80C (under Old Tax Regime), interest accrued annually is 100% tax-free, and the entire maturity proceeds of ₹40,68,209 are exempt from income tax. For a taxpayer in the 30% slab (+ 4% cess), matching this 7.1% tax-free return requires an equivalent pre-tax taxable yield of 10.32%.
+          </p>
+          <p>
+            <strong class="text-text-primary">Extension in 5-Year Blocks:</strong> After the initial 15-year maturity, the account can be extended indefinitely in blocks of 5 years with or without fresh contributions. Extending for 5 years (to Year 20) with continued contributions of ₹1.5L/year elevates the corpus to over ₹66 lakh due to compounding on an already substantial capital base.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4. Key Assumptions and Limitations -->
+      <section aria-labelledby="ppf-calculator-assumptions">
+        <h2 id="ppf-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Quarterly Rate Revisions:</strong> Sourced from Ministry of Finance notifications. The calculator models a constant 7.1% p.a. rate across the entire duration; actual historical and future returns may vary as rates are reviewed quarterly by the Government of India.
+          </li>
+          <li>
+            <strong class="text-text-primary">Deposit Timing Rule:</strong> Assumes contributions arrive between the 1st and 5th of April each financial year. Contributions deposited after the 5th miss interest accrual for that calendar month.
+          </li>
+          <li>
+            <strong class="text-text-primary">Statutory Limits:</strong> Conforms strictly to government limits: minimum ₹500 and maximum ₹1,50,000 per financial year per individual account.
+          </li>
+          <li>
+            <strong class="text-text-primary">Simplified Accumulation:</strong> Does not simulate partial premature withdrawals (available from the 7th financial year) or loan-against-PPF facilities (available from the 3rd to 6th financial year).
+          </li>
+          <li>
+            <strong class="text-text-primary">Tax Regime Specific:</strong> Section 80C deductions are available under the Old Tax Regime only; the New Tax Regime does not offer 80C deductions (though PPF interest remains tax-free).
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. Frequently Asked Questions -->
       <section aria-labelledby="ppf-calculator-faq">
         <h2 id="ppf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
