@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:18:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:20:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 3
-- **IN_PROGRESS:** 004. capital-gains-tax-rules
-- **NEXT:** 005. markup-vs-margin
+- **COMPLETED_ARTICLES:** 4
+- **IN_PROGRESS:** 005. markup-vs-margin
+- **NEXT:** 006. npv-vs-irr
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** old-vs-new-tax-regime
-- **LAST_COMMIT:** d626e07
+- **LAST_COMPLETED_ARTICLE:** capital-gains-tax-rules
+- **LAST_COMMIT:** 509618d
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (68 pages)
+- **BUILD_STATUS:** PASS (69 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -21,8 +21,8 @@
 - [x] 001. cagr-vs-xirr — DONE (Evergreen)
 - [x] 002. home-loan-prepayment-vs-sip — DONE (Hybrid)
 - [x] 003. old-vs-new-tax-regime — DONE (Trending/Hybrid)
-- [ ] 004. capital-gains-tax-rules — IN PROGRESS (Trending/Hybrid)
-- [ ] 005. markup-vs-margin — PENDING (Evergreen)
+- [x] 004. capital-gains-tax-rules — DONE (Trending/Hybrid)
+- [ ] 005. markup-vs-margin — IN PROGRESS (Evergreen)
 - [ ] 006. npv-vs-irr — PENDING (Evergreen)
 - [ ] 007. flat-vs-reducing-interest-rate — PENDING (Evergreen)
 - [ ] 008. cash-conversion-cycle — PENDING (Evergreen)
@@ -91,3 +91,11 @@
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS (389/389), `npm run build` PASS (69 pages built), `git diff --check` PASS.
 
+- **004. capital-gains-tax-rules (/blog/capital-gains-tax-rules)**:
+  - Title: Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule
+  - Intent: Demystify the historic capital gains tax restructuring enacted by the Finance (No. 2) Act 2024, the unified 12.5% LTCG regime, and the critical August 2024 grandfathering amendment for real estate indexation.
+  - Linked Calculators: `/in/capital-gains-tax-calculator`, `/in/advance-tax-calculator`, `/in/tds-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/in/capital-gains-tax-calculator` and `/in/advance-tax-calculator`.
+  - Key Content: Two-tier holding period classification (12m listed vs 24m all other), comprehensive asset-by-asset tax rate schedule (equity, unlisted shares, gold, debt funds), worked side-by-side legacy real estate case study showing ₹3.80 Lakh tax savings using the 20% indexed grandfathering option vs 12.5% unindexed, Section 54/54EC/54F exemption pathways, and Section 234C advance tax safe harbor rules.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (70 pages built), `git diff --check` PASS.

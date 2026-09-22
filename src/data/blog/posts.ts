@@ -799,4 +799,281 @@ export const BLOG_POSTS: BlogPost[] = [
       </p>
     `,
   },
+  {
+    slug: 'capital-gains-tax-rules',
+    title: 'Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule',
+    seoTitle: 'Capital Gains Tax Rules India: 12.5% LTCG & Property Grandfathering | Calcumetrics',
+    description:
+      'Complete guide to capital gains tax in India after the Finance (No. 2) Act 2024. Understand the new 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh exemption, and the dual-option real estate indexation rule.',
+    category: 'Taxes',
+    publishDate: '2026-09-23',
+    dateModified: '2026-09-23',
+    readTime: '10 min read',
+    author: 'Calcumetrics Financial Research Team',
+    type: 'Hybrid',
+    summary:
+      "A definitive guide to India's overhauled capital gains tax framework enacted by the Finance (No. 2) Act 2024 and amended in August 2024. Learn how listed equities, mutual funds, gold, unlisted shares, and real estate are taxed, with an exact worked example showing how the dual indexation option saves lakhs on legacy property sales.",
+    relatedCalculators: [
+      {
+        name: 'Capital Gains Tax Calculator',
+        path: '/in/capital-gains-tax-calculator',
+        description: 'Calculate STCG and LTCG tax liability across equities, debt, gold, and real estate with grandfathering rules.',
+        badge: 'Post-Budget 2024',
+      },
+      {
+        name: 'Advance Tax Calculator',
+        path: '/in/advance-tax-calculator',
+        description: 'Schedule quarterly advance tax installments to prevent Section 234B & 234C penal interest after capital gains.',
+        badge: 'Quarterly Deadlines',
+      },
+      {
+        name: 'TDS Calculator',
+        path: '/in/tds-calculator',
+        description: 'Verify 1% Section 194-IA TDS deduction rules on real estate property sales exceeding ₹50 Lakh.',
+      },
+    ],
+    relatedArticles: [
+      {
+        slug: 'old-vs-new-tax-regime',
+        title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+        description: 'How your total annual taxable income and tax regime choice interact with capital gains liabilities.',
+      },
+      {
+        slug: 'cagr-vs-xirr',
+        title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
+        description: 'Account for tax drag when computing post-tax geometric compound returns.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'What is the new LTCG tax rate for equity shares and equity mutual funds?',
+        answer: 'Under Section 112A, as amended from July 23, 2024, Long-Term Capital Gains (LTCG) on listed equity shares and equity mutual fund units are taxed at 12.5% (up from 10%). The basic annual exemption threshold was simultaneously raised from ₹1,00,000 to ₹1,25,000 per financial year.',
+      },
+      {
+        question: 'Can I still claim indexation benefit when selling property in India?',
+        answer: 'Yes, but conditionally. Under the parliamentary amendment passed in August 2024, if a residential or commercial property was purchased before July 23, 2024 by a resident individual or HUF, the seller has the choice of paying either 12.5% tax without indexation or 20% tax with indexation, whichever results in lower tax outgo. For properties purchased on or after July 23, 2024, indexation is permanently abolished and the tax rate is flat 12.5%.',
+      },
+      {
+        question: 'What are the holding period thresholds for long-term capital assets after Budget 2024?',
+        answer: 'The Finance (No. 2) Act 2024 streamlined holding periods into just two simple categories: (1) 12 months for all listed securities (listed equity shares, equity mutual funds, listed bonds, and units of REITs/InvITs), and (2) 24 months for all other assets, including immovable property (real estate), physical gold, unlisted equity shares, and gold mutual funds.',
+      },
+      {
+        question: 'When is advance tax due after booking capital gains?',
+        answer: 'Because capital gains cannot always be foreseen, Section 234C stipulates that if a capital gain occurs during the year, advance tax on that gain is payable only in the remaining quarterly installments following the transaction date. If you pay the full remaining liability on or before March 15, no Section 234C penal interest is charged on previous missed installments.',
+      },
+      {
+        question: 'How are debt mutual funds taxed after the budget changes?',
+        answer: 'Specified debt mutual funds (where equity investment does not exceed 35%) purchased on or after April 1, 2023 continue to be governed by Section 50AA. They are treated as short-term capital gains regardless of the holding period and are taxed strictly at the investor applicable income tax slab rates, with no indexation benefit.',
+      },
+    ],
+    content: `
+      <p class="text-base text-text-muted leading-relaxed mb-6 font-normal">
+        On July 23, 2024, India's Union Budget delivered the most comprehensive overhaul of capital gains taxation in two decades. Enacted via the Finance (No. 2) Act 2024, the government dismantled a complex web of varying holding periods, differential indexation allowances, and fragmented tax rates in favor of a simplified, standardized framework centered around a <strong>flat 12.5% Long-Term Capital Gains (LTCG) rate</strong>.
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        However, the abrupt abolition of indexation on real estate triggered intense public debate, prompting the Ministry of Finance to introduce a vital amendment in August 2024: <strong>a dual-option grandfathering rule</strong> for immovable property purchased prior to July 23, 2024.
+      </p>
+
+      <div class="p-4 bg-surface border border-accent/30 rounded-card mb-8 text-xs text-text-muted">
+        <strong class="text-text-primary text-sm block mb-1">Verify Your Asset Tax Liability:</strong>
+        Calculate your exact short-term and long-term tax outgo across equities, property, and gold with our interactive <a href="/in/capital-gains-tax-calculator" class="text-accent font-medium hover:underline">Capital Gains Tax Calculator</a>.
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The New Holding Period Architecture</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Prior to July 23, 2024, determining whether an asset was "short-term" or "long-term" required navigating three separate holding period benchmarks: 12 months, 24 months, and 36 months. The new framework collapses this into two straightforward tiers:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-accent mb-2">12 Months: Listed Securities</h4>
+          <p class="text-xs text-text-muted leading-relaxed">
+            Assets that qualify as Long-Term after just 12 months of holding:
+          </p>
+          <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mt-2">
+            <li>Equity shares listed on a recognized Indian stock exchange (NSE/BSE).</li>
+            <li>Units of equity-oriented mutual funds (minimum 65% domestic equity).</li>
+            <li>Units of Business Trusts (REITs and InvITs).</li>
+            <li>Zero Coupon Bonds.</li>
+          </ul>
+        </div>
+
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-accent mb-2">24 Months: All Other Assets</h4>
+          <p class="text-xs text-text-muted leading-relaxed">
+            Assets that require 24 months of holding to qualify as Long-Term:
+          </p>
+          <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mt-2">
+            <li>Immovable property (residential land, commercial buildings, plots).</li>
+            <li>Physical gold, gold jewelry, and sovereign gold bonds.</li>
+            <li>Unlisted equity shares and startup private equity.</li>
+            <li>Debt-oriented hybrid mutual funds with equity exposure between 35% and 65%.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Summary of Revised Capital Gains Tax Rates</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The table below provides the authoritative tax rates effective for all transactions finalized on or after July 23, 2024:
+      </p>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Asset Category</th>
+              <th class="p-3">Holding Period (ST / LT)</th>
+              <th class="p-3">STCG Tax Rate</th>
+              <th class="p-3">LTCG Tax Rate</th>
+              <th class="p-3">Key Exemptions / Deductions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted">
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Listed Equity Shares & Equity Mutual Funds</td>
+              <td class="p-3">12 Months</td>
+              <td class="p-3 text-red-400 font-semibold">20% (Section 111A)</td>
+              <td class="p-3 text-accent font-semibold">12.5% (Section 112A)</td>
+              <td class="p-3 font-medium text-text-primary">₹1.25 Lakh annual LTCG exemption (raised from ₹1 Lakh).</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Real Estate (Acquired on or after 23-Jul-2024)</td>
+              <td class="p-3">24 Months</td>
+              <td class="p-3">Applicable Slab Rate</td>
+              <td class="p-3 font-semibold text-text-primary">12.5% (No Indexation)</td>
+              <td class="p-3">Exemptions under Section 54 / 54EC / 54GB.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Real Estate (Acquired before 23-Jul-2024)</td>
+              <td class="p-3">24 Months</td>
+              <td class="p-3">Applicable Slab Rate</td>
+              <td class="p-3 text-accent font-semibold">Lower of 12.5% (No Index) OR 20% (With Index)</td>
+              <td class="p-3">Grandfathering option exclusively for resident individuals & HUFs.</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Physical Gold & Gold ETFs</td>
+              <td class="p-3">24 Months (reduced from 36m)</td>
+              <td class="p-3">Applicable Slab Rate</td>
+              <td class="p-3 text-accent font-semibold">12.5% (No Indexation)</td>
+              <td class="p-3">Prior 20% with indexation replaced with 12.5% flat rate.</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Unlisted Equity Shares</td>
+              <td class="p-3">24 Months</td>
+              <td class="p-3">Applicable Slab Rate</td>
+              <td class="p-3 text-accent font-semibold">12.5% (No Indexation)</td>
+              <td class="p-3">Tax parity established with listed shares.</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Debt Mutual Funds (≤35% Equity)</td>
+              <td class="p-3">Always STCG (Section 50AA)</td>
+              <td class="p-3 text-red-400 font-semibold">Applicable Slab Rate</td>
+              <td class="p-3">Not Applicable</td>
+              <td class="p-3">Governed by Section 50AA (no LTCG status).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Real Estate Grandfathering Rule: A Worked Comparison</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The most important practical calculation under the new law involves the sale of real estate acquired before July 23, 2024. If you are an individual resident Indian or HUF, you are legally entitled to calculate tax under <strong>both methods</strong> and pay whichever is lower.
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-3">
+        Let us examine a real-world scenario with the following parameters:
+      </p>
+      <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mb-4 ml-2 font-mono">
+        <li>• Property Purchase Date: August 2011 (FY 2011-12, Cost Inflation Index = 184)</li>
+        <li>• Original Purchase Price: ₹40,00,000</li>
+        <li>• Sale Date: November 2024 (FY 2024-25, Cost Inflation Index = 363)</li>
+        <li>• Sale Consideration: ₹95,00,000</li>
+        <li>• Gross Capital Gain: ₹55,00,000</li>
+      </ul>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Component</th>
+              <th class="p-3">Option 1: New Law (12.5% Without Indexation)</th>
+              <th class="p-3 text-accent">Option 2: Grandfathered (20% With Indexation)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted">
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Acquisition Cost</td>
+              <td class="p-3">₹40,00,000 (Nominal)</td>
+              <td class="p-3 font-mono">₹40,00,000 × (363 / 184) = <strong>₹78,91,304</strong></td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Net Taxable Capital Gain</td>
+              <td class="p-3 font-mono font-semibold">₹55,00,000</td>
+              <td class="p-3 font-mono font-semibold text-accent">₹16,08,696 (₹95L − ₹78.91L)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">Applicable Tax Rate</td>
+              <td class="p-3 font-medium">12.5%</td>
+              <td class="p-3 font-medium">20.0%</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">Base Tax Payable</td>
+              <td class="p-3 font-mono text-red-400 font-semibold">₹6,87,500</td>
+              <td class="p-3 font-mono text-accent font-semibold">₹3,21,739</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">With 4% Health & Education Cess</td>
+              <td class="p-3 font-mono text-red-400 font-bold">₹7,15,000</td>
+              <td class="p-3 font-mono text-accent font-bold">₹3,34,609</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-bold text-text-primary">Grandfathering Savings</td>
+              <td class="p-3 text-text-muted">—</td>
+              <td class="p-3 font-bold text-accent">Saves ₹3,80,391 in tax!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        <strong>Key Mathematical Takeaway:</strong> When a property has appreciated moderately over a long holding period (e.g., 7% to 10% annualized), inflation indexation heavily elevates the acquisition cost, making the 20% indexed route dramatically superior. Conversely, for properties that experienced multi-bagger gains (e.g. 5x to 10x growth), the 12.5% unindexed flat tax will generally yield the lower tax liability.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Capital Gains Exemption Pathways (Sections 54, 54EC, 54F)</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        You do not have to surrender your hard-earned profits to the tax department if you reinvest according to statutory safe harbors:
+      </p>
+
+      <div class="space-y-3 mb-6 text-xs text-text-muted">
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54: Reinvestment in Residential Property</h4>
+          <p class="leading-relaxed">Available to individuals and HUFs selling a residential house. If you purchase another residential property within 1 year before or 2 years after the sale date (or construct within 3 years), capital gains up to ₹10 Crore are fully exempt.</p>
+        </div>
+
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54EC: Capital Gain Bonds</h4>
+          <p class="leading-relaxed">Invest up to ₹50 Lakh in approved infrastructure bonds (REC, PFC, NHAI, IRFC) within 6 months of selling land or buildings. The bonds carry a mandatory 5-year lock-in period and provide 100% tax relief on the invested amount.</p>
+        </div>
+
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54F: Sale of Any Non-Residential Asset</h4>
+          <p class="leading-relaxed">Selling gold, commercial property, or unlisted shares? You can claim proportionate tax exemption by reinvesting the entire <em>net sale consideration</em> (not just the gain) into a new residential home, provided you do not own more than one house on the transfer date.</p>
+        </div>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. Advance Tax Compliance and Section 234C Safeguards</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Many investors who book substantial gains on the stock market or sell property find themselves penalized by Section 234B and Section 234C interest penalties for failure to pay advance tax.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        However, the Income Tax Act explicitly protects taxpayers against unexpected capital events. Under the proviso to Section 234C, no penal interest is charged for shortfall in advance tax installments due <em>prior</em> to the date the capital gain was realized. As long as you discharge the remaining tax liability in the remaining advance tax windows (June 15, Sept 15, Dec 15, March 15), penal interest is completely waived. You can compute your installment schedule using the <a href="/in/advance-tax-calculator" class="text-accent font-medium hover:underline">Advance Tax Calculator</a>.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <p class="text-sm text-text-muted leading-relaxed">
+        The post-Budget 2024 capital gains regime simplifies holding periods and standardizes long-term taxation across financial assets at 12.5%. For property sellers holding legacy real estate acquired prior to July 23, 2024, the parliamentary grandfathering amendment is a multi-lakh rupee tax shield that should always be computed side-by-side before filing your tax return.
+      </p>
+    `,
+  },
 ];
