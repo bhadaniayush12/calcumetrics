@@ -228,31 +228,132 @@ const jsonld = {
       <section aria-labelledby="amort-calculator-how">
         <h2 id="amort-calculator-how" class="text-xl font-bold text-text-primary mb-4">How loan amortization works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Each periodic installment consists of interest on the remaining principal balance plus a repayment of principal:
+          Loan amortization follows the reducing-balance (French amortization) methodology. Each fixed monthly installment (EMI) pays down both accrued interest and a portion of the outstanding principal balance:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Equated Monthly Installment: </strong> EMI = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
-            <strong>Period Interest: </strong> Interest<sub>t</sub> = Balance<sub>t&minus;1</sub> &times; r<br />
-            <strong>Period Principal: </strong> Principal<sub>t</sub> = EMI &minus; Interest<sub>t</sub><br />
-            <strong>New Balance: </strong> Balance<sub>t</sub> = Balance<sub>t&minus;1</sub> &minus; Principal<sub>t</sub>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Periodic Monthly Rate:</strong> r = Annual Interest Rate (%) &divide; 12 &divide; 100<br /><br />
+            <strong>2. Total Payment Installments:</strong> n = Loan Tenure (Years) &times; 12<br /><br />
+            <strong>3. Monthly Installment (EMI):</strong> EMI = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br /><br />
+            <strong>4. Period Accrued Interest:</strong> Interest<sub>t</sub> = Outstanding Balance<sub>t&minus;1</sub> &times; r<br /><br />
+            <strong>5. Period Principal Repayment:</strong> Principal<sub>t</sub> = EMI &minus; Interest<sub>t</sub><br /><br />
+            <strong>6. Ending Balance:</strong> Balance<sub>t</sub> = Balance<sub>t&minus;1</sub> &minus; Principal<sub>t</sub>
           </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a personal or vehicle loan of <strong>₹10,00,000</strong> borrowed at an annual reducing rate of <strong>9.50%</strong> over a <strong>5-year term (60 monthly payments)</strong>:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Period / Milestone</th>
+                <th class="py-2.5 px-4">Amortization Math</th>
+                <th class="py-2.5 px-4">Computed Value</th>
+                <th class="py-2.5 px-4">Balance Dynamics</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Disbursed Principal (P)</td>
+                <td class="py-2.5 px-4 font-mono">Starting Borrowed Capital</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,00,000</td>
+                <td class="py-2.5 px-4">Opening balance on Day 1 upon loan disbursement.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Monthly Payment (EMI)</td>
+                <td class="py-2.5 px-4 font-mono">Formula (r=0.79167%, n=60)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹21,002 / Month</td>
+                <td class="py-2.5 px-4">Constant installment due every month for 60 consecutive months.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
+                <td class="py-2.5 px-4 font-mono">Interest: ₹10L &times; 0.79167% = ₹7,917<br />Principal: ₹21,002 &minus; ₹7,917 = ₹13,085</td>
+                <td class="py-2.5 px-4 font-mono">37.7% Interest / 62.3% Principal</td>
+                <td class="py-2.5 px-4">Balance reduces to ₹9,86,915, lowering Month 2 interest to ₹7,813.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 1 Cumulative</td>
+                <td class="py-2.5 px-4 font-mono">Months 1 to 12 Summation</td>
+                <td class="py-2.5 px-4 font-mono">₹1,64,517 Principal / ₹87,505 Interest</td>
+                <td class="py-2.5 px-4">Outstanding balance drops to ₹8,35,483 after 12 payments.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 3 (Month 36) Midpoint</td>
+                <td class="py-2.5 px-4 font-mono">Balance: ₹4,53,607<br />Interest: ₹3,591 / Principal: ₹17,411</td>
+                <td class="py-2.5 px-4 font-mono">17.1% Interest / 82.9% Principal</td>
+                <td class="py-2.5 px-4">Notice how principal portion expands as interest burden shrinks!</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Repaid</td>
+                <td class="py-2.5 px-4 font-mono">Original Principal</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,00,000 (79.4%)</td>
+                <td class="py-2.5 px-4">Complete retirement of debt obligation.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Payable</td>
+                <td class="py-2.5 px-4 font-mono">(₹21,002 &times; 60) &minus; ₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹2,60,112 (20.6%)</td>
+                <td class="py-2.5 px-4">Cost of borrowing over 5 full years.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Total Amount Repaid</td>
+                <td class="py-3 px-4 font-mono">Principal + Total Interest</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹12,60,112</td>
+                <td class="py-3 px-4">Total cash paid to lender across 60 monthly installments.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Reducing Balance vs Flat Interest Rate Trap</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Borrowers often encounter deceptively marketed "flat rate" financing:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Reducing Balance (Real 9.50%):</strong> Total interest is <strong>₹2,60,112</strong> because interest is charged only on remaining debt.</li>
+              <li><strong>Flat Rate (Advertised 9.50%):</strong> Interest is charged on the initial ₹10L for all 5 years: ₹10L &times; 9.5% &times; 5 = <strong>₹4,75,000 in interest</strong>!</li>
+              <li>A "9.5% Flat Rate" carries an effective reducing-balance APR of nearly <strong>17.5%</strong> — costing an extra ₹2,14,888 in disguised interest!</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The Power of Principal Prepayment</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Prepaying principal early delivers exponential compound interest savings:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Prepayment Timing:</strong> A ₹1,00,000 lump sum paid in Month 12 eliminates <strong>7 full months</strong> from your 5-year loan and saves over <strong>₹42,000 in interest</strong>.</li>
+              <li><strong>The "Front-Loaded Interest" Reality:</strong> Lenders don't front-load interest maliciously; interest is simply highest when your debt balance is highest.</li>
+              <li>Every rupee of early prepayment permanently reduces the balance that future interest is computed upon.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Uniform Repayment Dates:</strong> The schedule assumes installments occur on the exact same calendar date each month (30/360 or actual/365 convention). Irregular payment dates slightly alter daily interest accrual.</li>
+            <li><strong>Floating vs Fixed Benchmarks:</strong> On floating-rate loans, benchmark interest changes adjust your remaining loan tenure or monthly EMI, recalculating the entire future amortization trajectory.</li>
+            <li><strong>Ancillary Lending Charges:</strong> Loan origination fees, processing fees (typically 0.5% to 2%), stamp taxes, and prepayment penalties (if applicable to fixed retail loans) are excluded from the pure amortization schedule.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="amort-calculator-faq">
         <h2 id="amort-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What is a loan amortization schedule?', 'A loan amortization schedule is a complete table of periodic loan payments showing how each payment is partitioned between interest charges and principal reduction, along with the remaining balance after each payment.'],
-            ['Why is interest higher in early loan payments?', 'Interest is calculated on the remaining loan principal. Since the principal is largest at the beginning of the loan, the interest charge is at its peak. As you repay principal, monthly interest charges decline, leaving more of each fixed EMI to repay principal.'],
-            ['What is the reducing-balance method?', 'Under the reducing-balance (or reducing-principal) method, interest is calculated strictly on the outstanding balance at each compounding period rather than the initial borrowing amount.'],
-            ['How do extra payments affect the amortization schedule?', 'Extra payments accelerate principal payoff, which reduces subsequent interest calculations for all future periods, shortening total loan duration and saving money.'],
-            ['Is the EMI amount identical every month?', 'For a fixed-rate loan, the total monthly EMI remains identical each month, but the internal split between principal and interest shifts continuously.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
@@ -260,7 +361,23 @@ const jsonld = {
 
       <section aria-labelledby="amort-calculator-related">
         <h2 id="amort-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/loan-prepayment-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Prepayment Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">See how extra principal prepayments reduce interest and shorten loan term.</p>
+          </a>
+          <a href="/emi-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">EMI Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate monthly loan installments, total interest, and loan amortization.</p>
+          </a>
+          <a href="/mortgage-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Mortgage Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate monthly mortgage payments, down payment impact, and total loan interest.</p>
+          </a>
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>

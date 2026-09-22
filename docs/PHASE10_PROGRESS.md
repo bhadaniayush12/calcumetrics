@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:31:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:32:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 39
-- **IN_PROGRESS:** 040. loan-amortization-calculator
-- **NEXT:** 041. interest-rate-calculator
+- **COMPLETED:** 40
+- **IN_PROGRESS:** 041. interest-rate-calculator
+- **NEXT:** 042. tds-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** credit-card-payoff-calculator
-- **LAST_COMMIT:** 6f458dd
+- **LAST_COMPLETED_UNIT:** loan-amortization-calculator
+- **LAST_COMMIT:** 1b728b6
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -57,8 +57,8 @@
 - [x] 037. loan-affordability-calculator — DONE
 - [x] 038. debt-to-income-ratio-calculator — DONE
 - [x] 039. credit-card-payoff-calculator — DONE
-- [ ] 040. loan-amortization-calculator — IN PROGRESS
-- [ ] 041. interest-rate-calculator — PENDING
+- [x] 040. loan-amortization-calculator — DONE
+- [ ] 041. interest-rate-calculator — IN PROGRESS
 - [ ] 042. tds-calculator — PENDING (India Tax Protected)
 - [ ] 043. capital-gains-tax-calculator — PENDING (India Tax Protected)
 - [ ] 044. advance-tax-calculator — PENDING (India Tax Protected)
@@ -284,4 +284,10 @@
   - Audited: High-interest revolving debt amortization model solving for debt-free timeline, compound finance charges, and minimum payment trap mitigation.
   - Changes: Added complete 6-stage mathematical amortization formula breakdown (monthly periodic rate, daily accrual, closed-form logarithmic payoff duration formula, solvency threshold condition `PMT > P × r`), comprehensive step-by-step worked example schedule matching default inputs (₹1,50,000 balance, 36.00% APR / 3.00% per month, ₹10,000 fixed monthly payment → 21 months / 1.8 years payoff, Month 1: ₹4,500 interest vs ₹5,500 principal, ₹2,10,000 total cash repaid, ₹60,000 total interest accrued / 28.6% of outflow), analysis of the brutal "Minimum Payment Trap" (5% minimum due takes 14+ years and costs ₹1.85L+ interest vs 21 months and ₹60k with fixed ₹10k payment), debt elimination frameworks (Debt Avalanche vs Snowball, personal loan consolidation, 0% balance transfer cards), and real-world card mechanics (zero new purchases assumption, 18% GST on Indian card finance charges inflating 36% APR to 42.48%, and voided interest-free grace periods).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcCreditCardPayoff`, 5 FAQs matching JSON-LD schema, and curated related links (`debt-to-income-ratio-calculator`, `loan-amortization-calculator`, `loan-affordability-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **040. loan-amortization-calculator (/loan-amortization-calculator)**:
+  - Audited: Detailed multi-period reducing-balance amortization model computing EMI, period-by-period interest/principal splits, and balance trajectories.
+  - Changes: Added complete 6-stage mathematical amortization equations (monthly periodic rate, EMI closed-form derivation, period interest accrual, principal component, ending balance), comprehensive step-by-step worked example schedule matching default inputs (₹10,00,000 principal, 9.50% annual interest rate over 5 years / 60 months → ₹21,002/month EMI, Month 1: ₹7,917 interest vs ₹13,085 principal, Year 1 cumulative: ₹1.65L principal / ₹87.5k interest, Year 3 midpoint balance ₹4.54L with interest down to 17%, ₹10,00,000 principal repaid (79.4%), ₹2,60,112 total interest payable (20.6%), ₹12,60,112 total repayment), critical analysis of the deceptive "Flat Interest Rate Trap" (a 9.5% flat rate costs ₹4,75,000 interest — nearly double reducing-balance interest — carrying an effective APR of 17.5%), prepayment timing impact (prepaying ₹1L in Month 12 saves 7 months and ₹42,000 interest), and practical lending assumptions (uniform monthly payment dates, floating rate benchmark adjustments, origination fee exclusions).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcAmortization`, 5 FAQs matching JSON-LD schema, and curated related links (`loan-prepayment-calculator`, `emi-calculator`, `mortgage-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
