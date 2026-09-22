@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:01:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:02:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 15
-- **IN_PROGRESS:** 016. gst-calculator
+- **COMPLETED:** 16
+- **IN_PROGRESS:** NONE
 - **NEXT:** 017. hra-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** income-tax-calculator
-- **LAST_COMMIT:** 02562d1
+- **LAST_COMPLETED_UNIT:** gst-calculator
+- **LAST_COMMIT:** e73f182
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -33,7 +33,7 @@
 - [x] 013. car-loan-calculator — DONE
 - [x] 014. loan-prepayment-calculator — DONE
 - [x] 015. income-tax-calculator — DONE (Phase 5 Locked, India Tax Protected, Intentionally Preserved)
-- [ ] 016. gst-calculator — IN PROGRESS (India Tax Protected)
+- [x] 016. gst-calculator — DONE (India Tax Protected)
 - [ ] 017. hra-calculator — PENDING (India Tax Protected)
 - [ ] 018. upi-mdr-calculator — PENDING
 - [ ] 019. break-even-calculator — PENDING (Phase 5 Locked)
@@ -149,3 +149,9 @@
 - **015. income-tax-calculator (/in/income-tax-calculator)**:
   - Audited: Phase 5 Locked & Phase 7/8 India Tax Protected Calculator. Verified New Tax Regime (Budget 2024 / FY 2024-25 / AY 2025-26) vs Old Tax Regime comparative model, ₹75,000 salaried standard deduction, Section 87A rebate rules, complete New vs Old tax slabs table, step-by-step worked example (₹12L CTC with ₹2.25L deductions → ₹71,500 New Regime vs ₹1,01,400 Old Regime, saving ₹29,900), comprehensive assumptions/legal notes, 5 targeted FAQs, strict INR jurisdiction lock, and related calculators.
   - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **016. gst-calculator (/in/gst-calculator)**:
+  - Audited: India Goods and Services Tax model with inclusive/exclusive modes and intra-state (CGST+SGST) vs inter-state (IGST) supply classification.
+  - Changes: Added step-by-step dual worked examples for both B2B exclusive invoice (₹10,000 base at 18% → ₹900 CGST + ₹900 SGST = ₹11,800 total) and retail inclusive MRP (₹10,000 gross at 18% → ₹8,475 base + ₹1,525 GST split into ₹762.50 CGST + ₹762.50 SGST), added comprehensive statutory GST rate slabs table across 0%, 5%, 12%, 18%, and 28% tiers with representative goods/services, and added statutory compliance guidance (Input Tax Credit / GSTR-2B matching, GST Compensation Cess rules, mandatory ₹40L/₹20L turnover registration thresholds, and legal Place of Supply rules).
+  - Preserved: Strict INR jurisdiction lock, Phase 7/8 regulatory baseline, authoritative CBIC source link, verified date, statutory disclaimers, calculation engine `calcGST`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.

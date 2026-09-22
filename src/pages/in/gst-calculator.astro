@@ -242,14 +242,117 @@ const jsonld = {
 
     <Fragment slot="below">
       <section aria-labelledby="gst-calculator-how">
-        <h2 id="gst-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Indian GST is calculated</h2>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Add GST (Exclusive):</strong> GST Amount = (Base Price × Slab Rate) ÷ 100. Total = Base Price + GST Amount.<br />
-            <strong>Remove GST (Inclusive):</strong> Base Price = (Total Gross Amount × 100) ÷ (100 + Slab Rate). GST Amount = Total Gross − Base Price.<br />
-            <strong>Intra-State:</strong> CGST = SGST = GST Amount ÷ 2.<br />
-            <strong>Inter-State:</strong> IGST = Full GST Amount.
-          </p>
+        <h2 id="gst-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Indian GST is computed</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Under the Goods and Services Tax (GST) regime in India, tax liability is computed differently based on whether the quoted price is tax-exclusive (base cost) or tax-inclusive (retail MRP):
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
+          <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+            <h3 class="font-bold text-text-primary">1. Adding GST (Tax-Exclusive Base Price)</h3>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">GST Amount = (Base Price × Slab Rate) ÷ 100</p>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">Total Invoice Amount = Base Price + GST Amount</p>
+            <p class="text-xs">Used for business-to-business (B2B) quotations, professional billing, and commercial procurement contracts.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+            <h3 class="font-bold text-text-primary">2. Removing GST (Tax-Inclusive MRP)</h3>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">Base Price = (Gross Amount × 100) ÷ (100 + Slab Rate)</p>
+            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">GST Amount = Gross Amount − Base Price</p>
+            <p class="text-xs">Used to extract the embedded tax component and underlying pre-tax cost from consumer retail products and MRP tags.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="gst-worked-examples">
+        <h2 id="gst-worked-examples" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked examples (18% Slab)</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
+          <div class="bg-surface border border-border rounded-card p-5 space-y-3">
+            <h3 class="font-bold text-text-primary border-b border-border/50 pb-2">Example A: Exclusive Invoice (Add GST)</h3>
+            <p class="text-xs">A software consultant bills a client within Karnataka for <strong>₹10,000</strong> net professional fees:</p>
+            <div class="space-y-1.5 text-xs">
+              <div class="flex justify-between"><span>Base Taxable Value:</span><strong class="font-mono text-text-primary">₹10,000</strong></div>
+              <div class="flex justify-between"><span>CGST @ 9%:</span><strong class="font-mono text-text-primary">₹900</strong></div>
+              <div class="flex justify-between"><span>SGST @ 9%:</span><strong class="font-mono text-text-primary">₹900</strong></div>
+              <div class="flex justify-between border-t border-border/50 pt-1.5 font-bold"><span>Total Invoice Receivable:</span><strong class="font-mono text-accent">₹11,800</strong></div>
+            </div>
+            <p class="text-xs text-text-muted pt-1">If the client were in Maharashtra (inter-state), a single <strong>IGST of ₹1,800 (18%)</strong> would apply instead.</p>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5 space-y-3">
+            <h3 class="font-bold text-text-primary border-b border-border/50 pb-2">Example B: Inclusive Retail MRP (Remove GST)</h3>
+            <p class="text-xs">A customer purchases a smartphone accessory priced at <strong>₹10,000</strong> inclusive of 18% GST:</p>
+            <div class="space-y-1.5 text-xs">
+              <div class="flex justify-between"><span>Gross Retail Price (MRP):</span><strong class="font-mono text-text-primary">₹10,000</strong></div>
+              <div class="flex justify-between"><span>Computed Base Price:</span><strong class="font-mono text-text-primary">₹8,475</strong></div>
+              <div class="flex justify-between"><span>CGST Component (9%):</span><strong class="font-mono text-text-primary">₹762.50</strong></div>
+              <div class="flex justify-between"><span>SGST Component (9%):</span><strong class="font-mono text-text-primary">₹762.50</strong></div>
+              <div class="flex justify-between border-t border-border/50 pt-1.5 font-bold"><span>Total Embedded GST (18%):</span><strong class="font-mono text-accent">₹1,525</strong></div>
+            </div>
+            <p class="text-xs text-text-muted pt-1">The seller retains ₹8,475 as net product revenue and remits ₹1,525 to the government tax portal.</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="gst-slabs-overview">
+        <h2 id="gst-slabs-overview" class="text-xl font-bold text-text-primary mb-4">India statutory GST rate slabs & item coverage</h2>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="p-3">Slab Rate</th>
+                <th class="p-3">Classification</th>
+                <th class="p-3">Representative Goods & Services</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted text-xs">
+              <tr>
+                <td class="p-3 font-bold text-text-primary font-mono">0% (Exempt)</td>
+                <td class="p-3">Essential Staples</td>
+                <td class="p-3">Unpackaged fresh produce, milk, eggs, salt, curd, bread, municipal water.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-text-primary font-mono">5%</td>
+                <td class="p-3">Household Essentials</td>
+                <td class="p-3">Packaged food, edible oils, sugar, tea, domestic LPG, economy transport, life-saving medicines.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-text-primary font-mono">12%</td>
+                <td class="p-3">Standard Lower Tier</td>
+                <td class="p-3">Processed foods, fruit juices, dairy products (butter/ghee), non-AC hotel rooms, cellular phones.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-text-primary font-mono">18%</td>
+                <td class="p-3">Standard General Tier</td>
+                <td class="p-3">IT services, software, telecom, banking & financial services, capital goods, restaurants, consumer goods.</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-text-primary font-mono">28%</td>
+                <td class="p-3">Luxury & Demerit</td>
+                <td class="p-3">Motor vehicles, luxury motorcycles (>350cc), air conditioners, aerated drinks, pan masala, online gaming.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section aria-labelledby="gst-compliance-notes">
+        <h2 id="gst-compliance-notes" class="text-xl font-bold text-text-primary mb-4">Input Tax Credit (ITC) & compliance rules</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Input Tax Credit (ITC) Mechanism</h3>
+            <p>GST-registered entities can offset GST paid on inbound raw materials and capital purchases against outbound tax obligations, preventing tax-on-tax cascading provided invoices match auto-populated GSTR-2B records.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">GST Compensation Cess Note</h3>
+            <p>Specific demerit and luxury items (such as SUVs, tobacco, and aerated waters) attract an additional statutory GST Compensation Cess on top of the 28% peak slab, which must be verified against CBIC tariff schedules.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Mandatory Registration Thresholds</h3>
+            <p>Suppliers of goods must register if aggregate turnover exceeds ₹40 Lakh (₹20 Lakh for special category states). Service providers must register above ₹20 Lakh (₹10 Lakh for special category states).</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Place of Supply Rules</h3>
+            <p>Tax classification strictly follows the legal Place of Supply: Intra-state (supplier and recipient in the same state) splits 50:50 into CGST and SGST; Inter-state supplies remit 100% as IGST to the Union government.</p>
+          </div>
         </div>
       </section>
 
