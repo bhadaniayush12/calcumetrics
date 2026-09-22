@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:30:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:35:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 7
-- **IN_PROGRESS:** 008. cash-conversion-cycle
-- **NEXT:** 009. advance-tax-guide
+- **COMPLETED_ARTICLES:** 8
+- **IN_PROGRESS:** 009. advance-tax-guide
+- **NEXT:** 010. real-rate-of-return
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** flat-vs-reducing-interest-rate
-- **LAST_COMMIT:** e82605e
+- **LAST_COMPLETED_ARTICLE:** cash-conversion-cycle
+- **LAST_COMMIT:** 10420eb
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (72 pages)
+- **BUILD_STATUS:** PASS (73 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -25,8 +25,8 @@
 - [x] 005. markup-vs-margin — DONE (Evergreen)
 - [x] 006. npv-vs-irr — DONE (Evergreen)
 - [x] 007. flat-vs-reducing-interest-rate — DONE (Evergreen)
-- [ ] 008. cash-conversion-cycle — IN PROGRESS (Evergreen)
-- [ ] 009. advance-tax-guide — PENDING (Evergreen/Statutory)
+- [x] 008. cash-conversion-cycle — DONE (Evergreen)
+- [ ] 009. advance-tax-guide — IN PROGRESS (Evergreen/Statutory)
 - [ ] 010. real-rate-of-return — PENDING (Evergreen)
 
 ---
@@ -125,5 +125,14 @@
   - Linked Calculators: `/interest-rate-calculator`, `/car-loan-calculator`, `/emi-calculator`, `/loan-amortization-calculator`.
   - Reciprocal Linking Added: Contextual educational callouts added to `/interest-rate-calculator` and `/car-loan-calculator`.
   - Key Content: Mechanics of flat interest calculation and why it ignores principal amortization, reducing balance formula and declining balance charge mechanics, analytical approximation formula `Reducing Rate ≈ Flat Rate × [2n / (n + 1)]`, multi-tenure conversion matrix (6% to 15% flat across 3-year and 5-year tenures), worked ₹10,00,000 5-year car loan case study comparing Dealership 8.5% flat (₹4.25L interest, 15.84% APR, ₹23,750 EMI) against Commercial Bank 14.0% reducing (₹3.96L interest, 14.00% APR, ₹23,268 EMI), and RBI Key Facts Statement (KFS) consumer protections.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+
+- **008. cash-conversion-cycle (/blog/cash-conversion-cycle)**:
+  - Title: The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency
+  - Intent: Explain why GAAP profit does not prevent operational insolvency, detail the working capital velocity formula `CCC = DIO + DSO - DPO`, illustrate negative float models (Apple/Amazon), and offer 5 balance sheet acceleration levers.
+  - Linked Calculators: `/cash-conversion-cycle-calculator`, `/working-capital-calculator`, `/inventory-turnover-calculator`, `/dscr-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/cash-conversion-cycle-calculator` and `/working-capital-calculator`.
+  - Key Content: The profitable insolvency paradox, comparison between the Operating Cycle ($DIO + DSO$) and Cash Conversion Cycle ($DIO + DSO - DPO$), detailed breakdown of the 3 pillars (DIO, DSO, DPO), cross-sector industry benchmarks table (Amazon -32d, Walmart +2d, Apple -71d, Auto OEM +35d, Industrial Machinery +110d, B2B SaaS +15d), Apple's negative working capital float case study (holding cash for 71 days before supplier disbursement), and 5 practical operational interventions (2/10 Net 30 trade discounts, SKU culling, automated dunning, supplier terms negotiation, and milestone billing).
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
