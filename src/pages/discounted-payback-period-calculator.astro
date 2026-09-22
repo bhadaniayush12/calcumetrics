@@ -214,47 +214,153 @@ const jsonld = {
 
     <Fragment slot="below">
       <section aria-labelledby="dpp-how">
-        <h2 id="dpp-how" class="text-xl font-bold text-text-primary mb-4">How the Discounted Payback Period works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">Unlike the simple payback period, DPP adjusts each future cash inflow for the time value of money before accumulating them toward the initial investment. This makes it a more conservative and theoretically rigorous measure.</p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
-          <p class="text-base font-mono text-text-primary mb-3">Discounted CF(t) = CF(t) / (1 + r)^t</p>
-          <p class="text-base font-mono text-text-primary mb-3">DPP = smallest t where Σ Discounted CF ≥ Initial Investment</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">CF(t)</strong> — Nominal cash inflow in year t</li>
-            <li><strong class="text-text-primary">r</strong> — Annual discount rate</li>
-            <li><strong class="text-text-primary">t</strong> — Year number (starting at 1)</li>
-          </ul>
+        <h2 id="dpp-how" class="text-xl font-bold text-text-primary mb-4">How the Discounted Payback Period Works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The Discounted Payback Period (DPP) is a capital budgeting metric that determines the exact time required for an investment to break even on a time-value-adjusted basis. Unlike the traditional simple payback period, which treats a dollar received ten years from now as equivalent to a dollar today, DPP discounts every future cash inflow by the company's cost of capital (WACC or hurdle rate) before accumulating it toward the initial outlay:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Present Value of Period Inflow:</strong> PV(t) = CF(t) &divide; (1 + r)<sup>t</sup><br /><br />
+            <strong>2. Cumulative Discounted Cash Flow:</strong> CumPV(t) = &Sigma;<sub>i=1</sub><sup>t</sup> PV(i)<br /><br />
+            <strong>3. Fractional Payback Period:</strong> DPP = (E &minus; 1) + [ (Initial Capital &minus; CumPV<sub>E&minus;1</sub>) &divide; PV<sub>E</sub> ]<br />
+            &bull; Where <em>E</em> represents the breakthrough period where CumPV &ge; Initial Investment.<br /><br />
+            <strong>4. Mathematical Divergence:</strong> For any positive discount rate (r &gt; 0), DPP &ge; Simple Payback Period.<br /><br />
+            <strong>5. Net Present Value Relationship:</strong> A project achieves full discounted payback within its lifespan if and only if NPV &ge; 0.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an enterprise evaluating an initial capital expenditure of <strong>₹10,00,000</strong> with a corporate cost of capital of <strong>10.00%</strong> and projected 5-year nominal cash inflows of ₹3,00,000, ₹3,50,000, ₹4,00,000, ₹4,00,000, and ₹5,00,000:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Project Year (t)</th>
+                <th class="py-2.5 px-4">Nominal Inflow</th>
+                <th class="py-2.5 px-4">10% Discount Factor</th>
+                <th class="py-2.5 px-4">Discounted Cash Flow (PV)</th>
+                <th class="py-2.5 px-4">Cumulative Discounted PV</th>
+                <th class="py-2.5 px-4">Unrecovered Outlay</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 0 (Outlay)</td>
+                <td class="py-2.5 px-4 font-mono text-red-400">&minus;₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono">1.0000</td>
+                <td class="py-2.5 px-4 font-mono text-red-400">&minus;₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-red-400">&minus;₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono">₹10,00,000</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 1</td>
+                <td class="py-2.5 px-4 font-mono">₹3,00,000</td>
+                <td class="py-2.5 px-4 font-mono">0.9091</td>
+                <td class="py-2.5 px-4 font-mono">₹2,72,727</td>
+                <td class="py-2.5 px-4 font-mono">₹2,72,727</td>
+                <td class="py-2.5 px-4 font-mono">₹7,27,273</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 2</td>
+                <td class="py-2.5 px-4 font-mono">₹3,50,000</td>
+                <td class="py-2.5 px-4 font-mono">0.8264</td>
+                <td class="py-2.5 px-4 font-mono">₹2,89,256</td>
+                <td class="py-2.5 px-4 font-mono">₹5,61,983</td>
+                <td class="py-2.5 px-4 font-mono">₹4,38,017</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 3</td>
+                <td class="py-2.5 px-4 font-mono">₹4,00,000</td>
+                <td class="py-2.5 px-4 font-mono">0.7513</td>
+                <td class="py-2.5 px-4 font-mono">₹3,00,526</td>
+                <td class="py-2.5 px-4 font-mono">₹8,62,509</td>
+                <td class="py-2.5 px-4 font-mono">₹1,37,491</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Year 4 (Breakeven)</td>
+                <td class="py-2.5 px-4 font-mono">₹4,00,000</td>
+                <td class="py-2.5 px-4 font-mono">0.6830</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹2,73,205</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-accent">₹11,35,715</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">Fully Recovered</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Year 5</td>
+                <td class="py-2.5 px-4 font-mono">₹5,00,000</td>
+                <td class="py-2.5 px-4 font-mono">0.6209</td>
+                <td class="py-2.5 px-4 font-mono">₹3,10,461</td>
+                <td class="py-2.5 px-4 font-mono">₹14,46,176</td>
+                <td class="py-2.5 px-4 font-mono text-dark-accent">+₹4,46,176 NPV</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Payback Summary</td>
+                <td class="py-3 px-4" colspan="2">Simple Payback = <strong>2.9 Years</strong> (unadjusted)</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary text-base" colspan="2">DPP = 3.5 Years</td>
+                <td class="py-3 px-4">Time-value gap: +0.6 years</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Capital Budgeting Decision Benchmarks</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Hurdle Comparison:</strong> Accept capital projects where <strong>DPP &le; Maximum Cut-Off Target</strong> established by the investment committee.</li>
+              <li><strong>Technology &amp; Software (&le;2–3 Years):</strong> High obsolescence risk demands rapid capital recovery before next-generation platform disruption.</li>
+              <li><strong>Heavy Manufacturing (&le;5 Years):</strong> Balanced recovery threshold providing sufficient time to generate cumulative operating margin.</li>
+              <li><strong>Infrastructure &amp; Energy (&le;8–12 Years):</strong> Extended asset useful lives tolerate longer discounted payback periods backed by utility-grade contracts.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Analytical Strengths &amp; Limitations</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              While DPP resolves the fatal flaw of simple payback, financial analysts must consider its boundary constraints:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>The Post-Payback Blind Spot:</strong> DPP completely ignores all cash inflows generated after the breakeven threshold. A project yielding massive returns in Year 5 receives zero credit in the DPP score.</li>
+              <li><strong>Complementary Tool Pairing:</strong> Always evaluate DPP in tandem with <strong>Net Present Value (NPV)</strong> for total shareholder wealth creation and <strong>Internal Rate of Return (IRR)</strong> for capital efficiency.</li>
+            </ul>
+          </div>
         </div>
       </section>
 
       <section aria-labelledby="dpp-faq">
         <h2 id="dpp-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What is the discounted payback period?', 'The DPP is the time to recover an initial investment from cumulative present-value-adjusted future cash flows — the time-value-aware version of the simple payback period.'],
-            ['Why is DPP always longer than simple payback?', 'Discounting reduces each period\'s contribution to recovery. More time is needed to accumulate the same total when cash flows are discounted.'],
-            ['What discount rate should I use?', 'Use the project\'s WACC, the firm\'s required rate of return, or the cost of capital. The discount rate should reflect the risk profile of the cash flows.'],
-            ['How is DPP different from NPV?', 'NPV measures total value created over the project\'s life. DPP only measures time to break even and ignores all cash flows after the break-even point.'],
-            ['What if the investment is never recovered?', 'If cumulative discounted inflows never reach the initial investment, DPP is infinite — the project never recoups its cost in present-value terms. This is a strong signal to reconsider.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
       </section>
 
       <section aria-labelledby="dpp-related">
-        <h2 id="dpp-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <h2 id="dpp-related" class="text-xl font-bold text-text-primary mb-4">Related corporate finance calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
-              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
-              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
-              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
-            </a>
-          ))}
+          <a href="/npv-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Corporate Finance</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">NPV Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compute Net Present Value to measure total shareholder wealth creation across project lifetimes.</p>
+          </a>
+          <a href="/irr-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Corporate Finance</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">IRR Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine the Internal Rate of Return where project discounted cash flows equal initial capital cost.</p>
+          </a>
+          <a href="/payback-period-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Corporate Finance</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Payback Period Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate simple undiscounted breakeven recovery duration from annual cash flows.</p>
+          </a>
         </div>
       </section>
     </Fragment>

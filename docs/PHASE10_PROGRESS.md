@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:51:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:53:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 47
-- **IN_PROGRESS:** 048. discounted-payback-period-calculator
-- **NEXT:** 049. present-value-calculator
+- **COMPLETED:** 48
+- **IN_PROGRESS:** 049. present-value-calculator
+- **NEXT:** 050. future-value-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** dscr-calculator
-- **LAST_COMMIT:** f66748e
+- **LAST_COMPLETED_UNIT:** discounted-payback-period-calculator
+- **LAST_COMMIT:** ec0d706
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -65,8 +65,8 @@
 - [x] 045. salary-ctc-calculator — DONE (India Tax Protected)
 - [x] 046. cash-conversion-cycle-calculator — DONE
 - [x] 047. dscr-calculator — DONE
-- [ ] 048. discounted-payback-period-calculator — IN PROGRESS
-- [ ] 049. present-value-calculator — PENDING
+- [x] 048. discounted-payback-period-calculator — DONE
+- [ ] 049. present-value-calculator — IN PROGRESS
 - [ ] 050. future-value-calculator — PENDING
 
 ---
@@ -332,4 +332,10 @@
   - Audited: Commercial credit and term debt underwriting engine evaluating Debt Service Coverage Ratio (DSCR) from Net Operating Income (NOI / EBITDA) and annual debt obligations.
   - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added comprehensive solvency equations (DSCR = NOI &divide; Debt Service, debt service principal + interest breakdown, free cash flow cushion buffer margin, maximum borrowing capacity derivation at target covenant), complete step-by-step worked example schedule matching default inputs (₹15,00,000 NOI, ₹10,00,000 Total Debt Service → 1.50x DSCR / 150.0% coverage, ₹5,00,000 unencumbered cash cushion / 33.3% of NOI, ₹12,00,000 max allowable debt service at standard 1.25x bank covenant with ₹2,00,000 unused borrowing headroom), institutional lender underwriting tiers (&lt;1.00x critical default vs 1.20–1.25x commercial floor vs 1.35–1.50x prime vs &ge;2.00x low leverage), and critical analysis of DSCR vs Interest Coverage Ratio (ICR) illustrating how ignoring contractual principal amortization creates deceptive solvency traps.
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcDSCR`, composition bar visualization, 5 FAQs matching JSON-LD schema, and curated related links (`/working-capital-calculator`, `/cash-conversion-cycle-calculator`, `/loan-amortization-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **048. discounted-payback-period-calculator (/discounted-payback-period-calculator)**:
+  - Audited: Corporate capital budgeting break-even engine computing Discounted Payback Period (DPP) from time-value-adjusted cash inflows, discount rate (WACC), and upfront capital expenditure.
+  - Changes: Deepened below-the-fold content in `<Fragment slot="below">`, added 5-stage time-value capital recovery mathematical formulations (period present value derivation, cumulative discounted flow summation, linear fractional breakeven interpolation, positive rate divergence `DPP ≥ SPP`, NPV relationship), comprehensive step-by-step 5-year worked example schedule matching default inputs (₹10,00,000 initial outlay, 10.00% discount rate, cash flows of ₹3L, ₹3.5L, ₹4L, ₹4L, ₹5L → Year 1: ₹2,72,727 PV; Year 2: ₹2,89,256 PV / ₹5,61,983 cum; Year 3: ₹3,00,526 PV / ₹8,62,509 cum / ₹1,37,491 unrecovered; Year 4: ₹2,73,205 PV / ₹11,35,715 cum → DPP = 3.5 years, contrasting with 2.9 years simple undiscounted payback, a 0.6-year time-value latency gap; Year 5: ₹14,46,176 total PV / +₹4,46,176 NPV), capital budgeting decision thresholds by industry (&le;2–3 yrs tech vs &le;5 yrs manufacturing vs &le;8–12 yrs infrastructure), and critical analytical limitations (the post-payback blind spot ignoring cash flows after breakeven, necessity of multi-metric pairing with NPV and IRR).
+  - Preserved: Clean interactive inputs with sliders and dynamic year add/remove controls, calculation engine `calcDiscountedPayback`, 5 FAQs matching JSON-LD schema, and curated related links (`/npv-calculator`, `/irr-calculator`, `/payback-period-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
