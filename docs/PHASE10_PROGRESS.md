@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:51:35+05:30
+- **LAST_UPDATED:** 2026-09-23T03:52:45+05:30
 - **TOTAL:** 50
 - **COMPLETED:** 8
-- **IN_PROGRESS:** NONE
-- **NEXT:** 009. ppf-calculator
+- **IN_PROGRESS:** ppf-calculator
+- **NEXT:** 010. 401k-calculator
 - **BLOCKER:** NONE
 - **LAST_COMPLETED_UNIT:** rd-calculator
-- **LAST_COMMIT:** 9e46abd
+- **LAST_COMMIT:** bd7fc5c
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -26,7 +26,7 @@
 - [x] 006. xirr-calculator — DONE
 - [x] 007. fd-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 008. rd-calculator — DONE
-- [ ] 009. ppf-calculator — PENDING
+- [ ] 009. ppf-calculator — IN PROGRESS
 - [ ] 010. 401k-calculator — PENDING
 - [ ] 011. emi-calculator — PENDING (Phase 5 Locked)
 - [ ] 012. home-loan-calculator — PENDING
