@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:34:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:35:10+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 41
-- **IN_PROGRESS:** 042. tds-calculator
-- **NEXT:** 043. capital-gains-tax-calculator
+- **COMPLETED:** 42
+- **IN_PROGRESS:** 043. capital-gains-tax-calculator
+- **NEXT:** 044. advance-tax-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** interest-rate-calculator
-- **LAST_COMMIT:** 4662da9
+- **LAST_COMPLETED_UNIT:** tds-calculator
+- **LAST_COMMIT:** ccdac57
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -59,8 +59,8 @@
 - [x] 039. credit-card-payoff-calculator — DONE
 - [x] 040. loan-amortization-calculator — DONE
 - [x] 041. interest-rate-calculator — DONE
-- [ ] 042. tds-calculator — IN PROGRESS (India Tax Protected)
-- [ ] 043. capital-gains-tax-calculator — PENDING (India Tax Protected)
+- [x] 042. tds-calculator — DONE (India Tax Protected)
+- [ ] 043. capital-gains-tax-calculator — IN PROGRESS (India Tax Protected)
 - [ ] 044. advance-tax-calculator — PENDING (India Tax Protected)
 - [ ] 045. salary-ctc-calculator — PENDING (India Tax Protected)
 - [ ] 046. cash-conversion-cycle-calculator — PENDING
@@ -297,3 +297,9 @@
   - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added Newton-Raphson numerical root-finding methodology and formula derivation, complete step-by-step worked example schedule matching default inputs (₹5,00,000 principal, ₹12,000 monthly payment, 5 years / 60 months → 15.40% solved nominal annual APR, 16.53% EAR, ₹7,20,000 total cash repaid, ₹2,20,000 total interest accrued / 30.6% of outflow), extensive exposure of the deceptive "Flat Rate" dealer pitch (where an 8.80% flat quote masks a 15.40% reducing rate), impact of upfront fee deduction on true net borrowing APR (2% fee escalates APR to 16.63%), and mathematical solvency constraints (`EMI × n > P` boundary requirement, &epsilon; &lt; 10<sup>&minus;7</sup> convergence guard).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcImpliedRate`, 5 FAQs matching JSON-LD schema, and curated related links (`loan-amortization-calculator`, `emi-calculator`, `loan-affordability-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection confirmed How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **042. tds-calculator (/in/tds-calculator)**:
+  - Audited: India direct tax withholding engine computing Tax Deducted at Source (TDS), statutory exemption thresholds, and net receivable sums under the Income-tax Act, 1961.
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added 5-stage statutory withholding mathematical equations (threshold gating condition, deduction formula, net payout, and Sec 206AA non-PAN penalty), complete step-by-step worked example schedule matching default inputs (₹1,00,000 professional consulting invoice under Section 194J exceeding ₹30,000 threshold → 10.00% TDS rate, ₹10,000 deposited with Central Govt via Challan 281, ₹90,000 net bank transfer received, ₹10,000 credit reflecting in Form 26AS / AIS), statutory sections & thresholds comparison table (194J professional/technical, 194C contractors, 194I rent, 194A FD interest, 194H commission, 194Q goods), Section 206AA 20% punitive non-PAN / inoperative-PAN rules and Form 15G/15H exemptions, and regulatory nuances (flat statutory rates without surcharge/cess, CBDT Circular 23/2017 GST exclusion rule, Form 16A issuance timeline).
+  - Preserved: Clean interactive inputs, calculation engine `calcTDS`, statutory section rates per Finance Act 2024-25, INR currency locks, 5 FAQs matching JSON-LD schema, and curated related links (`/in/income-tax-calculator`, `/in/advance-tax-calculator`, `/in/salary-ctc-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
