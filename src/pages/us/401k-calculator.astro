@@ -45,7 +45,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -54,6 +54,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
         { '@type': 'ListItem', position: 3, name: '401(k) Calculator (US)' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is employer matching in a 401(k)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Employer match is additional money contributed by your company based on your own contributions. For instance, a 50% match up to 6% of salary means that if you contribute 6% of your $100,000 salary ($6,000), your employer contributes an additional $3,000, bringing total annual contributions to $9,000.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'When can I withdraw from a 401(k) without penalty?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Generally, qualified penalty-free distributions can begin at age 59½. Non-qualified withdrawals prior to 59½ are typically subject to regular income taxes plus an additional 10% early withdrawal tax penalty, barring specific statutory exceptions.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the annual employee contribution limit for a 401(k)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For 2024–2026, the IRS employee elective deferral limit is $23,000 to $23,500 per year, with an additional catch-up contribution permitted for workers aged 50 and older.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between Traditional and Roth 401(k)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A Traditional 401(k) is funded with pre-tax dollars, lowering your taxable income today, and withdrawals in retirement are taxed as ordinary income. A Roth 401(k) is funded with after-tax dollars, but qualified withdrawals in retirement are completely tax-free.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What average annual return rate is realistic for a 401(k)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Historically, broad US equity indices like the S&P 500 have generated long-term nominal annualized returns around 9% to 10% (around 7% real after inflation). Diversified retirement portfolios containing bonds typically project between 6% and 8% p.a.',
+          },
+        },
       ],
     },
   ],
@@ -73,10 +118,18 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmtUSD(result.maturity)}
     heroLabel="Projected 401(k) Balance"
+    calcType="advanced"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">401(k) Calculator (US)</h1>
       <p class="text-sm text-text-muted mb-6">Estimate your retirement balance including employee contributions and employer matching.</p>
+
+      <!-- Error alert -->
+      <div id="k401-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="k401-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Annual Salary -->
       <div class="mb-5">
@@ -89,6 +142,7 @@ const jsonld = {
           localeFormat="western"
           helperText="Gross pre-tax annual income"
           inputmode="decimal"
+          aria-describedby="k401-error-msg"
         />
         <div class="mt-2">
           <Slider id="k401-salary-slider" min={20000} max={500000} step={5000} value={100000} ariaLabel="Annual salary slider" />
@@ -99,84 +153,89 @@ const jsonld = {
       <div class="mb-5">
         <Input
           id="k401-contrib"
-          label="Your Contribution"
+          label="Your Contribution (% of Salary)"
           suffix="%"
           value="8"
           isNumeric={true}
-          helperText="Percentage of salary you contribute each year"
+          helperText="Percentage deducted each paycheck"
           inputmode="decimal"
+          aria-describedby="k401-error-msg"
         />
         <div class="mt-2">
-          <Slider id="k401-contrib-slider" min={1} max={50} step={0.5} value={8} ariaLabel="Employee contribution slider" />
+          <Slider id="k401-contrib-slider" min={1} max={50} step={0.5} value={8} ariaLabel="Contribution slider" />
         </div>
       </div>
 
-      <!-- Employer Match % -->
+      <!-- Employer Match -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
         <div>
           <Input
             id="k401-match"
-            label="Employer Match"
+            label="Employer Match Rate"
             suffix="%"
             value="50"
             isNumeric={true}
-            helperText="e.g. 50% or 100% match"
+            helperText="e.g. 50% match (50c on the dollar)"
             inputmode="decimal"
+            aria-describedby="k401-error-msg"
           />
           <div class="mt-2">
-            <Slider id="k401-match-slider" min={0} max={100} step={5} value={50} ariaLabel="Employer match rate slider" />
+            <Slider id="k401-match-slider" min={0} max={100} step={5} value={50} ariaLabel="Match rate slider" />
           </div>
         </div>
         <div>
           <Input
             id="k401-match-limit"
-            label="Match Limit"
-            suffix="% of Salary"
+            label="Match Capped Up To"
+            suffix="%"
             value="6"
             isNumeric={true}
-            helperText="Maximum salary % matched"
+            helperText="Max % of salary matched by employer"
             inputmode="decimal"
+            aria-describedby="k401-error-msg"
           />
           <div class="mt-2">
-            <Slider id="k401-match-limit-slider" min={0} max={15} step={0.5} value={6} ariaLabel="Employer match ceiling slider" />
+            <Slider id="k401-match-limit-slider" min={0} max={15} step={0.5} value={6} ariaLabel="Match cap slider" />
           </div>
         </div>
       </div>
 
-      <!-- Expected Return & Years -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div>
-          <Input
-            id="k401-rate"
-            label="Annual Return"
-            suffix="%"
-            value="8"
-            isNumeric={true}
-            helperText="Expected annual portfolio growth"
-            inputmode="decimal"
-          />
-          <div class="mt-2">
-            <Slider id="k401-rate-slider" min={1} max={15} step={0.25} value={8} ariaLabel="Annual return rate slider" />
-          </div>
-        </div>
-        <div>
-          <Input
-            id="k401-years"
-            label="Years to Retirement"
-            suffix="Years"
-            value="30"
-            isNumeric={true}
-            helperText="Investment timeframe"
-            inputmode="decimal"
-          />
-          <div class="mt-2">
-            <Slider id="k401-years-slider" min={1} max={45} step={1} value={30} ariaLabel="Years to retirement slider" />
-          </div>
+      <!-- Return Rate -->
+      <div class="mb-5">
+        <Input
+          id="k401-rate"
+          label="Estimated Annual Rate of Return"
+          suffix="%"
+          value="8"
+          isNumeric={true}
+          helperText="Expected annual portfolio compound return"
+          inputmode="decimal"
+          aria-describedby="k401-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="k401-rate-slider" min={1} max={15} step={0.25} value={8} ariaLabel="Return rate slider" />
         </div>
       </div>
 
-      <Alert variant="info" title="IRS 401(k) Limits">
-        For 2025/2026, the IRS employee elective deferral limit is $23,500/year (plus $7,500 catch-up for age 50+). Employer contributions do not count toward this elective limit.
+      <!-- Years to Retire -->
+      <div class="mb-6">
+        <Input
+          id="k401-years"
+          label="Years Until Retirement"
+          suffix="Years"
+          value="30"
+          isNumeric={true}
+          helperText="Time horizon until retirement withdrawals start"
+          inputmode="numeric"
+          aria-describedby="k401-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="k401-years-slider" min={1} max={45} step={1} value={30} ariaLabel="Years slider" />
+        </div>
+      </div>
+
+      <Alert variant="info" title="US Jurisdiction Lock">
+        This calculator operates strictly in US Dollars ($) reflecting US Internal Revenue Code 401(k) contribution rules.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -243,8 +302,8 @@ const jsonld = {
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
           <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Annual Balance Growth:</strong> Balance<sub>t</sub> = (Balance<sub>t-1</sub> + Employee Contribution + Employer Match) × (1 + r)<br />
-            <strong>Employer Match Formula:</strong> Min(Your Contribution %, Match Cap %) × Salary × Match Rate %
+            <strong>Annual Balance Growth:</strong> Balance<sub>t</sub> = (Balance<sub>t-1</sub> + Employee Contribution + Employer Match) &times; (1 + r)<br />
+            <strong>Employer Match Formula:</strong> Min(Your Contribution %, Match Cap %) &times; Salary &times; Match Rate %
           </p>
         </div>
       </section>
@@ -252,18 +311,18 @@ const jsonld = {
       <section aria-labelledby="k401-calculator-faq">
         <h2 id="k401-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is employer matching in a 401(k)?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Employer match is additional money contributed by your company based on how much you save. For example, a 50% match up to 6% means if you earn $100,000 and save 6% ($6,000), your company contributes $3,000, boosting your total annual savings to $9,000.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When can I withdraw without penalty?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Generally, you can make qualified penalty-free withdrawals starting at age 59½. Withdrawals prior to this age may be subject to ordinary income tax plus an additional 10% IRS early withdrawal penalty, subject to specific exceptions.
-            </div>
-          </details>
+          {[
+            ['What is employer matching in a 401(k)?', 'Employer match is additional money contributed by your company based on your own contributions. For instance, a 50% match up to 6% of salary means that if you contribute 6% of your $100,000 salary ($6,000), your employer contributes an additional $3,000, bringing total annual contributions to $9,000.'],
+            ['When can I withdraw from a 401(k) without penalty?', 'Generally, qualified penalty-free distributions can begin at age 59½. Non-qualified withdrawals prior to 59½ are typically subject to regular income taxes plus an additional 10% early withdrawal tax penalty, barring specific statutory exceptions.'],
+            ['What is the annual employee contribution limit for a 401(k)?', 'For 2024–2026, the IRS employee elective deferral limit is $23,000 to $23,500 per year, with an additional catch-up contribution permitted for workers aged 50 and older.'],
+            ['What is the difference between Traditional and Roth 401(k)?', 'A Traditional 401(k) is funded with pre-tax dollars, lowering your taxable income today, and withdrawals in retirement are taxed as ordinary income. A Roth 401(k) is funded with after-tax dollars, but qualified withdrawals in retirement are completely tax-free.'],
+            ['What average annual return rate is realistic for a 401(k)?', 'Historically, broad US equity indices like the S&P 500 have generated long-term nominal annualized returns around 9% to 10% (around 7% real after inflation). Diversified retirement portfolios containing bonds typically project between 6% and 8% p.a.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -284,38 +343,14 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calc401KClient(salary: number, contribPct: number, matchPct: number, matchUpTo: number, ratePct: number, years: number) {
-    const rate = ratePct / 100;
-    const empContrib = salary * (contribPct / 100);
-    const matchable = salary * (Math.min(contribPct, matchUpTo) / 100);
-    const erContrib = matchable * (matchPct / 100);
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+  import { calc401K } from '../../lib/calculators/401k';
 
-    let balance = 0;
-    let totalEmp = 0;
-    let totalEr = 0;
-
-    for (let yr = 1; yr <= years; yr++) {
-      balance = (balance + empContrib + erContrib) * (1 + rate);
-      totalEmp += empContrib;
-      totalEr += erContrib;
-    }
-
-    const totalContrib = totalEmp + totalEr;
-    const gain = Math.max(0, balance - totalContrib);
-
-    return {
-      maturity: balance,
-      employeeContributed: totalEmp,
-      employerContributed: totalEr,
-      totalContributed: totalContrib,
-      gain,
-      contributedFraction: balance > 0 ? totalContrib / balance : 0,
-      gainFraction: balance > 0 ? gain / balance : 0,
-    };
-  }
-
-  let currSym = '$';
-  let currLocale = 'en-US';
+  // Strict USD jurisdiction lock
+  const currSym = '$';
+  const currLocale = 'en-US';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -325,6 +360,9 @@ const jsonld = {
   }
 
   function init401KCalc() {
+    if ((window as any).__cm401KBound) return;
+    (window as any).__cm401KBound = true;
+
     const salaryInput = document.getElementById('k401-salary') as HTMLInputElement | null;
     const contribInput = document.getElementById('k401-contrib') as HTMLInputElement | null;
     const matchInput = document.getElementById('k401-match') as HTMLInputElement | null;
@@ -344,35 +382,71 @@ const jsonld = {
     const resEr = document.getElementById('k401-result-er');
     const resTotalContrib = document.getElementById('k401-result-total-contrib');
     const resGain = document.getElementById('k401-result-gain');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('k401-error-alert');
+    const errMsg = document.getElementById('k401-error-msg');
 
     if (!salaryInput || !contribInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { salary: 100000, contrib: 8, match: 50, matchLimit: 6, rate: 8, years: 30 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const sal = parse(salaryInput.value);
-      const con = parseFloat(contribInput.value) || 0;
-      const mat = parseFloat(matchInput ? matchInput.value : '50') || 0;
-      const lim = parseFloat(matchLimitInput ? matchLimitInput.value : '6') || 0;
-      const r = parseFloat(rateInput.value) || 0;
-      const y = parseInt(yearsInput.value) || 0;
+      const rawSal = salaryInput!.value.replace(/[^0-9.]/g, '');
+      const rawCon = contribInput!.value.replace(/[^0-9.]/g, '');
+      const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
+      const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
+      const rawR = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawY = yearsInput!.value.replace(/[^0-9.]/g, '');
 
-      if (sal <= 0 || y <= 0) return;
+      const vSal = validate(rawSal, { required: true, min: 1000, label: 'Annual Salary' });
+      const vCon = validate(rawCon, { required: true, min: 0, max: 100, decimal: true, label: 'Contribution %' });
+      const vMat = validate(rawMat, { required: true, min: 0, max: 200, decimal: true, label: 'Employer Match %' });
+      const vLim = validate(rawLim, { required: true, min: 0, max: 100, decimal: true, label: 'Match Cap %' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 25, decimal: true, label: 'Return Rate' });
+      const vY = validate(rawY, { required: true, min: 1, max: 50, integer: true, label: 'Years to Retirement' });
 
-      const res = calc401KClient(sal, con, mat, lim, r, y);
+      if (!vSal.valid) { showError(vSal.error!.message); return; }
+      if (!vCon.valid) { showError(vCon.error!.message); return; }
+      if (!vMat.valid) { showError(vMat.error!.message); return; }
+      if (!vLim.valid) { showError(vLim.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vY.valid) { showError(vY.error!.message); return; }
+      clearError();
+
+      const sal = vSal.value!;
+      const con = vCon.value!;
+      const mat = vMat.value!;
+      const lim = vLim.value!;
+      const r = vR.value!;
+      const y = vY.value!;
+
+      const res = calc401K(sal, con, mat, lim, r, y);
+
+      setResult({
+        heroValue: fmtVal(res.maturity),
+        heroLabel: 'Projected 401(k) Balance',
+        rows: [
+          { label: 'Your Contributions', value: fmtVal(res.employeeContributed) },
+          { label: 'Employer Match', value: fmtVal(res.employerContributed) },
+          { label: 'Total Contributed', value: fmtVal(res.totalContributed) },
+          { label: 'Compound Growth / Gains', value: fmtVal(res.gain) },
+        ],
+      });
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resEmp) resEmp.textContent = fmtVal(res.employeeContributed);
       if (resEr) resEr.textContent = fmtVal(res.employerContributed);
       if (resTotalContrib) resTotalContrib.textContent = fmtVal(res.totalContributed);
       if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
 
       const wrapper = document.getElementById('k401-composition-wrapper');
       if (wrapper && res.maturity > 0) {
@@ -385,7 +459,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', `#s=${sal}&c=${con}&m=${mat}&l=${lim}&r=${r}&y=${y}`);
+      history.replaceState(null, '', serializeHash({ s: sal, c: con, m: mat, l: lim, r, y }));
     }
 
     function debounce() {
@@ -455,6 +529,7 @@ const jsonld = {
         yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (45 - 1)) * 100}%`);
       }
 
+      clearError();
       recalc();
       salaryInput.focus();
     });
@@ -465,16 +540,25 @@ const jsonld = {
       });
     });
 
-    // Copy & Share
     document.getElementById('k401-copy-btn')?.addEventListener('click', async () => {
-      const sal = parse(salaryInput.value);
-      const con = parseFloat(contribInput.value) || 0;
-      const mat = parseFloat(matchInput ? matchInput.value : '50') || 0;
-      const lim = parseFloat(matchLimitInput ? matchLimitInput.value : '6') || 0;
-      const r = parseFloat(rateInput.value) || 0;
-      const y = parseInt(yearsInput.value) || 0;
-      const res = calc401KClient(sal, con, mat, lim, r, y);
-      const text = `401(k) Projection: Salary ${fmtVal(sal)}, saving ${con}% with ${mat}% match up to ${lim}% at ${r}% for ${y} years => Retirement balance: ${fmtVal(res.maturity)} (gains: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      const rawSal = salaryInput.value.replace(/[^0-9.]/g, '');
+      const rawCon = contribInput.value.replace(/[^0-9.]/g, '');
+      const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
+      const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
+      const rawR = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawY = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vSal = validate(rawSal, { required: true, min: 1000, label: 'Salary' });
+      const vCon = validate(rawCon, { required: true, min: 0, max: 100, label: 'Contrib' });
+      const vMat = validate(rawMat, { required: true, min: 0, max: 200, label: 'Match' });
+      const vLim = validate(rawLim, { required: true, min: 0, max: 100, label: 'Limit' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'R' });
+      const vY = validate(rawY, { required: true, min: 1, label: 'Y' });
+
+      if (!vSal.valid || !vCon.valid || !vMat.valid || !vLim.valid || !vR.valid || !vY.valid) return;
+
+      const res = calc401K(vSal.value!, vCon.value!, vMat.value!, vLim.value!, vR.value!, vY.value!);
+      const text = `401(k) Projection: Salary ${fmtVal(vSal.value!)}, saving ${vCon.value}% with ${vMat.value}% match up to ${vLim.value}% at ${vR.value}% for ${vY.value} years => Retirement balance: ${fmtVal(res.maturity)} (gains: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('k401-copy-btn');
       if (btn) {
@@ -494,20 +578,26 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      s: { required: true, min: 1000, label: 's' },
+      c: { required: true, min: 0, max: 100, decimal: true, label: 'c' },
+      m: { required: true, min: 0, max: 200, decimal: true, label: 'm' },
+      l: { required: true, min: 0, max: 100, decimal: true, label: 'l' },
+      r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('₹') ? '₹' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '$';
-        currLocale = saved.includes('INR') ? 'en-IN' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-US';
-      }
-    } catch (e) {}
+    if (restored.valid && restored.values.s && restored.values.c !== undefined && restored.values.r !== undefined && restored.values.y) {
+      salaryInput.value = fmtLiveInput(String(restored.values.s));
+      contribInput.value = String(restored.values.c);
+      if (matchInput && restored.values.m !== undefined) matchInput.value = String(restored.values.m);
+      if (matchLimitInput && restored.values.l !== undefined) matchLimitInput.value = String(restored.values.l);
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
   }
 
   init401KCalc();

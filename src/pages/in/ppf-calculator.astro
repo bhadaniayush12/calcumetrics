@@ -34,7 +34,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -45,12 +45,57 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'PPF Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'When should I deposit money in PPF to get maximum interest?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Depositing between the 1st and 5th of April ensures your entire annual contribution earns interest for all 12 months of that financial year, because PPF interest is calculated on the minimum balance between the 5th and the end of each calendar month.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I extend a PPF account beyond 15 years?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, a PPF account can be extended indefinitely in blocks of 5 years each, with or without continuing new contributions.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the tax status of Public Provident Fund (PPF)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'PPF enjoys Exempt-Exempt-Exempt (EEE) tax status in India. Contributions are deductible under Section 80C (up to ₹1.5 lakh), annual interest accrued is completely tax-free, and maturity proceeds are exempt from income tax.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What are the minimum and maximum yearly deposits in PPF?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The statutory minimum annual deposit required to keep a PPF account active is ₹500, and the maximum allowed deposit is ₹1,50,000 per financial year.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can a loan or partial withdrawal be taken from PPF?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. A loan facility is available from the 3rd to 6th financial year, and partial withdrawals are allowed from the 7th financial year onwards subject to statutory limits.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
 
 <Layout
-  title="PPF Calculator: Maturity Value & Interest | Calcumetrics India"
+  title="PPF Calculator: Maturity Value & Tax-Free Interest | Calcumetrics India"
   description="Calculate your Public Provident Fund (PPF) maturity value and interest with annual compounding over 15 to 30 years. Section 80C EEE status."
   canonical={canonicalUrl}
 >
@@ -62,10 +107,18 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmt(result.maturity)}
     heroLabel="Maturity Value"
+    calcType="simple"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Public Provident Fund (PPF) Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate maturity value and tax-free interest on your PPF account over 15 to 30 years.</p>
+
+      <!-- Error alert -->
+      <div id="ppf-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="ppf-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Annual Deposit -->
       <div class="mb-5">
@@ -78,6 +131,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Maximum allowed deposit is ₹1.5 lakh per financial year"
           inputmode="decimal"
+          aria-describedby="ppf-error-msg"
         />
         <div class="mt-2">
           <Slider id="ppf-annual-slider" min={500} max={150000} step={500} value={150000} ariaLabel="Yearly deposit slider" />
@@ -94,13 +148,14 @@ const jsonld = {
           isNumeric={true}
           helperText="Current government notified rate (7.1% p.a.)"
           inputmode="decimal"
+          aria-describedby="ppf-error-msg"
         />
         <div class="mt-2">
           <Slider id="ppf-rate-slider" min={6.0} max={9.0} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
-      <!-- Years -->
+      <!-- Tenure in Years -->
       <div class="mb-6">
         <Input
           id="ppf-years"
@@ -108,16 +163,17 @@ const jsonld = {
           suffix="Years"
           value="15"
           isNumeric={true}
-          helperText="Initial lock-in is 15 years; extendable in 5-year blocks"
-          inputmode="decimal"
+          helperText="Minimum 15 years; extendable in 5-year blocks"
+          inputmode="numeric"
+          aria-describedby="ppf-error-msg"
         />
         <div class="mt-2">
           <Slider id="ppf-years-slider" min={15} max={30} step={5} value={15} ariaLabel="Tenure slider" />
         </div>
       </div>
 
-      <Alert variant="info" title="Exempt-Exempt-Exempt (EEE)">
-        PPF carries EEE tax status: deposits qualify for Section 80C deduction, interest earned is completely tax-free, and maturity proceeds are exempt from tax.
+      <Alert variant="info" title="Tax Status (EEE)">
+        PPF falls under the Exempt-Exempt-Exempt (EEE) category: contributions qualify for Section 80C deduction, interest is tax-free, and maturity amount is fully exempt.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -136,27 +192,27 @@ const jsonld = {
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Amount Invested</span>
+          <span class="text-xs text-dark-muted">Total Invested</span>
           <span id="ppf-result-invested" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.invested)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Interest Earned</span>
-          <span id="ppf-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.interest)}</span>
+          <span class="text-xs text-dark-muted">Total Interest</span>
+          <span id="ppf-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.gain)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Return on Investment</span>
-          <span id="ppf-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.invested > 0 ? ((result.interest / result.invested) * 100).toFixed(1) : '0.0'}%</span>
+          <span class="text-xs text-dark-muted">Tax Benefit (Sec 80C)</span>
+          <span class="text-sm font-medium tabular-nums text-dark-accent">EEE (100% Tax-Free)</span>
         </div>
       </div>
 
       <div class="mb-5" id="ppf-composition-wrapper">
         <CompositionBar
-          principalFraction={result.investedFraction}
-          gainFraction={result.interestFraction}
+          principalFraction={result.principalFraction}
+          gainFraction={result.gainFraction}
           principalLabel="Invested"
           gainLabel="Interest"
           principalValue={fmt(result.invested)}
-          gainValue={fmt(result.interest)}
+          gainValue={fmt(result.gain)}
         />
       </div>
 
@@ -179,7 +235,7 @@ const jsonld = {
           Public Provident Fund interest is compounded annually and calculated on the minimum balance between the 5th and the end of each calendar month.
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">F = P × [({'{'}1 + i{'}'}^n - 1) / i] × (1 + i)</p>
+          <p class="text-base font-mono text-text-primary mb-2">F = P &times; [((1 + i)<sup>n</sup> &minus; 1) &divide; i] &times; (1 + i)</p>
           <ul class="space-y-1 text-sm text-text-muted">
             <li><strong class="text-text-primary">F</strong> — Maturity amount</li>
             <li><strong class="text-text-primary">P</strong> — Annual installment deposited before the 5th of April</li>
@@ -192,18 +248,18 @@ const jsonld = {
       <section aria-labelledby="ppf-calculator-faq">
         <h2 id="ppf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When should I deposit money in PPF to get maximum interest?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Depositing between the 1st and 5th of April ensures your entire annual contribution earns interest for all 12 months of that financial year.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I extend PPF beyond 15 years?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, PPF can be extended indefinitely in blocks of 5 years each, with or without continuing new contributions.
-            </div>
-          </details>
+          {[
+            ['When should I deposit money in PPF to get maximum interest?', 'Depositing between the 1st and 5th of April ensures your entire annual contribution earns interest for all 12 months of that financial year, because PPF interest is calculated on the minimum balance between the 5th and the end of each calendar month.'],
+            ['Can I extend a PPF account beyond 15 years?', 'Yes, a PPF account can be extended indefinitely in blocks of 5 years each, with or without continuing new contributions.'],
+            ['What is the tax status of Public Provident Fund (PPF)?', 'PPF enjoys Exempt-Exempt-Exempt (EEE) tax status in India. Contributions are deductible under Section 80C (up to ₹1.5 lakh), annual interest accrued is completely tax-free, and maturity proceeds are exempt from income tax.'],
+            ['What are the minimum and maximum yearly deposits in PPF?', 'The statutory minimum annual deposit required to keep a PPF account active is ₹500, and the maximum allowed deposit is ₹1,50,000 per financial year.'],
+            ['Can a loan or partial withdrawal be taken from PPF?', 'Yes. A loan facility is available from the 3rd to 6th financial year, and partial withdrawals are allowed from the 7th financial year onwards subject to statutory limits.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -224,6 +280,11 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { validate } from '../../lib/validate';
+  import { setResult } from '../../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+  import { calcPPF } from '../../lib/calculators/ppf';
+
   function calcPPFClient(annual: number, rate: number, years: number) {
     const r = rate / 100;
     let balance = 0;
@@ -243,8 +304,9 @@ const jsonld = {
     };
   }
 
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  // Jurisdiction lock: permanently ₹ and en-IN
+  const currSym = '₹';
+  const currLocale = 'en-IN';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -254,9 +316,13 @@ const jsonld = {
   }
 
   function initPPFCalc() {
+    if ((window as any).__cmPPFBound) return;
+    (window as any).__cmPPFBound = true;
+
     const aInput = document.getElementById('ppf-annual') as HTMLInputElement | null;
     const rInput = document.getElementById('ppf-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('ppf-years') as HTMLInputElement | null;
+
     const aSlider = document.getElementById('ppf-annual-slider') as HTMLInputElement | null;
     const rSlider = document.getElementById('ppf-rate-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('ppf-years-slider') as HTMLInputElement | null;
@@ -264,35 +330,59 @@ const jsonld = {
     const resMaturity = document.getElementById('ppf-result-maturity');
     const resInvested = document.getElementById('ppf-result-invested');
     const resGain = document.getElementById('ppf-result-gain');
-    const resGainPct = document.getElementById('ppf-result-gainpct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('ppf-error-alert');
+    const errMsg = document.getElementById('ppf-error-msg');
 
     if (!aInput || !rInput || !yInput) return;
 
     const DEFAULTS = { annual: 150000, rate: 7.1, years: 15 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const a = Math.min(150000, parse(aInput.value));
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseInt(yInput.value) || 0;
+      const rawA = aInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput!.value.replace(/[^0-9.]/g, '');
 
-      if (a <= 0 || r <= 0 || y <= 0) return;
+      const vA = validate(rawA, { required: true, min: 500, max: 150000, label: 'Yearly Investment' });
+      const vR = validate(rawR, { required: true, min: 1, max: 15, decimal: true, label: 'Interest Rate' });
+      const vY = validate(rawY, { required: true, min: 15, max: 50, integer: true, label: 'Tenure in Years' });
+
+      if (!vA.valid) { showError(vA.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vY.valid) { showError(vY.error!.message); return; }
+      clearError();
+
+      const a = vA.value!;
+      const r = vR.value!;
+      const y = vY.value!;
 
       const res = calcPPFClient(a, r, y);
+
+      setResult({
+        heroValue: fmtVal(res.maturity),
+        heroLabel: 'Maturity Value',
+        rows: [
+          { label: 'Total Invested', value: fmtVal(res.invested) },
+          { label: 'Total Interest', value: fmtVal(res.gain) },
+          { label: 'Tax Benefit', value: 'EEE (100% Tax-Free)' },
+        ],
+      });
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resInvested) resInvested.textContent = fmtVal(res.invested);
       if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
 
       const wrapper = document.getElementById('ppf-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && res.maturity > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
         if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
@@ -302,7 +392,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', `#a=${a}&r=${r}&y=${y}`);
+      history.replaceState(null, '', serializeHash({ a, r, y }));
     }
 
     function debounce() {
@@ -352,22 +442,30 @@ const jsonld = {
         ySlider.value = String(DEFAULTS.years);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 15) / (30 - 15)) * 100}%`);
       }
+      clearError();
       recalc();
       aInput.focus();
     });
 
     [aInput, rInput, yInput].forEach((el) => {
-      el.addEventListener('keydown', (e) => {
+      el?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') recalc();
       });
     });
 
     document.getElementById('ppf-copy-btn')?.addEventListener('click', async () => {
-      const a = parse(aInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseInt(yInput.value) || 0;
-      const res = calcPPFClient(a, r, y);
-      const text = `PPF: ${fmtVal(a)}/yr for ${y} yrs at ${r}% p.a. gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      const rawA = aInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawY = yInput.value.replace(/[^0-9.]/g, '');
+
+      const vA = validate(rawA, { required: true, min: 500, max: 150000, label: 'A' });
+      const vR = validate(rawR, { required: true, min: 1, label: 'R' });
+      const vY = validate(rawY, { required: true, min: 15, label: 'Y' });
+
+      if (!vA.valid || !vR.valid || !vY.valid) return;
+
+      const res = calcPPFClient(vA.value!, vR.value!, vY.value!);
+      const text = `PPF: ${fmtVal(vA.value!)}/yr for ${vY.value} yrs at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('ppf-copy-btn');
       if (btn) {
@@ -387,12 +485,20 @@ const jsonld = {
       }
     });
 
-    // Jurisdiction lock: PPF is an India-specific calculator.
-    // currSym and currLocale are permanently fixed to ₹ / en-IN.
-    // This calculator intentionally ignores cm:currency-change events.
-    window.addEventListener('cm:currency-change', () => {
-      // India-locked: currency change events are intentionally ignored here.
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      a: { required: true, min: 500, max: 150000, label: 'a' },
+      r: { required: true, min: 1, max: 15, decimal: true, label: 'r' },
+      y: { required: true, min: 15, max: 50, integer: true, label: 'y' },
     });
+    if (restored.valid && restored.values.a && restored.values.r !== undefined && restored.values.y) {
+      aInput.value = fmtLiveInput(String(restored.values.a));
+      rInput.value = String(restored.values.r);
+      yInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
   }
 
   initPPFCalc();

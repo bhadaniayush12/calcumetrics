@@ -11,7 +11,8 @@ import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { monthly: 5000, rate: 7.0, months: 60 };
-const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months);
+const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months / 12);
+const defaultGainPct = result.invested > 0 ? (result.interest / result.invested) * 100 : 0;
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -34,7 +35,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -43,6 +44,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
         { '@type': 'ListItem', position: 3, name: 'Recurring Deposit Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Can I change my monthly RD installment amount?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'In standard recurring deposits with commercial banks and post offices, the monthly installment amount is fixed at account opening. Some specialized digital banks offer flexible RD accounts where contributions can vary.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is Recurring Deposit interest taxable in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹40,000 (₹50,000 for senior citizens).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is interest compounded on a Recurring Deposit?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Per Indian Banks\' Association (IBA) guidelines, commercial banks compound RD interest quarterly. Each monthly installment earns interest compounded quarterly for its respective remaining tenure until maturity.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What happens if I miss an RD monthly installment?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Banks usually levy a nominal penalty (e.g. ₹1.50 to ₹2.00 per ₹100 per month) for missed installments. If installments remain unpaid for consecutive months (typically 4 to 6 months), the bank may prematurely deactivate the account.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I withdraw funds prematurely from an RD account?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, premature closure is permitted by most banks, but it typically incurs a penalty of 0.5% to 1% reduction from the applicable interest rate for the period the deposit actually ran.',
+          },
+        },
       ],
     },
   ],
@@ -62,10 +108,18 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmt(result.maturity)}
     heroLabel="Maturity Value"
+    calcType="simple"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Recurring Deposit Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate the total maturity and interest from regular monthly bank deposits.</p>
+
+      <!-- Error alert -->
+      <div id="rd-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="rd-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Monthly Deposit -->
       <div class="mb-5">
@@ -78,6 +132,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Amount deposited every month"
           inputmode="decimal"
+          aria-describedby="rd-error-msg"
         />
         <div class="mt-2">
           <Slider id="rd-monthly-slider" min={500} max={100000} step={500} value={5000} ariaLabel="Monthly installment slider" />
@@ -94,6 +149,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Bank interest rate p.a."
           inputmode="decimal"
+          aria-describedby="rd-error-msg"
         />
         <div class="mt-2">
           <Slider id="rd-rate-slider" min={3} max={12} step={0.1} value={7.0} ariaLabel="Interest rate slider" />
@@ -110,6 +166,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Total investment duration (60 months = 5 years)"
           inputmode="decimal"
+          aria-describedby="rd-error-msg"
         />
         <div class="mt-2">
           <Slider id="rd-months-slider" min={6} max={120} step={6} value={60} ariaLabel="Tenure slider" />
@@ -140,12 +197,12 @@ const jsonld = {
           <span id="rd-result-invested" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.invested)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Interest Earned</span>
+          <span class="text-xs text-dark-muted">Interest Earned</span>
           <span id="rd-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.interest)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Gain Percentage</span>
-          <span id="rd-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.invested > 0 ? ((result.interest / result.invested) * 100).toFixed(1) : '0.0'}%</span>
+          <span class="text-xs text-dark-muted">Return on Investment</span>
+          <span id="rd-result-gain-pct" class="text-sm font-medium tabular-nums text-dark-accent">{defaultGainPct.toFixed(1)}%</span>
         </div>
       </div>
 
@@ -179,7 +236,7 @@ const jsonld = {
           The maturity value of a Recurring Deposit is determined by compounding each monthly installment from the deposit date until maturity:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">M = P × (1 + r/4)^(4 × t) for each monthly contribution</p>
+          <p class="text-base font-mono text-text-primary mb-2">M = P &times; (1 + r/4)<sup>(4 &times; t)</sup> for each monthly contribution</p>
           <p class="text-sm text-text-muted">
             The earliest deposit earns interest for the full tenure, while the last deposit earns interest for one month.
           </p>
@@ -189,18 +246,18 @@ const jsonld = {
       <section aria-labelledby="rd-calculator-faq">
         <h2 id="rd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I change my monthly RD installment?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              In traditional bank RDs, the installment amount is fixed at account opening. Some modern banks offer flexible or flexi-RD accounts where contributions can vary.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is RD interest taxable?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, RD interest is added to your income and taxed at your marginal slab rate. TDS applies if annual interest across bank deposits exceeds ₹40,000 (₹50,000 for seniors).
-            </div>
-          </details>
+          {[
+            ['Can I change my monthly RD installment amount?', 'In standard recurring deposits with commercial banks and post offices, the monthly installment amount is fixed at account opening. Some specialized digital banks offer flexible RD accounts where contributions can vary.'],
+            ['Is Recurring Deposit interest taxable in India?', 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹40,000 (₹50,000 for senior citizens).'],
+            ['How is interest compounded on a Recurring Deposit?', 'Per Indian Banks\' Association (IBA) guidelines, commercial banks compound RD interest quarterly. Each monthly installment earns interest compounded quarterly for its respective remaining tenure until maturity.'],
+            ['What happens if I miss an RD monthly installment?', 'Banks usually levy a nominal penalty (e.g. ₹1.50 to ₹2.00 per ₹100 per month) for missed installments. If installments remain unpaid for consecutive months (typically 4 to 6 months), the bank may prematurely deactivate the account.'],
+            ['Can I withdraw funds prematurely from an RD account?', 'Yes, premature closure is permitted by most banks, but it typically incurs a penalty of 0.5% to 1% reduction from the applicable interest rate for the period the deposit actually ran.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -221,6 +278,11 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcRD } from '../lib/calculators/rd';
+
   function calcRDClient(p: number, rate: number, months: number) {
     const r = rate / 100;
     let maturity = 0;
@@ -230,12 +292,11 @@ const jsonld = {
     }
     const invested = p * months;
     const gain = maturity - invested;
-    const gainPct = invested > 0 ? (gain / invested) * 100 : 0;
     return {
       maturity,
       invested,
       gain,
-      gainPct,
+      gainPct: invested > 0 ? (gain / invested) * 100 : 0,
       principalFraction: maturity > 0 ? invested / maturity : 0,
       gainFraction: maturity > 0 ? gain / maturity : 0,
     };
@@ -252,9 +313,13 @@ const jsonld = {
   }
 
   function initRDCalc() {
+    if ((window as any).__cmRDBound) return;
+    (window as any).__cmRDBound = true;
+
     const mInput = document.getElementById('rd-monthly') as HTMLInputElement | null;
     const rInput = document.getElementById('rd-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('rd-months') as HTMLInputElement | null;
+
     const mSlider = document.getElementById('rd-monthly-slider') as HTMLInputElement | null;
     const rSlider = document.getElementById('rd-rate-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('rd-months-slider') as HTMLInputElement | null;
@@ -262,35 +327,61 @@ const jsonld = {
     const resMaturity = document.getElementById('rd-result-maturity');
     const resInvested = document.getElementById('rd-result-invested');
     const resGain = document.getElementById('rd-result-gain');
-    const resGainPct = document.getElementById('rd-result-gainpct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+    const resGainPct = document.getElementById('rd-result-gain-pct');
+
+    const errAlert = document.getElementById('rd-error-alert');
+    const errMsg = document.getElementById('rd-error-msg');
 
     if (!mInput || !rInput || !yInput) return;
 
     const DEFAULTS = { monthly: 5000, rate: 7.0, months: 60 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const m = parse(mInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const mo = parseInt(yInput.value) || 0;
+      const rawM = mInput!.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
+      const rawMo = yInput!.value.replace(/[^0-9.]/g, '');
 
-      if (m <= 0 || r <= 0 || mo <= 0) return;
+      const vM = validate(rawM, { required: true, min: 100, label: 'Monthly Installment' });
+      const vR = validate(rawR, { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
+      const vMo = validate(rawMo, { required: true, min: 1, max: 240, integer: true, label: 'Tenure in Months' });
+
+      if (!vM.valid) { showError(vM.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      if (!vMo.valid) { showError(vMo.error!.message); return; }
+      clearError();
+
+      const m = vM.value!;
+      const r = vR.value!;
+      const mo = vMo.value!;
 
       const res = calcRDClient(m, r, mo);
+
+      setResult({
+        heroValue: fmtVal(res.maturity),
+        heroLabel: 'Maturity Value',
+        rows: [
+          { label: 'Total Invested', value: fmtVal(res.invested) },
+          { label: 'Interest Earned', value: fmtVal(res.gain) },
+          { label: 'Return on Investment', value: res.gainPct.toFixed(1) + '%' },
+        ],
+      });
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resInvested) resInvested.textContent = fmtVal(res.invested);
       if (resGain) resGain.textContent = fmtVal(res.gain);
       if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
 
       const wrapper = document.getElementById('rd-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && res.maturity > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
         if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
@@ -300,7 +391,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', `#m=${m}&r=${r}&mo=${mo}`);
+      history.replaceState(null, '', serializeHash({ m, r, mo }));
     }
 
     function debounce() {
@@ -350,22 +441,30 @@ const jsonld = {
         ySlider.value = String(DEFAULTS.months);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.months - 6) / (120 - 6)) * 100}%`);
       }
+      clearError();
       recalc();
       mInput.focus();
     });
 
     [mInput, rInput, yInput].forEach((el) => {
-      el.addEventListener('keydown', (e) => {
+      el?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') recalc();
       });
     });
 
     document.getElementById('rd-copy-btn')?.addEventListener('click', async () => {
-      const m = parse(mInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const mo = parseInt(yInput.value) || 0;
-      const res = calcRDClient(m, r, mo);
-      const text = `Recurring Deposit: ${fmtVal(m)}/mo for ${mo} months at ${r}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      const rawM = mInput.value.replace(/[^0-9.]/g, '');
+      const rawR = rInput.value.replace(/[^0-9.]/g, '');
+      const rawMo = yInput.value.replace(/[^0-9.]/g, '');
+
+      const vM = validate(rawM, { required: true, min: 100, label: 'M' });
+      const vR = validate(rawR, { required: true, min: 0.1, label: 'R' });
+      const vMo = validate(rawMo, { required: true, min: 1, label: 'Mo' });
+
+      if (!vM.valid || !vR.valid || !vMo.valid) return;
+
+      const res = calcRDClient(vM.value!, vR.value!, vMo.value!);
+      const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('rd-copy-btn');
       if (btn) {
@@ -384,6 +483,21 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      m: { required: true, min: 100, label: 'm' },
+      r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
+      mo: { required: true, min: 1, max: 240, integer: true, label: 'mo' },
+    });
+    if (restored.valid && restored.values.m && restored.values.r !== undefined && restored.values.mo) {
+      mInput.value = fmtLiveInput(String(restored.values.m));
+      rInput.value = String(restored.values.r);
+      yInput.value = String(restored.values.mo);
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

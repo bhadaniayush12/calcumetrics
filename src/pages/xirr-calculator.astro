@@ -38,7 +38,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -47,6 +47,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
         { '@type': 'ListItem', position: 3, name: 'XIRR Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'When should I use XIRR instead of CAGR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Use CAGR only for a single lump sum investment held from start to finish. For mutual fund SIPs, dividend reinvestments, STP, or sporadic investments, XIRR is mandatory because money is added or withdrawn at multiple different dates.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why does XIRR require both negative and positive numbers?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'XIRR mathematically solves for the discount rate that balances outflows against inflows. Outflows (money invested) must be negative and inflows (redemptions or current market valuation) must be positive.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What does a negative XIRR mean?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A negative XIRR means your investment portfolio has lost value on an annualized basis across the cash flow timeline, with current valuations plus redemptions trailing total deployed capital.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does XIRR differ from IRR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Standard IRR assumes cash flows occur at strictly equal time intervals (e.g. exactly annually or monthly). XIRR allows arbitrary, exact daily dates for each cash flow event, accounting for leap years and exact day counts.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What algorithm is used to compute XIRR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'XIRR uses the Newton-Raphson numerical iterative solver with tolerance guards to discover the annualized rate of return where the net present value of all cash flows equals zero.',
+          },
+        },
       ],
     },
   ],
@@ -66,10 +111,18 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={initialResult.xirrPct.toFixed(2) + '%'}
     heroLabel="Annualised XIRR"
+    calcType="advanced"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">XIRR Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate the annualized return for irregular investments with dates. Use negative numbers for investments/outflows and positive numbers for redemptions/current value.</p>
+
+      <!-- Error alert -->
+      <div id="xirr-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="xirr-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <div class="mb-4">
         <div class="flex items-center justify-between mb-2">
@@ -87,6 +140,7 @@ const jsonld = {
                 class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent"
                 value={cf.date}
                 required
+                aria-label={`Date for cash flow ${idx + 1}`}
               />
               <div class="relative flex-1">
                 <input
@@ -95,6 +149,7 @@ const jsonld = {
                   value={cf.amount}
                   placeholder="e.g. -50000"
                   required
+                  aria-label={`Amount for cash flow ${idx + 1}`}
                 />
               </div>
               <button
@@ -179,18 +234,18 @@ const jsonld = {
       <section aria-labelledby="xirr-calculator-faq">
         <h2 id="xirr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When should I use XIRR instead of CAGR?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Use CAGR only for a single lump sum investment held from start to finish. For mutual fund SIPs, dividend reinvestments, STP, or sporadic investments, XIRR is mandatory because money is added or withdrawn at multiple different dates.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why did my calculation return an error?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              XIRR mathematically requires at least one negative cash flow (money going in) and at least one positive cash flow (money coming out or current market valuation).
-            </div>
-          </details>
+          {[
+            ['When should I use XIRR instead of CAGR?', 'Use CAGR only for a single lump sum investment held from start to finish. For mutual fund SIPs, dividend reinvestments, STP, or sporadic investments, XIRR is mandatory because money is added or withdrawn at multiple different dates.'],
+            ['Why does XIRR require both negative and positive numbers?', 'XIRR mathematically solves for the discount rate that balances outflows against inflows. Outflows (money invested) must be negative and inflows (redemptions or current market valuation) must be positive.'],
+            ['What does a negative XIRR mean?', 'A negative XIRR means your investment portfolio has lost value on an annualized basis across the cash flow timeline, with current valuations plus redemptions trailing total deployed capital.'],
+            ['How does XIRR differ from IRR?', 'Standard IRR assumes cash flows occur at strictly equal time intervals (e.g. exactly annually or monthly). XIRR allows arbitrary, exact daily dates for each cash flow event, accounting for leap years and exact day counts.'],
+            ['What algorithm is used to compute XIRR?', 'XIRR uses the Newton-Raphson numerical iterative solver with tolerance guards to discover the annualized rate of return where the net present value of all cash flows equals zero.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -211,6 +266,9 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+
   function npvRate(flows: Array<{ amount: number; date: Date }>, rate: number): number {
     const t0 = flows[0].date.getTime();
     return flows.reduce((sum, cf) => {
@@ -223,7 +281,7 @@ const jsonld = {
     const hasNeg = flows.some((c) => c.amount < 0);
     const hasPos = flows.some((c) => c.amount > 0);
     if (!hasNeg || !hasPos) {
-      return { xirrPct: 0, valid: false, error: 'Need at least one negative and one positive cash flow' };
+      return { xirrPct: 0, valid: false, error: 'XIRR requires at least one negative outflow (investment) and one positive inflow (return).' };
     }
 
     let rate = 0.1;
@@ -247,7 +305,17 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
 
+  const DEFAULT_DATA = [
+    { amount: -100000, date: '2023-01-01' },
+    { amount: -50000, date: '2023-07-01' },
+    { amount: 20000, date: '2024-01-01' },
+    { amount: 185000, date: '2025-01-01' },
+  ];
+
   function initXIRRCalc() {
+    if ((window as any).__cmXIRRBound) return;
+    (window as any).__cmXIRRBound = true;
+
     const container = document.getElementById('xirr-rows-container');
     const addBtn = document.getElementById('xirr-add-row');
     const calcBtn = document.getElementById('xirr-calculate');
@@ -258,30 +326,51 @@ const jsonld = {
     const resInflow = document.getElementById('xirr-result-inflow');
     const resProfit = document.getElementById('xirr-result-profit');
     const resCount = document.getElementById('xirr-result-count');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('xirr-error-alert');
+    const errMsg = document.getElementById('xirr-error-msg');
 
     if (!container) return;
 
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
     function getFlows(): Array<{ amount: number; date: Date }> {
-      const rows = Array.from(container.querySelectorAll<HTMLElement>('.xirr-row'));
+      const rows = Array.from(container!.querySelectorAll<HTMLElement>('.xirr-row'));
       const flows: Array<{ amount: number; date: Date }> = [];
-      rows.forEach((row) => {
+      for (const row of rows) {
         const dateInput = row.querySelector<HTMLInputElement>('.xirr-date');
         const amtInput = row.querySelector<HTMLInputElement>('.xirr-amount');
-        if (dateInput && amtInput && dateInput.value && amtInput.value) {
-          const amt = parseFloat(amtInput.value.replace(/,/g, ''));
+        if (dateInput && amtInput && dateInput.value && amtInput.value.trim() !== '') {
+          const rawAmt = amtInput.value.replace(/,/g, '').trim();
+          const num = parseFloat(rawAmt);
           const dt = new Date(dateInput.value);
-          if (!isNaN(amt) && !isNaN(dt.getTime())) {
-            flows.push({ amount: amt, date: dt });
+          if (!isNaN(num) && !isNaN(dt.getTime())) {
+            flows.push({ amount: num, date: dt });
           }
         }
-      });
+      }
       return flows.sort((a, b) => a.date.getTime() - b.date.getTime());
     }
 
     function recalc() {
       const flows = getFlows();
-      if (flows.length < 2) return;
+      if (flows.length < 2) {
+        showError('Please specify at least 2 cash flow entries with valid dates and amounts.');
+        return;
+      }
+
+      const res = calcXIRRClient(flows);
+      if (!res.valid) {
+        showError(res.error || 'Invalid cash flows.');
+        return;
+      }
+      clearError();
 
       let outflow = 0;
       let inflow = 0;
@@ -290,23 +379,33 @@ const jsonld = {
         else inflow += f.amount;
       });
 
-      const res = calcXIRRClient(flows);
+      const heroPctText = res.xirrPct.toFixed(2) + '%';
 
-      if (resPct) {
-        resPct.textContent = res.valid ? res.xirrPct.toFixed(2) + '%' : 'Invalid Flows';
-      }
+      setResult({
+        heroValue: heroPctText,
+        heroLabel: 'Annualised XIRR',
+        rows: [
+          { label: 'Total Invested (Outflows)', value: fmtVal(outflow) },
+          { label: 'Total Received/Value (Inflows)', value: fmtVal(inflow) },
+          { label: 'Net Absolute Profit', value: fmtVal(inflow - outflow) },
+          { label: 'Total Cash Flows', value: `${flows.length} events` },
+        ],
+      });
+
+      if (resPct) resPct.textContent = heroPctText;
       if (resOutflow) resOutflow.textContent = fmtVal(outflow);
       if (resInflow) resInflow.textContent = fmtVal(inflow);
       if (resProfit) resProfit.textContent = fmtVal(inflow - outflow);
       if (resCount) resCount.textContent = `${flows.length} events`;
-      if (mobileHero) mobileHero.textContent = res.valid ? res.xirrPct.toFixed(2) + '%' : 'N/A';
     }
 
     function wireRow(row: HTMLElement) {
       row.querySelector('.xirr-remove-row')?.addEventListener('click', () => {
-        if (container.querySelectorAll('.xirr-row').length > 2) {
+        if (container!.querySelectorAll('.xirr-row').length > 2) {
           row.remove();
           recalc();
+        } else {
+          showError('At least two cash flow events are required.');
         }
       });
       row.querySelector('.xirr-date')?.addEventListener('change', recalc);
@@ -332,14 +431,32 @@ const jsonld = {
     });
 
     calcBtn?.addEventListener('click', recalc);
+
     resetBtn?.addEventListener('click', () => {
-      location.reload();
+      container.innerHTML = '';
+      DEFAULT_DATA.forEach((cf, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row';
+        row.setAttribute('data-index', String(idx));
+        row.innerHTML = `
+          <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${cf.date}" required />
+          <div class="relative flex-1">
+            <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" value="${cf.amount}" placeholder="e.g. -50000" required />
+          </div>
+          <button type="button" class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer" title="Remove cash flow" aria-label="Remove cash flow">✕</button>
+        `;
+        container.appendChild(row);
+        wireRow(row);
+      });
+      clearError();
+      recalc();
     });
 
     document.getElementById('xirr-copy-btn')?.addEventListener('click', async () => {
       const flows = getFlows();
       const res = calcXIRRClient(flows);
-      const text = `XIRR: ${res.valid ? res.xirrPct.toFixed(2) + '%' : 'N/A'} across ${flows.length} cash flows. ${location.href.split('#')[0]}`;
+      if (!res.valid) return;
+      const text = `XIRR: ${res.xirrPct.toFixed(2)}% across ${flows.length} cash flows. ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('xirr-copy-btn');
       if (btn) {
@@ -366,6 +483,13 @@ const jsonld = {
         recalc();
       }
     });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
   }
 
   initXIRRCalc();

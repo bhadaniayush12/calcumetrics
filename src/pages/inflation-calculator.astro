@@ -1,0 +1,497 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcInflation } from '../lib/finance/time-value';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { amount: 100000, rate: 6, years: 10 };
+const result = calcInflation(DEFAULT.amount, DEFAULT.rate, DEFAULT.years);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'inflation-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/inflation-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Inflation Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the future cost of goods and the erosion of purchasing power caused by inflation over time.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'Inflation Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What does an inflation calculator measure?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'An inflation calculator measures two fundamental economic impacts: (1) what a basket of goods costing a certain amount today will cost in the future, and (2) how much the purchasing power of a fixed amount of cash diminishes over time.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is purchasing power risk?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Purchasing power risk, also known as inflation risk, is the danger that cash holdings or fixed-income investment returns will fail to keep pace with the rate of inflation, resulting in a net decline in the real value of your wealth over time.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What average inflation rate should I assume?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Historical inflation benchmarks vary by economy. For developing economies like India, long-term CPI inflation typically oscillates around 5.5% to 6.5%. For mature economies like the United States, central banks target approximately 2.0% to 3.0% long-term inflation.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I protect my savings against inflation?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'To preserve purchasing power, investments need to generate a real return (nominal return minus inflation). Common inflation hedges include equity equities, equity mutual funds, real estate, inflation-indexed bonds, and commodities like gold.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the Rule of 72 regarding inflation?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The Rule of 72 estimates how long it takes prices to double at a constant inflation rate: divide 72 by the annual inflation rate. For example, at 6% annual inflation, general price levels double in approximately 72 ÷ 6 = 12 years.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Inflation Calculator: Future Cost & Purchasing Power | Calcumetrics"
+  description="Calculate the future cost of goods and measure the loss of purchasing power over time at any inflation rate."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Inflation Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmtCurrency(result.futureCost)}
+    heroLabel="Future Cost of Today's Amount"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Inflation Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">See how inflation increases living costs and erodes the future purchasing power of your money.</p>
+
+      <!-- Error alert -->
+      <div id="inf-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="inf-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Current Amount -->
+      <div class="mb-5">
+        <Input
+          id="inf-amount"
+          label="Current Amount"
+          prefix="₹"
+          value="1,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="The cost of goods or amount of cash today"
+          inputmode="decimal"
+          aria-describedby="inf-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="inf-amount-slider" min={5000} max={10000000} step={5000} value={100000} ariaLabel="Current amount slider" />
+        </div>
+      </div>
+
+      <!-- Inflation Rate -->
+      <div class="mb-5">
+        <Input
+          id="inf-rate"
+          label="Expected Annual Inflation Rate"
+          suffix="%"
+          value="6"
+          isNumeric={true}
+          helperText="Annual percentage increase in prices"
+          inputmode="decimal"
+          aria-describedby="inf-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="inf-rate-slider" min={0.5} max={20} step={0.25} value={6} ariaLabel="Inflation rate slider" />
+        </div>
+      </div>
+
+      <!-- Number of Years -->
+      <div class="mb-6">
+        <Input
+          id="inf-years"
+          label="Time Horizon (Years)"
+          value="10"
+          isNumeric={true}
+          helperText="Number of years in the future"
+          inputmode="numeric"
+          aria-describedby="inf-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="inf-years-slider" min={1} max={40} step={1} value={10} ariaLabel="Years slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="inf-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="inf-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Future Cost of Same Goods</span>
+        <div id="inf-result-future-cost" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtCurrency(result.futureCost)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Today's Amount</span>
+          <span id="inf-result-present" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.presentValue)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Future Purchasing Power</span>
+          <span id="inf-result-power" class="text-sm font-semibold tabular-nums text-amber-400">{fmtCurrency(result.futurePurchasingPower)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Purchasing Power Lost</span>
+          <span id="inf-result-loss" class="text-sm font-semibold tabular-nums text-red-400">{fmtCurrency(result.purchasingPowerLoss)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Cumulative Price Rise</span>
+          <span id="inf-result-cumulative" class="text-sm font-bold tabular-nums text-dark-accent">+{result.cumulativeInflationPct.toFixed(1)}%</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="inf-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.futurePurchasingPower / result.presentValue}
+          gainFraction={result.purchasingPowerLoss / result.presentValue}
+          principalLabel="Retained Power"
+          gainLabel="Lost to Inflation"
+          principalValue={fmtCurrency(result.futurePurchasingPower)}
+          gainValue={fmtCurrency(result.purchasingPowerLoss)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="inf-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="inf-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Calculations assume a constant annual compound inflation rate.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="inf-calculator-how">
+        <h2 id="inf-calculator-how" class="text-xl font-bold text-text-primary mb-4">How inflation impacts your finances</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Inflation acts as an invisible tax on cash. Over time, each unit of currency buys a smaller percentage of a good or service:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Future Cost Formula: </strong> FV = PV &times; (1 + i)<sup>t</sup><br />
+            <strong>Future Purchasing Power Formula: </strong> Purchasing Power = PV &divide; (1 + i)<sup>t</sup><br />
+            <strong>Cumulative Price Increase: </strong> [(FV &divide; PV) &minus; 1] &times; 100%
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="inf-calculator-faq">
+        <h2 id="inf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What does an inflation calculator measure?', 'An inflation calculator measures two fundamental economic impacts: (1) what a basket of goods costing a certain amount today will cost in the future, and (2) how much the purchasing power of a fixed amount of cash diminishes over time.'],
+            ['What is purchasing power risk?', 'Purchasing power risk, also known as inflation risk, is the danger that cash holdings or fixed-income investment returns will fail to keep pace with the rate of inflation, resulting in a net decline in the real value of your wealth over time.'],
+            ['What average inflation rate should I assume?', 'Historical inflation benchmarks vary by economy. For developing economies like India, long-term CPI inflation typically oscillates around 5.5% to 6.5%. For mature economies like the United States, central banks target approximately 2.0% to 3.0% long-term inflation.'],
+            ['How do I protect my savings against inflation?', 'To preserve purchasing power, investments need to generate a real return (nominal return minus inflation). Common inflation hedges include equity equities, equity mutual funds, real estate, inflation-indexed bonds, and commodities like gold.'],
+            ['What is the Rule of 72 regarding inflation?', 'The Rule of 72 estimates how long it takes prices to double at a constant inflation rate: divide 72 by the annual inflation rate. For example, at 6% annual inflation, general price levels double in approximately 72 ÷ 6 = 12 years.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="inf-calculator-related">
+        <h2 id="inf-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcInflation } from '../lib/finance/time-value';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initInflationCalc() {
+    if ((window as any).__cmInfBound) return;
+    (window as any).__cmInfBound = true;
+
+    const amtInput = document.getElementById('inf-amount') as HTMLInputElement | null;
+    const rateInput = document.getElementById('inf-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('inf-years') as HTMLInputElement | null;
+
+    const amtSlider = document.getElementById('inf-amount-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('inf-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('inf-years-slider') as HTMLInputElement | null;
+
+    const resFuture = document.getElementById('inf-result-future-cost');
+    const resPresent = document.getElementById('inf-result-present');
+    const resPower = document.getElementById('inf-result-power');
+    const resLoss = document.getElementById('inf-result-loss');
+    const resCum = document.getElementById('inf-result-cumulative');
+
+    const errAlert = document.getElementById('inf-error-alert');
+    const errMsg = document.getElementById('inf-error-msg');
+
+    if (!amtInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { amount: 100000, rate: 6, years: 10 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawAmt = amtInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+
+      const vAmt = validate(rawAmt, { required: true, min: 1, label: 'Current Amount' });
+      const vRate = validate(rawRate, { required: true, min: 0, max: 100, decimal: true, label: 'Inflation Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 100, integer: true, label: 'Years' });
+
+      if (!vAmt.valid) { showError(vAmt.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+      clearError();
+
+      const amount = vAmt.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+
+      const res = calcInflation(amount, rate, years);
+
+      setResult({
+        heroValue: fmtVal(res.futureCost),
+        heroLabel: "Future Cost of Today's Amount",
+        rows: [
+          { label: "Today's Amount", value: fmtVal(res.presentValue) },
+          { label: 'Future Purchasing Power', value: fmtVal(res.futurePurchasingPower) },
+          { label: 'Purchasing Power Lost', value: fmtVal(res.purchasingPowerLoss) },
+          { label: 'Cumulative Price Rise', value: '+' + res.cumulativeInflationPct.toFixed(1) + '%' },
+        ],
+      });
+
+      if (resFuture) resFuture.textContent = fmtVal(res.futureCost);
+      if (resPresent) resPresent.textContent = fmtVal(res.presentValue);
+      if (resPower) resPower.textContent = fmtVal(res.futurePurchasingPower);
+      if (resLoss) resLoss.textContent = fmtVal(res.purchasingPowerLoss);
+      if (resCum) resCum.textContent = '+' + res.cumulativeInflationPct.toFixed(1) + '%';
+
+      const wrapper = document.getElementById('inf-composition-wrapper');
+      if (wrapper && res.presentValue > 0) {
+        const retainedFrac = res.futurePurchasingPower / res.presentValue;
+        const lostFrac = res.purchasingPowerLoss / res.presentValue;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(retainedFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(lostFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.futurePurchasingPower);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.purchasingPowerLoss);
+      }
+
+      history.replaceState(null, '', serializeHash({ a: amount, r: rate, y: years }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(amtSlider, amtInput, true);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('inf-calculate')?.addEventListener('click', recalc);
+    document.getElementById('inf-reset')?.addEventListener('click', () => {
+      amtInput.value = fmtLiveInput(String(DEFAULTS.amount));
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+
+      if (amtSlider) {
+        amtSlider.value = String(DEFAULTS.amount);
+        amtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.amount - 5000) / (10000000 - 5000)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 0.5) / (20 - 0.5)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      amtInput.focus();
+    });
+
+    [amtInput, rateInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('inf-copy-btn')?.addEventListener('click', async () => {
+      const rawAmt = amtInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vAmt = validate(rawAmt, { required: true, min: 1, label: 'Amount' });
+      const vRate = validate(rawRate, { required: true, min: 0, max: 100, label: 'Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 100, label: 'Years' });
+
+      if (!vAmt.valid || !vRate.valid || !vYears.valid) return;
+
+      const res = calcInflation(vAmt.value!, vRate.value!, vYears.value!);
+      const text = `Inflation Impact: Today's ${fmtVal(vAmt.value!)} will cost ${fmtVal(res.futureCost)} in ${vYears.value} years at ${vRate.value}% annual inflation (Purchasing power drops to ${fmtVal(res.futurePurchasingPower)}). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('inf-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('inf-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('inf-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      a: { required: true, min: 1, label: 'a' },
+      r: { required: true, min: 0, max: 100, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 100, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.a && restored.values.r !== undefined && restored.values.y) {
+      amtInput.value = fmtLiveInput(String(restored.values.a));
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initInflationCalc();
+  document.addEventListener('astro:page-load', initInflationCalc);
+</script>

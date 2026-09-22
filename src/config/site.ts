@@ -451,9 +451,9 @@ export const TOOLS: Tool[] = [
     category: 'Investments',
     region: 'Global',
     description: 'Calculate the future purchasing-power impact of inflation over time.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
     name: 'Savings Goal Calculator',
@@ -462,9 +462,9 @@ export const TOOLS: Tool[] = [
     category: 'Investments',
     region: 'Global',
     description: 'Calculate the amount to save regularly to reach a target savings goal.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
     name: 'Mortgage Calculator',

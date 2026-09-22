@@ -1,0 +1,531 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcSavingsGoal } from '../lib/finance/time-value';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { target: 2500000, current: 200000, rate: 10, years: 5 };
+const result = calcSavingsGoal(DEFAULT.target, DEFAULT.current, DEFAULT.rate, DEFAULT.years);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'savings-goal-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/savings-goal-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Savings Goal Calculator',
+      url: canonicalUrl,
+      description: 'Calculate how much you need to save each month or year to reach your financial target amount.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
+        { '@type': 'ListItem', position: 3, name: 'Savings Goal Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How does a savings goal calculator work?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'It calculates the exact periodic deposit (monthly or annual) needed to bridge the gap between your existing savings and your target future amount, taking into account compound growth across your investment horizon.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does compound interest help reach a savings goal?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Compound interest generates returns on both your initial principal and previously earned interest. Over long investment horizons, compound earnings can fund a significant portion of your total target, reducing the actual out-of-pocket contributions needed.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What expected return rate should I use for a 5-year goal?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For short-to-medium horizons (3 to 5 years), capital preservation is paramount. Conservative investors typically project 6% to 8% using debt funds, fixed deposits, or conservative hybrid funds. High equity allocations (10–12%) carry sequence-of-returns risk for rigid deadlines.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What if my existing savings already grow to my target?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If your initial seed savings compounded at your expected rate of return reaches or exceeds your target before the deadline, your required monthly contribution drops to ₹0 / $0.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does inflation affect my savings goal?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If your goal represents a future real expenditure (like higher education or a house down payment), price increases will likely raise your target amount. You should increase your future target to reflect inflation or use a real (inflation-adjusted) return rate.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Savings Goal Calculator: How Much to Save Monthly | Calcumetrics"
+  description="Calculate the monthly and annual savings required to reach your target financial goal with compound returns."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Savings Goal Calculator"
+    category="Investments"
+    categoryHref="/investments"
+    heroValue={fmtCurrency(result.monthlyContribution)}
+    heroLabel="Required Monthly Savings"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Savings Goal Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Discover exactly how much money you need to put away each month to achieve your target financial milestone.</p>
+
+      <!-- Error alert -->
+      <div id="sg-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="sg-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <!-- Target Goal Amount -->
+      <div class="mb-5">
+        <Input
+          id="sg-target"
+          label="Target Goal Amount"
+          prefix="₹"
+          value="25,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="The total amount you wish to accumulate"
+          inputmode="decimal"
+          aria-describedby="sg-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="sg-target-slider" min={50000} max={50000000} step={50000} value={2500000} ariaLabel="Target amount slider" />
+        </div>
+      </div>
+
+      <!-- Initial / Current Savings -->
+      <div class="mb-5">
+        <Input
+          id="sg-current"
+          label="Current Savings (Seed Capital)"
+          prefix="₹"
+          value="2,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Funds already set aside towards this goal"
+          inputmode="decimal"
+          aria-describedby="sg-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="sg-current-slider" min={0} max={10000000} step={25000} value={200000} ariaLabel="Current savings slider" />
+        </div>
+      </div>
+
+      <!-- Expected Annual Return -->
+      <div class="mb-5">
+        <Input
+          id="sg-rate"
+          label="Expected Annual Return"
+          suffix="%"
+          value="10"
+          isNumeric={true}
+          helperText="Expected annual portfolio compound return"
+          inputmode="decimal"
+          aria-describedby="sg-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="sg-rate-slider" min={1} max={25} step={0.25} value={10} ariaLabel="Return rate slider" />
+        </div>
+      </div>
+
+      <!-- Time Horizon in Years -->
+      <div class="mb-6">
+        <Input
+          id="sg-years"
+          label="Time Horizon (Years)"
+          value="5"
+          isNumeric={true}
+          helperText="Number of years until target date"
+          inputmode="numeric"
+          aria-describedby="sg-error-msg"
+        />
+        <div class="mt-2">
+          <Slider id="sg-years-slider" min={1} max={30} step={1} value={5} ariaLabel="Years slider" />
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="sg-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="sg-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Required Monthly Savings</span>
+        <div id="sg-result-monthly" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+          {fmtCurrency(result.monthlyContribution)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Annual Contribution</span>
+          <span id="sg-result-annual" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.annualContribution)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total You Save</span>
+          <span id="sg-result-total-contrib" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.totalContributions)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Growth / Returns Earned</span>
+          <span id="sg-result-total-interest" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalInterest)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Target Goal</span>
+          <span id="sg-result-target" class="text-sm font-bold tabular-nums text-dark-text">{fmtCurrency(result.targetAmount)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5" id="sg-composition-wrapper">
+        <CompositionBar
+          principalFraction={result.totalContributions / result.targetAmount}
+          gainFraction={result.totalInterest / result.targetAmount}
+          principalLabel="Total Saved"
+          gainLabel="Interest Earned"
+          principalValue={fmtCurrency(result.totalContributions)}
+          gainValue={fmtCurrency(result.totalInterest)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="sg-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="sg-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes monthly compounding deposits with end-of-period contributions.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="sg-calculator-how">
+        <h2 id="sg-calculator-how" class="text-xl font-bold text-text-primary mb-4">How target savings calculation works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          To calculate the periodic contribution required to reach a future financial milestone, we solve the annuity future value equation for payment ($PMT$):
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <p class="text-sm text-text-muted leading-relaxed">
+            <strong>Target Equation: </strong> FV = PV &times; (1 + r)<sup>n</sup> + PMT &times; [ (1 + r)<sup>n</sup> &minus; 1 ] &divide; r<br />
+            <strong>Required Monthly Deposit: </strong> PMT = [ FV &minus; PV &times; (1 + r)<sup>n</sup> ] &times; r &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br />
+            <strong>Total Capital Outlay: </strong> Total Saved = PV + (PMT &times; n)
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="sg-calculator-faq">
+        <h2 id="sg-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['How does a savings goal calculator work?', 'It calculates the exact periodic deposit (monthly or annual) needed to bridge the gap between your existing savings and your target future amount, taking into account compound growth across your investment horizon.'],
+            ['How does compound interest help reach a savings goal?', 'Compound interest generates returns on both your initial principal and previously earned interest. Over long investment horizons, compound earnings can fund a significant portion of your total target, reducing the actual out-of-pocket contributions needed.'],
+            ['What expected return rate should I use for a 5-year goal?', 'For short-to-medium horizons (3 to 5 years), capital preservation is paramount. Conservative investors typically project 6% to 8% using debt funds, fixed deposits, or conservative hybrid funds. High equity allocations (10–12%) carry sequence-of-returns risk for rigid deadlines.'],
+            ['What if my existing savings already grow to my target?', 'If your initial seed savings compounded at your expected rate of return reaches or exceeds your target before the deadline, your required monthly contribution drops to ₹0 / $0.'],
+            ['How does inflation affect my savings goal?', 'If your goal represents a future real expenditure (like higher education or a house down payment), price increases will likely raise your target amount. You should increase your future target to reflect inflation or use a real (inflation-adjusted) return rate.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="sg-calculator-related">
+        <h2 id="sg-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { calcSavingsGoal } from '../lib/finance/time-value';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initSavingsGoalCalc() {
+    if ((window as any).__cmSavingsBound) return;
+    (window as any).__cmSavingsBound = true;
+
+    const targetInput = document.getElementById('sg-target') as HTMLInputElement | null;
+    const currentInput = document.getElementById('sg-current') as HTMLInputElement | null;
+    const rateInput = document.getElementById('sg-rate') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('sg-years') as HTMLInputElement | null;
+
+    const targetSlider = document.getElementById('sg-target-slider') as HTMLInputElement | null;
+    const currentSlider = document.getElementById('sg-current-slider') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('sg-rate-slider') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('sg-years-slider') as HTMLInputElement | null;
+
+    const resMonthly = document.getElementById('sg-result-monthly');
+    const resAnnual = document.getElementById('sg-result-annual');
+    const resTotalContrib = document.getElementById('sg-result-total-contrib');
+    const resTotalInterest = document.getElementById('sg-result-total-interest');
+    const resTarget = document.getElementById('sg-result-target');
+
+    const errAlert = document.getElementById('sg-error-alert');
+    const errMsg = document.getElementById('sg-error-msg');
+
+    if (!targetInput || !currentInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { target: 2500000, current: 200000, rate: 10, years: 5 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawTarget = targetInput!.value.replace(/[^0-9.]/g, '');
+      const rawCurrent = currentInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+
+      const vTarget = validate(rawTarget, { required: true, min: 1000, label: 'Target Goal Amount' });
+      const vCurrent = validate(rawCurrent, { required: true, min: 0, label: 'Current Savings' });
+      const vRate = validate(rawRate, { required: true, min: 0, max: 100, decimal: true, label: 'Expected Return' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integer: true, label: 'Time Horizon' });
+
+      if (!vTarget.valid) { showError(vTarget.error!.message); return; }
+      if (!vCurrent.valid) { showError(vCurrent.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+      clearError();
+
+      const target = vTarget.value!;
+      const current = vCurrent.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+
+      const res = calcSavingsGoal(target, current, rate, years);
+
+      setResult({
+        heroValue: fmtVal(res.monthlyContribution),
+        heroLabel: 'Required Monthly Savings',
+        rows: [
+          { label: 'Annual Contribution', value: fmtVal(res.annualContribution) },
+          { label: 'Total You Save', value: fmtVal(res.totalContributions) },
+          { label: 'Growth / Returns Earned', value: fmtVal(res.totalInterest) },
+          { label: 'Target Goal', value: fmtVal(res.targetAmount) },
+        ],
+      });
+
+      if (resMonthly) resMonthly.textContent = fmtVal(res.monthlyContribution);
+      if (resAnnual) resAnnual.textContent = fmtVal(res.annualContribution);
+      if (resTotalContrib) resTotalContrib.textContent = fmtVal(res.totalContributions);
+      if (resTotalInterest) resTotalInterest.textContent = fmtVal(res.totalInterest);
+      if (resTarget) resTarget.textContent = fmtVal(res.targetAmount);
+
+      const wrapper = document.getElementById('sg-composition-wrapper');
+      if (wrapper && res.targetAmount > 0) {
+        const principalFrac = Math.min(1, res.totalContributions / res.targetAmount);
+        const gainFrac = Math.max(0, 1 - principalFrac);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(principalFrac * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(gainFrac * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalContributions);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
+      }
+
+      history.replaceState(null, '', serializeHash({ t: target, s: current, r: rate, y: years }));
+    }
+
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
+
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
+    }
+
+    sync(targetSlider, targetInput, true);
+    sync(currentSlider, currentInput, true);
+    sync(rateSlider, rateInput, false);
+    sync(yearsSlider, yearsInput, false);
+
+    document.getElementById('sg-calculate')?.addEventListener('click', recalc);
+    document.getElementById('sg-reset')?.addEventListener('click', () => {
+      targetInput.value = fmtLiveInput(String(DEFAULTS.target));
+      currentInput.value = fmtLiveInput(String(DEFAULTS.current));
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+
+      if (targetSlider) {
+        targetSlider.value = String(DEFAULTS.target);
+        targetSlider.style.setProperty('--slider-pct', `${((DEFAULTS.target - 50000) / (50000000 - 50000)) * 100}%`);
+      }
+      if (currentSlider) {
+        currentSlider.value = String(DEFAULTS.current);
+        currentSlider.style.setProperty('--slider-pct', `${((DEFAULTS.current - 0) / (10000000 - 0)) * 100}%`);
+      }
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (25 - 1)) * 100}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+
+      clearError();
+      recalc();
+      targetInput.focus();
+    });
+
+    [targetInput, currentInput, rateInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('sg-copy-btn')?.addEventListener('click', async () => {
+      const rawTarget = targetInput.value.replace(/[^0-9.]/g, '');
+      const rawCurrent = currentInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+
+      const vTarget = validate(rawTarget, { required: true, min: 1000, label: 'Target' });
+      const vCurrent = validate(rawCurrent, { required: true, min: 0, label: 'Current' });
+      const vRate = validate(rawRate, { required: true, min: 0, max: 100, label: 'Rate' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 50, label: 'Years' });
+
+      if (!vTarget.valid || !vCurrent.valid || !vRate.valid || !vYears.valid) return;
+
+      const res = calcSavingsGoal(vTarget.value!, vCurrent.value!, vRate.value!, vYears.value!);
+      const text = `Savings Goal: To accumulate ${fmtVal(vTarget.value!)} in ${vYears.value} years at ${vRate.value}% return, save ${fmtVal(res.monthlyContribution)}/month (${fmtVal(res.annualContribution)}/year). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('sg-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('sg-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('sg-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      t: { required: true, min: 1000, label: 't' },
+      s: { required: true, min: 0, label: 's' },
+      r: { required: true, min: 0, max: 100, decimal: true, label: 'r' },
+      y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
+    });
+    if (restored.valid && restored.values.t && restored.values.s !== undefined && restored.values.r !== undefined && restored.values.y) {
+      targetInput.value = fmtLiveInput(String(restored.values.t));
+      currentInput.value = fmtLiveInput(String(restored.values.s));
+      rateInput.value = String(restored.values.r);
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initSavingsGoalCalc();
+  document.addEventListener('astro:page-load', initSavingsGoalCalc);
+</script>
