@@ -19,7 +19,7 @@ const DEFAULT = { principal: 1000000, rate: 8.5, years: 20 };
 const result = calcEMI(DEFAULT.principal, DEFAULT.rate, DEFAULT.years);
 const amort = calcEMIAmortization(DEFAULT.principal, DEFAULT.rate, DEFAULT.years);
 
-const fmt = (n: number) => '₹' + formatIndian(n);
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'emi-calculator' && t.status === 'published').slice(0, 3);
 
@@ -29,13 +29,42 @@ const jsonld = {
   '@graph': [
     { '@type': 'WebApplication', name: 'EMI Calculator', url: canonicalUrl, description: 'Calculate monthly EMI, total interest, and repayment schedule for any loan.', applicationCategory: 'FinanceApplication', operatingSystem: 'Any', browserRequirements: 'Requires JavaScript', isAccessibleForFree: true, offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, inLanguage: 'en', dateModified: '2026-09-20', publisher: { '@id': 'https://calcumetrics.com/#org' } },
     { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' }, { '@type': 'ListItem', position: 3, name: 'EMI Calculator' }] },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is EMI and how is it calculated?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'An Equated Monthly Instalment (EMI) is a fixed monthly payment made by a borrower to a lender. It is calculated using the formula: EMI = P × r × (1 + r)^n / ((1 + r)^n − 1), where P is principal, r is monthly interest rate, and n is total months.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does a higher tenure mean lower EMI?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, a longer tenure reduces the monthly instalment amount, but significantly increases the cumulative interest paid over the life of the loan.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I save interest by making prepayments?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. Making prepayments directly reduces your outstanding loan principal balance, reducing future compound interest and either lowering your EMI or shortening your loan tenure.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
 
 <Layout title="EMI Calculator: Monthly Instalment & Total Interest | Calcumetrics" description="Calculate your loan EMI, total interest paid, and year-by-year amortization. Works for home loans, car loans, and personal loans. 100% client-side." canonical={canonicalUrl}>
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <CalculatorLayout toolName="EMI Calculator" category="Loans" categoryHref="/loans" heroValue={fmt(result.emiRounded)} heroLabel="Monthly EMI">
+  <CalculatorLayout toolName="EMI Calculator" category="Loans" categoryHref="/loans" heroValue={fmt(result.emiRounded)} heroLabel="Monthly EMI" calcType="multi-input">
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">EMI Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate your Equated Monthly Instalment, total interest paid, and view an amortization schedule.</p>
@@ -52,6 +81,14 @@ const jsonld = {
         <Input id="emi-years" label="Loan Tenure" suffix="Yrs" value="20" isNumeric={true} helperText="Duration in years" inputmode="decimal" />
         <div class="mt-2"><Slider id="emi-years-slider" min={1} max={30} step={1} value={20} ariaLabel="Loan tenure slider" /></div>
       </div>
+
+      <!-- Validation Error Container -->
+      <div id="emi-error-alert" class="hidden mb-5">
+        <Alert variant="error" title="Validation Error">
+          <span id="emi-error-message">Please check your inputs.</span>
+        </Alert>
+      </div>
+
       <Alert variant="info" title="Assumption">Computed using standard EMI formula. Internal computation uses unrounded EMI; displayed EMI is rounded to the nearest rupee. Total interest may differ slightly from multiplying rounded EMI × months.</Alert>
       <div class="flex gap-3 mt-6"><Button variant="primary" id="emi-calculate" type="button">Calculate</Button><Button variant="ghost" id="emi-reset" type="button">Reset</Button></div>
     </Fragment>
@@ -98,8 +135,21 @@ const jsonld = {
             <li><strong class="text-text-primary">n</strong> — Total months = years × 12</li>
           </ul>
         </div>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">The internal calculation uses the unrounded EMI (full float precision) to compute the exact total interest. The displayed EMI is rounded to the nearest rupee. This matches the convention of Indian banks and avoids accumulation of rounding errors over a 20-year amortization.</p>
-        <p class="text-sm text-text-muted leading-relaxed">For ₹10,00,000 at 8.5% p.a. over 20 years: monthly EMI = ₹8,678; total interest = ₹10,82,776; total payment = ₹20,82,776. The interest amount exceeds the principal — a common outcome for long-tenure home loans.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2">Worked Example</h3>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Consider a loan of <strong class="text-text-primary">₹10,00,000</strong> at <strong class="text-text-primary">8.5% p.a.</strong> over <strong class="text-text-primary">20 years</strong> (240 months):
+          </p>
+          <ul class="space-y-1 text-sm text-text-muted my-2">
+            <li>Monthly Interest Rate (r) = 8.5 / 1200 ≈ 0.0070833</li>
+            <li>Monthly EMI = <strong class="text-text-primary">₹8,678</strong></li>
+            <li>Total Payment = 8,678.23 &times; 240 = <strong class="text-text-primary">₹20,82,776</strong></li>
+            <li>Total Interest Paid = ₹20,82,776 − ₹10,00,000 = <strong class="text-text-primary">₹10,82,776</strong></li>
+          </ul>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Because of the 20-year duration, total interest exceeds the original loan principal amount, highlighting the value of partial prepayments.
+          </p>
+        </div>
       </section>
 
       <section aria-labelledby="emi-example">
@@ -109,7 +159,7 @@ const jsonld = {
           <div class="overflow-x-auto mt-3">
             <table class="w-full text-sm border-collapse">
               <thead><tr class="border-b border-border"><th class="text-left py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Year</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Principal</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Interest</th><th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Balance</th></tr></thead>
-              <tbody>
+              <tbody id="emi-amort-body">
                 {amort.map((row) => (
                   <tr class="border-b border-border hover:bg-canvas transition-standard">
                     <td class="py-2 px-3 text-text-primary">{row.year}</td>
@@ -159,74 +209,343 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcEMIClient(p: number, rate: number, years: number) {
-    const n = years * 12;
-    const r = rate / (12 * 100);
-    const emi = r === 0 ? p / n : (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    const totalPayment = emi * n;
-    const totalInterest = totalPayment - p;
-    return { emi, emiRounded: Math.round(emi), totalPayment, totalInterest, principalFraction: totalPayment > 0 ? p / totalPayment : 0, interestFraction: totalPayment > 0 ? totalInterest / totalPayment : 0 };
+  import { calcEMI, calcEMIAmortization } from '../lib/calculators/emi';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtIndian(n: number) { return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n)); }
-  function fmtLiveIndian(raw: string) { const num = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num); }
+
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
 
   function initEMICalc() {
     const principalInput = document.getElementById('emi-principal') as HTMLInputElement | null;
     const rateInput = document.getElementById('emi-rate') as HTMLInputElement | null;
     const yearsInput = document.getElementById('emi-years') as HTMLInputElement | null;
+
     const pSlider = document.getElementById('emi-principal-slider') as HTMLInputElement | null;
     const rSlider = document.getElementById('emi-rate-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('emi-years-slider') as HTMLInputElement | null;
+
     const resEMI = document.getElementById('emi-result-emi');
     const resPrincipal = document.getElementById('emi-result-principal');
     const resInterest = document.getElementById('emi-result-interest');
     const resTotal = document.getElementById('emi-result-total');
     const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errorAlert = document.getElementById('emi-error-alert');
+    const errorMessage = document.getElementById('emi-error-message');
+    const currencyDropdown = document.getElementById('emi-currency') as HTMLSelectElement | null;
+    const amortBody = document.getElementById('emi-amort-body');
+
     if (!principalInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { principal: 1000000, rate: 8.5, years: 20 };
+    const emiSchema = {
+      p: { required: true, min: 1000, max: 1000000000, integerOnly: true, label: 'Loan Amount' },
+      r: { required: true, min: 0, max: 50, decimal: true, label: 'Annual Interest Rate' },
+      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Loan Tenure (Years)' },
+    };
+
     let timer: ReturnType<typeof setTimeout>;
 
-    function parseRaw(s: string) { return parseFloat(s.replace(/[^0-9.]/g, '')) || 0; }
+    function showError(msg: string) {
+      if (errorAlert && errorMessage) {
+        errorMessage.textContent = msg;
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function hideError() {
+      if (errorAlert) {
+        errorAlert.classList.add('hidden');
+      }
+    }
+
+    function updateAmortizationTable(p: number, r: number, y: number) {
+      if (!amortBody) return;
+      const rows = calcEMIAmortization(p, r, y);
+      amortBody.innerHTML = '';
+      rows.forEach((row) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-border hover:bg-canvas transition-standard';
+        tr.innerHTML = `
+          <td class="py-2 px-3 text-text-primary">${row.year}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-text-primary font-medium">${fmtVal(row.principal)}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-accent">${fmtVal(row.interest)}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-text-muted">${fmtVal(row.balance)}</td>
+        `;
+        amortBody.appendChild(tr);
+      });
+    }
 
     function recalc() {
-      const p = parseRaw(principalInput.value);
-      const r = parseFloat(rateInput.value) || 0;
-      const y = parseInt(yearsInput.value) || 0;
-      if (p <= 0 || r <= 0 || y <= 0) return;
-      const res = calcEMIClient(p, r, y);
-      if (resEMI) resEMI.textContent = fmtIndian(res.emiRounded);
-      if (resPrincipal) resPrincipal.textContent = fmtIndian(p);
-      if (resInterest) resInterest.textContent = fmtIndian(res.totalInterest);
-      if (resTotal) resTotal.textContent = fmtIndian(res.totalPayment);
-      if (mobileHero) mobileHero.textContent = fmtIndian(res.emiRounded);
-      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}`);
+      // Phase 4.3 Centralized Validation Engine
+      const valP = validate(principalInput.value, emiSchema.p);
+      if (!valP.valid) {
+        showError(valP.error.message);
+        return;
+      }
+
+      const valR = validate(rateInput.value, emiSchema.r);
+      if (!valR.valid) {
+        showError(valR.error.message);
+        return;
+      }
+
+      const valY = validate(yearsInput.value, emiSchema.y);
+      if (!valY.valid) {
+        showError(valY.error.message);
+        return;
+      }
+
+      hideError();
+
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+
+      const res = calcEMI(p, r, y);
+
+      const emiStr = fmtVal(res.emiRounded);
+      const principalStr = fmtVal(p);
+      const interestStr = fmtVal(res.totalInterest);
+      const totalStr = fmtVal(res.totalPayment);
+
+      // Phase 4.2 Canonical Result State
+      const canonicalResult = {
+        heroValue: emiStr,
+        heroLabel: 'Monthly EMI',
+        rows: [
+          { label: 'Principal Amount', value: principalStr },
+          { label: 'Total Interest', value: interestStr, variant: 'accent' as const },
+          { label: 'Total Payment', value: totalStr },
+        ],
+        fields: {
+          'emi-result-emi': emiStr,
+          'emi-result-principal': principalStr,
+          'emi-result-interest': interestStr,
+          'emi-result-total': totalStr,
+        },
+        meta: { p, r, y, emi: res.emi, emiRounded: res.emiRounded, totalInterest: res.totalInterest, totalPayment: res.totalPayment },
+      };
+
+      setResult(canonicalResult);
+
+      const win = window as any;
+      if (win.__cmResultStore) {
+        win.__cmResultStore.setResult(canonicalResult);
+      }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
+
+      // Fallback desktop node updates
+      if (resEMI) resEMI.textContent = emiStr;
+      if (resPrincipal) resPrincipal.textContent = principalStr;
+      if (resInterest) resInterest.textContent = interestStr;
+      if (resTotal) resTotal.textContent = totalStr;
+      if (mobileHero) mobileHero.textContent = emiStr;
+
+      const wrapper = document.getElementById('emi-composition-wrapper');
+      if (wrapper && res.totalPayment > 0) {
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
+        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (legendEls[0]) legendEls[0].textContent = principalStr;
+        if (legendEls[1]) legendEls[1].textContent = interestStr;
+      }
+
+      updateAmortizationTable(p, r, y);
+
+      // Phase 4.4 URL State Serialization
+      updateHash(serializeHash({ p, r, y }));
     }
 
-    function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 100); }
+    function debounce() {
+      clearTimeout(timer);
+      timer = setTimeout(recalc, 100);
+    }
 
-    function syncPair(slider: HTMLInputElement | null, input: HTMLInputElement, isIndian: boolean) {
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
       if (!slider) return;
-      slider.addEventListener('input', () => { input.value = isIndian ? fmtLiveIndian(slider.value) : slider.value; const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100; slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`); debounce(); });
-      input.addEventListener('input', () => { const raw = input.value.replace(/[^0-9.]/g, ''); const num = parseFloat(raw); if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) { slider.value = String(num); const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100; slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`); } if (isIndian) input.value = fmtLiveIndian(raw); debounce(); });
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
+        const pct = ((val - min) / (max - min)) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtLiveInput(raw);
+        debounce();
+      });
     }
 
-    syncPair(pSlider, principalInput, true);
-    syncPair(rSlider, rateInput, false);
-    syncPair(ySlider, yearsInput, false);
+    sync(pSlider, principalInput, true);
+    sync(rSlider, rateInput, false);
+    sync(ySlider, yearsInput, false);
 
     document.getElementById('emi-calculate')?.addEventListener('click', recalc);
     document.getElementById('emi-reset')?.addEventListener('click', () => {
-      principalInput.value = fmtLiveIndian(String(DEFAULTS.principal));
+      principalInput.value = fmtLiveInput(String(DEFAULTS.principal));
       rateInput.value = String(DEFAULTS.rate);
       yearsInput.value = String(DEFAULTS.years);
-      if (pSlider) { pSlider.value = String(DEFAULTS.principal); pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal-10000)/(10000000-10000)*100).toFixed(2)}%`); }
-      if (rSlider) { rSlider.value = String(DEFAULTS.rate); rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate-1)/(30-1)*100).toFixed(2)}%`); }
-      if (ySlider) { ySlider.value = String(DEFAULTS.years); ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years-1)/(30-1)*100).toFixed(2)}%`); }
-      recalc(); principalInput.focus();
+
+      if (pSlider) {
+        pSlider.value = String(DEFAULTS.principal);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 10000) / (10000000 - 10000)) * 100}%`);
+      }
+      if (rSlider) {
+        rSlider.value = String(DEFAULTS.rate);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (30 - 1)) * 100}%`);
+      }
+      if (ySlider) {
+        ySlider.value = String(DEFAULTS.years);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+      }
+
+      hideError();
+      recalc();
+      principalInput.focus();
     });
-    [principalInput, rateInput, yearsInput].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
+
+    [principalInput, rateInput, yearsInput].forEach((el) => {
+      el?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    // Copy & Share
+    document.getElementById('emi-copy-btn')?.addEventListener('click', async () => {
+      const p = parseFloat(principalInput.value.replace(/[^0-9.]/g, '')) || 0;
+      const r = parseFloat(rateInput.value) || 0;
+      const y = parseFloat(yearsInput.value) || 0;
+      const res = calcEMI(p, r, y);
+      const text = `EMI Calculator: Loan of ${fmtVal(p)} at ${r}% p.a. for ${y} years => Monthly EMI: ${fmtVal(res.emiRounded)}, Total Interest: ${fmtVal(res.totalInterest)}. ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const btn = document.getElementById('emi-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('emi-share-btn')?.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      const btn = document.getElementById('emi-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Currency synchronization
+    function setEMICurrency(code: string, symbol: string) {
+      currSym = symbol;
+      currLocale = code === 'USD' ? 'en-US' : code === 'EUR' ? 'de-DE' : code === 'GBP' ? 'en-GB' : 'en-IN';
+      if (currencyDropdown && currencyDropdown.value !== code) {
+        currencyDropdown.value = code;
+      }
+      recalc();
+    }
+
+    currencyDropdown?.addEventListener('change', () => {
+      const code = currencyDropdown.value;
+      const symbolMap: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+      const sym = symbolMap[code] || '₹';
+      setEMICurrency(code, sym);
+      window.dispatchEvent(new CustomEvent('cm:currency-change', {
+        detail: { code, symbol: sym, label: `${sym} ${code}` },
+      }));
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.code && e.detail?.symbol) {
+        setEMICurrency(e.detail.code, e.detail.symbol);
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        if (saved.includes('USD')) setEMICurrency('USD', '$');
+        else if (saved.includes('EUR')) setEMICurrency('EUR', '€');
+        else if (saved.includes('GBP')) setEMICurrency('GBP', '£');
+        else setEMICurrency('INR', '₹');
+      }
+    } catch (e) {}
+
+    // Phase 4.4 URL State Restoration
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, emiSchema);
+      if (restored.valid) {
+        if (restored.values.p !== undefined) {
+          principalInput.value = fmtLiveInput(String(restored.values.p));
+          if (pSlider) {
+            pSlider.value = String(restored.values.p);
+            pSlider.style.setProperty('--slider-pct', `${((restored.values.p - 10000) / (10000000 - 10000)) * 100}%`);
+          }
+        }
+        if (restored.values.r !== undefined) {
+          rateInput.value = String(restored.values.r);
+          if (rSlider) {
+            rSlider.value = String(restored.values.r);
+            rSlider.style.setProperty('--slider-pct', `${((restored.values.r - 1) / (30 - 1)) * 100}%`);
+          }
+        }
+        if (restored.values.y !== undefined) {
+          yearsInput.value = String(restored.values.y);
+          if (ySlider) {
+            ySlider.value = String(restored.values.y);
+            ySlider.style.setProperty('--slider-pct', `${((restored.values.y - 1) / (30 - 1)) * 100}%`);
+          }
+        }
+      }
+    }
+
+    recalc();
   }
+
   initEMICalc();
   document.addEventListener('astro:page-load', initEMICalc);
 </script>
