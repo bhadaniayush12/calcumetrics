@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:11:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:13:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 23
-- **IN_PROGRESS:** 024. depreciation-calculator
-- **NEXT:** 025. working-capital-calculator
+- **COMPLETED:** 24
+- **IN_PROGRESS:** 025. working-capital-calculator
+- **NEXT:** 026. cogs-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** eoq-calculator
-- **LAST_COMMIT:** 56dec9f
+- **LAST_COMPLETED_UNIT:** depreciation-calculator
+- **LAST_COMMIT:** fb896ea
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -41,8 +41,8 @@
 - [x] 021. markup-vs-margin-calculator — DONE
 - [x] 022. roi-calculator — DONE
 - [x] 023. eoq-calculator — DONE
-- [ ] 024. depreciation-calculator — IN PROGRESS
-- [ ] 025. working-capital-calculator — PENDING
+- [x] 024. depreciation-calculator — DONE
+- [ ] 025. working-capital-calculator — IN PROGRESS
 - [ ] 026. cogs-calculator — PENDING
 - [ ] 027. inventory-turnover-calculator — PENDING
 - [ ] 028. liquidity-ratios-calculator — PENDING
@@ -194,4 +194,10 @@
   - Audited: Ford W. Harris Economic Order Quantity inventory optimization model.
   - Changes: Added mathematical formula and component breakdown, step-by-step worked example matching default inputs (10,000 units demand, ₹500 order fee, ₹25 holding cost → 632 units EOQ, 15.8 orders/year, 23.1-day cycle, ₹7,906 ordering cost = ₹7,906 holding cost = ₹15,811 total cost), batch size sensitivity matrix comparing small orders vs optimal EOQ vs bulk orders, detailed anatomy of holding vs ordering cost components, vendor volume discount decision rule, and supply chain assumptions/limitations.
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcEOQ`, 5 FAQs matching JSON-LD schema, and curated related links (`inventory-turnover-calculator`, `cogs-calculator`, `working-capital-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **024. depreciation-calculator (/depreciation-calculator)**:
+  - Audited: Capital asset write-off model comparing Straight Line Method (SLM) and Written Down Value (WDV).
+  - Changes: Added comparative SLM vs WDV formulas including exact WDV rate derivation, dual worked examples matching default parameters (₹5L asset, ₹50k salvage, 5 years → SLM ₹90k uniform yearly write-off at 18.0% vs WDV 36.90% rate starting at ₹1,84,521 Year 1 and declining to ₹29,246 Year 5), year-by-year write-off comparison schedule, "Tax Shield" timing advantage analysis explaining higher present value of early write-offs, statutory framework (Income Tax Act Section 32 block of assets vs Companies Act 2013 Schedule II component depreciation), and accounting assumptions/limitations.
+  - Preserved: Dynamic full write-off schedule table, calculation engine `calcDepreciation`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `cogs-calculator`, `cash-conversion-cycle-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
