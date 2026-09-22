@@ -252,44 +252,140 @@ const jsonld = {
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes a standard 365-day annual reporting period. A shorter or negative cycle represents superior working capital velocity.</p>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>The Cash Conversion Cycle measures working capital latency:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
-          CCC = DSO + DIO − DPO
+    <Fragment slot="below">
+      <section aria-labelledby="ccc-calculator-how">
+        <h2 id="ccc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the Cash Conversion Cycle (CCC) Works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The Cash Conversion Cycle (CCC), also known as the Net Operating Cycle, is a vital financial metric measuring the time span (expressed in days) required for a company to convert its investments in inventory and operational resources into liquid cash inflows from sales. It measures the net duration cash remains trapped in working capital:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. The Master CCC Equation:</strong> CCC = DSO + DIO &minus; DPO<br /><br />
+            <strong>2. Days Sales Outstanding (DSO):</strong> DSO = (Accounts Receivable &divide; Net Credit Sales) &times; 365<br />
+            &bull; Measures average days taken to collect payment from customers after making credit sales.<br /><br />
+            <strong>3. Days Inventory Outstanding (DIO / DSI):</strong> DIO = (Average Inventory &divide; Cost of Goods Sold) &times; 365<br />
+            &bull; Measures average days inventory sits in storage/production before being sold.<br /><br />
+            <strong>4. Days Payable Outstanding (DPO):</strong> DPO = (Accounts Payable &divide; Cost of Goods Sold) &times; 365<br />
+            &bull; Measures average days the business takes to pay its suppliers for trade purchases.<br /><br />
+            <strong>5. Gross Operating Cycle:</strong> Operating Cycle = DSO + DIO (total time from raw materials to customer payment)
+          </p>
         </div>
-        <p>Where DSO = (Receivables / Revenue) × 365, DIO = (Inventory / COGS) × 365, and DPO = (Payables / COGS) × 365.</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a commercial distributor or manufacturing enterprise with annual financial results consisting of <strong>₹20,00,000</strong> in revenue, <strong>₹12,00,000</strong> in COGS, <strong>₹2,00,000</strong> in Accounts Receivable, <strong>₹3,00,000</strong> in Average Inventory, and <strong>₹1,50,000</strong> in Accounts Payable across a 365-day fiscal year:
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Cycle Stage / Metric</th>
+                <th class="py-2.5 px-4">Financial Baseline Data</th>
+                <th class="py-2.5 px-4">Mathematical Equation</th>
+                <th class="py-2.5 px-4">Duration (Days)</th>
+                <th class="py-2.5 px-4">Working Capital Impact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">1. Days Sales Outstanding (DSO)</td>
+                <td class="py-2.5 px-4 font-mono">AR: ₹2,00,000 | Sales: ₹20,00,000</td>
+                <td class="py-2.5 px-4 font-mono">(₹2,00,000 &divide; ₹20,00,000) &times; 365</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">36.5 Days</td>
+                <td class="py-2.5 px-4">Average customer credit period granted before cash is collected.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">2. Days Inventory Outstanding (DIO)</td>
+                <td class="py-2.5 px-4 font-mono">Inv: ₹3,00,000 | COGS: ₹12,00,000</td>
+                <td class="py-2.5 px-4 font-mono">(₹3,00,000 &divide; ₹12,00,000) &times; 365</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">91.3 Days</td>
+                <td class="py-2.5 px-4">Inventory turnover duration before stock converts into finished sales.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Gross Operating Cycle</td>
+                <td class="py-2.5 px-4 font-mono">Production + Customer Collection</td>
+                <td class="py-2.5 px-4 font-mono">36.5 Days + 91.3 Days</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-text-primary">127.8 Days</td>
+                <td class="py-2.5 px-4">Total gross operating cycle before vendor financing deductions.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">3. Days Payable Outstanding (DPO)</td>
+                <td class="py-2.5 px-4 font-mono">AP: ₹1,50,000 | COGS: ₹12,00,000</td>
+                <td class="py-2.5 px-4 font-mono">(₹1,50,000 &divide; ₹12,00,000) &times; 365</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">&minus;45.6 Days</td>
+                <td class="py-2.5 px-4">Trade credit provided interest-free by suppliers, buffering working capital.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Net Cash Conversion Cycle (CCC)</td>
+                <td class="py-3 px-4 font-mono">DSO + DIO &minus; DPO</td>
+                <td class="py-3 px-4 font-mono">36.5 + 91.3 &minus; 45.6</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary text-base">82.1 Days</td>
+                <td class="py-3 px-4">Fair standing: The company must finance 82.1 days of operations via working capital lines.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">CCC Benchmarking &amp; Industry Standards</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Negative CCC (&lt;0 Days):</strong> Exemplary working capital efficiency. The business collects customer cash before paying vendors (e.g., Amazon, Walmart, Dell). Free operational cash float funds growth.</li>
+              <li><strong>Lean Cycle (&le;30 Days):</strong> Excellent capital velocity typical of fast-moving consumer goods (FMCG), quick-service restaurants, and lean retailers.</li>
+              <li><strong>Standard Cycle (31–60 Days):</strong> Healthy, sustainable cycle common in discrete manufacturing, wholesale trade, and commercial services.</li>
+              <li><strong>Extended Cycle (&gt;90 Days):</strong> Operational warning sign. Cash is locked up in dormant warehouses or delayed customer payments, requiring costly overdraft facilities.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Tactical Working Capital Levers</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Corporate CFOs compress CCC using three synchronized balance sheet levers:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Accelerating Collections (DSO):</strong> Offer early settlement terms (e.g., 2/10 Net 30), enforce automated invoice dunning, and deploy digital payment gateways.</li>
+              <li><strong>Optimizing Inventory Velocity (DIO):</strong> Implement just-in-time (JIT) procurement, eliminate slow-moving stock-keeping units (SKUs), and automate demand forecasting.</li>
+              <li><strong>Stretching Trade Payables (DPO):</strong> Negotiate extended vendor credit terms (from Net 30 to Net 60) and adopt supply chain dynamic discounting without damaging strategic partner relationships.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="ccc-calculator-faq">
+        <h2 id="ccc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="ccc-calculator-related">
+        <h2 id="ccc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related business calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/working-capital-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Business</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Working Capital Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate Net Working Capital and Current Ratio to evaluate operational short-term liquidity.</p>
           </a>
-        ))}
-      </div>
+          <a href="/inventory-turnover-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Business</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Inventory Turnover Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine how frequently your warehouse stock is sold and replenished across the fiscal year.</p>
+          </a>
+          <a href="/cogs-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Business</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">COGS Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate Cost of Goods Sold from beginning inventory, direct purchases, and ending stock.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>

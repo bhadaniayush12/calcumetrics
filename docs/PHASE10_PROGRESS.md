@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:48:45+05:30
+- **LAST_UPDATED:** 2026-09-23T04:50:20+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 45
-- **IN_PROGRESS:** 046. cash-conversion-cycle-calculator
-- **NEXT:** 047. dscr-calculator
+- **COMPLETED:** 46
+- **IN_PROGRESS:** 047. dscr-calculator
+- **NEXT:** 048. discounted-payback-period-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** salary-ctc-calculator
-- **LAST_COMMIT:** 26193f2
+- **LAST_COMPLETED_UNIT:** cash-conversion-cycle-calculator
+- **LAST_COMMIT:** b690a30
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -63,8 +63,8 @@
 - [x] 043. capital-gains-tax-calculator — DONE (India Tax Protected)
 - [x] 044. advance-tax-calculator — DONE (India Tax Protected)
 - [x] 045. salary-ctc-calculator — DONE (India Tax Protected)
-- [ ] 046. cash-conversion-cycle-calculator — IN PROGRESS
-- [ ] 047. dscr-calculator — PENDING
+- [x] 046. cash-conversion-cycle-calculator — DONE
+- [ ] 047. dscr-calculator — IN PROGRESS
 - [ ] 048. discounted-payback-period-calculator — PENDING
 - [ ] 049. present-value-calculator — PENDING
 - [ ] 050. future-value-calculator — PENDING
@@ -318,6 +318,12 @@
 
 - **045. salary-ctc-calculator (/in/salary-ctc-calculator)**:
   - Audited: India corporate payroll and compensation engine converting annual Cost to Company (CTC) into monthly in-hand take-home salary, allowances, and statutory retirals under the EPF Act, 1952.
-  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added 6-stage mathematical payroll decomposition equations (40% basic benchmarking, 40% non-metro HRA, statutory ₹15,000 EPF wage ceiling, balancing special allowance, gross monthly salary, net monthly take-home cash), complete step-by-step worked example schedule matching default inputs (₹12,00,000 annual CTC / ₹1,00,000 monthly budget → ₹21,600/yr employer EPF @ 12% on ₹15k wage ceiling, ₹11,78,400 annual gross salary / ₹98,200 monthly gross: ₹4,80,000 basic / ₹40,000 mo, ₹1,92,000 HRA / ₹16,000 mo, ₹5,06,400 special allowance / ₹42,200 mo; minus ₹21,600/yr employee EPF deduction @ ₹1,800/mo → ₹11,56,800 annual net cash / ₹96,400 monthly in-hand take-home pay / 96.4% cash realization), compensation structuring insights (basic pay ratio trade-offs, Payment of Gratuity Act 4.81% provisioning, state Professional Tax ₹2,500 annual caps, Section 192 TDS integration), and EPF capping analysis (statutory ₹15k capped model maximizing take-home vs uncapped MNC model building long-term PF corpus).
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added 6-stage mathematical payroll decomposition equations (40% basic benchmarking, 40% non-metro HRA, statutory ₹15,00,000 EPF wage ceiling, balancing special allowance, gross monthly salary, net monthly take-home cash), complete step-by-step worked example schedule matching default inputs (₹12,00,000 annual CTC / ₹1,00,000 monthly budget → ₹21,600/yr employer EPF @ 12% on ₹15k wage ceiling, ₹11,78,400 annual gross salary / ₹98,200 monthly gross: ₹4,80,000 basic / ₹40,000 mo, ₹1,92,000 HRA / ₹16,000 mo, ₹5,06,400 special allowance / ₹42,200 mo; minus ₹21,600/yr employee EPF deduction @ ₹1,800/mo → ₹11,56,800 annual net cash / ₹96,400 monthly in-hand take-home pay / 96.4% cash realization), compensation structuring insights (basic pay ratio trade-offs, Payment of Gratuity Act 4.81% provisioning, state Professional Tax ₹2,500 annual caps, Section 192 TDS integration), and EPF capping analysis (statutory ₹15k capped model maximizing take-home vs uncapped MNC model building long-term PF corpus).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcSalaryCTC`, standard Indian compensation ratios, INR currency locks, 5 FAQs matching JSON-LD schema, and curated related links (`/in/income-tax-calculator`, `/in/hra-calculator`, `/in/tds-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **046. cash-conversion-cycle-calculator (/cash-conversion-cycle-calculator)**:
+  - Audited: Corporate working capital velocity engine computing the Cash Conversion Cycle (CCC) from Days Sales Outstanding (DSO), Days Inventory Outstanding (DIO), and Days Payable Outstanding (DPO).
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added complete mathematical formula breakdown (CCC = DSO + DIO &minus; DPO, Operating Cycle = DSO + DIO, 365-day annualized balance sheet formulations), complete step-by-step worked example schedule matching default inputs (₹20,00,000 Revenue, ₹12,00,000 COGS, ₹2,00,000 AR, ₹3,00,000 Inventory, ₹1,50,000 AP over 365 days → DSO = 36.5 days, DIO = 91.3 days, Gross Operating Cycle = 127.8 days, DPO = 45.6 days, net CCC = 82.1 days, qualitative assessment: "Fair — cash is tied up for a moderate period"), institutional CCC benchmarking matrix (&lt;0 days negative cycle float vs &le;30 days lean FMCG vs 31–60 days manufacturing vs &gt;90 days working capital distress), and tactical working capital levers (DSO acceleration via 2/10 Net 30, DIO lean JIT replenishment, DPO trade credit optimization).
+  - Preserved: Clean interactive inputs, calculation engine `calcCCC`, dynamic multi-tier assessment messaging, 5 FAQs matching JSON-LD schema, and curated related links (`/working-capital-calculator`, `/inventory-turnover-calculator`, `/cogs-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
