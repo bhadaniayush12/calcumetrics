@@ -201,44 +201,161 @@ const jsonld = {
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes standard 40% Basic, 40% HRA, and statutory ₹15,000 EPF ceiling. Net take-home excludes voluntary deductions and income tax TDS.</p>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>CTC to In-Hand Salary conversion formula:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
-          Net Monthly Take-Home = (Annual CTC − Employer EPF) / 12 − Employee EPF − Professional Tax − Income Tax TDS
+    <Fragment slot="below">
+      <section aria-labelledby="ctc-calculator-how">
+        <h2 id="ctc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Cost to Company (CTC) Translates into In-Hand Salary</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Cost to Company (CTC) is the total cumulative expenditure an employer budgets to employ an individual annually in India. It encompasses not only the take-home cash deposited into the employee's bank account, but also statutory retirement benefits, allowances, and statutory payroll deductions:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Basic Salary Structure:</strong> Basic Pay = 40.00% &times; Annual CTC (Industry benchmark for non-metros; 50% in metros)<br /><br />
+            <strong>2. House Rent Allowance (HRA):</strong> HRA = 40.00% &times; Basic Salary (Eligible for partial tax exemption under Section 10(13A))<br /><br />
+            <strong>3. Statutory Retiral Allocation (EPF):</strong><br />
+            &bull; Statutory Wage Ceiling: ₹15,000 / month (₹1,80,000 / year)<br />
+            &bull; Employer EPF Contribution = 12% &times; min(Basic, ₹1,80,000) = ₹21,600 / year (deducted from CTC to derive Gross Salary)<br />
+            &bull; Employee EPF Deduction = 12% &times; min(Basic, ₹1,80,000) = ₹21,600 / year (deducted from Gross Salary)<br /><br />
+            <strong>4. Balancing Special Allowance:</strong> Special Allowance = Annual Gross Salary &minus; (Basic Salary + HRA)<br /><br />
+            <strong>5. Gross Monthly Salary:</strong> Gross Monthly = (Annual CTC &minus; Employer EPF) &divide; 12<br /><br />
+            <strong>6. Net Monthly Take-Home Pay:</strong> In-Hand Cash = Gross Monthly &minus; (Employee EPF &divide; 12) &minus; Professional Tax &minus; TDS
+          </p>
         </div>
-        <p>Basic Salary = 40% of CTC; HRA = 40% of Basic; EPF is 12% of capped basic wage (₹1,800/mo).</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an executive or software engineer offered an annual CTC package of <strong>₹12,00,000</strong> (₹1,00,000 monthly CTC budget) under standard Indian corporate payroll rules:
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Compensation Component</th>
+                <th class="py-2.5 px-4">Formula / Statutory Baseline</th>
+                <th class="py-2.5 px-4">Annual Value (₹)</th>
+                <th class="py-2.5 px-4">Monthly Value (₹)</th>
+                <th class="py-2.5 px-4">Payroll Role / Nature</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Cost to Company (CTC)</td>
+                <td class="py-2.5 px-4 font-mono">Agreed Employer Package</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹12,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000</td>
+                <td class="py-2.5 px-4">Gross corporate employment budget.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Employer EPF Contribution</td>
+                <td class="py-2.5 px-4 font-mono">12% on ₹15,000 Wage Ceiling</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">&minus;₹21,600</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">&minus;₹1,800</td>
+                <td class="py-2.5 px-4">Employer retiral share deposited with EPFO (not part of Gross Pay).</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Annual Gross Salary</td>
+                <td class="py-2.5 px-4 font-mono">CTC &minus; Employer EPF</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-text-primary">₹11,78,400</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-text-primary">₹98,200</td>
+                <td class="py-2.5 px-4">Total gross salary appearing on the monthly payslip earnings column.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">&bull; Basic Salary (40%)</td>
+                <td class="py-2.5 px-4 font-mono">40% of Annual CTC</td>
+                <td class="py-2.5 px-4 font-mono">₹4,80,000</td>
+                <td class="py-2.5 px-4 font-mono">₹40,000</td>
+                <td class="py-2.5 px-4">Core fixed pay; forms statutory baseline for PF, Gratuity, and HRA.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">&bull; House Rent Allowance (HRA)</td>
+                <td class="py-2.5 px-4 font-mono">40% of Basic Salary</td>
+                <td class="py-2.5 px-4 font-mono">₹1,92,000</td>
+                <td class="py-2.5 px-4 font-mono">₹16,000</td>
+                <td class="py-2.5 px-4">Non-metro HRA rate; eligible for rent exemption under Section 10(13A).</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">&bull; Special Allowance</td>
+                <td class="py-2.5 px-4 font-mono">Gross Pay &minus; (Basic + HRA)</td>
+                <td class="py-2.5 px-4 font-mono">₹5,06,400</td>
+                <td class="py-2.5 px-4 font-mono">₹42,200</td>
+                <td class="py-2.5 px-4">Residual balancing allowance; 100% taxable under income tax slabs.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Employee EPF Deduction</td>
+                <td class="py-2.5 px-4 font-mono">12% on ₹15,000 Wage Ceiling</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">&minus;₹21,600</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">&minus;₹1,800</td>
+                <td class="py-2.5 px-4">Statutory employee deduction to EPF account (Section 80C eligible).</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Net Monthly In-Hand (Take-Home)</td>
+                <td class="py-3 px-4 font-mono">Gross Monthly &minus; Employee EPF</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹11,56,800 (96.4%)</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary text-base">₹96,400 / mo</td>
+                <td class="py-3 px-4">Actual net bank transfer received (before state PT and annual ITR TDS).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Salary Structuring &amp; Tax Implications</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Basic Pay Optimization:</strong> A higher basic salary (&ge;50%) raises mandatory EPF contributions and increases the statutory HRA exemption ceiling, but decreases immediate net monthly cash in hand.</li>
+              <li><strong>Gratuity Inclusion:</strong> Under the Payment of Gratuity Act, 1972, many employers budget gratuity at <strong>4.81% of Basic</strong> inside annual CTC. Gratuity is only disbursed upon resignation or retirement after 5 years of continuous service.</li>
+              <li><strong>Professional Tax (PT):</strong> State-level tax levied in Maharashtra, Karnataka, Telangana, West Bengal, and other states, capped statutorily at <strong>₹2,500 per year</strong> (typically ₹200/month, with ₹300 in February).</li>
+              <li><strong>Income Tax TDS (Section 192):</strong> Monthly in-hand pay is subject to tax withholding by the employer based on the employee's regime choice (New vs Old) and Form 12BB investment declarations.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">EPF Capping: Statutory vs Actual Basic</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Understanding how your employer administers the Employees' Provident Fund (EPF) is critical:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Statutory Capped EPF (Default Model):</strong> Contributions are capped at 12% of the statutory wage limit of <strong>₹15,000/month</strong>, totaling <strong>₹1,800/month</strong> each for employer and employee. This maximizes immediate monthly take-home cash.</li>
+              <li><strong>Uncapped EPF (MNC / Corporate Practice):</strong> Many multinational corporations calculate 12% EPF on the <em>actual</em> basic pay (e.g., 12% on ₹40,000 = ₹4,800/month). While this builds a significantly larger retirement nest egg, it reduces monthly take-home pay by ₹3,000.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="ctc-calculator-faq">
+        <h2 id="ctc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="ctc-calculator-related">
+        <h2 id="ctc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related tax calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/in/income-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Income Tax Calculator (India)</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compare Old vs New Tax Regime tax liability per Finance Act 2024-25.</p>
           </a>
-        ))}
-      </div>
+          <a href="/in/hra-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">HRA Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate House Rent Allowance tax exemption under Section 10(13A) of the Income-tax Act.</p>
+          </a>
+          <a href="/in/tds-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">TDS Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine Tax Deducted at Source withholding amounts across commercial and professional sections.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
