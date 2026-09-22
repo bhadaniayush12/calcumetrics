@@ -253,17 +253,89 @@ const jsonld = {
 
     <Fragment slot="below">
       <section aria-labelledby="mdr-calculator-how">
-        <h2 id="mdr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How UPI MDR works for businesses</h2>
+        <h2 id="mdr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How UPI MDR & interchange fees are calculated</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          While direct bank-account-to-bank-account UPI payments have zero MDR, the NPCI introduced interchange pricing on merchant transactions initiated via Prepaid Payment Instruments (wallets) and RuPay credit cards:
+          Under National Payments Corporation of India (NPCI) directives, standard peer-to-peer (P2P) and person-to-merchant (P2M) bank account transfers carry <strong>zero MDR</strong>. Interchange fees apply strictly when consumers pay merchants via Prepaid Payment Instruments (wallets like Paytm, PhonePe Wallet) or RuPay Credit Cards on UPI for transactions exceeding ₹2,000:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Chargeable Volume = </strong> Monthly Volume &times; (Chargeable Share % &divide; 100)<br />
-            <strong>Base MDR Fee = </strong> Chargeable Volume &times; (MDR % &divide; 100)<br />
-            <strong>GST Amount = </strong> Base MDR Fee &times; 18%<br />
-            <strong>Net Payout = </strong> Total Monthly Volume &minus; (Base MDR + GST)
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3">
+          <div class="space-y-1">
+            <p class="font-bold text-text-primary text-sm">Step 1: Determine Chargeable Merchant Volume</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Chargeable Volume = Total Monthly Volume × (Chargeable Share % ÷ 100)</p>
+          </div>
+          <div class="space-y-1 border-t border-border/50 pt-2">
+            <p class="font-bold text-text-primary text-sm">Step 2: Compute Base Merchant Discount Rate (MDR)</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Base MDR Fee = Chargeable Volume × (Interchange Rate % ÷ 100)</p>
+          </div>
+          <div class="space-y-1 border-t border-border/50 pt-2">
+            <p class="font-bold text-text-primary text-sm">Step 3: Levy Statutory 18% GST on Financial Services</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">GST Amount = Base MDR Fee × 18%</p>
+          </div>
+          <div class="space-y-1 border-t border-border/50 pt-2">
+            <p class="font-bold text-text-primary text-sm">Step 4: Net Payout Credited to Business Account</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Net Bank Settlement = Total Monthly Volume − (Base MDR Fee + GST Amount)</p>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="mdr-worked-example">
+        <h2 id="mdr-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: Retail Merchant</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider a retail merchant in Pune processing <strong>₹5,00,000</strong> in total monthly digital collections through merchant QR codes. Customer payment analytics indicate that <strong>80%</strong> (₹4,00,000) are direct savings bank transfers (0% MDR), while <strong>20%</strong> (₹1,00,000) are paid using PPI wallets or RuPay credit cards on UPI at a standard <strong>1.1% interchange rate</strong>:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Total Monthly UPI Volume:</span>
+            <strong class="text-text-primary font-mono">₹5,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Free Bank-to-Bank Volume (80%):</span>
+            <strong class="text-text-primary font-mono">₹4,00,000 (₹0 fee)</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Chargeable Volume (20% via PPI / RuPay Credit):</span>
+            <strong class="text-text-primary font-mono">₹1,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Base MDR Fee (₹1,00,000 × 1.1%):</span>
+            <strong class="text-text-primary font-mono">₹1,100</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>GST on Processing Fee (18% × ₹1,100):</span>
+            <strong class="text-text-primary font-mono">₹198</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Total Payment Processing Deductions:</span>
+            <strong class="text-text-primary font-mono">₹1,298</strong>
+          </div>
+          <div class="flex justify-between pt-1">
+            <span>Net Monthly Bank Settlement:</span>
+            <strong class="text-accent font-mono font-bold">₹4,98,702</strong>
+          </div>
+          <p class="text-xs text-text-muted pt-1 border-t border-border/50">
+            <strong>Effective Acceptance Cost:</strong> ₹1,298 ÷ ₹5,00,000 = <strong>0.260%</strong>. This represents substantial operational savings compared to traditional card POS machines (which average 1.75% to 2.50%).
           </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="mdr-regulatory-rules">
+        <h2 id="mdr-regulatory-rules" class="text-xl font-bold text-text-primary mb-4">NPCI regulations, interchange tiers & tax rules</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Zero Surcharge on Consumers</h3>
+            <p>NPCI guidelines explicitly mandate that merchants cannot pass interchange costs onto buyers as convenience fees or checkout surcharges. Payment via UPI must remain 100% free for consumers.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">₹2,000 Ticket Size Threshold</h3>
+            <p>Wallet and prepaid instrument interchange fees apply exclusively to transactions strictly above ₹2,000. High-volume, low-ticket retail transactions remain completely exempt from MDR deductions.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Input Tax Credit (ITC) Recovery</h3>
+            <p>GST-registered merchants can claim the 18% GST levied on payment aggregator MDR invoices as Input Tax Credit (ITC) in their monthly GSTR-3B filings, offsetting taxes on outward goods or services.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Category Code (MCC) Concessions</h3>
+            <p>Merchants in government services, agriculture, utilities, fuel, and education enjoy capped or reduced interchange tiers (typically 0.5%–0.7%) compared to the standard 1.1% commercial cap.</p>
+          </div>
         </div>
       </section>
 

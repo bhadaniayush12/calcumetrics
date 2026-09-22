@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:04:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:04:45+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 17
-- **IN_PROGRESS:** 018. upi-mdr-calculator
+- **COMPLETED:** 18
+- **IN_PROGRESS:** NONE
 - **NEXT:** 019. break-even-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** hra-calculator
-- **LAST_COMMIT:** ac94661
+- **LAST_COMPLETED_UNIT:** upi-mdr-calculator
+- **LAST_COMMIT:** fcb3aed
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -35,7 +35,7 @@
 - [x] 015. income-tax-calculator — DONE (Phase 5 Locked, India Tax Protected, Intentionally Preserved)
 - [x] 016. gst-calculator — DONE (India Tax Protected)
 - [x] 017. hra-calculator — DONE (India Tax Protected)
-- [ ] 018. upi-mdr-calculator — IN PROGRESS
+- [x] 018. upi-mdr-calculator — DONE
 - [ ] 019. break-even-calculator — PENDING (Phase 5 Locked)
 - [ ] 020. profit-margin-calculator — PENDING
 - [ ] 021. markup-vs-margin-calculator — PENDING
@@ -160,4 +160,10 @@
   - Audited: Section 10(13A) and Rule 2A House Rent Allowance tax exemption tripartite model.
   - Changes: Added step-by-step worked example for metro resident (₹6L basic, ₹2.4L HRA received, ₹1.8L rent paid in Mumbai → Limit 1: ₹2.4L, Limit 2: ₹1.2L, Limit 3: ₹3L → statutory exemption is ₹1.2L, taxable HRA is ₹1.2L), added statutory city classification guidance explaining the strict 4-metro definition (Delhi, Mumbai, Kolkata, Chennai as 50% vs Bengaluru, Hyderabad, Pune as 40%), and added compliance rules (mandatory landlord PAN threshold above ₹1 Lakh annual rent, requirements for legally paying rent to parents, and simultaneous Section 24(b) home loan interest + HRA exemption rules).
   - Preserved: Strict INR jurisdiction lock, Phase 7/8 regulatory baseline, authoritative CBDT source link, verified date, statutory disclaimers, calculation engine `calcHRA`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **018. upi-mdr-calculator (/in/upi-mdr-calculator)**:
+  - Audited: Merchant Discount Rate & interchange fee model on UPI digital transactions (Prepaid Wallets and RuPay Credit on UPI).
+  - Changes: Added step-by-step worked example using default retail parameters (₹5,00,000 monthly volume, 80% free bank-to-bank transfers = ₹4L at ₹0 fee, 20% chargeable PPI/RuPay credit = ₹1L at 1.1% MDR → Base MDR ₹1,100 + 18% GST ₹198 = ₹1,298 total deductions, ₹4,98,702 net payout, 0.260% effective acceptance cost), added regulatory rules (NPCI zero-surcharge mandate for consumers, ₹2,000 ticket size exemption threshold, Input Tax Credit recovery on GST charged on MDR, and Merchant Category Code concessions for utilities, fuel, and education).
+  - Preserved: Strict INR jurisdiction lock, calculation engine `calcUPIMDR`, 5 FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
