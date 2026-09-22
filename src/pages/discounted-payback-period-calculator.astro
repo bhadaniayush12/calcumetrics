@@ -1,0 +1,477 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcDiscountedPayback } from '../lib/finance/time-value';
+import { calcPayback } from '../lib/calculators/corporate';
+import { formatIndian } from '../lib/formatters';
+import { TOOLS } from '../config/site';
+
+const DEFAULT_FLOWS = [300000, 350000, 400000, 400000, 500000];
+const DEFAULT_INVEST = 1000000;
+const DEFAULT_RATE = 10;
+const result = calcDiscountedPayback(DEFAULT_INVEST, DEFAULT_FLOWS, DEFAULT_RATE);
+const undiscounted = calcPayback(DEFAULT_INVEST, DEFAULT_FLOWS);
+
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+const heroText = result.recovered
+  ? result.paybackYears.toFixed(1) + ' Years'
+  : 'Not Recovered';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'discounted-payback-period-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/discounted-payback-period-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Discounted Payback Period Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the discounted payback period (DPP) — the time required to recover an initial investment from time-value-adjusted future cash flows.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'Discounted Payback Period Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is the discounted payback period?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The discounted payback period (DPP) is the time it takes to recover an initial investment from cumulative discounted (present value–adjusted) future cash flows. Unlike the simple payback period, DPP accounts for the time value of money.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why is DPP always longer than the simple payback period?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'When future cash flows are discounted, each period\'s contribution to recovery is reduced relative to its nominal value. This means it takes more time to accumulate the same total in discounted terms, making DPP ≥ simple payback period when the discount rate is positive.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a good discounted payback period?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'There is no universal benchmark — it depends on industry and project type. Most companies set internal thresholds (e.g. DPP ≤ 3–5 years for technology projects, longer for infrastructure). A DPP shorter than the project\'s useful life is the minimum requirement.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is DPP different from NPV?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'NPV measures total value created over the project\'s life in present-value terms. DPP measures only the time to break even in discounted terms. DPP does not account for cash flows after the break-even point, which can cause it to reject high-NPV long-life projects.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What happens if the investment is never recovered?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If the sum of all discounted cash flows is less than the initial investment, the DPP is mathematically infinite — the project never recoups its cost in present-value terms. This is often a signal to reconsider the project or renegotiate terms.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Discounted Payback Period Calculator: Time-Value-Adjusted Recovery | Calcumetrics"
+  description="Calculate the discounted payback period (DPP) using present-value-adjusted cash flows. Compare to simple payback period. Free, instant, and fully client-side."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Discounted Payback Period Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={heroText}
+    heroLabel="Discounted Payback Period"
+    calcType="advanced"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Discounted Payback Period Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Enter an initial investment, a discount rate, and up to 10 years of annual cash inflows to find the time-value-adjusted break-even point.</p>
+
+      <div id="dpp-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="dpp-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <div class="mb-5">
+        <Input id="dpp-invest" label="Initial Investment" prefix="₹" value="10,00,000" isNumeric={true} localeFormat="indian" helperText="Upfront capital outlay" inputmode="decimal" aria-describedby="dpp-error-msg" />
+        <div class="mt-2"><Slider id="dpp-invest-slider" min={10000} max={50000000} step={10000} value={1000000} ariaLabel="Initial investment slider" /></div>
+      </div>
+
+      <div class="mb-6">
+        <Input id="dpp-rate" label="Discount Rate" suffix="%" value="10" isNumeric={true} helperText="Annual discount rate (e.g. WACC or required return)" inputmode="decimal" aria-describedby="dpp-error-msg" />
+        <div class="mt-2"><Slider id="dpp-rate-slider" min={1} max={30} step={0.5} value={10} ariaLabel="Discount rate slider" /></div>
+      </div>
+
+      <p class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Annual Cash Inflows</p>
+      <div id="dpp-flows-container" class="space-y-3 mb-5">
+        {DEFAULT_FLOWS.map((flow, i) => (
+          <div class="flex gap-3 items-center">
+            <span class="text-xs text-text-muted w-12 shrink-0">Year {i + 1}</span>
+            <Input id={`dpp-flow-${i}`} label="" prefix="₹" value={formatIndian(flow)} isNumeric={true} localeFormat="indian" helperText="" inputmode="decimal" class="flex-1" aria-describedby="dpp-error-msg" />
+          </div>
+        ))}
+      </div>
+
+      <div class="flex gap-2 mb-6">
+        <button type="button" id="dpp-add-year" class="h-9 px-4 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">+ Add Year</button>
+        <button type="button" id="dpp-remove-year" class="h-9 px-4 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer disabled:opacity-40" disabled={DEFAULT_FLOWS.length <= 1}>− Remove Year</button>
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="dpp-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="dpp-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Discounted Payback Period</span>
+        <div id="dpp-result-dpp" class="text-[36px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite" aria-atomic="true">
+          {heroText}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Simple Payback Period</span>
+          <span id="dpp-result-simple" class="text-sm font-medium tabular-nums text-dark-text">
+            {undiscounted.recovered ? undiscounted.paybackYears.toFixed(1) + ' yrs' : '—'}
+          </span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Discounted Inflows</span>
+          <span id="dpp-result-pv-inflows" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.totalPVInflows)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Investment Recovered?</span>
+          <span id="dpp-result-recovered" class={`text-sm font-semibold ${result.recovered ? 'text-dark-accent' : 'text-red-400'}`}>
+            {result.recovered ? 'Yes' : 'No'}
+          </span>
+        </div>
+      </div>
+
+      <!-- Period-by-period table -->
+      <div class="mb-5 overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-dark-border">
+              <th class="text-left text-dark-muted pb-2 pr-3">Year</th>
+              <th class="text-right text-dark-muted pb-2 pr-3">Cash Flow</th>
+              <th class="text-right text-dark-muted pb-2 pr-3">Discounted</th>
+              <th class="text-right text-dark-muted pb-2">Cumulative PV</th>
+            </tr>
+          </thead>
+          <tbody id="dpp-table-body">
+            {result.cumulativeDiscounted.map((row) => (
+              <tr class="border-b border-dark-border/40">
+                <td class="py-1.5 pr-3 text-dark-muted">{row.period}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums text-dark-text">{fmt(row.cashFlow)}</td>
+                <td class="py-1.5 pr-3 text-right tabular-nums text-dark-text">{fmt(row.discounted)}</td>
+                <td class="py-1.5 text-right tabular-nums text-dark-text">{fmt(row.cumulative)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="dpp-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Copy Result</button>
+        <button type="button" id="dpp-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Share Link</button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="dpp-how">
+        <h2 id="dpp-how" class="text-xl font-bold text-text-primary mb-4">How the Discounted Payback Period works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Unlike the simple payback period, DPP adjusts each future cash inflow for the time value of money before accumulating them toward the initial investment. This makes it a more conservative and theoretically rigorous measure.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">Discounted CF(t) = CF(t) / (1 + r)^t</p>
+          <p class="text-base font-mono text-text-primary mb-3">DPP = smallest t where Σ Discounted CF ≥ Initial Investment</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">CF(t)</strong> — Nominal cash inflow in year t</li>
+            <li><strong class="text-text-primary">r</strong> — Annual discount rate</li>
+            <li><strong class="text-text-primary">t</strong> — Year number (starting at 1)</li>
+          </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="dpp-faq">
+        <h2 id="dpp-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What is the discounted payback period?', 'The DPP is the time to recover an initial investment from cumulative present-value-adjusted future cash flows — the time-value-aware version of the simple payback period.'],
+            ['Why is DPP always longer than simple payback?', 'Discounting reduces each period\'s contribution to recovery. More time is needed to accumulate the same total when cash flows are discounted.'],
+            ['What discount rate should I use?', 'Use the project\'s WACC, the firm\'s required rate of return, or the cost of capital. The discount rate should reflect the risk profile of the cash flows.'],
+            ['How is DPP different from NPV?', 'NPV measures total value created over the project\'s life. DPP only measures time to break even and ignores all cash flows after the break-even point.'],
+            ['What if the investment is never recovered?', 'If cumulative discounted inflows never reach the initial investment, DPP is infinite — the project never recoups its cost in present-value terms. This is a strong signal to reconsider.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="dpp-related">
+        <h2 id="dpp-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+
+  function dppCalcClient(invest: number, flows: number[], ratePct: number) {
+    const r = ratePct / 100;
+    let cumulative = 0;
+    let totalPV = 0;
+    let paybackYears = Infinity;
+    let recovered = false;
+    const schedule: Array<{ period: number; cashFlow: number; discounted: number; cumulative: number }> = [];
+
+    for (let i = 0; i < flows.length; i++) {
+      const period = i + 1;
+      const cf = flows[i];
+      const discounted = cf / Math.pow(1 + r, period);
+      const prev = cumulative;
+      cumulative += discounted;
+      totalPV += discounted;
+      schedule.push({ period, cashFlow: cf, discounted, cumulative });
+      if (!recovered && cumulative >= invest) {
+        paybackYears = i + (invest - prev) / discounted;
+        recovered = true;
+      }
+    }
+
+    // Simple payback
+    let simpCum = 0; let simpPB = Infinity; let simpRec = false;
+    for (let i = 0; i < flows.length; i++) {
+      const prev = simpCum; simpCum += flows[i];
+      if (!simpRec && simpCum >= invest) { simpPB = i + (invest - prev) / flows[i]; simpRec = true; }
+    }
+
+    return { paybackYears, recovered, schedule, totalPV, simplePB: simpPB, simpleRecovered: simpRec };
+  }
+
+  let currSym = '₹'; let currLocale = 'en-IN';
+  function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
+  function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+
+  function initDPP() {
+    if ((window as any).__cmDPPBound) return;
+    (window as any).__cmDPPBound = true;
+
+    const investEl = document.getElementById('dpp-invest') as HTMLInputElement | null;
+    const rateEl   = document.getElementById('dpp-rate') as HTMLInputElement | null;
+    const investSlider = document.getElementById('dpp-invest-slider') as HTMLInputElement | null;
+    const rateSlider   = document.getElementById('dpp-rate-slider') as HTMLInputElement | null;
+    const container    = document.getElementById('dpp-flows-container');
+    const errAlert     = document.getElementById('dpp-error-alert');
+    const errMsg       = document.getElementById('dpp-error-msg');
+    if (!investEl || !rateEl || !container) return;
+
+    const DEFAULT_INVEST = 1000000;
+    const DEFAULT_FLOWS = [300000, 350000, 400000, 400000, 500000];
+    const DEFAULT_RATE = 10;
+    let yearCount = DEFAULT_FLOWS.length;
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) { if (errAlert) errAlert.classList.remove('hidden'); if (errMsg) errMsg.textContent = msg; }
+    function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
+
+    function getFlows(): { ok: boolean; flows: number[] } {
+      const flows: number[] = [];
+      for (let i = 0; i < yearCount; i++) {
+        const el = document.getElementById(`dpp-flow-${i}`) as HTMLInputElement | null;
+        if (!el) continue;
+        const raw = el.value.replace(/[^0-9.]/g, '');
+        const v = validate(raw, { required: true, min: 0, decimal: true, label: `Year ${i + 1} Cash Flow` });
+        if (!v.valid) { showError(v.error!.message); return { ok: false, flows: [] }; }
+        flows.push(v.value!);
+      }
+      return { ok: true, flows };
+    }
+
+    function recalc() {
+      const vI = validate(investEl!.value.replace(/[^0-9.]/g, ''), { required: true, min: 1, label: 'Initial Investment' });
+      const vR = validate(rateEl!.value, { required: true, min: 0.01, max: 100, decimal: true, label: 'Discount Rate' });
+      if (!vI.valid) { showError(vI.error!.message); return; }
+      if (!vR.valid) { showError(vR.error!.message); return; }
+      const { ok, flows } = getFlows();
+      if (!ok) return;
+      clearError();
+
+      const res = dppCalcClient(vI.value!, flows, vR.value!);
+      const heroVal = res.recovered ? res.paybackYears.toFixed(1) + ' Years' : 'Not Recovered';
+
+      setResult({ heroValue: heroVal, heroLabel: 'Discounted Payback Period' });
+
+      document.getElementById('dpp-result-dpp')!.textContent = heroVal;
+      document.getElementById('dpp-result-simple')!.textContent = res.simpleRecovered ? res.simplePB.toFixed(1) + ' yrs' : '—';
+      document.getElementById('dpp-result-pv-inflows')!.textContent = fmt(res.totalPV);
+      const recEl = document.getElementById('dpp-result-recovered')!;
+      recEl.textContent = res.recovered ? 'Yes' : 'No';
+      recEl.className = `text-sm font-semibold ${res.recovered ? 'text-dark-accent' : 'text-red-400'}`;
+
+      // Rebuild table
+      const tbody = document.getElementById('dpp-table-body');
+      if (tbody) {
+        tbody.innerHTML = res.schedule.map(row =>
+          `<tr class="border-b border-dark-border/40">
+            <td class="py-1.5 pr-3 text-dark-muted">${row.period}</td>
+            <td class="py-1.5 pr-3 text-right tabular-nums text-dark-text">${fmt(row.cashFlow)}</td>
+            <td class="py-1.5 pr-3 text-right tabular-nums text-dark-text">${fmt(row.discounted)}</td>
+            <td class="py-1.5 text-right tabular-nums text-dark-text">${fmt(row.cumulative)}</td>
+          </tr>`
+        ).join('');
+      }
+    }
+
+    function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 150); }
+
+    function syncSlider(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtInput(slider.value) : slider.value;
+        const pct = ((+slider.value - +slider.min) / (+slider.max - +slider.min)) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
+          slider.value = String(num);
+          slider.style.setProperty('--slider-pct', `${((num - +slider.min) / (+slider.max - +slider.min) * 100).toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtInput(raw);
+        debounce();
+      });
+    }
+
+    syncSlider(investSlider, investEl, true);
+    syncSlider(rateSlider, rateEl, false);
+
+    container.addEventListener('input', debounce);
+    container.querySelectorAll('input').forEach(el => el.addEventListener('input', () => {
+      const raw = el.value.replace(/[^0-9]/g, '');
+      el.value = fmtInput(raw);
+    }));
+
+    document.getElementById('dpp-add-year')?.addEventListener('click', () => {
+      if (yearCount >= 10) return;
+      const div = document.createElement('div');
+      div.className = 'flex gap-3 items-center';
+      div.innerHTML = `<span class="text-xs text-text-muted w-12 shrink-0">Year ${yearCount + 1}</span>
+        <div class="flex-1 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10">₹</span>
+          <input id="dpp-flow-${yearCount}" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="0" />
+        </div>`;
+      container.appendChild(div);
+      yearCount++;
+      document.getElementById('dpp-remove-year')?.removeAttribute('disabled');
+      debounce();
+    });
+
+    document.getElementById('dpp-remove-year')?.addEventListener('click', () => {
+      if (yearCount <= 1) return;
+      container.lastElementChild?.remove();
+      yearCount--;
+      if (yearCount <= 1) document.getElementById('dpp-remove-year')?.setAttribute('disabled', 'true');
+      debounce();
+    });
+
+    document.getElementById('dpp-calculate')?.addEventListener('click', recalc);
+    document.getElementById('dpp-reset')?.addEventListener('click', () => {
+      investEl.value = fmtInput(String(DEFAULT_INVEST));
+      rateEl.value = String(DEFAULT_RATE);
+      if (investSlider) { investSlider.value = String(DEFAULT_INVEST); investSlider.style.setProperty('--slider-pct', `${((DEFAULT_INVEST - 10000) / (50000000 - 10000) * 100).toFixed(2)}%`); }
+      if (rateSlider) { rateSlider.value = String(DEFAULT_RATE); rateSlider.style.setProperty('--slider-pct', `${((DEFAULT_RATE - 1) / (30 - 1) * 100).toFixed(2)}%`); }
+      // Reset flows to default
+      while (container.children.length > 0) container.removeChild(container.lastChild!);
+      yearCount = 0;
+      DEFAULT_FLOWS.forEach((flow, i) => {
+        const div = document.createElement('div');
+        div.className = 'flex gap-3 items-center';
+        div.innerHTML = `<span class="text-xs text-text-muted w-12 shrink-0">Year ${i + 1}</span>
+          <div class="flex-1 relative">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10">₹</span>
+            <input id="dpp-flow-${i}" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="${fmtInput(String(flow))}" />
+          </div>`;
+        container.appendChild(div);
+        yearCount++;
+      });
+      clearError(); recalc(); investEl.focus();
+    });
+
+    document.getElementById('dpp-copy-btn')?.addEventListener('click', async () => {
+      const result = document.getElementById('dpp-result-dpp')?.textContent ?? '';
+      await navigator.clipboard.writeText(`Discounted Payback Period: ${result}. ${location.href.split('#')[0]}`);
+      const btn = document.getElementById('dpp-copy-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    document.getElementById('dpp-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('dpp-share-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+
+    recalc();
+  }
+
+  initDPP();
+  document.addEventListener('astro:page-load', initDPP);
+</script>

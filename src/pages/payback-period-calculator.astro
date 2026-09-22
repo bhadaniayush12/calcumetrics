@@ -31,7 +31,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -40,6 +40,35 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
         { '@type': 'ListItem', position: 3, name: 'Payback Period Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a good payback period for equipment or software?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Industrial machinery usually has acceptable payback periods between 3 to 5 years. Enterprise software, tooling, or marketing automation projects generally aim for a payback period of under 18 to 24 months due to fast technological shifts.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is discounted payback period?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The discounted payback period discounts future cash flows at the company\'s cost of capital before calculating the recovery time. Because discounted dollars have lower present values, the discounted payback period is always longer than the simple payback period.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What are the limitations of the payback period?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The payback period ignores (1) the time value of money, (2) all cash flows after the break-even point, and (3) risk. It should be used alongside NPV, IRR, or the discounted payback period for robust capital budgeting decisions.',
+          },
+        },
       ],
     },
   ],
@@ -59,10 +88,18 @@ const jsonld = {
     categoryHref="/corporate-finance"
     heroValue={result.paybackYears.toFixed(1) + ' Years'}
     heroLabel="Payback Period"
+    calcType="advanced"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Payback Period Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Determine the exact time required for capital outlays to be completely recouped.</p>
+      <p class="text-sm text-text-muted mb-6">Determine the exact time required for capital outlays to be completely recouped from projected cash inflows.</p>
+
+      <!-- Error alert -->
+      <div id="pb-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="pb-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Initial Investment -->
       <div class="mb-5">
@@ -75,6 +112,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Total upfront capital expenditure at Year 0"
           inputmode="decimal"
+          aria-describedby="pb-error-msg"
         />
         <div class="mt-2">
           <Slider id="pb-initial-slider" min={50000} max={5000000} step={25000} value={500000} ariaLabel="Initial outlay slider" />
@@ -92,6 +130,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Estimated net cash generated per year"
           inputmode="decimal"
+          aria-describedby="pb-error-msg"
         />
         <div class="mt-2">
           <Slider id="pb-annual-slider" min={10000} max={2500000} step={10000} value={150000} ariaLabel="Annual cash flow slider" />
@@ -101,26 +140,16 @@ const jsonld = {
       <div class="border-t border-border pt-4 mb-6">
         <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Or Specify Uneven Inflows (Years 1 to 5)</div>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div>
-            <Input id="pb-y1" label="Year 1" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
-          </div>
-          <div>
-            <Input id="pb-y2" label="Year 2" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
-          </div>
-          <div>
-            <Input id="pb-y3" label="Year 3" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
-          </div>
-          <div>
-            <Input id="pb-y4" label="Year 4" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
-          </div>
-          <div>
-            <Input id="pb-y5" label="Year 5" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" />
-          </div>
+          <div><Input id="pb-y1" label="Year 1" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" /></div>
+          <div><Input id="pb-y2" label="Year 2" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" /></div>
+          <div><Input id="pb-y3" label="Year 3" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" /></div>
+          <div><Input id="pb-y4" label="Year 4" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" /></div>
+          <div><Input id="pb-y5" label="Year 5" prefix="₹" value="1,50,000" isNumeric={true} localeFormat="indian" /></div>
         </div>
       </div>
 
       <Alert variant="info" title="Capital Budgeting Tip">
-        Payback period ignores the time value of money and cash flows generated after the break-even point. For comprehensive capital decisions, review Net Present Value (NPV).
+        Payback period ignores the time value of money and cash flows generated after the break-even point. For comprehensive capital decisions, review Net Present Value (NPV) or use the Discounted Payback Period.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -132,7 +161,7 @@ const jsonld = {
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Payback Period</span>
-        <div id="pb-result-years" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+        <div id="pb-result-years" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite" aria-atomic="true">
           {result.paybackYears.toFixed(1)} Years
         </div>
       </div>
@@ -196,18 +225,16 @@ const jsonld = {
       <section aria-labelledby="pb-calculator-faq">
         <h2 id="pb-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good payback period for equipment or software?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Industrial machinery usually has acceptable payback periods between 3 to 5 years. Enterprise software, tooling, or marketing automation projects generally aim for a payback period of under 18 to 24 months due to fast technological shifts.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is discounted payback period?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              The discounted payback period discounts future cash flows at the company's cost of capital before calculating the recovery time. Because discounted dollars have lower present values, the discounted payback period is always longer than the simple payback period.
-            </div>
-          </details>
+          {[
+            ['What is a good payback period for equipment or software?', 'Industrial machinery usually has acceptable payback periods between 3 to 5 years. Enterprise software, tooling, or marketing automation projects generally aim for a payback period of under 18 to 24 months due to fast technological shifts.'],
+            ['What is the discounted payback period?', 'The discounted payback period discounts future cash flows at the company\'s cost of capital before calculating the recovery time. Because discounted dollars have lower present values, the discounted payback period is always longer than the simple payback period.'],
+            ['What are the limitations of the payback period?', 'The payback period ignores (1) the time value of money, (2) all cash flows after the break-even point, and (3) risk. It should be used alongside NPV, IRR, or the discounted payback period for robust capital budgeting decisions.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -220,6 +247,10 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
   function calcPaybackClient(initial: number, flows: number[]) {
     let cumulative = 0;
     for (let i = 0; i < flows.length; i++) {
@@ -245,6 +276,9 @@ const jsonld = {
   }
 
   function initPaybackCalc() {
+    if ((window as any).__cmPBBound) return;
+    (window as any).__cmPBBound = true;
+
     const initInput = document.getElementById('pb-initial') as HTMLInputElement | null;
     const annualInput = document.getElementById('pb-annual') as HTMLInputElement | null;
     const initSlider = document.getElementById('pb-initial-slider') as HTMLInputElement | null;
@@ -263,29 +297,48 @@ const jsonld = {
     const resInitial = document.getElementById('pb-result-initial');
     const resInflows = document.getElementById('pb-result-inflows');
     const resStatus = document.getElementById('pb-result-status');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+    const errAlert = document.getElementById('pb-error-alert');
+    const errMsg = document.getElementById('pb-error-msg');
 
     if (!initInput || !annualInput) return;
 
     const DEFAULTS = { initial: 500000, annual: 150000 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
-    }
+    function showError(msg: string) { if (errAlert) errAlert.classList.remove('hidden'); if (errMsg) errMsg.textContent = msg; }
+    function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
 
     function recalc() {
-      const initial = parse(initInput.value);
-      const annual = parse(annualInput.value);
+      const rawI = initInput!.value.replace(/[^0-9.]/g, '');
+      const rawA = annualInput!.value.replace(/[^0-9.]/g, '');
+      const vI = validate(rawI, { required: true, min: 1, label: 'Initial Investment' });
+      const vA = validate(rawA, { required: true, min: 0, label: 'Annual Cash Flow' });
+      if (!vI.valid) { showError(vI.error!.message); return; }
+      if (!vA.valid) { showError(vA.error!.message); return; }
+      clearError();
 
-      if (initial <= 0) return;
+      const initial = vI.value!;
+      const annual = vA.value!;
+      const flows = yInputs.map((el) => {
+        const raw = el?.value.replace(/[^0-9.]/g, '') ?? '';
+        const v = validate(raw, { required: false, min: 0, decimal: true, label: 'Year' });
+        return v.valid && v.value !== undefined ? v.value : annual;
+      });
 
-      // Check if uneven inputs were edited or use annual default
-      const flows = yInputs.map((el) => (el ? parse(el.value) : annual));
       const res = calcPaybackClient(initial, flows);
-
       const yrsText = isFinite(res.paybackYears) ? res.paybackYears.toFixed(1) + ' Years' : '> 5 Years';
       const mthsText = isFinite(res.paybackMonths) ? Math.round(res.paybackMonths) + ' Months' : 'Unrecovered';
+
+      setResult({
+        heroValue: yrsText,
+        heroLabel: 'Payback Period',
+        rows: [
+          { label: 'Months to Recover', value: mthsText },
+          { label: 'Initial Investment', value: fmtVal(initial) },
+          { label: 'Total Inflows', value: fmtVal(res.totalInflows) },
+          { label: 'Status', value: res.recovered ? 'Fully Recovered' : 'Not Recovered', variant: res.recovered ? 'accent' : 'muted' },
+        ],
+      });
 
       if (resYears) resYears.textContent = yrsText;
       if (resMonths) resMonths.textContent = mthsText;
@@ -295,9 +348,8 @@ const jsonld = {
         resStatus.textContent = res.recovered ? 'Fully Recovered' : 'Not Recovered in 5 Yrs';
         resStatus.className = res.recovered ? 'text-sm font-bold tabular-nums text-dark-accent' : 'text-sm font-bold tabular-nums text-red-400';
       }
-      if (mobileHero) mobileHero.textContent = yrsText;
 
-      history.replaceState(null, '', `#i=${initial}&a=${annual}`);
+      history.replaceState(null, '', serializeHash({ i: initial, a: annual }));
     }
 
     function debounce() {
@@ -311,7 +363,6 @@ const jsonld = {
         input.value = fmtLiveInput(slider.value);
         const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
-        // update year inputs
         if (slider === annualSlider) {
           yInputs.forEach((y) => { if (y) y.value = input.value; });
         }
@@ -348,7 +399,6 @@ const jsonld = {
       initInput.value = fmtLiveInput(String(DEFAULTS.initial));
       annualInput.value = fmtLiveInput(String(DEFAULTS.annual));
       yInputs.forEach((y) => { if (y) y.value = fmtLiveInput(String(DEFAULTS.annual)); });
-
       if (initSlider) {
         initSlider.value = String(DEFAULTS.initial);
         initSlider.style.setProperty('--slider-pct', `${((DEFAULTS.initial - 50000) / (5000000 - 50000)) * 100}%`);
@@ -357,36 +407,47 @@ const jsonld = {
         annualSlider.value = String(DEFAULTS.annual);
         annualSlider.style.setProperty('--slider-pct', `${((DEFAULTS.annual - 10000) / (2500000 - 10000)) * 100}%`);
       }
-
+      clearError();
       recalc();
       initInput.focus();
     });
 
-    // Copy & Share
     document.getElementById('pb-copy-btn')?.addEventListener('click', async () => {
-      const initial = parse(initInput.value);
-      const annual = parse(annualInput.value);
-      const flows = yInputs.map((el) => (el ? parse(el.value) : annual));
-      const res = calcPaybackClient(initial, flows);
-      const text = `Payback Period: Initial Outflow ${fmtVal(initial)} => Payback in ${isFinite(res.paybackYears) ? res.paybackYears.toFixed(1) + ' years' : '> 5 years'} (${Math.round(res.paybackMonths)} months). ${location.href.split('#')[0]}`;
+      const rawI = initInput.value.replace(/[^0-9.]/g, '');
+      const vI = validate(rawI, { required: true, min: 1, label: 'Initial' });
+      if (!vI.valid) return;
+      const flows = yInputs.map((el) => {
+        const raw = el?.value.replace(/[^0-9.]/g, '') ?? '';
+        const v = validate(raw, { required: false, min: 0, decimal: true, label: 'Y' });
+        const vA = validate(annualInput!.value.replace(/[^0-9.]/g, ''), { required: false, min: 0, label: 'A' });
+        return v.valid && v.value !== undefined ? v.value : (vA.value ?? 0);
+      });
+      const res = calcPaybackClient(vI.value!, flows);
+      const text = `Payback Period: Initial Outflow ${fmtVal(vI.value!)} => Payback in ${isFinite(res.paybackYears) ? res.paybackYears.toFixed(1) + ' years' : '> 5 years'} (${Math.round(res.paybackMonths)} months). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('pb-copy-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => (btn.textContent = orig), 2000);
-      }
+      if (btn) { const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => (btn.textContent = orig), 2000); }
     });
 
     document.getElementById('pb-share-btn')?.addEventListener('click', async () => {
       await navigator.clipboard.writeText(location.href);
       const btn = document.getElementById('pb-share-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied Link!';
-        setTimeout(() => (btn.textContent = orig), 2000);
-      }
+      if (btn) { const orig = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => (btn.textContent = orig), 2000); }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      i: { required: true, min: 1, label: 'i' },
+      a: { required: true, min: 0, label: 'a' },
+    });
+    if (restored.valid && restored.values.i && restored.values.a) {
+      initInput.value = fmtLiveInput(String(restored.values.i));
+      annualInput.value = fmtLiveInput(String(restored.values.a));
+      yInputs.forEach((y) => { if (y) y.value = fmtLiveInput(String(restored.values.a)); });
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

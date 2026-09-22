@@ -1,0 +1,412 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcFV } from '../lib/finance/time-value';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { presentAmount: 100000, rate: 8, years: 10 };
+const result = calcFV(DEFAULT.presentAmount, DEFAULT.rate, DEFAULT.years, 'annually');
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtPct = (n: number) => n.toFixed(2) + '%';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'future-value-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/future-value-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Future Value Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the future value of a present amount at a given growth rate and compounding frequency.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'Future Value Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is future value (FV)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Future value is the value of a current asset at a specified date in the future, assuming a certain growth rate (interest or return). It answers "how much will my money be worth in N years?"',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between FV and a Lump Sum calculator?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Conceptually they are the same math (FV = PV × (1+r)^t), but framing differs. A Lump Sum calculator is typically positioned for investors asking "how will my mutual fund one-time investment grow?" while FV is a finance-theory framing used in corporate finance, CFA exams, and capital budgeting textbooks.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Does compounding frequency matter for FV?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. More frequent compounding (monthly, quarterly) produces a higher FV than annual compounding because interest accrues on previously earned interest more frequently. The difference can be substantial over long horizons.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is continuous compounding?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Continuous compounding is the mathematical limit of compounding infinitely frequently. The formula becomes FV = PV × e^(r × t), where e is Euler\'s number (~2.71828). It produces the highest possible FV for a given rate and represents the theoretical maximum.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How can I use FV for retirement planning?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Enter your current savings as the present amount, your expected annual return, and the number of years to retirement. The FV shows the projected corpus assuming no additional contributions — combine with a Savings Goal or SIP calculator to factor in periodic investments.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Future Value Calculator: See How Any Amount Grows Over Time | Calcumetrics"
+  description="Calculate the future value of a lump sum at any growth rate and compounding frequency. Uses the TVM formula FV = PV × (1+r/n)^(n×t). Instant and free."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Future Value Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={fmtCurrency(result.fv)}
+    heroLabel="Future Value"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Future Value Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">See how a lump sum grows over time using compound growth. Formula: FV = PV × (1 + r/n)^(n×t)</p>
+
+      <div id="fv-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="fv-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <div class="mb-5">
+        <Input id="fv-present" label="Present Amount" prefix="₹" value="1,00,000" isNumeric={true} localeFormat="indian" helperText="Current lump sum to invest or grow" inputmode="decimal" aria-describedby="fv-error-msg" />
+        <div class="mt-2"><Slider id="fv-present-slider" min={1000} max={10000000} step={1000} value={100000} ariaLabel="Present amount slider" /></div>
+      </div>
+
+      <div class="mb-5">
+        <Input id="fv-rate" label="Annual Growth Rate" suffix="%" value="8.0" isNumeric={true} helperText="Expected annual return / interest rate" inputmode="decimal" aria-describedby="fv-error-msg" />
+        <div class="mt-2"><Slider id="fv-rate-slider" min={0.5} max={30} step={0.5} value={8} ariaLabel="Growth rate slider" /></div>
+      </div>
+
+      <div class="mb-5">
+        <Input id="fv-years" label="Time Period" suffix="Years" value="10" isNumeric={true} helperText="Number of years for the amount to grow" inputmode="decimal" aria-describedby="fv-error-msg" />
+        <div class="mt-2"><Slider id="fv-years-slider" min={1} max={40} step={1} value={10} ariaLabel="Time period slider" /></div>
+      </div>
+
+      <div class="mb-6">
+        <Dropdown id="fv-freq" label="Compounding Frequency" options={[{value:'annually',label:'Annually'},{value:'semi-annually',label:'Semi-annually'},{value:'quarterly',label:'Quarterly'},{value:'monthly',label:'Monthly'},{value:'continuously',label:'Continuously'}]} value="annually" helperText="How frequently growth is compounded" />
+      </div>
+
+      <Alert variant="info" title="Rule of 72">Divide 72 by the annual rate to estimate how many years it takes for money to double. At 8%, money doubles approximately every 9 years.</Alert>
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="fv-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="fv-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Future Value</span>
+        <div id="fv-result-fv" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite" aria-atomic="true">
+          {fmtCurrency(result.fv)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Present Amount</span>
+          <span id="fv-result-present" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(DEFAULT.presentAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Growth</span>
+          <span id="fv-result-growth" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalGrowth)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Growth %</span>
+          <span id="fv-result-growth-pct" class="text-sm font-medium tabular-nums text-dark-text">{fmtPct(result.growthPct)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <CompositionBar
+          principalFraction={result.principalFraction}
+          gainFraction={result.growthFraction}
+          principalLabel="Principal"
+          gainLabel="Growth"
+          principalValue={fmtCurrency(DEFAULT.presentAmount)}
+          gainValue={fmtCurrency(result.totalGrowth)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="fv-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Copy Result</button>
+        <button type="button" id="fv-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Share Link</button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Actual returns may vary.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="fv-how">
+        <h2 id="fv-how" class="text-xl font-bold text-text-primary mb-4">How the Future Value calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Future value is the mirror image of present value — instead of discounting back to today, we compound forward to a future date. This shows the power of compounding: interest earned generates additional interest over time.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">FV = PV × (1 + r/n)^(n × t)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">PV</strong> — Present value (today's lump sum)</li>
+            <li><strong class="text-text-primary">r</strong> — Annual growth rate (e.g. 0.08 for 8%)</li>
+            <li><strong class="text-text-primary">n</strong> — Compounding periods per year</li>
+            <li><strong class="text-text-primary">t</strong> — Time in years</li>
+            <li><strong class="text-text-primary">FV</strong> — Future value at time t</li>
+          </ul>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed"><strong>Worked example:</strong> ₹1,00,000 at 8% annually compounded for 10 years: FV = 1,00,000 × (1.08)^10 = <strong>₹2,15,892</strong>. Your money more than doubles — ₹1,15,892 of that is growth earned from compounding.</p>
+      </section>
+
+      <section aria-labelledby="fv-faq">
+        <h2 id="fv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What is future value (FV)?', 'Future value is the value of a current asset at a future date, assuming a certain rate of return. It answers "how much will my money be worth in N years?"'],
+            ['How is FV different from Lump Sum?', 'They use the same formula. The lump sum calculator is framed for investors in mutual funds; FV is the finance-theory term used in corporate finance and exams like CFA/CA.'],
+            ['Does compounding frequency matter?', 'Yes — monthly compounding generates more FV than annual compounding. At 8% for 10 years: annual = ₹2,15,892 vs. monthly = ₹2,21,964.'],
+            ['What is continuous compounding?', 'The mathematical limit of compounding infinitely often. FV = PV × e^(r × t). This produces the theoretical maximum FV for a given rate and is used in options pricing models.'],
+            ['How do I use FV for retirement planning?', 'Enter your current corpus as the present amount and your expected returns. For periodic contributions, also use the SIP Calculator and add both results together.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="fv-related">
+        <h2 id="fv-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
+  const fvSchema = {
+    pv: { required: true, min: 1, max: 1e10, label: 'Present Amount' },
+    r:  { required: true, min: 0.01, max: 100, decimal: true, label: 'Growth Rate' },
+    y:  { required: true, min: 0.1, max: 100, decimal: true, label: 'Time Period' },
+  } as const;
+
+  const FREQ_MAP: Record<string, number> = {
+    annually: 1, 'semi-annually': 2, quarterly: 4, monthly: 12, continuously: Infinity,
+  };
+
+  function calcFVClient(pv: number, rPct: number, years: number, n: number) {
+    const r = rPct / 100;
+    const fv = n === Infinity ? pv * Math.exp(r * years) : pv * Math.pow(1 + r / n, n * years);
+    const growth = fv - pv;
+    return { fv, growth, growthPct: pv > 0 ? (growth / pv) * 100 : 0, princFrac: fv > 0 ? pv / fv : 0, growFrac: fv > 0 ? growth / fv : 0 };
+  }
+
+  let currSym = '₹'; let currLocale = 'en-IN';
+  function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
+  function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+
+  function initFV() {
+    if ((window as any).__cmFVBound) return;
+    (window as any).__cmFVBound = true;
+
+    const presEl = document.getElementById('fv-present') as HTMLInputElement | null;
+    const rateEl = document.getElementById('fv-rate') as HTMLInputElement | null;
+    const yearsEl = document.getElementById('fv-years') as HTMLInputElement | null;
+    const freqEl  = document.getElementById('fv-freq') as HTMLSelectElement | null;
+    const pSlider = document.getElementById('fv-present-slider') as HTMLInputElement | null;
+    const rSlider = document.getElementById('fv-rate-slider') as HTMLInputElement | null;
+    const ySlider = document.getElementById('fv-years-slider') as HTMLInputElement | null;
+    const errAlert = document.getElementById('fv-error-alert');
+    const errMsg   = document.getElementById('fv-error-msg');
+    if (!presEl || !rateEl || !yearsEl) return;
+
+    const DEFAULTS = { pv: 100000, rate: 8, years: 10 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) { if (errAlert) errAlert.classList.remove('hidden'); if (errMsg) errMsg.textContent = msg; }
+    function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
+
+    function recalc() {
+      const rawPv = presEl!.value.replace(/[^0-9.]/g, '');
+      const vPv = validate(rawPv, fvSchema.pv);
+      const vR  = validate(rateEl!.value, fvSchema.r);
+      const vY  = validate(yearsEl!.value, fvSchema.y);
+      if (!vPv.valid) { showError(vPv.error!.message); return; }
+      if (!vR.valid)  { showError(vR.error!.message); return; }
+      if (!vY.valid)  { showError(vY.error!.message); return; }
+      clearError();
+
+      const pv = vPv.value!; const r = vR.value!; const y = vY.value!;
+      const n = FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1;
+      const res = calcFVClient(pv, r, y, n);
+
+      setResult({
+        heroValue: fmt(res.fv),
+        heroLabel: 'Future Value',
+        rows: [
+          { label: 'Present Amount', value: fmt(pv) },
+          { label: 'Total Growth',   value: fmt(res.growth), variant: 'accent' },
+          { label: 'Growth %',       value: res.growthPct.toFixed(2) + '%' },
+        ],
+      });
+
+      document.getElementById('fv-result-fv')!.textContent = fmt(res.fv);
+      document.getElementById('fv-result-present')!.textContent = fmt(pv);
+      document.getElementById('fv-result-growth')!.textContent = fmt(res.growth);
+      document.getElementById('fv-result-growth-pct')!.textContent = res.growthPct.toFixed(2) + '%';
+
+      const compBar = document.querySelector('[class*="bg-dark-muted"]') as HTMLElement | null;
+      const gainBar = document.querySelector('[class*="bg-dark-accent"]') as HTMLElement | null;
+      if (compBar) compBar.style.width = `${(res.princFrac * 100).toFixed(2)}%`;
+      if (gainBar) gainBar.style.width = `${(res.growFrac * 100).toFixed(2)}%`;
+      const legendEls = document.querySelectorAll('[class*="tabular-nums"]');
+      if (legendEls[legendEls.length - 2]) (legendEls[legendEls.length - 2] as HTMLElement).textContent = fmt(pv);
+      if (legendEls[legendEls.length - 1]) (legendEls[legendEls.length - 1] as HTMLElement).textContent = fmt(res.growth);
+
+      history.replaceState(null, '', serializeHash({ pv, r, y }));
+    }
+
+    function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 100); }
+
+    function syncSlider(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtInput(slider.value) : slider.value;
+        const pct = ((+slider.value - +slider.min) / (+slider.max - +slider.min)) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
+          slider.value = String(num);
+          slider.style.setProperty('--slider-pct', `${((num - +slider.min) / (+slider.max - +slider.min) * 100).toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtInput(raw);
+        debounce();
+      });
+    }
+
+    syncSlider(pSlider, presEl, true);
+    syncSlider(rSlider, rateEl, false);
+    syncSlider(ySlider, yearsEl, false);
+    freqEl?.addEventListener('change', debounce);
+
+    document.getElementById('fv-calculate')?.addEventListener('click', recalc);
+    document.getElementById('fv-reset')?.addEventListener('click', () => {
+      presEl.value = fmtInput(String(DEFAULTS.pv));
+      rateEl.value = String(DEFAULTS.rate);
+      yearsEl.value = String(DEFAULTS.years);
+      if (freqEl) freqEl.value = 'annually';
+      if (pSlider) { pSlider.value = String(DEFAULTS.pv); pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.pv - 1000) / (10000000 - 1000) * 100).toFixed(2)}%`); }
+      if (rSlider) { rSlider.value = String(DEFAULTS.rate); rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 0.5) / (30 - 0.5) * 100).toFixed(2)}%`); }
+      if (ySlider) { ySlider.value = String(DEFAULTS.years); ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`); }
+      clearError(); recalc(); presEl.focus();
+    });
+
+    [presEl, rateEl, yearsEl].forEach(el => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
+
+    document.getElementById('fv-copy-btn')?.addEventListener('click', async () => {
+      const rawPv = presEl.value.replace(/[^0-9.]/g, '');
+      const vPv = validate(rawPv, fvSchema.pv);
+      const vR  = validate(rateEl.value, fvSchema.r);
+      const vY  = validate(yearsEl.value, fvSchema.y);
+      if (!vPv.valid || !vR.valid || !vY.valid) return;
+      const res = calcFVClient(vPv.value!, vR.value!, vY.value!, FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1);
+      await navigator.clipboard.writeText(`Future Value: ${fmt(res.fv)} (PV: ${fmt(vPv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`);
+      const btn = document.getElementById('fv-copy-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    document.getElementById('fv-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('fv-share-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    const restored = restoreFromHash(readCurrentHash(), { pv: fvSchema.pv, r: fvSchema.r, y: fvSchema.y });
+    if (restored.valid && restored.values.pv && restored.values.r && restored.values.y) {
+      presEl.value = fmtInput(String(restored.values.pv));
+      rateEl.value = String(restored.values.r);
+      yearsEl.value = String(restored.values.y);
+      recalc();
+    } else { recalc(); }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initFV();
+  document.addEventListener('astro:page-load', initFV);
+</script>

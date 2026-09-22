@@ -33,7 +33,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -42,6 +42,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
         { '@type': 'ListItem', position: 3, name: 'DCF Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Why is terminal value often 70%+ of DCF value?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Because companies are assumed to exist as going concerns into perpetuity, all cash flows earned beyond year 5 accumulate into the terminal value, making it naturally the largest component of total value.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What discount rate should I use?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'For firm valuation, use the Weighted Average Cost of Capital (WACC), which reflects the blended required returns of equity investors and debt lenders. Typically, WACC ranges between 8% to 15% depending on risk.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the Gordon Growth Model rule for terminal value?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The perpetual growth rate (g) must strictly be lower than the discount rate (r). If perpetual growth equals or exceeds the cost of capital, the enterprise is mathematically modeled to grow larger than the overall economy, rendering the valuation undefined.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a realistic perpetual terminal growth rate?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'In practice, perpetual terminal growth rates are typically pegged to long-run nominal GDP growth or expected inflation rates, typically ranging between 2% and 4% for mature economies and up to 5% to 6% for rapidly expanding developing markets.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does DCF differ from market multiples like P/E or EV/EBITDA?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'DCF calculates fundamental intrinsic value derived from the firm\'s expected cash generation and risk profile, whereas market multiples reflect relative valuation based on current market sentiment and peer pricing.',
+          },
+        },
       ],
     },
   ],
@@ -61,10 +106,18 @@ const jsonld = {
     categoryHref="/corporate-finance"
     heroValue={fmt(result.intrinsicValue)}
     heroLabel="Intrinsic Enterprise Value"
+    calcType="advanced"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">DCF Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Estimate corporate intrinsic value based on discounted future cash flows and terminal value.</p>
+
+      <!-- Error alert -->
+      <div id="dcf-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="dcf-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
       <!-- Year 1 Cash Flow -->
       <div class="mb-5">
@@ -77,6 +130,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Operating cash flow minus capital expenditures"
           inputmode="decimal"
+          aria-describedby="dcf-error-msg"
         />
         <div class="mt-2">
           <Slider id="dcf-fcf1-slider" min={10000} max={2500000} step={10000} value={100000} ariaLabel="Year 1 FCF slider" />
@@ -93,6 +147,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Forecast annual growth for explicit 5-year period"
           inputmode="decimal"
+          aria-describedby="dcf-error-msg"
         />
         <div class="mt-2">
           <Slider id="dcf-growth-slider" min={0} max={40} step={0.5} value={10} ariaLabel="5-year growth slider" />
@@ -109,6 +164,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Cost of capital or required rate of return"
           inputmode="decimal"
+          aria-describedby="dcf-error-msg"
         />
         <div class="mt-2">
           <Slider id="dcf-discount-slider" min={4} max={30} step={0.25} value={12} ariaLabel="Discount rate slider" />
@@ -125,6 +181,7 @@ const jsonld = {
           isNumeric={true}
           helperText="Long-term GDP growth ceiling (must be less than discount rate)"
           inputmode="decimal"
+          aria-describedby="dcf-error-msg"
         />
         <div class="mt-2">
           <Slider id="dcf-terminal-slider" min={0.5} max={8} step={0.25} value={3} ariaLabel="Terminal growth slider" />
@@ -210,18 +267,18 @@ const jsonld = {
       <section aria-labelledby="dcf-calculator-faq">
         <h2 id="dcf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is terminal value often 70%+ of DCF value?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Because companies are assumed to exist as going concerns into perpetuity, all cash flows earned beyond year 5 accumulate into the terminal value, making it naturally the largest component of total value.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What discount rate should I use?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              For firm valuation, use the Weighted Average Cost of Capital (WACC), which reflects the blended required returns of equity investors and debt lenders. Typically, WACC ranges between 8% to 15% depending on risk.
-            </div>
-          </details>
+          {[
+            ['Why is terminal value often 70%+ of DCF value?', 'Because companies are assumed to exist as going concerns into perpetuity, all cash flows earned beyond year 5 accumulate into the terminal value, making it naturally the largest component of total value.'],
+            ['What discount rate should I use?', 'For firm valuation, use the Weighted Average Cost of Capital (WACC), which reflects the blended required returns of equity investors and debt lenders. Typically, WACC ranges between 8% to 15% depending on risk.'],
+            ['What is the Gordon Growth Model rule for terminal value?', 'The perpetual growth rate (g) must strictly be lower than the discount rate (r). If perpetual growth equals or exceeds the cost of capital, the enterprise is mathematically modeled to grow larger than the overall economy, rendering the valuation undefined.'],
+            ['What is a realistic perpetual terminal growth rate?', 'In practice, perpetual terminal growth rates are typically pegged to long-run nominal GDP growth or expected inflation rates, typically ranging between 2% and 4% for mature economies and up to 5% to 6% for rapidly expanding developing markets.'],
+            ['How does DCF differ from market multiples like P/E or EV/EBITDA?', 'DCF calculates fundamental intrinsic value derived from the firm\'s expected cash generation and risk profile, whereas market multiples reflect relative valuation based on current market sentiment and peer pricing.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -234,6 +291,10 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
   function calcDCFClient(fcf1: number, growthPct: number, discountPct: number, terminalPct: number) {
     const r = discountPct / 100;
     const g = terminalPct / 100;
@@ -274,6 +335,9 @@ const jsonld = {
   }
 
   function initDCFCalc() {
+    if ((window as any).__cmDCFBound) return;
+    (window as any).__cmDCFBound = true;
+
     const fcf1Input = document.getElementById('dcf-fcf1') as HTMLInputElement | null;
     const growthInput = document.getElementById('dcf-growth') as HTMLInputElement | null;
     const discountInput = document.getElementById('dcf-discount') as HTMLInputElement | null;
@@ -289,33 +353,68 @@ const jsonld = {
     const resPvTv = document.getElementById('dcf-result-pvtv');
     const resTv = document.getElementById('dcf-result-tv');
     const resTvPct = document.getElementById('dcf-result-tvpct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('dcf-error-alert');
+    const errMsg = document.getElementById('dcf-error-msg');
 
     if (!fcf1Input || !growthInput || !discountInput || !terminalInput) return;
 
     const DEFAULTS = { fcf1: 100000, growth: 10, discount: 12, terminal: 3 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const fcf1 = parse(fcf1Input.value);
-      const growth = parseFloat(growthInput.value) || 0;
-      const discount = parseFloat(discountInput.value) || 12;
-      const terminal = parseFloat(terminalInput.value) || 3;
+      const rawFcf = fcf1Input!.value.replace(/[^0-9.]/g, '');
+      const rawGrowth = growthInput!.value.replace(/[^0-9.-]/g, '');
+      const rawDiscount = discountInput!.value.replace(/[^0-9.]/g, '');
+      const rawTerminal = terminalInput!.value.replace(/[^0-9.-]/g, '');
 
-      if (fcf1 <= 0 || discount <= terminal) return;
+      const vFcf = validate(rawFcf, { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
+      const vGrowth = validate(rawGrowth, { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
+      const vDiscount = validate(rawDiscount, { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
+      const vTerminal = validate(rawTerminal, { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
+
+      if (!vFcf.valid) { showError(vFcf.error!.message); return; }
+      if (!vGrowth.valid) { showError(vGrowth.error!.message); return; }
+      if (!vDiscount.valid) { showError(vDiscount.error!.message); return; }
+      if (!vTerminal.valid) { showError(vTerminal.error!.message); return; }
+
+      if (vDiscount.value! <= vTerminal.value!) {
+        showError('Discount rate must be strictly greater than perpetual terminal growth rate (r > g).');
+        return;
+      }
+      clearError();
+
+      const fcf1 = vFcf.value!;
+      const growth = vGrowth.value!;
+      const discount = vDiscount.value!;
+      const terminal = vTerminal.value!;
 
       const res = calcDCFClient(fcf1, growth, discount, terminal);
+
+      setResult({
+        heroValue: fmtVal(res.intrinsicValue),
+        heroLabel: 'Intrinsic Enterprise Value',
+        rows: [
+          { label: 'PV of 5-Yr Forecast', value: fmtVal(res.pvOfCashFlows) },
+          { label: 'PV of Terminal Value', value: fmtVal(res.pvOfTerminalValue) },
+          { label: 'Undiscounted Terminal Value', value: fmtVal(res.terminalValue) },
+          { label: 'Terminal Value % of Total', value: res.tvPct.toFixed(1) + '%' },
+        ],
+      });
 
       if (resIntrinsic) resIntrinsic.textContent = fmtVal(res.intrinsicValue);
       if (resPvFlows) resPvFlows.textContent = fmtVal(res.pvOfCashFlows);
       if (resPvTv) resPvTv.textContent = fmtVal(res.pvOfTerminalValue);
       if (resTv) resTv.textContent = fmtVal(res.terminalValue);
       if (resTvPct) resTvPct.textContent = res.tvPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.intrinsicValue);
 
       const wrapper = document.getElementById('dcf-composition-wrapper');
       if (wrapper && res.intrinsicValue > 0) {
@@ -328,7 +427,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.pvOfTerminalValue);
       }
 
-      history.replaceState(null, '', `#f=${fcf1}&g=${growth}&d=${discount}&t=${terminal}`);
+      history.replaceState(null, '', serializeHash({ f: fcf1, g: growth, d: discount, t: terminal }));
     }
 
     function debounce() {
@@ -386,6 +485,7 @@ const jsonld = {
         terminalSlider.style.setProperty('--slider-pct', `${((DEFAULTS.terminal - 0.5) / (8 - 0.5)) * 100}%`);
       }
 
+      clearError();
       recalc();
       fcf1Input.focus();
     });
@@ -398,12 +498,20 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('dcf-copy-btn')?.addEventListener('click', async () => {
-      const fcf1 = parse(fcf1Input.value);
-      const growth = parseFloat(growthInput.value) || 0;
-      const discount = parseFloat(discountInput.value) || 12;
-      const terminal = parseFloat(terminalInput.value) || 3;
-      const res = calcDCFClient(fcf1, growth, discount, terminal);
-      const text = `DCF Valuation: Year 1 FCF ${fmtVal(fcf1)}, growth ${growth}%, discount ${discount}%, terminal ${terminal}% => Intrinsic Value: ${fmtVal(res.intrinsicValue)}. ${location.href.split('#')[0]}`;
+      const rawFcf = fcf1Input.value.replace(/[^0-9.]/g, '');
+      const rawGrowth = growthInput.value.replace(/[^0-9.-]/g, '');
+      const rawDiscount = discountInput.value.replace(/[^0-9.]/g, '');
+      const rawTerminal = terminalInput.value.replace(/[^0-9.-]/g, '');
+
+      const vFcf = validate(rawFcf, { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
+      const vGrowth = validate(rawGrowth, { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
+      const vDiscount = validate(rawDiscount, { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
+      const vTerminal = validate(rawTerminal, { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
+
+      if (!vFcf.valid || !vGrowth.valid || !vDiscount.valid || !vTerminal.valid || vDiscount.value! <= vTerminal.value!) return;
+
+      const res = calcDCFClient(vFcf.value!, vGrowth.value!, vDiscount.value!, vTerminal.value!);
+      const text = `DCF Valuation: Year 1 FCF ${fmtVal(vFcf.value!)}, growth ${vGrowth.value}%, discount ${vDiscount.value}%, terminal ${vTerminal.value}% => Intrinsic Value: ${fmtVal(res.intrinsicValue)}. ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('dcf-copy-btn');
       if (btn) {
@@ -422,6 +530,23 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      f: { required: true, min: 1, label: 'f' },
+      g: { required: true, min: -50, max: 100, decimal: true, label: 'g' },
+      d: { required: true, min: 0.1, max: 100, decimal: true, label: 'd' },
+      t: { required: true, min: -10, max: 20, decimal: true, label: 't' },
+    });
+    if (restored.valid && restored.values.f && restored.values.g !== undefined && restored.values.d && restored.values.t !== undefined) {
+      fcf1Input.value = fmtLiveInput(String(restored.values.f));
+      growthInput.value = String(restored.values.g);
+      discountInput.value = String(restored.values.d);
+      terminalInput.value = String(restored.values.t);
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

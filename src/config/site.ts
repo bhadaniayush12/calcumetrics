@@ -605,9 +605,9 @@ export const TOOLS: Tool[] = [
     category: 'Corporate Finance',
     region: 'Global',
     description: 'Calculate the time required to recover an investment using discounted cash flows.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
     name: 'Present Value Calculator',
@@ -616,9 +616,9 @@ export const TOOLS: Tool[] = [
     category: 'Corporate Finance',
     region: 'Global',
     description: 'Calculate the present value of a future cash flow using a chosen discount rate.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'keyword-serp' },
+    research: { status: 'verified', basis: 'keyword-serp', checkedAt: '2026-09-22' },
   },
   {
     name: 'Future Value Calculator',
@@ -627,9 +627,9 @@ export const TOOLS: Tool[] = [
     category: 'Corporate Finance',
     region: 'Global',
     description: 'Calculate the future value of a present amount or cash-flow series at a chosen growth rate.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
 ];
 

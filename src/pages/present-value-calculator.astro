@@ -1,0 +1,431 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../components/calculator/CompositionBar.astro';
+import Slider from '../components/calculator/Slider.astro';
+import Input from '../components/ui/Input.astro';
+import Dropdown from '../components/ui/Dropdown.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcPV } from '../lib/finance/time-value';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = { futureAmount: 100000, rate: 8, years: 10 };
+const result = calcPV(DEFAULT.futureAmount, DEFAULT.rate, DEFAULT.years, 'annually');
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtPct = (n: number) => n.toFixed(2) + '%';
+
+const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'present-value-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/present-value-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Present Value Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the present value of a future cash flow using a chosen discount rate and compounding frequency.',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
+        { '@type': 'ListItem', position: 3, name: 'Present Value Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is present value (PV)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Present value is the current worth of a future sum of money or cash flow, discounted at a specified rate of return. The concept reflects the time value of money — a dollar today is worth more than a dollar tomorrow because of its earning potential.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a good discount rate to use for present value?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The appropriate discount rate depends on context. For corporate projects, the company\'s WACC is standard. For personal finance, the opportunity cost (e.g. expected market return of 8–12%) is often used. Government bonds or risk-free rates are used when evaluating risk-free cash flows.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does compounding frequency affect present value?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'More frequent compounding (monthly vs annually) produces a lower PV because the effective annual rate is higher, causing more aggressive discounting. For example, ₹1,00,000 in 10 years discounted at 8% annually gives PV ≈ ₹46,319, while monthly compounding gives PV ≈ ₹45,052.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between PV and NPV?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Present value (PV) discounts a single future cash flow to today. Net Present Value (NPV) sums the PV of multiple cash flows over time and subtracts the initial investment. NPV tells you whether a project or investment creates or destroys value.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can present value be higher than the future amount?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. Present value is always less than or equal to the future amount when the discount rate is positive. PV equals the future amount only when the rate is 0% or the time period is 0 years. A negative discount rate is theoretically possible in some economic models but is not standard.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Present Value Calculator: Discount Any Future Cash Flow | Calcumetrics"
+  description="Calculate the present value (PV) of any future sum using a chosen discount rate and compounding frequency. Instant, free, and fully client-side."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Present Value Calculator"
+    category="Corporate Finance"
+    categoryHref="/corporate-finance"
+    heroValue={fmtCurrency(result.pv)}
+    heroLabel="Present Value"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Present Value Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Discount a future cash flow back to its value today using the time value of money. Formula: PV = FV / (1 + r/n)^(n×t)</p>
+
+      <!-- Validation error banner -->
+      <div id="pv-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="pv-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
+
+      <div class="mb-5">
+        <Input id="pv-future" label="Future Amount" prefix="₹" value="1,00,000" isNumeric={true} localeFormat="indian" helperText="Cash flow expected in the future" inputmode="decimal" aria-describedby="pv-error-msg" />
+        <div class="mt-2"><Slider id="pv-future-slider" min={1000} max={10000000} step={1000} value={100000} ariaLabel="Future amount slider" /></div>
+      </div>
+
+      <div class="mb-5">
+        <Input id="pv-rate" label="Discount Rate" suffix="%" value="8.0" isNumeric={true} helperText="Annual discount / opportunity-cost rate" inputmode="decimal" aria-describedby="pv-error-msg" />
+        <div class="mt-2"><Slider id="pv-rate-slider" min={0.5} max={30} step={0.5} value={8} ariaLabel="Discount rate slider" /></div>
+      </div>
+
+      <div class="mb-5">
+        <Input id="pv-years" label="Time Period" suffix="Years" value="10" isNumeric={true} helperText="Number of years until the future cash flow" inputmode="decimal" aria-describedby="pv-error-msg" />
+        <div class="mt-2"><Slider id="pv-years-slider" min={1} max={40} step={1} value={10} ariaLabel="Time period slider" /></div>
+      </div>
+
+      <div class="mb-6">
+        <Dropdown id="pv-freq" label="Compounding Frequency" options={[{value:'annually',label:'Annually'},{value:'semi-annually',label:'Semi-annually'},{value:'quarterly',label:'Quarterly'},{value:'monthly',label:'Monthly'},{value:'continuously',label:'Continuously'}]} value="annually" helperText="How frequently the discount rate compounds" />
+      </div>
+
+      <Alert variant="info" title="Interpretation">The PV is always ≤ the future amount when the discount rate is positive. A higher discount rate or longer horizon produces a lower present value.</Alert>
+      <div class="flex gap-3 mt-6">
+        <Button variant="primary" id="pv-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="pv-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Present Value</span>
+        <div id="pv-result-pv" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite" aria-atomic="true">
+          {fmtCurrency(result.pv)}
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Future Amount</span>
+          <span id="pv-result-future" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(DEFAULT.futureAmount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Discount</span>
+          <span id="pv-result-discount" class="text-sm font-semibold tabular-nums text-dark-accent">{fmtCurrency(result.totalDiscount)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5">
+          <span class="text-xs text-dark-muted">Discount %</span>
+          <span id="pv-result-discount-pct" class="text-sm font-medium tabular-nums text-dark-text">{fmtPct(result.discountFraction * 100)}</span>
+        </div>
+      </div>
+
+      <div class="mb-5">
+        <CompositionBar
+          principalFraction={result.pvFraction}
+          gainFraction={result.discountFraction}
+          principalLabel="Present Value"
+          gainLabel="Discount"
+          principalValue={fmtCurrency(result.pv)}
+          gainValue={fmtCurrency(result.totalDiscount)}
+        />
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="pv-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Copy Result</button>
+        <button type="button" id="pv-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">Share Link</button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+    </Fragment>
+
+    <Fragment slot="below">
+      <section aria-labelledby="pv-how">
+        <h2 id="pv-how" class="text-xl font-bold text-text-primary mb-4">How the Present Value calculator works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Present value answers: "How much is a future sum worth in today's terms?" Using a discount rate that represents your minimum required return or opportunity cost, the formula reverses compounding to find the equivalent lump sum today.</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">PV = FV / (1 + r/n)^(n × t)</p>
+          <ul class="space-y-1 text-sm text-text-muted">
+            <li><strong class="text-text-primary">PV</strong> — Present value (what you want to find)</li>
+            <li><strong class="text-text-primary">FV</strong> — Future value (the cash flow you expect to receive)</li>
+            <li><strong class="text-text-primary">r</strong> — Annual discount rate (e.g. 0.08 for 8%)</li>
+            <li><strong class="text-text-primary">n</strong> — Compounding periods per year (1 = annual, 12 = monthly)</li>
+            <li><strong class="text-text-primary">t</strong> — Time in years</li>
+          </ul>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Worked example:</strong> You expect to receive ₹1,00,000 in 10 years. Your required return is 8% annually compounded. PV = 1,00,000 / (1.08)^10 = <strong>₹46,319</strong>. This means receiving ₹1 lakh in 10 years is worth only ₹46,319 today at your required rate of return.</p>
+      </section>
+
+      <section aria-labelledby="pv-faq">
+        <h2 id="pv-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            ['What is present value (PV)?', 'Present value is the current worth of a future sum of money, discounted at a specified rate. It reflects the time value of money — ₹1 today is worth more than ₹1 tomorrow because of its earning potential.'],
+            ['What discount rate should I use?', 'Use your opportunity cost — typically the expected market return (8–12% for equity investments), or the company\'s WACC for capital budgeting decisions. A risk-free rate (e.g. government bond yield) is appropriate for risk-free future cash flows.'],
+            ['How does compounding frequency affect PV?', 'More frequent compounding produces a lower PV. For ₹1,00,000 due in 10 years at 8%, annual compounding gives PV ≈ ₹46,319, while monthly compounding gives PV ≈ ₹45,052.'],
+            ['What is the difference between PV and NPV?', 'PV discounts a single future cash flow to today. NPV sums the PVs of multiple periodic cash flows and subtracts the initial investment — it tells you the net value creation or destruction of a project.'],
+            ['Can PV be higher than the future amount?', 'No — when the discount rate is positive, PV is always less than the future amount. PV equals the future amount only when the rate is 0% or the time period is zero.'],
+          ].map(([q, a]) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="pv-related">
+        <h2 id="pv-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
+  const pvSchema = {
+    fv: { required: true, min: 1, max: 1e10, label: 'Future Amount' },
+    r:  { required: true, min: 0.01, max: 100, decimal: true, label: 'Discount Rate' },
+    y:  { required: true, min: 0.1, max: 100, decimal: true, label: 'Time Period' },
+  } as const;
+
+  const FREQ_MAP: Record<string, number> = {
+    annually: 1, 'semi-annually': 2, quarterly: 4, monthly: 12, continuously: Infinity,
+  };
+
+  function calcPVClient(fv: number, rPct: number, years: number, n: number): { pv: number; discount: number; pvFrac: number; discFrac: number } {
+    const r = rPct / 100;
+    const pv = n === Infinity ? fv * Math.exp(-r * years) : fv / Math.pow(1 + r / n, n * years);
+    const discount = fv - pv;
+    return { pv, discount, pvFrac: fv > 0 ? pv / fv : 0, discFrac: fv > 0 ? discount / fv : 0 };
+  }
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
+  function fmtIndianInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+
+  function initPV() {
+    if ((window as any).__cmPVBound) return;
+    (window as any).__cmPVBound = true;
+
+    const futurEl = document.getElementById('pv-future') as HTMLInputElement | null;
+    const rateEl  = document.getElementById('pv-rate') as HTMLInputElement | null;
+    const yearsEl = document.getElementById('pv-years') as HTMLInputElement | null;
+    const freqEl  = document.getElementById('pv-freq') as HTMLSelectElement | null;
+    const futSlider = document.getElementById('pv-future-slider') as HTMLInputElement | null;
+    const rSlider   = document.getElementById('pv-rate-slider') as HTMLInputElement | null;
+    const ySlider   = document.getElementById('pv-years-slider') as HTMLInputElement | null;
+    const errAlert  = document.getElementById('pv-error-alert');
+    const errMsg    = document.getElementById('pv-error-msg');
+    if (!futurEl || !rateEl || !yearsEl) return;
+
+    const DEFAULTS = { fv: 100000, rate: 8, years: 10 };
+    let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) { if (errAlert) errAlert.classList.remove('hidden'); if (errMsg) errMsg.textContent = msg; }
+    function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
+
+    function recalc() {
+      const rawFv = futurEl!.value.replace(/[^0-9.]/g, '');
+      const vFv = validate(rawFv, pvSchema.fv);
+      const vR  = validate(rateEl!.value, pvSchema.r);
+      const vY  = validate(yearsEl!.value, pvSchema.y);
+
+      if (!vFv.valid) { showError(vFv.error!.message); return; }
+      if (!vR.valid)  { showError(vR.error!.message); return; }
+      if (!vY.valid)  { showError(vY.error!.message); return; }
+      clearError();
+
+      const fv = vFv.value!;
+      const r  = vR.value!;
+      const y  = vY.value!;
+      const n  = FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1;
+      const res = calcPVClient(fv, r, y, n);
+
+      setResult({
+        heroValue: fmt(res.pv),
+        heroLabel: 'Present Value',
+        rows: [
+          { label: 'Future Amount',  value: fmt(fv) },
+          { label: 'Total Discount', value: fmt(res.discount), variant: 'accent' },
+          { label: 'Discount %',     value: (res.discFrac * 100).toFixed(2) + '%' },
+        ],
+        fields: { pv: fmt(res.pv), discount: fmt(res.discount) },
+      });
+
+      // Update composition bar
+      const wrapper = document.getElementById('pv-result-pv')?.closest('[class]');
+      const resultPv  = document.getElementById('pv-result-pv');
+      const resFuture = document.getElementById('pv-result-future');
+      const resDisc   = document.getElementById('pv-result-discount');
+      const resDiscPct= document.getElementById('pv-result-discount-pct');
+      if (resultPv) resultPv.textContent = fmt(res.pv);
+      if (resFuture) resFuture.textContent = fmt(fv);
+      if (resDisc) resDisc.textContent = fmt(res.discount);
+      if (resDiscPct) resDiscPct.textContent = (res.discFrac * 100).toFixed(2) + '%';
+
+      const compBar = document.querySelector('[class*="bg-dark-muted"]') as HTMLElement | null;
+      const gainBar = document.querySelector('[class*="bg-dark-accent"]') as HTMLElement | null;
+      if (compBar) compBar.style.width = `${(res.pvFrac * 100).toFixed(2)}%`;
+      if (gainBar) gainBar.style.width = `${(res.discFrac * 100).toFixed(2)}%`;
+      const legendEls = document.querySelectorAll('[class*="tabular-nums"]');
+      if (legendEls[legendEls.length - 2]) (legendEls[legendEls.length - 2] as HTMLElement).textContent = fmt(res.pv);
+      if (legendEls[legendEls.length - 1]) (legendEls[legendEls.length - 1] as HTMLElement).textContent = fmt(res.discount);
+
+      history.replaceState(null, '', serializeHash({ fv, r, y }));
+    }
+
+    function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 100); }
+
+    function syncSlider(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
+      if (!slider) return;
+      slider.addEventListener('input', () => {
+        input.value = isFormatted ? fmtIndianInput(slider.value) : slider.value;
+        const pct = ((+slider.value - +slider.min) / (+slider.max - +slider.min)) * 100;
+        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        debounce();
+      });
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        const num = parseFloat(raw);
+        if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
+          slider.value = String(num);
+          const pct = ((num - +slider.min) / (+slider.max - +slider.min)) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        }
+        if (isFormatted) input.value = fmtIndianInput(raw);
+        debounce();
+      });
+    }
+
+    syncSlider(futSlider, futurEl, true);
+    syncSlider(rSlider, rateEl, false);
+    syncSlider(ySlider, yearsEl, false);
+    freqEl?.addEventListener('change', debounce);
+
+    document.getElementById('pv-calculate')?.addEventListener('click', recalc);
+    document.getElementById('pv-reset')?.addEventListener('click', () => {
+      futurEl.value = fmtIndianInput(String(DEFAULTS.fv));
+      rateEl.value = String(DEFAULTS.rate);
+      yearsEl.value = String(DEFAULTS.years);
+      if (freqEl) freqEl.value = 'annually';
+      if (futSlider) { futSlider.value = String(DEFAULTS.fv); futSlider.style.setProperty('--slider-pct', `${((DEFAULTS.fv - 1000) / (10000000 - 1000) * 100).toFixed(2)}%`); }
+      if (rSlider) { rSlider.value = String(DEFAULTS.rate); rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 0.5) / (30 - 0.5) * 100).toFixed(2)}%`); }
+      if (ySlider) { ySlider.value = String(DEFAULTS.years); ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`); }
+      clearError();
+      recalc();
+      futurEl.focus();
+    });
+
+    [futurEl, rateEl, yearsEl].forEach(el => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
+
+    document.getElementById('pv-copy-btn')?.addEventListener('click', async () => {
+      const rawFv = futurEl.value.replace(/[^0-9.]/g, '');
+      const vFv = validate(rawFv, pvSchema.fv);
+      const vR  = validate(rateEl.value, pvSchema.r);
+      const vY  = validate(yearsEl.value, pvSchema.y);
+      if (!vFv.valid || !vR.valid || !vY.valid) return;
+      const n = FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1;
+      const res = calcPVClient(vFv.value!, vR.value!, vY.value!, n);
+      await navigator.clipboard.writeText(`Present Value: ${fmt(res.pv)} (FV: ${fmt(vFv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`);
+      const btn = document.getElementById('pv-copy-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    document.getElementById('pv-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('pv-share-btn');
+      if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), { fv: pvSchema.fv, r: pvSchema.r, y: pvSchema.y });
+    if (restored.valid && restored.values.fv && restored.values.r && restored.values.y) {
+      futurEl.value = fmtIndianInput(String(restored.values.fv));
+      rateEl.value = String(restored.values.r);
+      yearsEl.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initPV();
+  document.addEventListener('astro:page-load', initPV);
+</script>
