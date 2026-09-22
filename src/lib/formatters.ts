@@ -5,21 +5,27 @@
  * font-variant-numeric: tabular-nums applied in CSS; these functions return strings only.
  */
 
-export type LocaleFormat = 'indian' | 'international';
-export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP';
+import {
+  type CurrencyCode,
+  CURRENCY_CONFIG,
+  formatDisplayCurrency,
+} from './currency';
 
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  INR: '₹',
-  USD: '$',
-  EUR: '€',
-  GBP: '£',
+export type LocaleFormat = 'indian' | 'international';
+export type Currency = CurrencyCode;
+
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  INR: CURRENCY_CONFIG.INR.symbol,
+  USD: CURRENCY_CONFIG.USD.symbol,
+  EUR: CURRENCY_CONFIG.EUR.symbol,
+  GBP: CURRENCY_CONFIG.GBP.symbol,
 };
 
-const CURRENCY_LOCALE: Record<Currency, { locale: string; grouping: LocaleFormat }> = {
-  INR: { locale: 'en-IN', grouping: 'indian' },
-  USD: { locale: 'en-US', grouping: 'international' },
-  EUR: { locale: 'de-DE', grouping: 'international' },
-  GBP: { locale: 'en-GB', grouping: 'international' },
+export const CURRENCY_LOCALE: Record<Currency, { locale: string; grouping: LocaleFormat }> = {
+  INR: { locale: CURRENCY_CONFIG.INR.locale, grouping: CURRENCY_CONFIG.INR.grouping },
+  USD: { locale: CURRENCY_CONFIG.USD.locale, grouping: CURRENCY_CONFIG.USD.grouping },
+  EUR: { locale: CURRENCY_CONFIG.EUR.locale, grouping: CURRENCY_CONFIG.EUR.grouping },
+  GBP: { locale: CURRENCY_CONFIG.GBP.locale, grouping: CURRENCY_CONFIG.GBP.grouping },
 };
 
 /**
@@ -44,14 +50,10 @@ export function formatIntl(value: number, decimals = 0): string {
 
 /**
  * Format a currency amount with the appropriate symbol and grouping.
+ * Delegates to canonical formatDisplayCurrency (Phase 9).
  */
 export function formatCurrency(value: number, currency: Currency = 'INR', decimals = 0): string {
-  const symbol = CURRENCY_SYMBOLS[currency];
-  const { grouping } = CURRENCY_LOCALE[currency];
-  const formatted = grouping === 'indian'
-    ? formatIndian(value)
-    : formatIntl(value, decimals);
-  return `${symbol}${formatted}`;
+  return formatDisplayCurrency(value, currency, decimals);
 }
 
 /**

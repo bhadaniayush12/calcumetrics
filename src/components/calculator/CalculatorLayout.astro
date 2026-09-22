@@ -201,6 +201,13 @@ const {
 </style>
 
 <script>
+  import {
+    isJurisdictionLocked,
+    getJurisdictionCurrency,
+    getCurrencyConfig,
+    normalizeCurrency,
+  } from '../../lib/currency';
+
   /**
    * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.
    *
@@ -410,7 +417,7 @@ const {
 
       // Generic currency prefix updater — registered only once (bypassed for region-locked tools)
       window.addEventListener('cm:currency-change', (e: any) => {
-        if (window.location.pathname.startsWith('/in/') || window.location.pathname.startsWith('/us/') || window.location.pathname.startsWith('/uk/')) return;
+        if (isJurisdictionLocked(window.location.pathname)) return;
         if (e.detail?.symbol) {
           document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
             el.textContent = e.detail.symbol;
@@ -446,34 +453,24 @@ const {
     }
   }
 
-  // Sync currency prefix from localStorage on current page DOM
+  // Sync currency prefix from localStorage or jurisdiction lock on current page DOM
   function syncCurrencyFromStorage() {
-    if (window.location.pathname.startsWith('/in/')) {
+    const lockedCode = getJurisdictionCurrency(window.location.pathname);
+    if (lockedCode) {
+      const config = getCurrencyConfig(lockedCode);
       document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-        el.textContent = '₹';
+        el.textContent = config.symbol;
       });
       return;
     }
-    if (window.location.pathname.startsWith('/us/')) {
-      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-        el.textContent = '$';
-      });
-      return;
-    }
-    if (window.location.pathname.startsWith('/uk/')) {
-      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-        el.textContent = '£';
-      });
-      return;
-    }
+
     try {
       const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        const symbol = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-          el.textContent = symbol;
-        });
-      }
+      const normalized = normalizeCurrency(saved);
+      const config = getCurrencyConfig(normalized);
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = config.symbol;
+      });
     } catch (e) {}
   }
 

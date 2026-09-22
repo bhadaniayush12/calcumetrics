@@ -131,6 +131,18 @@ export function setResult(result: CalcResult): void {
       // from blocking the rest.
     }
   });
+
+  if (typeof window !== 'undefined') {
+    const win = window as any;
+    if (win.__cmResultStore && typeof win.__cmResultStore.setResult === 'function') {
+      try {
+        win.__cmResultStore.setResult(result);
+      } catch {}
+    }
+    try {
+      win.dispatchEvent(new CustomEvent('cm:result', { detail: result }));
+    } catch {}
+  }
 }
 
 /**

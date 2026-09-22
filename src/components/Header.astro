@@ -157,7 +157,7 @@ const totalToolsCount = getToolCount();
         <button
           type="button"
           id="header-currency-btn"
-          aria-label="Select Currency"
+          aria-label="Select display currency"
           aria-expanded="false"
           aria-haspopup="true"
           class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
@@ -170,21 +170,23 @@ const totalToolsCount = getToolCount();
 
         <div
           id="header-currency-menu"
+          role="menu"
+          aria-label="Display currency options"
           class="hidden absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
         >
-          <button type="button" data-currency-val="₹ INR" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold transition-standard flex items-center justify-between cursor-pointer">
+          <button type="button" role="menuitem" data-currency-val="₹ INR" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold transition-standard flex items-center justify-between cursor-pointer">
             <span>₹ INR (India)</span>
             <span data-currency-check="₹ INR" class="text-accent font-bold">✓</span>
           </button>
-          <button type="button" data-currency-val="$ USD" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+          <button type="button" role="menuitem" data-currency-val="$ USD" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
             <span>$ USD (US)</span>
             <span data-currency-check="$ USD" class="text-accent font-bold hidden">✓</span>
           </button>
-          <button type="button" data-currency-val="€ EUR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+          <button type="button" role="menuitem" data-currency-val="€ EUR" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
             <span>€ EUR (Europe)</span>
             <span data-currency-check="€ EUR" class="text-accent font-bold hidden">✓</span>
           </button>
-          <button type="button" data-currency-val="£ GBP" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
+          <button type="button" role="menuitem" data-currency-val="£ GBP" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary font-medium flex items-center justify-between cursor-pointer">
             <span>£ GBP (UK)</span>
             <span data-currency-check="£ GBP" class="text-accent font-bold hidden">✓</span>
           </button>
@@ -383,7 +385,7 @@ const totalToolsCount = getToolCount();
       <div class="p-4 flex items-center justify-between text-xs text-text-muted bg-canvas">
         <div class="flex items-center gap-2">
           <span class="font-medium text-text-primary" data-i18n="nav-currency">Currency:</span>
-          <select id="mobile-currency-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
+          <select id="mobile-currency-select" aria-label="Select display currency" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
             <option value="₹ INR" selected>₹ INR</option>
             <option value="$ USD">$ USD</option>
             <option value="€ EUR">€ EUR</option>
@@ -407,6 +409,8 @@ const totalToolsCount = getToolCount();
 </header>
 
 <script>
+  import { CURRENCY_CONFIG, normalizeCurrency } from '../lib/currency';
+
   function initHeaderScripts() {
     // ── 1. Desktop Tools dropdown ───────────────────────────────────────────
     const toolsBtn = document.getElementById('tools-menu-button');
@@ -458,26 +462,22 @@ const totalToolsCount = getToolCount();
     const currencyLabel = document.getElementById('current-currency-label');
     const mobileCurrencySelect = document.getElementById('mobile-currency-select') as HTMLSelectElement | null;
 
-    const CURRENCIES: Record<string, { code: string; symbol: string; format: string }> = {
-      '₹ INR': { code: 'INR', symbol: '₹', format: 'indian' },
-      '$ USD': { code: 'USD', symbol: '$', format: 'international' },
-      '€ EUR': { code: 'EUR', symbol: '€', format: 'international' },
-      '£ GBP': { code: 'GBP', symbol: '£', format: 'international' },
-    };
-
     function applyCurrency(val: string, broadcast = true) {
-      if (!CURRENCIES[val]) val = '₹ INR';
-      if (currencyLabel) currencyLabel.textContent = val;
-      if (mobileCurrencySelect) mobileCurrencySelect.value = val;
+      const code = normalizeCurrency(val);
+      const config = CURRENCY_CONFIG[code];
+      const normalizedLabel = config.label;
+
+      if (currencyLabel) currencyLabel.textContent = normalizedLabel;
+      if (mobileCurrencySelect) mobileCurrencySelect.value = normalizedLabel;
 
       currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-check]').forEach((el) => {
         const checkVal = el.getAttribute('data-currency-check');
-        el.classList.toggle('hidden', checkVal !== val);
+        el.classList.toggle('hidden', checkVal !== normalizedLabel);
       });
 
       currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-val]').forEach((btn) => {
         const btnVal = btn.getAttribute('data-currency-val');
-        if (btnVal === val) {
+        if (btnVal === normalizedLabel) {
           btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
           btn.classList.remove('text-text-primary');
         } else {
@@ -487,53 +487,72 @@ const totalToolsCount = getToolCount();
       });
 
       try {
-        localStorage.setItem('cm_currency', val);
+        localStorage.setItem('cm_currency', normalizedLabel);
       } catch (e) {}
 
       if (broadcast) {
-        const detail = { label: val, ...CURRENCIES[val] };
+        const detail = { label: normalizedLabel, code: config.code, symbol: config.symbol, format: config.grouping };
         window.dispatchEvent(new CustomEvent('cm:currency-change', { detail }));
       }
     }
 
-    // Restore saved currency
+    // Restore saved currency safely with canonical fallback
     try {
       const savedCur = localStorage.getItem('cm_currency');
-      if (savedCur && CURRENCIES[savedCur]) {
-        applyCurrency(savedCur, false);
+      if (savedCur) {
+        const normalized = normalizeCurrency(savedCur);
+        applyCurrency(CURRENCY_CONFIG[normalized].label, false);
       }
     } catch (e) {}
 
     if (currencyBtn && currencyMenu) {
-      currencyBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currencyMenu.classList.toggle('hidden');
-        currencyMenu.classList.toggle('flex');
-        currencyBtn.setAttribute('aria-expanded', currencyMenu.classList.contains('flex') ? 'true' : 'false');
-      });
+      if (!currencyBtn.dataset.currencyBound) {
+        currencyBtn.dataset.currencyBound = 'true';
 
-      currencyMenu.querySelectorAll('[data-currency-val]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const val = btn.getAttribute('data-currency-val') || '₹ INR';
-          applyCurrency(val, true);
-          currencyMenu.classList.add('hidden');
-          currencyMenu.classList.remove('flex');
-          currencyBtn.setAttribute('aria-expanded', 'false');
+        currencyBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpening = currencyMenu.classList.contains('hidden');
+          currencyMenu.classList.toggle('hidden');
+          currencyMenu.classList.toggle('flex');
+          currencyBtn.setAttribute('aria-expanded', isOpening ? 'true' : 'false');
         });
-      });
 
-      document.addEventListener('click', (e) => {
-        if (!currencyMenu.contains(e.target as Node) && !currencyBtn.contains(e.target as Node)) {
-          currencyMenu.classList.add('hidden');
-          currencyMenu.classList.remove('flex');
-          currencyBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
+        currencyMenu.querySelectorAll('[data-currency-val]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const val = btn.getAttribute('data-currency-val') || '₹ INR';
+            applyCurrency(val, true);
+            currencyMenu.classList.add('hidden');
+            currencyMenu.classList.remove('flex');
+            currencyBtn.setAttribute('aria-expanded', 'false');
+            currencyBtn.focus();
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!currencyMenu.contains(e.target as Node) && !currencyBtn.contains(e.target as Node)) {
+            currencyMenu.classList.add('hidden');
+            currencyMenu.classList.remove('flex');
+            currencyBtn.setAttribute('aria-expanded', 'false');
+          }
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && currencyMenu.classList.contains('flex')) {
+            currencyMenu.classList.add('hidden');
+            currencyMenu.classList.remove('flex');
+            currencyBtn.setAttribute('aria-expanded', 'false');
+            currencyBtn.focus();
+          }
+        });
+      }
     }
 
-    mobileCurrencySelect?.addEventListener('change', () => {
-      applyCurrency(mobileCurrencySelect.value, true);
-    });
+    if (mobileCurrencySelect && !mobileCurrencySelect.dataset.currencyBound) {
+      mobileCurrencySelect.dataset.currencyBound = 'true';
+      mobileCurrencySelect.addEventListener('change', () => {
+        applyCurrency(mobileCurrencySelect.value, true);
+      });
+    }
 
     // ── 4. Language Selector with Persistence & Feedback ────────────────────
     const langBtn = document.getElementById('header-lang-btn');

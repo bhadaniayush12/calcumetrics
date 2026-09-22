@@ -208,7 +208,7 @@ const jsonld = {
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Future Value</span>
-        <div id="ci-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
+        <div id="ci-result-maturity" data-cm-result="heroValue" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
           {fmt(result.maturity)}
         </div>
       </div>
@@ -498,6 +498,16 @@ const jsonld = {
         },
       });
 
+      // Direct DOM updates for guaranteed consistency across desktop & mobile
+      const resMaturity = document.getElementById('ci-result-maturity');
+      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
+      const resPrincipal = document.getElementById('ci-result-principal');
+      if (resPrincipal) resPrincipal.textContent = fmtVal(p);
+      const resGain = document.getElementById('ci-result-gain');
+      if (resGain) resGain.textContent = fmtVal(res.gain);
+      const mobileHero = document.getElementById('calc-mobile-hero');
+      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+
       // ── Composition bar update (visual sub-component) ──────────────────
       const wrapper = document.getElementById('ci-composition-wrapper');
       if (wrapper) {
@@ -703,6 +713,7 @@ const jsonld = {
       if (saved) {
         currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
         currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+        recalc();
       }
     } catch (e) {}
   }
