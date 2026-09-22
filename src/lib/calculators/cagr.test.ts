@@ -106,4 +106,46 @@ describe('5.4 CAGR Calculator', () => {
       expect(restored.invalidKeys).toContain('y');
     });
   });
+
+  describe('Canonical Result & Validation Audit (Phase 5 Repair)', () => {
+    it('notifies subscribers exactly once per setResult call (single canonical write)', async () => {
+      const { setResult, subscribeResult, resetResult } = await import('../result-bus');
+      resetResult();
+
+      let updates = 0;
+      const unsub = subscribeResult(() => {
+        updates++;
+      });
+
+      setResult({
+        heroValue: '20.11%',
+        heroLabel: 'CAGR',
+        fields: { 'cagr-result-pct': '20.11%' },
+      });
+
+      expect(updates).toBe(1);
+      unsub();
+    });
+
+    it('rejects empty and invalid strings without silent coercion to 0', () => {
+      const cagrSchema = {
+        pv: { required: true, min: 100, max: 1000000000, label: 'Initial Investment' },
+        fv: { required: true, min: 1, max: 1000000000, label: 'Final Value' },
+        y: { required: true, min: 0.1, max: 100, decimal: true, label: 'Time Period (Years)' },
+      };
+
+      // Empty strings
+      expect(validate('', cagrSchema.pv).valid).toBe(false);
+      expect(validate('  ', cagrSchema.fv).valid).toBe(false);
+
+      // Non-numeric strings
+      expect(validate('invalid', cagrSchema.pv).valid).toBe(false);
+      expect(validate('NaN', cagrSchema.y).valid).toBe(false);
+
+      // Valid boundary and decimal years
+      const validTenure = validate('1.5', cagrSchema.y);
+      expect(validTenure.valid).toBe(true);
+      if (validTenure.valid) expect(validTenure.value).toBe(1.5);
+    });
+  });
 });

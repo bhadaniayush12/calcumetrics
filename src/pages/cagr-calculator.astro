@@ -314,6 +314,12 @@ const jsonld = {
 
     if (!pvInput || !fvInput || !yInput) return;
 
+    if (pvInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pvInput.dataset.bound = 'true';
+
     const DEFAULTS = { pv: 100000, fv: 250000, years: 5 };
     const cagrSchema = {
       pv: { required: true, min: 100, max: 1000000000, label: 'Initial Investment' },
@@ -395,12 +401,6 @@ const jsonld = {
 
       setResult(canonicalResult);
 
-      const win = window as any;
-      if (win.__cmResultStore) {
-        win.__cmResultStore.setResult(canonicalResult);
-      }
-      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
-
       // Desktop fallback updates
       if (resPct) resPct.textContent = cagrPctStr;
       if (resPv) resPv.textContent = pvStr;
@@ -476,11 +476,18 @@ const jsonld = {
     });
 
     document.getElementById('cagr-copy-btn')?.addEventListener('click', async () => {
-      const pv = parseFloat(pvInput.value.replace(/[^0-9.]/g, '')) || 0;
-      const fv = parseFloat(fvInput.value.replace(/[^0-9.]/g, '')) || 0;
-      const y = parseFloat(yInput.value) || 0;
+      const valPv = validate(pvInput.value, cagrSchema.pv);
+      const valFv = validate(fvInput.value, cagrSchema.fv);
+      const valY = validate(yInput.value, cagrSchema.y);
+      if (!valPv.valid || !valFv.valid || !valY.valid) {
+        showError((!valPv.valid && valPv.error.message) || (!valFv.valid && valFv.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const pv = valPv.value!;
+      const fv = valFv.value!;
+      const y = valY.value!;
       const res = calcCAGR(pv, fv, y);
-      const text = `CAGR: ${fmtVal(pv)} to ${fmtVal(fv)} over ${y} years is ${res.cagrPct.toFixed(2)}% CAGR (${res.multiple.toFixed(2)}x return). ${location.href.split('#')[0]}`;
+      const text = `CAGR: ${fmtVal(pv)} to ${fmtVal(fv)} over ${y} years is ${res.cagrPct.toFixed(2)}% CAGR (${res.multiple.toFixed(2)}x return). ${location.href.split('#')[0]}#pv=${pv}&fv=${fv}&y=${y}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -502,11 +509,22 @@ const jsonld = {
     });
 
     document.getElementById('cagr-share-btn')?.addEventListener('click', async () => {
+      const valPv = validate(pvInput.value, cagrSchema.pv);
+      const valFv = validate(fvInput.value, cagrSchema.fv);
+      const valY = validate(yInput.value, cagrSchema.y);
+      if (!valPv.valid || !valFv.valid || !valY.valid) {
+        showError((!valPv.valid && valPv.error.message) || (!valFv.valid && valFv.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const pv = valPv.value!;
+      const fv = valFv.value!;
+      const y = valY.value!;
+      const shareUrl = `${location.href.split('#')[0]}#pv=${pv}&fv=${fv}&y=${y}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -523,13 +541,17 @@ const jsonld = {
     });
 
     // Currency synchronization
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmCAGRCurrencyBound) {
+      win.__cmCAGRCurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
