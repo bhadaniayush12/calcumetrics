@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:28:15+05:30
+- **LAST_UPDATED:** 2026-09-23T04:29:40+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 36
-- **IN_PROGRESS:** 037. loan-affordability-calculator
-- **NEXT:** 038. debt-to-income-ratio-calculator
+- **COMPLETED:** 37
+- **IN_PROGRESS:** 038. debt-to-income-ratio-calculator
+- **NEXT:** 039. credit-card-payoff-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** mortgage-calculator
-- **LAST_COMMIT:** 1d7863a
+- **LAST_COMPLETED_UNIT:** loan-affordability-calculator
+- **LAST_COMMIT:** 71a50b4
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -54,8 +54,8 @@
 - [x] 034. inflation-calculator — DONE
 - [x] 035. savings-goal-calculator — DONE
 - [x] 036. mortgage-calculator — DONE
-- [ ] 037. loan-affordability-calculator — IN PROGRESS
-- [ ] 038. debt-to-income-ratio-calculator — PENDING
+- [x] 037. loan-affordability-calculator — DONE
+- [ ] 038. debt-to-income-ratio-calculator — IN PROGRESS
 - [ ] 039. credit-card-payoff-calculator — PENDING
 - [ ] 040. loan-amortization-calculator — PENDING
 - [ ] 041. interest-rate-calculator — PENDING
@@ -266,4 +266,10 @@
   - Audited: Long-term residential real estate debt amortization model computing monthly reducing-balance installments (EMI), interest/principal split, and total lifetime cash outflows.
   - Changes: Added complete 6-stage mathematical formula breakdown, comprehensive step-by-step worked example schedule matching default inputs (₹50L purchase price, 20% down payment = ₹10L, ₹40L loan at 8.50% over 20 years → ₹34,713/month EMI, Month 1 interest heavy split: 81.6% interest / 18.4% principal, ₹40L principal repaid (48.0%), ₹43,31,103 interest paid to bank (52.0%), ₹83,31,103 total loan repayment, ₹93,31,103 total property cash outlay / 1.87x original purchase price), loan term trade-off analysis comparing 15 vs 20 vs 30-year mortgages (15-yr term saves ₹12.39L interest; 30-yr term explodes interest by +₹27.41L), analysis of the equity "Crossover Point" (Month 137 / Year 11.5) and annual prepayment acceleration power, and real-world exclusions (PITI components, floating rate benchmark volatility, closing/acquisition charges).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcAmortization`, 5 FAQs matching JSON-LD schema, and curated related links (`home-loan-calculator`, `loan-affordability-calculator`, `loan-prepayment-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **037. loan-affordability-calculator (/loan-affordability-calculator)**:
+  - Audited: Reverse annuity present value debt capacity model computing maximum loan principal sanctionable from target monthly repayment budget.
+  - Changes: Added complete 5-stage mathematical annuity formula breakdown, comprehensive step-by-step worked example schedule matching default inputs (₹40,000 monthly EMI budget, 9.00% annual interest rate over 15-year tenure / 180 months → ₹39,43,736 maximum affordable principal, ₹72,00,000 total cash repaid, ₹32,56,264 total lifetime interest payable (45.2%), 54.8% principal share), analysis of the "Tenure Trap" detailing diminishing borrowing power across 10/15/20/25 year terms vs explosive interest growth, FOIR (Fixed Obligation to Income Ratio) and DTI underwriting caps (40%–50% net income ceiling, pre-existing debt deductions, CIBIL/FICO 750+ credit score requirements), and practical underwriting exclusions (LTV 75–80% ceiling requiring 20–25% down payment, floating benchmark rate shock sensitivity, incidental registration/stamp duty charges).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcAffordability`, 5 FAQs matching JSON-LD schema, and curated related links (`mortgage-calculator`, `home-loan-calculator`, `debt-to-income-ratio-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
