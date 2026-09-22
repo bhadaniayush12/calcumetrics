@@ -14,7 +14,7 @@ import { TOOLS } from '../config/site';
 const DEFAULT = { principal: 100000, rate: 7.1, years: 5 };
 const result = calcFD(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, 'quarterly');
 
-const fmt = (n: number) => '₹' + formatIndian(n);
+const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter(
   (t) => t.category === 'Investments' && t.slug !== 'fd-calculator' && t.status === 'published'
@@ -46,6 +46,35 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Fixed Deposit Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How is FD interest compounded?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Most Indian banks (SBI, HDFC, ICICI, etc.) compound interest on a quarterly basis. Every three months, the interest earned is added to the principal balance for subsequent interest calculations.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What formula is used for FD maturity calculation?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The standard compound interest formula is A = P × (1 + r / n)^(n × t), where P is the principal, r is the annual interest rate as a decimal, n is compounding periods per year (4 for quarterly), and t is tenure in years.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Do senior citizens get higher interest rates on FDs?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, banks typically offer an additional 0.50% to 0.75% per annum for deposits held by individuals aged 60 and above.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -63,6 +92,7 @@ const jsonld = {
     categoryHref="/investments"
     heroValue={fmt(result.maturity)}
     heroLabel="Maturity Value"
+    calcType="advanced"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Fixed Deposit Calculator</h1>
@@ -97,7 +127,7 @@ const jsonld = {
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="fd-rate-slider" min={2.5} max={15} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
+          <Slider id="fd-rate-slider" min={1} max={15} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -131,6 +161,13 @@ const jsonld = {
           value="quarterly"
           helperText="Most Indian banks compound FD interest quarterly"
         />
+      </div>
+
+      <!-- Validation Error Container -->
+      <div id="fd-error-alert" class="hidden mb-5">
+        <Alert variant="error" title="Validation Error">
+          <span id="fd-error-message">Please check your inputs.</span>
+        </Alert>
       </div>
 
       <Alert variant="info" title="Tax Note">
@@ -196,13 +233,26 @@ const jsonld = {
           In India, major banks calculate term deposit maturity using quarterly compounding with the standard compound interest formula:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">A = P × (1 + r / 4)^(4 × t)</p>
+          <p class="text-base font-mono text-text-primary mb-2">A = P &times; (1 + r / n)^(n &times; t)</p>
           <ul class="space-y-1 text-sm text-text-muted">
             <li><strong class="text-text-primary">A</strong> — Maturity value</li>
             <li><strong class="text-text-primary">P</strong> — Principal deposit amount</li>
             <li><strong class="text-text-primary">r</strong> — Annual interest rate expressed as a decimal</li>
+            <li><strong class="text-text-primary">n</strong> — Compounding frequency per year (quarterly = 4)</li>
             <li><strong class="text-text-primary">t</strong> — Tenure in years</li>
           </ul>
+        </div>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2">Worked Example</h3>
+          <p class="text-sm text-text-muted leading-relaxed">
+            For a fixed deposit of <strong class="text-text-primary">₹1,00,000</strong> at <strong class="text-text-primary">7.0% p.a.</strong> for <strong class="text-text-primary">5 years</strong> with quarterly compounding (n = 4):
+          </p>
+          <p class="text-sm font-mono text-text-primary my-2">
+            A = 1,00,000 &times; (1 + 0.07 / 4)^(4 &times; 5) = 1,00,000 &times; (1.0175)^20 = ₹1,41,477.82
+          </p>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Interest Earned = ₹1,41,477.82 − ₹1,00,000 = <strong class="text-text-primary">₹41,477.82</strong>, delivering an effective overall return of 41.5% over the 5-year deposit tenure.
+          </p>
         </div>
       </section>
 
@@ -213,6 +263,12 @@ const jsonld = {
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is FD interest compounded?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
               Most Indian banks (SBI, HDFC, ICICI, etc.) compound interest on a quarterly basis. Every three months, the interest earned is added to the principal balance for subsequent interest calculations.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What formula is used for FD maturity calculation?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              The standard compound interest formula is A = P &times; (1 + r / n)^(n &times; t), where P is the principal, r is the annual rate as a decimal, n is compounding frequency (quarterly = 4), and t is tenure in years.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
@@ -241,27 +297,18 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcFDClient(p: number, rate: number, years: number, freq: string) {
-    const freqMap: Record<string, number> = { quarterly: 4, monthly: 12, 'half-yearly': 2, annually: 1 };
-    const n = freqMap[freq] || 4;
-    const r = rate / 100;
-    const maturity = p * Math.pow(1 + r / n, n * years);
-    const gain = maturity - p;
-    const gainPct = p > 0 ? (gain / p) * 100 : 0;
-    return {
-      maturity,
-      gain,
-      gainPct,
-      principalFraction: maturity > 0 ? p / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
+  import { calcFD, type FDCompoundFreq } from '../lib/calculators/fd';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, updateHash, readCurrentHash, parseHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
+
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
+
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
     return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
@@ -272,6 +319,7 @@ const jsonld = {
     const rInput = document.getElementById('fd-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('fd-years') as HTMLInputElement | null;
     const fSelect = document.getElementById('fd-compounding') as HTMLSelectElement | null;
+
     const pSlider = document.getElementById('fd-principal-slider') as HTMLInputElement | null;
     const rSlider = document.getElementById('fd-rate-slider') as HTMLInputElement | null;
     const ySlider = document.getElementById('fd-years-slider') as HTMLInputElement | null;
@@ -282,43 +330,113 @@ const jsonld = {
     const resGainPct = document.getElementById('fd-result-gainpct');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errorAlert = document.getElementById('fd-error-alert');
+    const errorMessage = document.getElementById('fd-error-message');
+
     if (!pInput || !rInput || !yInput) return;
 
-    const DEFAULTS = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' };
+    const DEFAULTS = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' as FDCompoundFreq };
+    const fdSchema = {
+      p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
+      r: { required: true, min: 0, max: 30, decimal: true, label: 'Annual Interest Rate' },
+      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Tenure (Years)' },
+    };
+
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errorAlert && errorMessage) {
+        errorMessage.textContent = msg;
+        errorAlert.classList.remove('hidden');
+      }
+    }
+
+    function hideError() {
+      if (errorAlert) {
+        errorAlert.classList.add('hidden');
+      }
     }
 
     function recalc() {
-      const p = parse(pInput.value);
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseFloat(yInput.value) || 0;
-      const f = fSelect ? fSelect.value : 'quarterly';
+      // Phase 4.3 Centralized Validation Engine
+      const valP = validate(pInput.value, fdSchema.p);
+      if (!valP.valid) {
+        showError(valP.error.message);
+        return;
+      }
 
-      if (p <= 0 || r <= 0 || y <= 0) return;
+      const valR = validate(rInput.value, fdSchema.r);
+      if (!valR.valid) {
+        showError(valR.error.message);
+        return;
+      }
 
-      const res = calcFDClient(p, r, y, f);
+      const valY = validate(yInput.value, fdSchema.y);
+      if (!valY.valid) {
+        showError(valY.error.message);
+        return;
+      }
 
-      if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
-      if (resPrincipal) resPrincipal.textContent = fmtVal(p);
-      if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.maturity);
+      hideError();
+
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const freq = (fSelect?.value as FDCompoundFreq) || 'quarterly';
+
+      const res = calcFD(p, r, y, freq);
+
+      const maturityStr = fmtVal(res.maturity);
+      const principalStr = fmtVal(p);
+      const gainStr = fmtVal(res.interest);
+      const returnPctStr = (p > 0 ? ((res.interest / p) * 100).toFixed(1) : '0.0') + '%';
+
+      // Phase 4.2 Canonical Result State
+      const canonicalResult = {
+        heroValue: maturityStr,
+        heroLabel: 'Maturity Value',
+        rows: [
+          { label: 'Principal Amount', value: principalStr },
+          { label: 'Total Interest', value: gainStr, variant: 'accent' as const },
+          { label: 'Total Return', value: returnPctStr },
+        ],
+        fields: {
+          'fd-result-maturity': maturityStr,
+          'fd-result-principal': principalStr,
+          'fd-result-gain': gainStr,
+          'fd-result-gainpct': returnPctStr,
+        },
+        meta: { p, r, y, freq, maturity: res.maturity, interest: res.interest },
+      };
+
+      setResult(canonicalResult);
+
+      const win = window as any;
+      if (win.__cmResultStore) {
+        win.__cmResultStore.setResult(canonicalResult);
+      }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
+
+      // Fallback desktop node updates
+      if (resMaturity) resMaturity.textContent = maturityStr;
+      if (resPrincipal) resPrincipal.textContent = principalStr;
+      if (resGain) resGain.textContent = gainStr;
+      if (resGainPct) resGainPct.textContent = returnPctStr;
+      if (mobileHero) mobileHero.textContent = maturityStr;
 
       const wrapper = document.getElementById('fd-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && res.maturity > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
         if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
         const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(p);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+        if (legendEls[0]) legendEls[0].textContent = principalStr;
+        if (legendEls[1]) legendEls[1].textContent = gainStr;
       }
 
-      history.replaceState(null, '', `#p=${p}&r=${r}&y=${y}&f=${f}`);
+      // Phase 4.4 URL State Serialization
+      updateHash(serializeHash({ p, r, y, f: freq }));
     }
 
     function debounce() {
@@ -330,7 +448,8 @@ const jsonld = {
       if (!slider) return;
       slider.addEventListener('input', () => {
         input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
-        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+        const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
+        const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         debounce();
       });
@@ -364,12 +483,13 @@ const jsonld = {
       }
       if (rSlider) {
         rSlider.value = String(DEFAULTS.rate);
-        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 2.5) / (15 - 2.5)) * 100}%`);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (15 - 1)) * 100}%`);
       }
       if (ySlider) {
         ySlider.value = String(DEFAULTS.years);
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 0.5) / (10 - 0.5)) * 100}%`);
       }
+      hideError();
       recalc();
       pInput.focus();
     });
@@ -381,13 +501,24 @@ const jsonld = {
     });
 
     document.getElementById('fd-copy-btn')?.addEventListener('click', async () => {
-      const p = parse(pInput.value);
+      const p = parseFloat(pInput.value.replace(/[^0-9.]/g, '')) || 0;
       const r = parseFloat(rInput.value) || 0;
       const y = parseFloat(yInput.value) || 0;
-      const f = fSelect ? fSelect.value : 'quarterly';
-      const res = calcFDClient(p, r, y, f);
-      const text = `Fixed Deposit: ${fmtVal(p)} at ${r}% p.a. for ${y} years gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      const f = (fSelect ? fSelect.value : 'quarterly') as FDCompoundFreq;
+      const res = calcFD(p, r, y, f);
+      const text = `Fixed Deposit: ${fmtVal(p)} at ${r}% p.a. for ${y} years gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('fd-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -397,7 +528,18 @@ const jsonld = {
     });
 
     document.getElementById('fd-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('fd-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -420,6 +562,42 @@ const jsonld = {
         currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
       }
     } catch (e) {}
+
+    // Phase 4.4 URL State Restoration
+    const currentHash = readCurrentHash();
+    if (currentHash) {
+      const restored = restoreFromHash(currentHash, fdSchema);
+      if (restored.valid) {
+        if (restored.values.p !== undefined) {
+          pInput.value = fmtLiveInput(String(restored.values.p));
+          if (pSlider) {
+            pSlider.value = String(restored.values.p);
+            pSlider.style.setProperty('--slider-pct', `${((restored.values.p - 5000) / (10000000 - 5000)) * 100}%`);
+          }
+        }
+        if (restored.values.r !== undefined) {
+          rInput.value = String(restored.values.r);
+          if (rSlider) {
+            rSlider.value = String(restored.values.r);
+            rSlider.style.setProperty('--slider-pct', `${((restored.values.r - 1) / (15 - 1)) * 100}%`);
+          }
+        }
+        if (restored.values.y !== undefined) {
+          yInput.value = String(restored.values.y);
+          if (ySlider) {
+            ySlider.value = String(restored.values.y);
+            ySlider.style.setProperty('--slider-pct', `${((restored.values.y - 0.5) / (10 - 0.5)) * 100}%`);
+          }
+        }
+      }
+      // Check for compounding frequency in raw hash
+      const raw = parseHash(currentHash);
+      if (raw.f && ['quarterly', 'monthly', 'half-yearly', 'annually'].includes(raw.f)) {
+        if (fSelect) fSelect.value = raw.f;
+      }
+    }
+
+    recalc();
   }
 
   initFDCalc();
