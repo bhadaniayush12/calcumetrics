@@ -236,21 +236,78 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="ls-how">
         <h2 id="ls-how" class="text-xl font-bold text-text-primary mb-4">How the Lump Sum calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">A lump sum investment is a one-time deployment of capital. Unlike a SIP where you invest monthly, here your entire principal starts compounding from day one. This means the longer your investment horizon, the more dramatic the compounding effect.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          A lump sum investment represents a one-time upfront deployment of capital. Unlike a Systematic Investment Plan (SIP) where contributions occur incrementally every month, your entire principal starts compounding immediately from day one. Over long investment horizons, compounding generates exponential growth because each period's accumulated earnings generate subsequent returns.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          This calculator uses the standard compound interest future value equation:
+        </p>
+
+        <!-- Formula block -->
         <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
-          <p class="text-base font-mono text-text-primary mb-3">A = P &times; (1 + r/n)<sup>n &times; t</sup></p>
+          <p class="text-base font-mono text-text-primary mb-3">A = P &times; (1 + r / n)<sup>n &times; t</sup></p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">A</strong> &mdash; Future value</li>
-            <li><strong class="text-text-primary">P</strong> &mdash; Principal (initial investment)</li>
-            <li><strong class="text-text-primary">r</strong> &mdash; Annual rate (e.g. 0.08 for 8%)</li>
-            <li><strong class="text-text-primary">n</strong> &mdash; Compounding periods per year</li>
-            <li><strong class="text-text-primary">t</strong> &mdash; Time in years</li>
+            <li><strong class="text-text-primary">A</strong> &mdash; Future value (total maturity corpus)</li>
+            <li><strong class="text-text-primary">P</strong> &mdash; Initial principal investment amount</li>
+            <li><strong class="text-text-primary">r</strong> &mdash; Annual nominal interest rate expressed as a decimal (e.g., 0.08 for 8.0%)</li>
+            <li><strong class="text-text-primary">n</strong> &mdash; Compounding frequency per year (1 for annually, 2 for semi-annually, 4 for quarterly, 12 for monthly)</li>
+            <li><strong class="text-text-primary">t</strong> &mdash; Investment horizon in years</li>
           </ul>
         </div>
       </section>
 
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="ls-example">
+        <h2 id="ls-example" class="text-xl font-bold text-text-primary mb-4">Worked example: ₹1,00,000 at 8% for 10 years</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an upfront investment of ₹1,00,000 held for 10 years at an expected annual return of 8.0% compounded annually:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Identify variables:</strong> P = ₹1,00,000, r = 0.08, n = 1, t = 10</p>
+          <p><strong class="text-text-primary">2. Periodic rate:</strong> r / n = 0.08 / 1 = 0.08</p>
+          <p><strong class="text-text-primary">3. Total compounding periods:</strong> n &times; t = 1 &times; 10 = 10</p>
+          <p><strong class="text-text-primary">4. Compounding factor:</strong> (1 + 0.08)<sup>10</sup> &asymp; 2.158925</p>
+          <p><strong class="text-text-primary">5. Maturity value (A):</strong> ₹1,00,000 &times; 2.158925 = <strong class="text-text-primary">₹2,15,892</strong> (rounded to nearest rupee)</p>
+          <p><strong class="text-text-primary">6. Wealth gain:</strong> ₹2,15,892 &minus; ₹1,00,000 = <strong class="text-text-primary text-accent">₹1,15,892</strong> (a 115.9% total return on capital)</p>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          <strong>Impact of compounding frequency:</strong> If the same ₹1,00,000 is compounded quarterly (n = 4) rather than annually, the compounding factor becomes (1 + 0.02)<sup>40</sup> &asymp; 2.208040, producing a maturity value of <strong>₹2,20,804</strong> (+₹4,912 in additional compound interest).
+        </p>
+      </section>
+
+      <!-- 3. Result Interpretation -->
+      <section aria-labelledby="ls-interpretation">
+        <h2 id="ls-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your results</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Future Value vs. Wealth Gain:</strong> The total future value reflects the gross corpus at maturity, combining returned principal with accumulated growth. The wealth gain represents the true profit earned above your initial deposit.
+          </p>
+          <p>
+            <strong class="text-text-primary">Nominal vs. Real Returns:</strong> All projections on this page are nominal. In inflationary environments, the real purchasing power of your maturity corpus will be lower than the headline figure. For example, with an average 6% annual inflation rate, a nominal 8% return yields an approximate real purchasing power gain of ~1.9% per year.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4. Assumptions & Limitations -->
+      <section aria-labelledby="ls-assumptions">
+        <h2 id="ls-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Constant Return Rate:</strong> The calculation models a steady, linear annual rate of return. Market-linked instruments (such as equity mutual funds or stocks) experience price volatility and sequence-of-returns variance; actual real-world paths will fluctuate above and below the simulated trajectory.
+          </li>
+          <li>
+            <strong class="text-text-primary">Taxes and Fees Excluded:</strong> Calculations do not deduct capital gains tax (such as LTCG/STCG in India or federal capital gains taxes in the US), expense ratios, exit loads, or account maintenance fees.
+          </li>
+          <li>
+            <strong class="text-text-primary">Undisturbed Compounding:</strong> Assumes all intermediate dividend or interest payouts are automatically reinvested without interim partial withdrawals.
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. Frequently Asked Questions -->
       <section aria-labelledby="ls-faq">
         <h2 id="ls-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
@@ -269,6 +326,7 @@ const jsonld = {
         </div>
       </section>
 
+      <!-- 6. Related Calculators -->
       <section aria-labelledby="ls-related">
         <h2 id="ls-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>

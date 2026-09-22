@@ -1,25 +1,25 @@
 # Phase 10: Content Depth — Progress Tracker
 
-**STATUS:** IN_PROGRESS  
-**PHASE:** 10  
-**LAST_UPDATED:** 2026-09-23T03:45:00+05:30  
-**TOTAL:** 50  
-**COMPLETED:** 0  
-**IN_PROGRESS:** NONE  
-**NEXT:** sip-calculator  
-**BLOCKER:** NONE  
-**LAST_COMPLETED_UNIT:** NONE  
-**LAST_COMMIT:** 3c768da  
-**TEST_STATUS:** PASS (385/385 tests)  
-**BUILD_STATUS:** PASS (65 pages)  
-**BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
+- **STATUS:** IN_PROGRESS
+- **PHASE:** 10
+- **LAST_UPDATED:** 2026-09-23T03:47:30+05:30
+- **TOTAL:** 50
+- **COMPLETED:** 2
+- **IN_PROGRESS:** NONE
+- **NEXT:** 003. compound-interest-calculator
+- **BLOCKER:** NONE
+- **LAST_COMPLETED_UNIT:** lump-sum-calculator
+- **LAST_COMMIT:** 35add7f
+- **TEST_STATUS:** PASS (385/385 tests)
+- **BUILD_STATUS:** PASS (65 pages)
+- **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
 
 ---
 
 ## Calculator Audit & Depth Checklist (50 Published Tools)
 
-- [ ] 001. sip-calculator — PENDING (Phase 5 Locked)
-- [ ] 002. lump-sum-calculator — PENDING
+- [x] 001. sip-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
+- [x] 002. lump-sum-calculator — DONE
 - [ ] 003. compound-interest-calculator — PENDING (Phase 5 Locked)
 - [ ] 004. simple-interest-calculator — PENDING (Phase 5 Locked)
 - [ ] 005. cagr-calculator — PENDING (Phase 5 Locked)
@@ -72,5 +72,14 @@
 ---
 
 ## Session-Safe Audit Log
+- **001. sip-calculator (/sip-calculator)**:
+  - Audited: Full review of existing content below the fold.
+  - Classification: Phase 5 Locked Calculator.
+  - Assessment: High-quality formula presentation, verified step-by-step worked example, compounding frequency nuance, explicit assumptions/limitations, 3 targeted FAQs matching JSON-LD schema, valid related tools.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
 
-*(Will record unit-by-unit audit details, actions taken, preserved content, and checkpoints)*
+- **002. lump-sum-calculator (/lump-sum-calculator)**:
+  - Audited: Detailed inspection of formula, examples, assumptions, limitations, and FAQs.
+  - Changes: Added verified step-by-step worked example (₹1,00,000 at 8% for 10 yrs → ₹2,15,892, comparing annual vs quarterly compounding), added result interpretation (nominal vs real purchasing power), and added key assumptions & limitations (constant rate, taxes/fees excluded, undisturbed compounding).
+  - Preserved: Clean interactive inputs, calculation engine `calcLumpSum`, 5 high-quality FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
