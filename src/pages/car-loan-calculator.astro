@@ -250,15 +250,94 @@ const jsonld = {
       <section aria-labelledby="car-loan-calculator-how">
         <h2 id="car-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How car loan EMI is computed</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Car loan EMIs follow the reducing balance method:
+          Vehicle loans are amortized using the standard reducing balance method, where interest is charged each month only on the remaining unpaid loan balance. The monthly equated instalment is determined by:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
           <p class="text-base font-mono text-text-primary mb-2">EMI = [P × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">P</strong> — Net loan amount = On-road price − Down payment</li>
-            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual rate / 12 / 100</li>
-            <li><strong class="text-text-primary">n</strong> — Months of tenure = Years × 12</li>
+            <li><strong class="text-text-primary">P</strong> — Net loan principal = On-road vehicle price − Down payment</li>
+            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual interest rate / 12 / 100</li>
+            <li><strong class="text-text-primary">n</strong> — Total repayment tenure in months = Years × 12</li>
           </ul>
+        </div>
+      </section>
+
+      <section aria-labelledby="car-loan-worked-example">
+        <h2 id="car-loan-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Suppose you purchase a new vehicle with an on-road price of <strong>₹12,00,000</strong>. You pay a down payment of <strong>₹2,00,000</strong> (16.67%) upfront from savings and finance the remainder at an annual interest rate of <strong>9.0%</strong> over a <strong>5-year</strong> tenure:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>On-Road Vehicle Price:</span>
+            <strong class="text-text-primary font-mono">₹12,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Upfront Down Payment:</span>
+            <strong class="text-text-primary font-mono">₹2,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Net Financed Principal (P):</span>
+            <strong class="text-text-primary font-mono">₹10,00,000</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Periodic Monthly Rate (r):</span>
+            <strong class="text-text-primary font-mono">9.0% / 12 = 0.75% (0.0075)</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Total Repayment Periods (n):</span>
+            <strong class="text-text-primary font-mono">5 × 12 = 60 months</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Calculated Monthly EMI:</span>
+            <strong class="text-text-primary font-mono">₹20,758</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Total Interest Payable over 5 Years:</span>
+            <strong class="text-text-primary font-mono">₹2,45,501</strong>
+          </div>
+          <div class="flex justify-between border-b border-border/50 pb-2">
+            <span>Total Loan Repayment (Principal + Interest):</span>
+            <strong class="text-text-primary font-mono">₹12,45,501</strong>
+          </div>
+          <div class="flex justify-between pt-1">
+            <span>Total Vehicle Acquisition Cost (Down Payment + Repayment):</span>
+            <strong class="text-accent font-mono font-bold">₹14,45,501</strong>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="car-loan-interpretation">
+        <h2 id="car-loan-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting auto loan metrics & dealer quotes</h2>
+        <div class="space-y-4 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Depreciation vs. Loan Amortization:</strong> Automobiles are depreciating consumer assets, commonly shedding 15% to 20% of their market value during the first year and approximately 10% annually thereafter. Choosing a longer tenure (e.g., 7 or 8 years) lowers your monthly EMI but causes the outstanding loan principal to decline much slower than the car's resale value. This results in negative equity (being "underwater" on your loan), leaving you owing more than the vehicle is worth if it is sold or totaled in an accident.
+          </p>
+          <p>
+            <strong class="text-text-primary">Flat Rate vs. Reducing Balance Trap:</strong> Auto dealerships frequently quote attractive "flat interest rates" (for instance, 5.5% flat). In a flat rate structure, interest is calculated on the original ₹10,00,000 principal throughout all 5 years, even when most of the principal has been repaid. A 5.5% flat rate translates to an effective reducing rate of approximately 10.2% p.a. Always ask the financier for the reducing balance annual percentage rate (APR) to compare offers accurately.
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="car-loan-assumptions">
+        <h2 id="car-loan-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions & practical limitations</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Fixed Rate Model</h3>
+            <p>Calculations assume a fixed interest rate with equal monthly instalments throughout the selected tenure without mid-term rate fluctuations.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Ancillary Financing Fees</h3>
+            <p>Estimates exclude lender loan origination/processing fees (usually 0.5%–2% + taxes), hypothecation charges, and documentation fees added to disbursement.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Ownership Operating Expenses</h3>
+            <p>The EMI covers only debt financing. Annual comprehensive motor insurance renewals, road taxes, routine servicing, consumables, and fuel are not included.</p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-text-primary mb-1">Foreclosure & Prepayment Fees</h3>
+            <p>Unlike floating rate home loans, banks and non-banking financial companies (NBFCs) often levy foreclosure penalties (2%–5% on outstanding balance) for early settlement.</p>
+          </div>
         </div>
       </section>
 
