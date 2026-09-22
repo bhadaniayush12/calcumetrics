@@ -210,44 +210,137 @@ const jsonld = {
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">Standard lender benchmark: 1.25x or higher. Below 1.0x indicates inability to service debt from operational earnings.</p>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>The Debt Service Coverage Ratio is defined as:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
-          DSCR = Net Operating Income (NOI) / Total Debt Service
+    <Fragment slot="below">
+      <section aria-labelledby="dscr-calculator-how">
+        <h2 id="dscr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the Debt Service Coverage Ratio (DSCR) Works</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          The Debt Service Coverage Ratio (DSCR) is the gold-standard solvency and credit underwriting metric utilized by commercial banks, SBA lenders, private credit funds, and institutional real estate investors. It quantifies an enterprise's capacity to service its term debt principal and interest obligations strictly through core operational cash flow:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. The Master DSCR Formula:</strong> DSCR = Net Operating Income (NOI) &divide; Total Annual Debt Service<br /><br />
+            <strong>2. Total Annual Debt Service:</strong> Debt Service = Annual Principal Amortization + Annual Interest Expense<br /><br />
+            <strong>3. Free Cash Flow Cushion (Surplus):</strong> Cash Cushion = NOI &minus; Total Annual Debt Service<br /><br />
+            <strong>4. Cash Cushion Margin (%):</strong> Buffer % = [ (NOI &minus; Debt Service) &divide; NOI ] &times; 100 = [ 1 &minus; (1 &divide; DSCR) ] &times; 100<br /><br />
+            <strong>5. Maximum Borrowing Debt Capacity:</strong> Max Allowable Debt Service = NOI &divide; Lender Target DSCR (e.g., 1.25x)
+          </p>
         </div>
-        <p>Where Total Debt Service = Annual Principal Amortization + Annual Interest Expense.</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider a commercial property owner or growing corporate business generating <strong>₹15,00,000</strong> in Net Operating Income (NOI / EBITDA) seeking to support <strong>₹10,00,000</strong> in annual debt obligations (combined principal repayments and term interest):
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Financial Metric / Underwriting Step</th>
+                <th class="py-2.5 px-4">Underwriting Formula / Definition</th>
+                <th class="py-2.5 px-4">Annual Financial Amount</th>
+                <th class="py-2.5 px-4">Proportion of NOI</th>
+                <th class="py-2.5 px-4">Credit Risk Interpretation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Net Operating Income (NOI / EBITDA)</td>
+                <td class="py-2.5 px-4 font-mono">Revenues &minus; Cash Operating Expenses</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹15,00,000</td>
+                <td class="py-2.5 px-4 font-mono">100.0%</td>
+                <td class="py-2.5 px-4">Total cash generated before debt service, depreciation, and corporate taxes.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Annual Debt Service</td>
+                <td class="py-2.5 px-4 font-mono">Principal Repayments + Interest</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">66.7%</td>
+                <td class="py-2.5 px-4">Mandatory contractual cash outflow owed to commercial lenders across the year.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Debt Service Coverage Ratio (DSCR)</td>
+                <td class="py-2.5 px-4 font-mono">₹15,00,000 &divide; ₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-text-primary text-base">1.50x</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-text-primary">150.0% Coverage</td>
+                <td class="py-2.5 px-4">Sufficient coverage comfortably exceeding standard 1.25x underwriting minimum.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Unencumbered Cash Cushion (Surplus)</td>
+                <td class="py-2.5 px-4 font-mono">₹15,00,000 &minus; ₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹5,00,000</td>
+                <td class="py-2.5 px-4 font-mono">33.3%</td>
+                <td class="py-2.5 px-4">Operational cash buffer retained after full debt retirement to fund capex or reserves.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Maximum Allowed Debt at 1.25x Covenant</td>
+                <td class="py-3 px-4 font-mono">₹15,00,000 &divide; 1.25x</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹12,00,000</td>
+                <td class="py-3 px-4 font-mono">80.0%</td>
+                <td class="py-3 px-4">The borrower possesses ₹2,00,000 in unused annual debt service borrowing headroom.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Institutional Underwriting Benchmark Tiers</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>&lt;1.00x (Critical Default Risk):</strong> Cash flow from operations is insufficient to cover debt service. Default is inevitable without outside equity infusions, refinancing, or reserve depletion.</li>
+              <li><strong>1.00x – 1.15x (High Risk / Vulnerable):</strong> Marginal solvency. Even minor revenue contractions or inflation in operating costs will breach loan covenants.</li>
+              <li><strong>1.20x – 1.25x (Standard Commercial Floor):</strong> The conventional minimum baseline requirement enforced by commercial banks, CMBS issuers, and SBA 7(a) lenders.</li>
+              <li><strong>1.35x – 1.50x (Prime Credit / Healthy):</strong> Solid operational coverage providing favorable loan pricing, reduced covenant strictness, and room for dividend distributions.</li>
+              <li><strong>&ge;2.00x (Exemplary / Low Leverage):</strong> Substantial borrowing capacity; pristine credit risk with large discretionary free cash flow.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">DSCR vs Interest Coverage Ratio (ICR)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Understanding the critical distinction between DSCR and ICR protects against solvency traps:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>The Interest Coverage Trap:</strong> Interest Coverage Ratio (EBIT &divide; Interest) strictly evaluates interest expenses, entirely ignoring contractual principal amortization schedules.</li>
+              <li><strong>True Cash Realism:</strong> Because debt principal amortization is not an income statement expense, an enterprise with heavy balloon debt can exhibit an apparently strong ICR while being structurally incapable of servicing mandatory principal repayments. DSCR incorporates both.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="dscr-calculator-faq">
+        <h2 id="dscr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="dscr-calculator-related">
+        <h2 id="dscr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related financial calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/working-capital-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Business</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Working Capital Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate Net Working Capital and Current Ratio to evaluate operational short-term liquidity.</p>
           </a>
-        ))}
-      </div>
+          <a href="/cash-conversion-cycle-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Business</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Cash Conversion Cycle Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine your net operating cycle duration in days from DSO, DIO, and DPO.</p>
+          </a>
+          <a href="/loan-amortization-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Amortization Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Generate complete period-by-period schedules of interest, principal repayment, and balances.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>

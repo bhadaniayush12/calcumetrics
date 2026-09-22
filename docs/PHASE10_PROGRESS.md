@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:50:20+05:30
+- **LAST_UPDATED:** 2026-09-23T04:51:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 46
-- **IN_PROGRESS:** 047. dscr-calculator
-- **NEXT:** 048. discounted-payback-period-calculator
+- **COMPLETED:** 47
+- **IN_PROGRESS:** 048. discounted-payback-period-calculator
+- **NEXT:** 049. present-value-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** cash-conversion-cycle-calculator
-- **LAST_COMMIT:** b690a30
+- **LAST_COMPLETED_UNIT:** dscr-calculator
+- **LAST_COMMIT:** f66748e
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -64,8 +64,8 @@
 - [x] 044. advance-tax-calculator — DONE (India Tax Protected)
 - [x] 045. salary-ctc-calculator — DONE (India Tax Protected)
 - [x] 046. cash-conversion-cycle-calculator — DONE
-- [ ] 047. dscr-calculator — IN PROGRESS
-- [ ] 048. discounted-payback-period-calculator — PENDING
+- [x] 047. dscr-calculator — DONE
+- [ ] 048. discounted-payback-period-calculator — IN PROGRESS
 - [ ] 049. present-value-calculator — PENDING
 - [ ] 050. future-value-calculator — PENDING
 
@@ -326,4 +326,10 @@
   - Audited: Corporate working capital velocity engine computing the Cash Conversion Cycle (CCC) from Days Sales Outstanding (DSO), Days Inventory Outstanding (DIO), and Days Payable Outstanding (DPO).
   - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added complete mathematical formula breakdown (CCC = DSO + DIO &minus; DPO, Operating Cycle = DSO + DIO, 365-day annualized balance sheet formulations), complete step-by-step worked example schedule matching default inputs (₹20,00,000 Revenue, ₹12,00,000 COGS, ₹2,00,000 AR, ₹3,00,000 Inventory, ₹1,50,000 AP over 365 days → DSO = 36.5 days, DIO = 91.3 days, Gross Operating Cycle = 127.8 days, DPO = 45.6 days, net CCC = 82.1 days, qualitative assessment: "Fair — cash is tied up for a moderate period"), institutional CCC benchmarking matrix (&lt;0 days negative cycle float vs &le;30 days lean FMCG vs 31–60 days manufacturing vs &gt;90 days working capital distress), and tactical working capital levers (DSO acceleration via 2/10 Net 30, DIO lean JIT replenishment, DPO trade credit optimization).
   - Preserved: Clean interactive inputs, calculation engine `calcCCC`, dynamic multi-tier assessment messaging, 5 FAQs matching JSON-LD schema, and curated related links (`/working-capital-calculator`, `/inventory-turnover-calculator`, `/cogs-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **047. dscr-calculator (/dscr-calculator)**:
+  - Audited: Commercial credit and term debt underwriting engine evaluating Debt Service Coverage Ratio (DSCR) from Net Operating Income (NOI / EBITDA) and annual debt obligations.
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added comprehensive solvency equations (DSCR = NOI &divide; Debt Service, debt service principal + interest breakdown, free cash flow cushion buffer margin, maximum borrowing capacity derivation at target covenant), complete step-by-step worked example schedule matching default inputs (₹15,00,000 NOI, ₹10,00,000 Total Debt Service → 1.50x DSCR / 150.0% coverage, ₹5,00,000 unencumbered cash cushion / 33.3% of NOI, ₹12,00,000 max allowable debt service at standard 1.25x bank covenant with ₹2,00,000 unused borrowing headroom), institutional lender underwriting tiers (&lt;1.00x critical default vs 1.20–1.25x commercial floor vs 1.35–1.50x prime vs &ge;2.00x low leverage), and critical analysis of DSCR vs Interest Coverage Ratio (ICR) illustrating how ignoring contractual principal amortization creates deceptive solvency traps.
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcDSCR`, composition bar visualization, 5 FAQs matching JSON-LD schema, and curated related links (`/working-capital-calculator`, `/cash-conversion-cycle-calculator`, `/loan-amortization-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
