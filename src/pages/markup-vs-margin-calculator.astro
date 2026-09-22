@@ -43,6 +43,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Markup vs Margin Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is the fundamental difference between markup and margin?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Markup represents the percentage added on top of unit cost to determine the selling price. Gross margin represents the percentage of the selling price retained as profit after covering costs.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What markup is needed for a 50% margin?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'To achieve a 50% gross margin, you must apply a 100% markup to your cost (i.e. doubling the cost). For example, an item costing ₹500 marked up 100% sells for ₹1,000, yielding ₹500 profit (50% of the ₹1,000 selling price).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can margin ever exceed 100%?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. Gross margin cannot exceed 100% unless cost is negative. However, markup can exceed 100% indefinitely (e.g. 200%, 500%, or 1000% markup on low-cost digital goods or luxury items).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I convert markup percentage directly to margin percentage?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Use the standard formula: Margin % = [Markup % / (100 + Markup %)] × 100. For instance, a 25% markup equals (25 / 125) × 100 = 20% margin.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why does confusing markup and margin lead to business losses?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'If a business with 30% overhead costs marks up goods by 30% thinking it achieves a 30% margin, it only gets a 23.1% margin. The shortfall of nearly 7% directly produces operating losses.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -64,6 +109,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Markup vs Margin Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Convert between markup % (on cost) and margin % (on price) to protect your profitability.</p>
+
+      <!-- Error alert -->
+      <div id="mvm-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="mvm-error-msg"></span>
+      </div>
 
       <!-- Cost -->
       <div class="mb-5">
@@ -192,6 +242,12 @@ const jsonld = {
         <h2 id="mvm-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the fundamental difference between markup and margin?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Markup represents the percentage added on top of unit cost to determine the selling price. Gross margin represents the percentage of the selling price retained as profit after covering costs.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What markup is needed for a 50% margin?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
               To achieve a 50% gross margin, you must apply a 100% markup to your cost (i.e. doubling the cost). For example, an item costing ₹500 marked up 100% sells for ₹1,000, yielding ₹500 profit (50% of the ₹1,000 selling price).
@@ -200,7 +256,19 @@ const jsonld = {
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can margin ever exceed 100%?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. Gross margin cannot exceed 100% unless your cost is negative. However, markup can exceed 100% indefinitely (e.g. 200%, 500%, or 1000% markup on low-cost digital goods or luxury items).
+              No. Gross margin cannot exceed 100% unless cost is negative. However, markup can exceed 100% indefinitely (e.g. 200%, 500%, or 1000% markup on low-cost digital goods or luxury items).
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How do I convert markup percentage directly to margin percentage?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Use the standard formula: Margin % = [Markup % / (100 + Markup %)] × 100. For instance, a 25% markup equals (25 / 125) × 100 = 20% margin.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why does confusing markup and margin lead to business losses?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              If a business with 30% overhead costs marks up goods by 30% thinking it achieves a 30% margin, it only gets a 23.1% margin. The shortfall of nearly 7% directly produces operating losses.
             </div>
           </details>
         </div>
@@ -223,34 +291,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcMVMClient(cost: number, rate: number, mode: 'markup' | 'margin') {
-    let markupPct = 0;
-    let marginPct = 0;
-    let sellingPrice = 0;
-    let profit = 0;
-
-    if (mode === 'markup') {
-      markupPct = rate;
-      sellingPrice = cost * (1 + markupPct / 100);
-      profit = sellingPrice - cost;
-      marginPct = sellingPrice > 0 ? (profit / sellingPrice) * 100 : 0;
-    } else {
-      marginPct = Math.min(rate, 99.9);
-      sellingPrice = cost / (1 - marginPct / 100);
-      profit = sellingPrice - cost;
-      markupPct = cost > 0 ? (profit / cost) * 100 : 0;
-    }
-
-    return {
-      cost,
-      sellingPrice,
-      profit,
-      markupPct,
-      marginPct,
-      costFraction: sellingPrice > 0 ? cost / sellingPrice : 1,
-      profitFraction: sellingPrice > 0 ? profit / sellingPrice : 0,
-    };
-  }
+  import { calcMarkupMargin } from '../lib/calculators/business';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -263,6 +307,9 @@ const jsonld = {
   }
 
   function initMVMCalc() {
+    if ((window as any).__cmMvmBound) return;
+    (window as any).__cmMvmBound = true;
+
     const costInput = document.getElementById('mvm-cost') as HTMLInputElement | null;
     const modeSelect = document.getElementById('mvm-mode') as HTMLSelectElement | null;
     const rateInput = document.getElementById('mvm-rate') as HTMLInputElement | null;
@@ -275,45 +322,89 @@ const jsonld = {
     const resProfit = document.getElementById('mvm-result-profit');
     const resMarkup = document.getElementById('mvm-result-markup');
     const resMargin = document.getElementById('mvm-result-margin');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('mvm-error-alert');
+    const errMsg = document.getElementById('mvm-error-msg');
 
     if (!costInput || !rateInput) return;
 
     const DEFAULTS = { cost: 1000, rate: 25, mode: 'markup' };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const cost = parse(costInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
+      const rawCost = costInput!.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
       const mode = (modeSelect ? modeSelect.value : 'markup') as 'markup' | 'margin';
 
-      if (cost <= 0) return;
+      const vCost = validate(rawCost, { required: true, min: 1, label: 'Unit Cost' });
+      const maxRate = mode === 'margin' ? 99.9 : 10000;
+      const vRate = validate(rawRate, { required: true, min: 0.1, max: maxRate, label: mode === 'margin' ? 'Margin Percentage' : 'Markup Percentage' });
 
-      const res = calcMVMClient(cost, rate, mode);
+      if (!vCost.valid) { showError(vCost.error!.message); return; }
+      if (!vRate.valid) { showError(vRate.error!.message); return; }
+      clearError();
 
-      if (resPrice) resPrice.textContent = fmtVal(res.sellingPrice);
-      if (resCost) resCost.textContent = fmtVal(cost);
-      if (resProfit) resProfit.textContent = fmtVal(res.profit);
-      if (resMarkup) resMarkup.textContent = res.markupPct.toFixed(1) + '%';
-      if (resMargin) resMargin.textContent = res.marginPct.toFixed(1) + '%';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.sellingPrice);
+      const cost = vCost.value!;
+      const rate = vRate.value!;
 
-      const wrapper = document.getElementById('mvm-composition-wrapper');
-      if (wrapper && res.sellingPrice > 0) {
-        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.costFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(cost);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.profit);
+      let resSellingPrice = 0;
+      let resProfitVal = 0;
+      let resMarkupPct = 0;
+      let resMarginPct = 0;
+
+      if (mode === 'markup') {
+        const res = calcMarkupMargin(cost, rate);
+        resSellingPrice = res.sellingPrice;
+        resProfitVal = res.profit;
+        resMarkupPct = res.markupPct;
+        resMarginPct = res.marginPct;
+      } else {
+        const marginPct = Math.min(rate, 99.99);
+        resSellingPrice = cost / (1 - marginPct / 100);
+        resProfitVal = resSellingPrice - cost;
+        resMarkupPct = cost > 0 ? (resProfitVal / cost) * 100 : 0;
+        resMarginPct = marginPct;
       }
 
-      history.replaceState(null, '', `#c=${cost}&r=${rate}&m=${mode}`);
+      setResult({
+        heroValue: fmtVal(resSellingPrice),
+        heroLabel: 'Recommended Selling Price',
+        rows: [
+          { label: 'Unit Cost', value: fmtVal(cost) },
+          { label: 'Gross Profit per Unit', value: fmtVal(resProfitVal) },
+          { label: 'Markup on Cost', value: `${resMarkupPct.toFixed(1)}%` },
+          { label: 'Gross Margin on Price', value: `${resMarginPct.toFixed(1)}%` },
+        ],
+      });
+
+      if (resPrice) resPrice.textContent = fmtVal(resSellingPrice);
+      if (resCost) resCost.textContent = fmtVal(cost);
+      if (resProfit) resProfit.textContent = fmtVal(resProfitVal);
+      if (resMarkup) resMarkup.textContent = `${resMarkupPct.toFixed(1)}%`;
+      if (resMargin) resMargin.textContent = `${resMarginPct.toFixed(1)}%`;
+
+      const wrapper = document.getElementById('mvm-composition-wrapper');
+      if (wrapper && resSellingPrice > 0) {
+        const costFrac = Math.min(1, cost / resSellingPrice);
+        const profitFrac = Math.min(1, resProfitVal / resSellingPrice);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(costFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(profitFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(cost);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(resProfitVal);
+      }
+
+      serializeHash({ c: cost, r: rate, m: mode });
     }
 
     function debounce() {
@@ -368,6 +459,7 @@ const jsonld = {
         rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (200 - 1)) * 100}%`);
       }
 
+      clearError();
       recalc();
       costInput.focus();
     });
@@ -380,11 +472,26 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('mvm-copy-btn')?.addEventListener('click', async () => {
-      const cost = parse(costInput.value);
-      const rate = parseFloat(rateInput.value) || 0;
+      const rawCost = costInput.value.replace(/[^0-9.]/g, '');
+      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
       const mode = (modeSelect ? modeSelect.value : 'markup') as any;
-      const res = calcMVMClient(cost, rate, mode);
-      const text = `Markup vs Margin: Cost ${fmtVal(cost)} => Selling Price: ${fmtVal(res.sellingPrice)} (Profit: ${fmtVal(res.profit)} | Markup: ${res.markupPct.toFixed(1)}% | Margin: ${res.marginPct.toFixed(1)}%). ${location.href.split('#')[0]}`;
+      const vCost = validate(rawCost, { required: true, min: 1, label: 'Unit Cost' });
+      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
+      if (!vCost.valid || !vRate.valid) return;
+
+      const cost = vCost.value!;
+      const rate = vRate.value!;
+      let price = 0;
+      let profit = 0;
+      if (mode === 'markup') {
+        const res = calcMarkupMargin(cost, rate);
+        price = res.sellingPrice;
+        profit = res.profit;
+      } else {
+        price = cost / (1 - Math.min(rate, 99.99) / 100);
+        profit = price - cost;
+      }
+      const text = `Markup vs Margin: Cost ${fmtVal(cost)} => Selling Price: ${fmtVal(price)} (Profit: ${fmtVal(profit)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('mvm-copy-btn');
       if (btn) {
@@ -403,6 +510,23 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      c: { required: true, min: 1, label: 'c' },
+      r: { required: true, min: 0.1, label: 'r' },
+      m: { required: false, label: 'm' },
+    });
+    if (restored.valid && restored.values.c && restored.values.r) {
+      costInput.value = fmtLiveInput(String(restored.values.c));
+      rateInput.value = String(restored.values.r);
+      if (restored.values.m && modeSelect && (restored.values.m === 'markup' || restored.values.m === 'margin')) {
+        modeSelect.value = restored.values.m;
+      }
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

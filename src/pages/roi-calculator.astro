@@ -42,6 +42,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'ROI Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a good ROI for business projects?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Most corporate finance teams benchmark internal projects against their Weighted Average Cost of Capital (WACC), typically requiring projects to yield at least 15% to 20% annualised ROI to justify capital risk.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does ROI differ from IRR?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Simple ROI only examines starting cost and final payoff, ignoring cash inflows or outflows occurring along the way. The Internal Rate of Return (IRR) accounts for the exact timing and magnitude of intermittent cash flows.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between total ROI and annualised ROI (CAGR)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Total ROI measures the overall percentage gain across the entire investment lifecycle. Annualised ROI (CAGR) calculates the geometric compound annual growth rate, allowing direct comparison between investments of different durations.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can ROI be negative?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. If the final value is less than the initial capital invested, the net profit is negative, resulting in a negative ROI representing a capital loss.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does inflation impact real ROI?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Nominal ROI does not reflect the loss of purchasing power over time. Real ROI adjusts nominal returns for inflation using the Fisher equation: Real ROI ≈ Nominal ROI − Inflation Rate.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -63,6 +108,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">ROI Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Evaluate capital efficiency, profit gain, and annualised compound returns.</p>
+
+      <!-- Error alert -->
+      <div id="roi-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="roi-error-msg"></span>
+      </div>
 
       <!-- Initial Investment -->
       <div class="mb-5">
@@ -205,6 +255,24 @@ const jsonld = {
               Simple ROI only examines starting cost and final payoff, ignoring cash inflows or outflows occurring along the way. The Internal Rate of Return (IRR) accounts for the exact timing and magnitude of intermittent cash flows.
             </div>
           </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between total ROI and annualised ROI (CAGR)?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Total ROI measures the overall percentage gain across the entire investment lifecycle. Annualised ROI (CAGR) calculates the geometric compound annual growth rate, allowing direct comparison between investments of different durations.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can ROI be negative?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes. If the final value is less than the initial capital invested, the net profit is negative, resulting in a negative ROI representing a capital loss.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inflation impact real ROI?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Nominal ROI does not reflect the loss of purchasing power over time. Real ROI adjusts nominal returns for inflation using the Fisher equation: Real ROI ≈ Nominal ROI − Inflation Rate.
+            </div>
+          </details>
         </div>
       </section>
 
@@ -225,22 +293,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcROIClient(init: number, finalVal: number, yrs: number) {
-    const netProfit = finalVal - init;
-    const roi = init > 0 ? (netProfit / init) * 100 : 0;
-    const annualised = yrs > 0 && init > 0 && finalVal > 0
-      ? (Math.pow(finalVal / init, 1 / yrs) - 1) * 100
-      : 0;
-    const multiple = init > 0 ? finalVal / init : 0;
-    return {
-      netProfit,
-      roi,
-      annualisedROI: annualised,
-      multiple,
-      initialFraction: finalVal > 0 ? init / finalVal : 1,
-      profitFraction: finalVal > 0 ? Math.max(0, netProfit) / finalVal : 0,
-    };
-  }
+  import { calcROI } from '../lib/calculators/business';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -253,6 +309,9 @@ const jsonld = {
   }
 
   function initROICalc() {
+    if ((window as any).__cmRoiBound) return;
+    (window as any).__cmRoiBound = true;
+
     const initInput = document.getElementById('roi-initial') as HTMLInputElement | null;
     const finalInput = document.getElementById('roi-final') as HTMLInputElement | null;
     const yearsInput = document.getElementById('roi-years') as HTMLInputElement | null;
@@ -266,45 +325,75 @@ const jsonld = {
     const resAnnualised = document.getElementById('roi-result-annualised');
     const resMultiple = document.getElementById('roi-result-multiple');
     const resTotal = document.getElementById('roi-result-total');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('roi-error-alert');
+    const errMsg = document.getElementById('roi-error-msg');
 
     if (!initInput || !finalInput || !yearsInput) return;
 
     const DEFAULTS = { initial: 100000, final: 250000, years: 3 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const initVal = parse(initInput.value);
-      const finalVal = parse(finalInput.value);
-      const yrs = parseFloat(yearsInput.value) || 1;
+      const rawInit = initInput!.value.replace(/[^0-9.]/g, '');
+      const rawFinal = finalInput!.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
 
-      if (initVal <= 0) return;
+      const vInit = validate(rawInit, { required: true, min: 1, label: 'Initial Investment' });
+      const vFinal = validate(rawFinal, { required: true, min: 0, label: 'Final Value' });
+      const vYears = validate(rawYears, { required: true, min: 0.1, max: 100, label: 'Investment Horizon' });
 
-      const res = calcROIClient(initVal, finalVal, yrs);
+      if (!vInit.valid) { showError(vInit.error!.message); return; }
+      if (!vFinal.valid) { showError(vFinal.error!.message); return; }
+      if (!vYears.valid) { showError(vYears.error!.message); return; }
+      clearError();
 
-      if (resPct) resPct.textContent = res.roi.toFixed(1) + '%';
+      const initVal = vInit.value!;
+      const finalVal = vFinal.value!;
+      const yrs = vYears.value!;
+
+      const res = calcROI(initVal, finalVal, yrs);
+      const multiple = initVal > 0 ? finalVal / initVal : 0;
+
+      setResult({
+        heroValue: `${res.roi.toFixed(1)}%`,
+        heroLabel: 'Total Return on Investment',
+        rows: [
+          { label: 'Net Profit / Gain', value: fmtVal(res.netProfit) },
+          { label: 'Annualised Return (CAGR)', value: `${res.annualisedROI.toFixed(1)}%` },
+          { label: 'Investment Multiple', value: `${multiple.toFixed(2)}x` },
+          { label: 'Total Realized Value', value: fmtVal(finalVal) },
+        ],
+      });
+
+      if (resPct) resPct.textContent = `${res.roi.toFixed(1)}%`;
       if (resProfit) resProfit.textContent = fmtVal(res.netProfit);
-      if (resAnnualised) resAnnualised.textContent = res.annualisedROI.toFixed(1) + '%';
-      if (resMultiple) resMultiple.textContent = res.multiple.toFixed(2) + 'x';
+      if (resAnnualised) resAnnualised.textContent = `${res.annualisedROI.toFixed(1)}%`;
+      if (resMultiple) resMultiple.textContent = `${multiple.toFixed(2)}x`;
       if (resTotal) resTotal.textContent = fmtVal(finalVal);
-      if (mobileHero) mobileHero.textContent = res.roi.toFixed(1) + '%';
 
       const wrapper = document.getElementById('roi-composition-wrapper');
       if (wrapper && finalVal > 0) {
+        const initFrac = Math.min(1, initVal / finalVal);
+        const profitFrac = Math.min(1, Math.max(0, res.netProfit) / finalVal);
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.initialFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (bar) bar.style.width = `${(initFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(profitFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(initVal);
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netProfit);
       }
 
-      history.replaceState(null, '', `#i=${initVal}&f=${finalVal}&y=${yrs}`);
+      serializeHash({ i: initVal, f: finalVal, y: yrs });
     }
 
     function debounce() {
@@ -356,6 +445,7 @@ const jsonld = {
         yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 0.5) / (30 - 0.5)) * 100}%`);
       }
 
+      clearError();
       recalc();
       initInput.focus();
     });
@@ -368,11 +458,20 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('roi-copy-btn')?.addEventListener('click', async () => {
-      const initVal = parse(initInput.value);
-      const finalVal = parse(finalInput.value);
-      const yrs = parseFloat(yearsInput.value) || 1;
-      const res = calcROIClient(initVal, finalVal, yrs);
-      const text = `ROI Result: Invested ${fmtVal(initVal)}, Returned ${fmtVal(finalVal)} over ${yrs} years => Total ROI: ${res.roi.toFixed(1)}%, CAGR: ${res.annualisedROI.toFixed(1)}% (${res.multiple.toFixed(2)}x). ${location.href.split('#')[0]}`;
+      const rawInit = initInput.value.replace(/[^0-9.]/g, '');
+      const rawFinal = finalInput.value.replace(/[^0-9.]/g, '');
+      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+      const vInit = validate(rawInit, { required: true, min: 1, label: 'Initial Investment' });
+      const vFinal = validate(rawFinal, { required: true, min: 0, label: 'Final Value' });
+      const vYears = validate(rawYears, { required: true, min: 0.1, label: 'Years' });
+      if (!vInit.valid || !vFinal.valid || !vYears.valid) return;
+
+      const initVal = vInit.value!;
+      const finalVal = vFinal.value!;
+      const yrs = vYears.value!;
+      const res = calcROI(initVal, finalVal, yrs);
+      const multiple = initVal > 0 ? finalVal / initVal : 0;
+      const text = `ROI Result: Invested ${fmtVal(initVal)}, Returned ${fmtVal(finalVal)} over ${yrs} years => Total ROI: ${res.roi.toFixed(1)}%, CAGR: ${res.annualisedROI.toFixed(1)}% (${multiple.toFixed(2)}x). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('roi-copy-btn');
       if (btn) {
@@ -391,6 +490,21 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      i: { required: true, min: 1, label: 'i' },
+      f: { required: true, min: 0, label: 'f' },
+      y: { required: true, min: 0.1, label: 'y' },
+    });
+    if (restored.valid && restored.values.i && restored.values.f !== undefined && restored.values.y) {
+      initInput.value = fmtLiveInput(String(restored.values.i));
+      finalInput.value = fmtLiveInput(String(restored.values.f));
+      yearsInput.value = String(restored.values.y);
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

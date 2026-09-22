@@ -31,7 +31,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -40,6 +40,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
         { '@type': 'ListItem', position: 3, name: 'Inventory Turnover Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a good inventory turnover ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Fast-moving consumer goods (FMCG) and grocery retailers typically turn over inventory 12 to 20 times per year (DSI of 18–30 days). Luxury retailers and heavy machinery manufacturers may turn inventory only 2 to 4 times per year (DSI of 90–180 days).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why use COGS instead of Sales Revenue?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Inventory is valued at historical cost on the balance sheet. Using Sales Revenue would artificially inflate the turnover ratio with gross profit markups, creating an apples-to-oranges comparison. COGS accurately measures cost-to-cost.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the relationship between Inventory Turnover and DSI (DIO)?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Days Sales of Inventory (DSI, also known as Days Inventory Outstanding or DIO) is the inverse of the turnover ratio expressed in days: DSI = 365 / Inventory Turnover Ratio. A higher turnover ratio yields a shorter DSI.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can an inventory turnover ratio be too high?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. An excessively high inventory turnover ratio may indicate inadequate stock levels, frequent stockouts, lost sales opportunities, or excessive freight costs from rushed replenishment orders.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does inventory turnover affect cash flow and working capital?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Higher inventory turnover shortens the Cash Conversion Cycle (CCC), freeing up tied-up working capital, reducing holding and storage expenses, and lowering the risk of product obsolescence.',
+          },
+        },
       ],
     },
   ],
@@ -63,6 +108,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Inventory Turnover &amp; Days (DSI/DIO)</h1>
       <p class="text-sm text-text-muted mb-6">Evaluate how quickly inventory is sold and converted into cash flow.</p>
+
+      <!-- Error Alert -->
+      <div id="it-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="it-error-msg"></span>
+      </div>
 
       <!-- Cost of Goods Sold -->
       <div class="mb-5">
@@ -94,7 +144,7 @@ const jsonld = {
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="it-beg-slider" min={10000} max={2500000} step={10000} value={120000} ariaLabel="Beginning inventory slider" />
+          <Slider id="it-beg-slider" min={0} max={2500000} step={10000} value={120000} ariaLabel="Beginning inventory slider" />
         </div>
       </div>
 
@@ -111,7 +161,7 @@ const jsonld = {
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="it-end-slider" min={10000} max={2500000} step={10000} value={80000} ariaLabel="Ending inventory slider" />
+          <Slider id="it-end-slider" min={0} max={2500000} step={10000} value={80000} ariaLabel="Ending inventory slider" />
         </div>
       </div>
 
@@ -205,6 +255,24 @@ const jsonld = {
               Inventory is valued at historical cost on the balance sheet. Using Sales Revenue would artificially inflate the turnover ratio with gross profit markups, creating an apples-to-oranges comparison. COGS accurately measures cost-to-cost.
             </div>
           </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the relationship between Inventory Turnover and DSI (DIO)?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Days Sales of Inventory (DSI, also known as Days Inventory Outstanding or DIO) is the inverse of the turnover ratio expressed in days: DSI = 365 / Inventory Turnover Ratio. A higher turnover ratio yields a shorter DSI.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can an inventory turnover ratio be too high?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Yes. An excessively high inventory turnover ratio may indicate inadequate stock levels, frequent stockouts, lost sales opportunities, or excessive freight costs from rushed replenishment orders.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inventory turnover affect cash flow and working capital?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Higher inventory turnover shortens the Cash Conversion Cycle (CCC), freeing up tied-up working capital, reducing holding and storage expenses, and lowering the risk of product obsolescence.
+            </div>
+          </details>
         </div>
       </section>
 
@@ -217,16 +285,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcITClient(cogs: number, beg: number, end: number) {
-    const avg = (beg + end) / 2;
-    const turnover = avg > 0 ? cogs / avg : 0;
-    const dsi = turnover > 0 ? 365 / turnover : 0;
-    let rating = 'Balanced';
-    if (dsi > 0 && dsi <= 30) rating = 'High Velocity';
-    else if (dsi > 90) rating = 'Slow-Moving';
-
-    return { avg, turnover, dsi, rating };
-  }
+  import { calcInventoryTurnover } from '../lib/calculators/inventory-turnover';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -239,6 +301,9 @@ const jsonld = {
   }
 
   function initITCalc() {
+    if ((window as any).__cmItBound) return;
+    (window as any).__cmItBound = true;
+
     const cogsInput = document.getElementById('it-cogs') as HTMLInputElement | null;
     const begInput = document.getElementById('it-beg') as HTMLInputElement | null;
     const endInput = document.getElementById('it-end') as HTMLInputElement | null;
@@ -254,36 +319,82 @@ const jsonld = {
     const resRating = document.getElementById('it-result-rating');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errAlert = document.getElementById('it-error-alert');
+    const errMsg = document.getElementById('it-error-msg');
+
     if (!cogsInput || !begInput || !endInput) return;
 
     const DEFAULTS = { cogs: 800000, beg: 120000, end: 80000 };
     let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
 
     function parse(v: string) {
       return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
     }
 
     function recalc() {
-      const cogs = parse(cogsInput.value);
-      const beg = parse(begInput.value);
-      const end = parse(endInput.value);
+      const rawCogs = cogsInput!.value.replace(/[^0-9.]/g, '');
+      const rawBeg = begInput!.value.replace(/[^0-9.]/g, '');
+      const rawEnd = endInput!.value.replace(/[^0-9.]/g, '');
 
-      if (cogs <= 0) return;
+      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'Cost of Goods Sold (COGS)' });
+      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
+      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
 
-      const res = calcITClient(cogs, beg, end);
+      if (!vCogs.valid) { showError(vCogs.error!.message); return; }
+      if (!vBeg.valid) { showError(vBeg.error!.message); return; }
+      if (!vEnd.valid) { showError(vEnd.error!.message); return; }
+      clearError();
 
-      if (resHero) resHero.textContent = res.turnover.toFixed(2) + 'x';
-      if (resDsi) resDsi.textContent = Math.round(res.dsi) + ' Days';
-      if (resAvg) resAvg.textContent = fmtVal(res.avg);
-      if (resCycles) resCycles.textContent = res.turnover.toFixed(1) + ' Cycles / Year';
-      if (mobileHero) mobileHero.textContent = res.turnover.toFixed(2) + 'x';
+      const cogs = vCogs.value!;
+      const beg = vBeg.value!;
+      const end = vEnd.value!;
+
+      const res = calcInventoryTurnover(cogs, beg, end);
+
+      setResult({
+        heroValue: res.inventoryTurnoverRatio.toFixed(2) + 'x',
+        heroLabel: 'Inventory Turnover Ratio',
+        rows: [
+          { label: 'Days Sales of Inventory (DSI / DIO)', value: `${Math.round(res.daysSalesInventory)} Days` },
+          { label: 'Average Inventory Maintained', value: fmtVal(res.averageInventory) },
+          { label: 'Annual Stock Cycles', value: `${res.inventoryTurnoverRatio.toFixed(1)} Cycles / Year` },
+          { label: 'Turnover Velocity', value: res.efficiencyRating },
+        ],
+      });
+
+      if (resHero) resHero.textContent = res.inventoryTurnoverRatio.toFixed(2) + 'x';
+      if (resDsi) resDsi.textContent = Math.round(res.daysSalesInventory) + ' Days';
+      if (resAvg) resAvg.textContent = fmtVal(res.averageInventory);
+      if (resCycles) resCycles.textContent = res.inventoryTurnoverRatio.toFixed(1) + ' Cycles / Year';
+      if (mobileHero) mobileHero.textContent = res.inventoryTurnoverRatio.toFixed(2) + 'x';
 
       if (resRating) {
-        resRating.textContent = res.rating;
-        resRating.className = res.rating === 'High Velocity' ? 'text-sm font-bold tabular-nums text-dark-accent' : res.rating === 'Slow-Moving' ? 'text-sm font-bold tabular-nums text-yellow-400' : 'text-sm font-bold tabular-nums text-dark-text';
+        resRating.textContent = res.efficiencyRating;
+        resRating.className = res.efficiencyRating === 'High Velocity' ? 'text-sm font-bold tabular-nums text-dark-accent' : res.efficiencyRating === 'Slow-Moving' ? 'text-sm font-bold tabular-nums text-yellow-400' : 'text-sm font-bold tabular-nums text-dark-text';
       }
 
-      history.replaceState(null, '', `#c=${cogs}&b=${beg}&e=${end}`);
+      const wrapper = document.getElementById('it-composition-wrapper');
+      if (wrapper && cogs > 0) {
+        const stockFrac = Math.min(1, res.averageInventory / cogs);
+        const clearedFrac = Math.max(0, (cogs - res.averageInventory) / cogs);
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        if (bar) bar.style.width = `${(stockFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(clearedFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.averageInventory);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(cogs);
+      }
+
+      serializeHash({ c: cogs, b: beg, e: end });
     }
 
     function debounce() {
@@ -328,13 +439,14 @@ const jsonld = {
       }
       if (begSlider) {
         begSlider.value = String(DEFAULTS.beg);
-        begSlider.style.setProperty('--slider-pct', `${((DEFAULTS.beg - 10000) / (2500000 - 10000)) * 100}%`);
+        begSlider.style.setProperty('--slider-pct', `${(DEFAULTS.beg / 2500000) * 100}%`);
       }
       if (endSlider) {
         endSlider.value = String(DEFAULTS.end);
-        endSlider.style.setProperty('--slider-pct', `${((DEFAULTS.end - 10000) / (2500000 - 10000)) * 100}%`);
+        endSlider.style.setProperty('--slider-pct', `${(DEFAULTS.end / 2500000) * 100}%`);
       }
 
+      clearError();
       recalc();
       cogsInput.focus();
     });
@@ -347,11 +459,17 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('it-copy-btn')?.addEventListener('click', async () => {
-      const cogs = parse(cogsInput.value);
-      const beg = parse(begInput.value);
-      const end = parse(endInput.value);
-      const res = calcITClient(cogs, beg, end);
-      const text = `Inventory Turnover: COGS ${fmtVal(cogs)}, Avg Stock ${fmtVal(res.avg)} => Turnover: ${res.turnover.toFixed(2)}x, DSI: ${Math.round(res.dsi)} days (${res.rating}). ${location.href.split('#')[0]}`;
+      const rawCogs = cogsInput.value.replace(/[^0-9.]/g, '');
+      const rawBeg = begInput.value.replace(/[^0-9.]/g, '');
+      const rawEnd = endInput.value.replace(/[^0-9.]/g, '');
+
+      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'Cost of Goods Sold (COGS)' });
+      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
+      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
+      if (!vCogs.valid || !vBeg.valid || !vEnd.valid) return;
+
+      const res = calcInventoryTurnover(vCogs.value!, vBeg.value!, vEnd.value!);
+      const text = `Inventory Turnover: COGS ${fmtVal(vCogs.value!)}, Avg Stock ${fmtVal(res.averageInventory)} => Turnover: ${res.inventoryTurnoverRatio.toFixed(2)}x, DSI: ${Math.round(res.daysSalesInventory)} days (${res.efficiencyRating}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('it-copy-btn');
       if (btn) {
@@ -370,6 +488,27 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      c: { required: false, min: 1, label: 'c' },
+      b: { required: false, min: 0, label: 'b' },
+      e: { required: false, min: 0, label: 'e' },
+      cogs: { required: false, min: 1, label: 'cogs' },
+      beg: { required: false, min: 0, label: 'beg' },
+      end: { required: false, min: 0, label: 'end' },
+    });
+    const initCogs = restored.values.c ?? restored.values.cogs;
+    const initBeg = restored.values.b ?? restored.values.beg;
+    const initEnd = restored.values.e ?? restored.values.end;
+    if (restored.valid && initCogs !== undefined) {
+      cogsInput.value = fmtLiveInput(String(initCogs));
+      if (initBeg !== undefined) begInput.value = fmtLiveInput(String(initBeg));
+      if (initEnd !== undefined) endInput.value = fmtLiveInput(String(initEnd));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

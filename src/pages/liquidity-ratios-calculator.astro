@@ -45,7 +45,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -54,6 +54,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
         { '@type': 'ListItem', position: 3, name: 'Liquidity Ratios Suite' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Can a Current Ratio be too high?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. A Current Ratio exceeding 3.0x or 4.0x often indicates capital misallocation—such as holding excessive non-interest-bearing cash, hoarding slow-moving inventory, or failing to collect outstanding invoices aggressively from customer debtors.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Which ratio do commercial lenders inspect first?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Commercial bank credit analysts scrutinize the Quick (Acid-Test) Ratio most closely. They rely on it because it eliminates inventory liquidation uncertainty while verifying that cash and receivables cover short-term debts.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is considered a healthy Quick Ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A Quick Ratio of 1.0x or greater is generally considered healthy, meaning the firm has at least one dollar of liquid assets (cash, marketable securities, and accounts receivable) for every dollar of current obligations.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is the Cash Ratio different from the Quick Ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'While the Quick Ratio includes accounts receivable (which may take 30 to 90 days to collect), the Cash Ratio is the most conservative metric, counting strictly cash and cash equivalents to assess immediate payment capacity without reliance on debtors.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why are prepaid expenses excluded from Quick Assets?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Prepaid expenses (such as advance insurance or rent) represent future economic benefits, but they cannot be liquidated or directly converted into cash to pay off maturing debts in an emergency.',
+          },
+        },
       ],
     },
   ],
@@ -77,6 +122,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Liquidity Ratios Suite</h1>
       <p class="text-sm text-text-muted mb-6">Assess corporate solvency across the three tiers of liquidity: Current, Acid-Test, and Cash ratios.</p>
+
+      <!-- Error Alert -->
+      <div id="lr-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="lr-error-msg"></span>
+      </div>
 
       <!-- Cash & Bank -->
       <div class="mb-5">
@@ -263,6 +313,24 @@ const jsonld = {
               Commercial bank credit analysts scrutinize the Quick (Acid-Test) Ratio most closely. They rely on it because it eliminates inventory liquidation uncertainty while verifying that cash and receivables cover short-term debts.
             </div>
           </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is considered a healthy Quick Ratio?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              A Quick Ratio of 1.0x or greater is generally considered healthy, meaning the firm has at least one dollar of liquid assets (cash, marketable securities, and accounts receivable) for every dollar of current obligations.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is the Cash Ratio different from the Quick Ratio?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              While the Quick Ratio includes accounts receivable (which may take 30 to 90 days to collect), the Cash Ratio is the most conservative metric, counting strictly cash and cash equivalents to assess immediate payment capacity without reliance on debtors.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why are prepaid expenses excluded from Quick Assets?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Prepaid expenses (such as advance insurance or rent) represent future economic benefits, but they cannot be liquidated or directly converted into cash to pay off maturing debts in an emergency.
+            </div>
+          </details>
         </div>
       </section>
 
@@ -275,25 +343,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcLRClient(cash: number, sec: number, ar: number, inv: number, cl: number) {
-    const totalAssets = cash + sec + ar + inv;
-    const quickAssets = cash + sec + ar;
-    const cashAssets = cash + sec;
-
-    const curRatio = cl > 0 ? totalAssets / cl : totalAssets > 0 ? 99 : 0;
-    const qRatio = cl > 0 ? quickAssets / cl : quickAssets > 0 ? 99 : 0;
-    const cRatio = cl > 0 ? cashAssets / cl : cashAssets > 0 ? 99 : 0;
-    const nwc = totalAssets - cl;
-
-    let status = 'Optimal Liquidity Profile';
-    if (curRatio < 1.0 || qRatio < 0.8) {
-      status = 'Liquidity Distress / Deficit';
-    } else if (curRatio < 1.5 || qRatio < 1.0) {
-      status = 'Caution: Monitor Working Capital';
-    }
-
-    return { totalAssets, curRatio, qRatio, cRatio, nwc, status };
-  }
+  import { calcLiquidityRatios } from '../lib/calculators/liquidity-ratios';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -307,6 +360,9 @@ const jsonld = {
   }
 
   function initLRCalc() {
+    if ((window as any).__cmLrBound) return;
+    (window as any).__cmLrBound = true;
+
     const cashInput = document.getElementById('lr-cash') as HTMLInputElement | null;
     const secInput = document.getElementById('lr-securities') as HTMLInputElement | null;
     const arInput = document.getElementById('lr-receivables') as HTMLInputElement | null;
@@ -326,49 +382,103 @@ const jsonld = {
     const resStatus = document.getElementById('lr-result-status');
     const mobileHero = document.getElementById('calc-mobile-hero');
 
+    const errAlert = document.getElementById('lr-error-alert');
+    const errMsg = document.getElementById('lr-error-msg');
+
     if (!cashInput || !clInput) return;
 
     const DEFAULTS = { cash: 300000, sec: 100000, ar: 400000, inv: 450000, cl: 500000 };
     let timer: ReturnType<typeof setTimeout>;
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
 
     function parse(v: string) {
       return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
     }
 
     function recalc() {
-      const cash = parse(cashInput.value);
-      const sec = parse(secInput ? secInput.value : '0');
-      const ar = parse(arInput ? arInput.value : '0');
-      const inv = parse(invInput ? invInput.value : '0');
-      const cl = parse(clInput.value);
+      const rawCash = cashInput!.value.replace(/[^0-9.]/g, '');
+      const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawCl = clInput!.value.replace(/[^0-9.]/g, '');
 
-      const res = calcLRClient(cash, sec, ar, inv, cl);
+      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash & Bank Balances' });
+      const vSec = validate(rawSec, { required: true, min: 0, label: 'Marketable Securities' });
+      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
+      const vCl = validate(rawCl, { required: true, min: 1, label: 'Current Liabilities' });
 
-      if (resCurrent) resCurrent.textContent = res.curRatio.toFixed(2) + 'x';
-      if (resQuick) resQuick.textContent = res.qRatio.toFixed(2) + 'x';
-      if (resCash) resCash.textContent = res.cRatio.toFixed(2) + 'x';
-      if (resNwc) resNwc.textContent = fmtVal(res.nwc);
-      if (mobileHero) mobileHero.textContent = res.curRatio.toFixed(2) + 'x';
+      if (!vCash.valid) { showError(vCash.error!.message); return; }
+      if (!vSec.valid) { showError(vSec.error!.message); return; }
+      if (!vAr.valid) { showError(vAr.error!.message); return; }
+      if (!vInv.valid) { showError(vInv.error!.message); return; }
+      if (!vCl.valid) { showError(vCl.error!.message); return; }
+      clearError();
+
+      const cash = vCash.value!;
+      const sec = vSec.value!;
+      const ar = vAr.value!;
+      const inv = vInv.value!;
+      const cl = vCl.value!;
+
+      const res = calcLiquidityRatios(cash, sec, ar, inv, 0, cl);
+
+      setResult({
+        heroValue: `${res.currentRatio.toFixed(2)}x`,
+        heroLabel: 'Current Ratio',
+        rows: [
+          { label: 'Quick (Acid-Test) Ratio', value: `${res.quickRatio.toFixed(2)}x` },
+          { label: 'Cash Ratio', value: `${res.cashRatio.toFixed(2)}x` },
+          { label: 'Net Working Capital Cushion', value: fmtVal(res.netWorkingCapital) },
+          { label: 'Current Ratio Status', value: res.currentRatioStatus },
+          { label: 'Quick Ratio Status', value: res.quickRatioStatus },
+          { label: 'Cash Ratio Status', value: res.cashRatioStatus },
+        ],
+      });
+
+      if (resCurrent) resCurrent.textContent = res.currentRatio.toFixed(2) + 'x';
+      if (resQuick) resQuick.textContent = res.quickRatio.toFixed(2) + 'x';
+      if (resCash) resCash.textContent = res.cashRatio.toFixed(2) + 'x';
+      if (resNwc) resNwc.textContent = fmtVal(res.netWorkingCapital);
+      if (mobileHero) mobileHero.textContent = res.currentRatio.toFixed(2) + 'x';
 
       if (resStatus) {
-        resStatus.textContent = res.status;
-        resStatus.className = res.status.includes('Optimal') ? 'text-sm font-bold tabular-nums text-dark-accent' : res.status.includes('Deficit') ? 'text-sm font-bold tabular-nums text-red-400' : 'text-sm font-bold tabular-nums text-yellow-400';
+        let statusText = 'Optimal Liquidity Profile';
+        if (res.currentRatio < 1.0 || res.quickRatio < 0.8) {
+          statusText = 'Liquidity Distress / Deficit';
+        } else if (res.currentRatio < 1.5 || res.quickRatio < 1.0) {
+          statusText = 'Caution: Monitor Working Capital';
+        }
+        resStatus.textContent = statusText;
+        resStatus.className = statusText.includes('Optimal')
+          ? 'text-sm font-bold tabular-nums text-dark-accent'
+          : statusText.includes('Deficit')
+          ? 'text-sm font-bold tabular-nums text-red-400'
+          : 'text-sm font-bold tabular-nums text-yellow-400';
       }
 
+      const totalAssets = cash + sec + ar + inv;
       const wrapper = document.getElementById('lr-composition-wrapper');
-      if (wrapper && res.totalAssets > 0) {
-        const liabFrac = Math.min(1, cl / res.totalAssets);
-        const cushionFrac = Math.max(0, res.nwc / res.totalAssets);
+      if (wrapper && totalAssets > 0) {
+        const liabFrac = Math.min(1, cl / totalAssets);
+        const cushionFrac = Math.max(0, res.netWorkingCapital / totalAssets);
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(cl);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.nwc);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netWorkingCapital);
       }
 
-      history.replaceState(null, '', `#c=${cash}&s=${sec}&ar=${ar}&i=${inv}&cl=${cl}`);
+      serializeHash({ c: cash, s: sec, ar: ar, i: inv, cl: cl });
     }
 
     function debounce() {
@@ -432,6 +542,7 @@ const jsonld = {
         clSlider.style.setProperty('--slider-pct', `${((DEFAULTS.cl - 50000) / (5000000 - 50000)) * 100}%`);
       }
 
+      clearError();
       recalc();
       cashInput.focus();
     });
@@ -444,13 +555,21 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('lr-copy-btn')?.addEventListener('click', async () => {
-      const cash = parse(cashInput.value);
-      const sec = parse(secInput ? secInput.value : '0');
-      const ar = parse(arInput ? arInput.value : '0');
-      const inv = parse(invInput ? invInput.value : '0');
-      const cl = parse(clInput.value);
-      const res = calcLRClient(cash, sec, ar, inv, cl);
-      const text = `Liquidity Ratios: Current Ratio: ${res.curRatio.toFixed(2)}x, Quick Ratio: ${res.qRatio.toFixed(2)}x, Cash Ratio: ${res.cRatio.toFixed(2)}x (NWC: ${fmtVal(res.nwc)}). ${location.href.split('#')[0]}`;
+      const rawCash = cashInput.value.replace(/[^0-9.]/g, '');
+      const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawCl = clInput.value.replace(/[^0-9.]/g, '');
+
+      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash & Bank Balances' });
+      const vSec = validate(rawSec, { required: true, min: 0, label: 'Marketable Securities' });
+      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
+      const vCl = validate(rawCl, { required: true, min: 1, label: 'Current Liabilities' });
+      if (!vCash.valid || !vSec.valid || !vAr.valid || !vInv.valid || !vCl.valid) return;
+
+      const res = calcLiquidityRatios(vCash.value!, vSec.value!, vAr.value!, vInv.value!, 0, vCl.value!);
+      const text = `Liquidity Ratios: Current Ratio: ${res.currentRatio.toFixed(2)}x, Quick Ratio: ${res.quickRatio.toFixed(2)}x, Cash Ratio: ${res.cashRatio.toFixed(2)}x (NWC: ${fmtVal(res.netWorkingCapital)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('lr-copy-btn');
       if (btn) {
@@ -469,6 +588,36 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      c: { required: false, min: 0, label: 'c' },
+      s: { required: false, min: 0, label: 's' },
+      ar: { required: false, min: 0, label: 'ar' },
+      i: { required: false, min: 0, label: 'i' },
+      cl: { required: false, min: 1, label: 'cl' },
+      cash: { required: false, min: 0, label: 'cash' },
+      securities: { required: false, min: 0, label: 'securities' },
+      receivables: { required: false, min: 0, label: 'receivables' },
+      inventory: { required: false, min: 0, label: 'inventory' },
+      liabilities: { required: false, min: 1, label: 'liabilities' },
+    });
+    const initCash = restored.values.c ?? restored.values.cash;
+    const initSec = restored.values.s ?? restored.values.securities;
+    const initAr = restored.values.ar ?? restored.values.receivables;
+    const initInv = restored.values.i ?? restored.values.inventory;
+    const initCl = restored.values.cl ?? restored.values.liabilities;
+
+    if (restored.valid && (initCash !== undefined || initCl !== undefined)) {
+      if (initCash !== undefined) cashInput.value = fmtLiveInput(String(initCash));
+      if (secInput && initSec !== undefined) secInput.value = fmtLiveInput(String(initSec));
+      if (arInput && initAr !== undefined) arInput.value = fmtLiveInput(String(initAr));
+      if (invInput && initInv !== undefined) invInput.value = fmtLiveInput(String(initInv));
+      if (initCl !== undefined) clInput.value = fmtLiveInput(String(initCl));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

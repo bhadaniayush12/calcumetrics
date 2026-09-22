@@ -57,6 +57,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Working Capital Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Can negative working capital ever be positive for a business?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, in specific asset-light businesses with rapid cash cycles (like supermarkets, McDonald’s, or Amazon). They receive immediate cash from customers while enjoying 30 to 90 days to pay suppliers, allowing them to fund growth on vendor float.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why is inventory deducted from the Quick Ratio?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Inventory takes time to manufacture, market, and sell, and may only be liquidated at steep fire-sale discounts in an immediate cash crisis. The Quick Ratio tests pure near-cash liquidity.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is an ideal Current Ratio benchmark?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A Current Ratio between 1.5x and 2.0x is generally considered healthy across most operating industries, indicating sufficient liquid assets to cover maturing short-term obligations without tying up excess idle cash.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does lengthening supplier payment terms improve working capital?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Negotiating longer payment terms with suppliers (higher Accounts Payable) delays cash outflows, directly preserving cash balances and increasing net operating liquidity.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between Gross Working Capital and Net Working Capital?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Gross Working Capital refers to the total monetary sum of all current assets. Net Working Capital subtracts total current liabilities from current assets, quantifying the true liquidity cushion.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -78,6 +123,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Working Capital Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Evaluate operating liquidity cushion: Current Assets minus Current Liabilities.</p>
+
+      <!-- Error alert -->
+      <div id="wc-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="wc-error-msg"></span>
+      </div>
 
       <!-- Current Assets section -->
       <div class="mb-4">
@@ -208,7 +258,7 @@ const jsonld = {
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can negative working capital ever be positive for a business?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, in specific asset-light businesses with rapid cash cycles (like supermarkets or fast-food chains like McDonald's or Amazon). They receive immediate cash from customers while enjoying 30 to 90 days to pay suppliers, allowing them to fund growth on vendor float.
+              Yes, in specific asset-light businesses with rapid cash cycles (like supermarkets, McDonald’s, or Amazon). They receive immediate cash from customers while enjoying 30 to 90 days to pay suppliers, allowing them to fund growth on vendor float.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
@@ -217,30 +267,48 @@ const jsonld = {
               Inventory takes time to manufacture, market, and sell, and may only be liquidated at steep fire-sale discounts in an immediate cash crisis. The Quick Ratio tests pure near-cash liquidity.
             </div>
           </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is an ideal Current Ratio benchmark?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              A Current Ratio between 1.5x and 2.0x is generally considered healthy across most operating industries, indicating sufficient liquid assets to cover maturing short-term obligations without tying up excess idle cash.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does lengthening supplier payment terms improve working capital?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Negotiating longer payment terms with suppliers (higher Accounts Payable) delays cash outflows, directly preserving cash balances and increasing net operating liquidity.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between Gross Working Capital and Net Working Capital?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Gross Working Capital refers to the total monetary sum of all current assets. Net Working Capital subtracts total current liabilities from current assets, quantifying the true liquidity cushion.
+            </div>
+          </details>
         </div>
       </section>
 
       <section aria-labelledby="wc-calculator-related">
         <h2 id="wc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  function calcWCClient(cash: number, rec: number, inv: number, pay: number, debt: number) {
-    const assets = cash + rec + inv;
-    const liabilities = pay + debt;
-    const nwc = assets - liabilities;
-    const curRatio = liabilities > 0 ? assets / liabilities : 99;
-    const quickRatio = liabilities > 0 ? (cash + rec) / liabilities : 99;
-    let status = 'Adequate';
-    if (curRatio >= 1.5 && nwc > 0) status = 'Strong';
-    else if (nwc < 0 || curRatio < 1.0) status = 'Deficit';
-
-    return { assets, liabilities, nwc, curRatio, quickRatio, status };
-  }
+  import { calcWorkingCapital } from '../lib/calculators/working-capital';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -254,6 +322,9 @@ const jsonld = {
   }
 
   function initWCCalc() {
+    if ((window as any).__cmWcBound) return;
+    (window as any).__cmWcBound = true;
+
     const cashInput = document.getElementById('wc-cash') as HTMLInputElement | null;
     const recInput = document.getElementById('wc-receivables') as HTMLInputElement | null;
     const invInput = document.getElementById('wc-inventory') as HTMLInputElement | null;
@@ -272,32 +343,70 @@ const jsonld = {
     const resCurRatio = document.getElementById('wc-result-currentratio');
     const resQuickRatio = document.getElementById('wc-result-quickratio');
     const resStatus = document.getElementById('wc-result-status');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('wc-error-alert');
+    const errMsg = document.getElementById('wc-error-msg');
 
     if (!cashInput || !recInput || !invInput) return;
 
     const DEFAULTS = { cash: 250000, rec: 350000, inv: 400000, pay: 300000, debt: 150000 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const cash = parse(cashInput.value);
-      const rec = parse(recInput.value);
-      const inv = parse(invInput.value);
-      const pay = parse(payInput ? payInput.value : '0');
-      const debt = parse(debtInput ? debtInput.value : '0');
+      const rawCash = cashInput!.value.replace(/[^0-9.]/g, '');
+      const rawRec = recInput!.value.replace(/[^0-9.]/g, '');
+      const rawInv = invInput!.value.replace(/[^0-9.]/g, '');
+      const rawPay = payInput ? payInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawDebt = debtInput ? debtInput.value.replace(/[^0-9.]/g, '') : '0';
 
-      const res = calcWCClient(cash, rec, inv, pay, debt);
+      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash & Bank Balances' });
+      const vRec = validate(rawRec, { required: true, min: 0, label: 'Accounts Receivable' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
+      const vPay = validate(rawPay, { required: true, min: 0, label: 'Accounts Payable' });
+      const vDebt = validate(rawDebt, { required: true, min: 0, label: 'Short-Term Debt' });
 
-      if (resHero) resHero.textContent = fmtVal(res.nwc);
-      if (resAssets) resAssets.textContent = fmtVal(res.assets);
-      if (resLiabilities) resLiabilities.textContent = fmtVal(res.liabilities);
-      if (resCurRatio) resCurRatio.textContent = res.curRatio.toFixed(2) + 'x';
-      if (resQuickRatio) resQuickRatio.textContent = res.quickRatio.toFixed(2) + 'x';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.nwc);
+      if (!vCash.valid) { showError(vCash.error!.message); return; }
+      if (!vRec.valid) { showError(vRec.error!.message); return; }
+      if (!vInv.valid) { showError(vInv.error!.message); return; }
+      if (!vPay.valid) { showError(vPay.error!.message); return; }
+      if (!vDebt.valid) { showError(vDebt.error!.message); return; }
+      clearError();
+
+      const cash = vCash.value!;
+      const rec = vRec.value!;
+      const inv = vInv.value!;
+      const pay = vPay.value!;
+      const debt = vDebt.value!;
+
+      const res = calcWorkingCapital(cash, rec, inv, 0, pay, debt, 0);
+
+      const statusText = res.status === 'Strong' ? 'Strong Liquidity' : res.status === 'Deficit' ? 'Liquidity Deficit / Risk' : 'Adequate Cushion';
+
+      setResult({
+        heroValue: fmtVal(res.netWorkingCapital),
+        heroLabel: 'Net Working Capital (NWC)',
+        rows: [
+          { label: 'Total Current Assets', value: fmtVal(res.totalCurrentAssets) },
+          { label: 'Total Current Liabilities', value: fmtVal(res.totalCurrentLiabilities) },
+          { label: 'Current Ratio', value: `${res.currentRatio.toFixed(2)}x` },
+          { label: 'Quick (Acid-Test) Ratio', value: `${res.quickRatio.toFixed(2)}x` },
+          { label: 'Liquidity Status', value: statusText },
+        ],
+      });
+
+      if (resHero) resHero.textContent = fmtVal(res.netWorkingCapital);
+      if (resAssets) resAssets.textContent = fmtVal(res.totalCurrentAssets);
+      if (resLiabilities) resLiabilities.textContent = fmtVal(res.totalCurrentLiabilities);
+      if (resCurRatio) resCurRatio.textContent = `${res.currentRatio.toFixed(2)}x`;
+      if (resQuickRatio) resQuickRatio.textContent = `${res.quickRatio.toFixed(2)}x`;
 
       if (resStatus) {
         if (res.status === 'Strong') {
@@ -313,19 +422,19 @@ const jsonld = {
       }
 
       const wrapper = document.getElementById('wc-composition-wrapper');
-      if (wrapper && res.assets > 0) {
-        const liabFrac = Math.min(1, res.liabilities / res.assets);
-        const cushionFrac = Math.max(0, res.nwc / res.assets);
+      if (wrapper && res.totalCurrentAssets > 0) {
+        const liabFrac = Math.min(1, res.totalCurrentLiabilities / res.totalCurrentAssets);
+        const cushionFrac = Math.max(0, res.netWorkingCapital / res.totalCurrentAssets);
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.liabilities);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.nwc);
+        if (bar) bar.style.width = `${(liabFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(cushionFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalCurrentLiabilities);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netWorkingCapital);
       }
 
-      history.replaceState(null, '', `#c=${cash}&r=${rec}&i=${inv}&p=${pay}&d=${debt}`);
+      serializeHash({ c: cash, r: rec, i: inv, p: pay, d: debt });
     }
 
     function debounce() {
@@ -389,6 +498,7 @@ const jsonld = {
         debtSlider.style.setProperty('--slider-pct', `${(DEFAULTS.debt / 2500000) * 100}%`);
       }
 
+      clearError();
       recalc();
       cashInput.focus();
     });
@@ -401,13 +511,21 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('wc-copy-btn')?.addEventListener('click', async () => {
-      const cash = parse(cashInput.value);
-      const rec = parse(recInput.value);
-      const inv = parse(invInput.value);
-      const pay = parse(payInput ? payInput.value : '0');
-      const debt = parse(debtInput ? debtInput.value : '0');
-      const res = calcWCClient(cash, rec, inv, pay, debt);
-      const text = `Working Capital: Assets ${fmtVal(res.assets)}, Liabilities ${fmtVal(res.liabilities)} => NWC: ${fmtVal(res.nwc)}, Current Ratio: ${res.curRatio.toFixed(2)}x (${res.status}). ${location.href.split('#')[0]}`;
+      const rawCash = cashInput.value.replace(/[^0-9.]/g, '');
+      const rawRec = recInput.value.replace(/[^0-9.]/g, '');
+      const rawInv = invInput.value.replace(/[^0-9.]/g, '');
+      const rawPay = payInput ? payInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawDebt = debtInput ? debtInput.value.replace(/[^0-9.]/g, '') : '0';
+
+      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash' });
+      const vRec = validate(rawRec, { required: true, min: 0, label: 'Receivables' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
+      const vPay = validate(rawPay, { required: true, min: 0, label: 'Payables' });
+      const vDebt = validate(rawDebt, { required: true, min: 0, label: 'Debt' });
+      if (!vCash.valid || !vRec.valid || !vInv.valid || !vPay.valid || !vDebt.valid) return;
+
+      const res = calcWorkingCapital(vCash.value!, vRec.value!, vInv.value!, 0, vPay.value!, vDebt.value!, 0);
+      const text = `Working Capital: Assets ${fmtVal(res.totalCurrentAssets)}, Liabilities ${fmtVal(res.totalCurrentLiabilities)} => NWC: ${fmtVal(res.netWorkingCapital)}, Current Ratio: ${res.currentRatio.toFixed(2)}x (${res.status}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('wc-copy-btn');
       if (btn) {
@@ -426,6 +544,25 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      c: { required: true, min: 0, label: 'c' },
+      r: { required: true, min: 0, label: 'r' },
+      i: { required: true, min: 0, label: 'i' },
+      p: { required: true, min: 0, label: 'p' },
+      d: { required: true, min: 0, label: 'd' },
+    });
+    if (restored.valid && restored.values.c !== undefined && restored.values.r !== undefined && restored.values.i !== undefined) {
+      cashInput.value = fmtLiveInput(String(restored.values.c));
+      recInput.value = fmtLiveInput(String(restored.values.r));
+      invInput.value = fmtLiveInput(String(restored.values.i));
+      if (payInput && restored.values.p !== undefined) payInput.value = fmtLiveInput(String(restored.values.p));
+      if (debtInput && restored.values.d !== undefined) debtInput.value = fmtLiveInput(String(restored.values.d));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

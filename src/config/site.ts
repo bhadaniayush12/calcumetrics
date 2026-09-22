@@ -583,9 +583,9 @@ export const TOOLS: Tool[] = [
     category: 'Business',
     region: 'Global',
     description: 'Calculate the cash conversion cycle from inventory, receivables, and payables days.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
     name: 'Debt Service Coverage Ratio (DSCR) Calculator',
@@ -594,9 +594,9 @@ export const TOOLS: Tool[] = [
     category: 'Business',
     region: 'Global',
     description: 'Calculate debt service coverage ratio from operating cash flow and debt service.',
-    status: 'planned',
+    status: 'draft',
     dateModified: '2026-09-22',
-    research: { status: 'pending', basis: 'google-data' },
+    research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
     name: 'Discounted Payback Period Calculator',

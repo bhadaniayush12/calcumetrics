@@ -42,6 +42,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'EOQ Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What assumptions does the EOQ model make?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The classic Wilson EOQ model assumes: (1) demand is known and constant throughout the year, (2) replenishment lead time is instantaneous or zero, (3) unit purchase price is constant (no quantity tier discounts), and (4) stockouts never happen.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is typically included in holding cost per unit?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Holding costs typically include warehouse rent, electricity, insurance, security, physical breakage/theft (shrinkage), obsolescence, and the opportunity cost of capital locked up in inventory (often 15%–25% of unit value annually).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is included in ordering or setup cost?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Ordering costs include clerical costs of preparing purchase orders, invoice processing, receiving inspection, vendor communication, and fixed freight/shipping handling charges per shipment.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do quantity discounts affect the standard EOQ calculation?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'When suppliers offer volume discounts, the optimal order quantity may be larger than the standard EOQ if annual purchase price savings exceed the additional carrying costs of the larger inventory batch.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What happens if actual demand differs from estimated demand?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Because EOQ uses a square root function, total costs are relatively flat near the optimal point. A 20% forecasting error in annual demand changes total inventory costs by only about 2%.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -63,6 +108,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Economic Order Quantity (EOQ)</h1>
       <p class="text-sm text-text-muted mb-6">Find the sweet spot between order placement fees and inventory warehousing carrying costs.</p>
+
+      <!-- Error alert -->
+      <div id="eoq-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="eoq-error-msg"></span>
+      </div>
 
       <!-- Annual Demand -->
       <div class="mb-5">
@@ -197,15 +247,33 @@ const jsonld = {
         <h2 id="eoq-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What assumptions does EOQ make?</summary>
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What assumptions does the EOQ model make?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
               The classic Wilson EOQ model assumes: (1) demand is known and constant throughout the year, (2) replenishment lead time is instantaneous or zero, (3) unit purchase price is constant (no quantity tier discounts), and (4) stockouts never happen.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is typically included in Holding Cost?</summary>
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is typically included in holding cost per unit?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Holding costs typically include warehouse rent, electricity, air conditioning, insurance, security, physical breakage/theft (shrinkage), technological or expiration obsolescence, and the cost of debt or capital locked up in inventory (often 15%–25% of product unit value annually).
+              Holding costs typically include warehouse rent, electricity, insurance, security, physical breakage/theft (shrinkage), obsolescence, and the opportunity cost of capital locked up in inventory (often 15%–25% of unit value annually).
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is included in ordering or setup cost?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Ordering costs include clerical costs of preparing purchase orders, invoice processing, receiving inspection, vendor communication, and fixed freight/shipping handling charges per shipment.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How do quantity discounts affect the standard EOQ calculation?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              When suppliers offer volume discounts, the optimal order quantity may be larger than the standard EOQ if annual purchase price savings exceed the additional carrying costs of the larger inventory batch.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What happens if actual demand differs from estimated demand?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Because EOQ uses a square root function, total costs are relatively flat near the optimal point. A 20% forecasting error in annual demand changes total inventory costs by only about 2%.
             </div>
           </details>
         </div>
@@ -213,26 +281,25 @@ const jsonld = {
 
       <section aria-labelledby="eoq-calculator-related">
         <h2 id="eoq-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  function calcEOQClient(d: number, s: number, h: number) {
-    if (d <= 0 || s <= 0 || h <= 0) {
-      return { eoq: 0, eoqRounded: 0, orders: 0, orderCost: 0, holdCost: 0, totalCost: 0, days: 0 };
-    }
-    const eoq = Math.sqrt((2 * d * s) / h);
-    const eoqRounded = Math.round(eoq);
-    const orders = d / eoq;
-    const orderCost = orders * s;
-    const holdCost = (eoq / 2) * h;
-    const totalCost = orderCost + holdCost;
-    const days = orders > 0 ? 365 / orders : 0;
-    return { eoq, eoqRounded, orders, orderCost, holdCost, totalCost, days };
-  }
+  import { calcEOQ } from '../lib/calculators/eoq';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -248,6 +315,9 @@ const jsonld = {
   }
 
   function initEOQCalc() {
+    if ((window as any).__cmEoqBound) return;
+    (window as any).__cmEoqBound = true;
+
     const dInput = document.getElementById('eoq-demand') as HTMLInputElement | null;
     const sInput = document.getElementById('eoq-order-cost') as HTMLInputElement | null;
     const hInput = document.getElementById('eoq-holding-cost') as HTMLInputElement | null;
@@ -261,41 +331,68 @@ const jsonld = {
     const resDays = document.getElementById('eoq-result-days');
     const resOrderCost = document.getElementById('eoq-result-ordercost');
     const resTotalCost = document.getElementById('eoq-result-totalcost');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('eoq-error-alert');
+    const errMsg = document.getElementById('eoq-error-msg');
 
     if (!dInput || !sInput || !hInput) return;
 
     const DEFAULTS = { d: 10000, s: 500, h: 25 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const d = parse(dInput.value);
-      const s = parse(sInput.value);
-      const h = parse(hInput.value);
+      const rawD = dInput!.value.replace(/[^0-9.]/g, '');
+      const rawS = sInput!.value.replace(/[^0-9.]/g, '');
+      const rawH = hInput!.value.replace(/[^0-9.]/g, '');
 
-      if (d <= 0 || s <= 0 || h <= 0) return;
+      const vD = validate(rawD, { required: true, min: 1, label: 'Annual Demand' });
+      const vS = validate(rawS, { required: true, min: 0.01, label: 'Order Cost' });
+      const vH = validate(rawH, { required: true, min: 0.01, label: 'Holding Cost' });
 
-      const res = calcEOQClient(d, s, h);
+      if (!vD.valid) { showError(vD.error!.message); return; }
+      if (!vS.valid) { showError(vS.error!.message); return; }
+      if (!vH.valid) { showError(vH.error!.message); return; }
+      clearError();
+
+      const d = vD.value!;
+      const s = vS.value!;
+      const h = vH.value!;
+
+      const res = calcEOQ(d, s, h);
+
+      setResult({
+        heroValue: fmtUnits(res.eoqRounded),
+        heroLabel: 'Optimal Order Batch Size',
+        rows: [
+          { label: 'Orders Required per Year', value: `${res.ordersPerYear.toFixed(1)} Orders` },
+          { label: 'Days Between Orders', value: `${Math.round(res.daysBetweenOrders)} Days` },
+          { label: 'Annual Ordering Costs', value: fmtVal(res.annualOrderingCost) },
+          { label: 'Total Minimized Inventory Cost', value: fmtVal(res.totalInventoryCost) },
+        ],
+      });
 
       if (resHero) resHero.textContent = fmtUnits(res.eoqRounded);
-      if (resOrders) resOrders.textContent = res.orders.toFixed(1) + ' Orders';
-      if (resDays) resDays.textContent = Math.round(res.days) + ' Days';
-      if (resOrderCost) resOrderCost.textContent = fmtVal(res.orderCost);
-      if (resTotalCost) resTotalCost.textContent = fmtVal(res.totalCost);
-      if (mobileHero) mobileHero.textContent = fmtUnits(res.eoqRounded);
+      if (resOrders) resOrders.textContent = `${res.ordersPerYear.toFixed(1)} Orders`;
+      if (resDays) resDays.textContent = `${Math.round(res.daysBetweenOrders)} Days`;
+      if (resOrderCost) resOrderCost.textContent = fmtVal(res.annualOrderingCost);
+      if (resTotalCost) resTotalCost.textContent = fmtVal(res.totalInventoryCost);
 
       const wrapper = document.getElementById('eoq-composition-wrapper');
-      if (wrapper && res.totalCost > 0) {
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.orderCost);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.holdCost);
+      if (wrapper && res.totalInventoryCost > 0) {
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.annualOrderingCost);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.annualHoldingCost);
       }
 
-      history.replaceState(null, '', `#d=${d}&s=${s}&h=${h}`);
+      serializeHash({ d, s, h });
     }
 
     function debounce() {
@@ -347,6 +444,7 @@ const jsonld = {
         hSlider.style.setProperty('--slider-pct', `${((DEFAULTS.h - 1) / (500 - 1)) * 100}%`);
       }
 
+      clearError();
       recalc();
       dInput.focus();
     });
@@ -359,11 +457,19 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('eoq-copy-btn')?.addEventListener('click', async () => {
-      const d = parse(dInput.value);
-      const s = parse(sInput.value);
-      const h = parse(hInput.value);
-      const res = calcEOQClient(d, s, h);
-      const text = `EOQ Result: Demand ${d} units, Setup Cost ${fmtVal(s)}, Holding Cost ${fmtVal(h)} => Optimal Order Quantity: ${fmtUnits(res.eoqRounded)} (${res.orders.toFixed(1)} orders/yr). ${location.href.split('#')[0]}`;
+      const rawD = dInput.value.replace(/[^0-9.]/g, '');
+      const rawS = sInput.value.replace(/[^0-9.]/g, '');
+      const rawH = hInput.value.replace(/[^0-9.]/g, '');
+      const vD = validate(rawD, { required: true, min: 1, label: 'Demand' });
+      const vS = validate(rawS, { required: true, min: 0.01, label: 'Order Cost' });
+      const vH = validate(rawH, { required: true, min: 0.01, label: 'Holding Cost' });
+      if (!vD.valid || !vS.valid || !vH.valid) return;
+
+      const d = vD.value!;
+      const s = vS.value!;
+      const h = vH.value!;
+      const res = calcEOQ(d, s, h);
+      const text = `EOQ Result: Demand ${d} units, Setup Cost ${fmtVal(s)}, Holding Cost ${fmtVal(h)} => Optimal Order Quantity: ${fmtUnits(res.eoqRounded)} (${res.ordersPerYear.toFixed(1)} orders/yr). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('eoq-copy-btn');
       if (btn) {
@@ -382,6 +488,21 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      d: { required: true, min: 1, label: 'd' },
+      s: { required: true, min: 0.01, label: 's' },
+      h: { required: true, min: 0.01, label: 'h' },
+    });
+    if (restored.valid && restored.values.d && restored.values.s && restored.values.h) {
+      dInput.value = fmtLiveInput(String(restored.values.d));
+      sInput.value = fmtLiveInput(String(restored.values.s));
+      hInput.value = fmtLiveInput(String(restored.values.h));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

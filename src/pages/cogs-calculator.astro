@@ -57,6 +57,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'COGS Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What costs are excluded from COGS?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Operating expenses such as sales commissions, marketing and advertising, administrative legal fees, corporate office rent, and corporate executive salaries are operating expenses (OpEx), not direct manufacturing costs, and must be excluded from COGS.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does inventory accounting method impact COGS?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'In inflationary environments, FIFO (First-In, First-Out) yields lower COGS and higher reported gross profit, whereas LIFO (Last-In, First-Out) or Weighted Average Cost yields higher COGS and lower taxable income.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is COGS calculated for a service business?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Service companies report Cost of Services (COS), which includes billable employee salaries, contractor fees, and direct software licenses required to deliver client deliverables, with zero physical inventory components.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the difference between direct labor and indirect labor?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Direct labor includes wages of employees directly assembling or fabricating products. Indirect labor includes plant supervisors, maintenance staff, and security guards, which are categorized as factory overhead.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why is ending inventory subtracted in the COGS formula?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the matching principle, costs must be matched to revenues in the period earned. Goods remaining in ending inventory were not sold, so their costs are capitalized on the balance sheet rather than expensed in COGS.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -78,6 +123,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Cost of Goods Sold (COGS)</h1>
       <p class="text-sm text-text-muted mb-6">Calculate inventory flow costs and direct production expenses incurred to generate revenue.</p>
+
+      <!-- Error alert -->
+      <div id="cogs-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="cogs-error-msg"></span>
+      </div>
 
       <!-- Beginning Inventory -->
       <div class="mb-5">
@@ -227,13 +277,31 @@ const jsonld = {
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What costs are excluded from COGS?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Operating expenses such as sales commissions, marketing and advertising, administrative legal fees, corporate office rent, and corporate executive salaries are operating overhead (OpEx), not direct manufacturing costs, and must not be included in COGS.
+              Operating expenses such as sales commissions, marketing and advertising, administrative legal fees, corporate office rent, and corporate executive salaries are operating expenses (OpEx), not direct manufacturing costs, and must be excluded from COGS.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inventory accounting method impact COGS?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              In inflationary environments, FIFO (First-In, First-Out) results in lower COGS and higher reported gross profit, whereas LIFO (Last-In, First-Out) or Weighted Average Cost yields higher COGS and lower taxable income.
+              In inflationary environments, FIFO (First-In, First-Out) yields lower COGS and higher reported gross profit, whereas LIFO (Last-In, First-Out) or Weighted Average Cost yields higher COGS and lower taxable income.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is COGS calculated for a service business?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Service companies report Cost of Services (COS), which includes billable employee salaries, contractor fees, and direct software licenses required to deliver client deliverables, with zero physical inventory components.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between direct labor and indirect labor?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Direct labor includes wages of employees directly assembling or fabricating products. Indirect labor includes plant supervisors, maintenance staff, and security guards, which are categorized as factory overhead.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is ending inventory subtracted in the COGS formula?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Under the matching principle, costs must be matched to revenues in the period earned. Goods remaining in ending inventory were not sold, so their costs are capitalized on the balance sheet rather than expensed in COGS.
             </div>
           </details>
         </div>
@@ -241,30 +309,25 @@ const jsonld = {
 
       <section aria-labelledby="cogs-calculator-related">
         <h2 id="cogs-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  function calcCOGSClient(beg: number, purch: number, lab: number, ovh: number, end: number, rev: number) {
-    const additions = purch + lab + ovh;
-    const available = beg + additions;
-    const cogs = Math.max(0, available - end);
-    const grossProfit = rev > 0 ? rev - cogs : 0;
-    const grossMargin = rev > 0 ? (grossProfit / rev) * 100 : 0;
-
-    return {
-      totalAdditions: additions,
-      goodsAvailableForSale: available,
-      cogs,
-      grossProfit,
-      grossMarginPct: grossMargin,
-      cogsFrac: rev > 0 ? Math.min(1, cogs / rev) : 0.6,
-      gpFrac: rev > 0 ? Math.max(0, grossProfit / rev) : 0.4,
-    };
-  }
+  import { calcCOGS } from '../lib/calculators/cogs';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -277,6 +340,9 @@ const jsonld = {
   }
 
   function initCOGSCalc() {
+    if ((window as any).__cmCogsBound) return;
+    (window as any).__cmCogsBound = true;
+
     const begInput = document.getElementById('cogs-beginning') as HTMLInputElement | null;
     const purchInput = document.getElementById('cogs-purchases') as HTMLInputElement | null;
     const labInput = document.getElementById('cogs-labor') as HTMLInputElement | null;
@@ -296,46 +362,86 @@ const jsonld = {
     const resGrossProfit = document.getElementById('cogs-result-grossprofit');
     const resGrossMargin = document.getElementById('cogs-result-grossmargin');
     const resAdditions = document.getElementById('cogs-result-additions');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('cogs-error-alert');
+    const errMsg = document.getElementById('cogs-error-msg');
 
     if (!begInput || !purchInput) return;
 
     const DEFAULTS = { beg: 150000, purch: 450000, lab: 100000, ovh: 50000, end: 120000, rev: 950000 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const beg = parse(begInput.value);
-      const purch = parse(purchInput.value);
-      const lab = parse(labInput ? labInput.value : '0');
-      const ovh = parse(ovhInput ? ovhInput.value : '0');
-      const end = parse(endInput ? endInput.value : '0');
-      const rev = parse(revInput ? revInput.value : '0');
+      const rawBeg = begInput!.value.replace(/[^0-9.]/g, '');
+      const rawPurch = purchInput!.value.replace(/[^0-9.]/g, '');
+      const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
 
-      const res = calcCOGSClient(beg, purch, lab, ovh, end, rev);
+      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
+      const vPurch = validate(rawPurch, { required: true, min: 0, label: 'Purchases' });
+      const vLab = validate(rawLab, { required: true, min: 0, label: 'Direct Labor' });
+      const vOvh = validate(rawOvh, { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(rawRev, { required: true, min: 0, label: 'Revenue' });
+
+      if (!vBeg.valid) { showError(vBeg.error!.message); return; }
+      if (!vPurch.valid) { showError(vPurch.error!.message); return; }
+      if (!vLab.valid) { showError(vLab.error!.message); return; }
+      if (!vOvh.valid) { showError(vOvh.error!.message); return; }
+      if (!vEnd.valid) { showError(vEnd.error!.message); return; }
+      if (!vRev.valid) { showError(vRev.error!.message); return; }
+      clearError();
+
+      const beg = vBeg.value!;
+      const purch = vPurch.value!;
+      const lab = vLab.value!;
+      const ovh = vOvh.value!;
+      const end = vEnd.value!;
+      const rev = vRev.value!;
+
+      const res = calcCOGS(beg, purch, lab, ovh, end, rev);
+
+      setResult({
+        heroValue: fmtVal(res.cogs),
+        heroLabel: 'Cost of Goods Sold (COGS)',
+        rows: [
+          { label: 'Goods Available for Sale', value: fmtVal(res.goodsAvailableForSale) },
+          { label: 'Gross Profit', value: fmtVal(res.grossProfit) },
+          { label: 'Gross Profit Margin', value: `${res.grossMarginPct.toFixed(1)}%` },
+          { label: 'Total Manufacturing Additions', value: fmtVal(res.totalAdditions) },
+        ],
+      });
 
       if (resHero) resHero.textContent = fmtVal(res.cogs);
       if (resAvailable) resAvailable.textContent = fmtVal(res.goodsAvailableForSale);
       if (resGrossProfit) resGrossProfit.textContent = fmtVal(res.grossProfit);
-      if (resGrossMargin) resGrossMargin.textContent = res.grossMarginPct.toFixed(1) + '%';
+      if (resGrossMargin) resGrossMargin.textContent = `${res.grossMarginPct.toFixed(1)}%`;
       if (resAdditions) resAdditions.textContent = fmtVal(res.totalAdditions);
-      if (mobileHero) mobileHero.textContent = fmtVal(res.cogs);
 
       const wrapper = document.getElementById('cogs-composition-wrapper');
       if (wrapper && rev > 0) {
+        const cogsFrac = Math.min(1, res.cogs / rev);
+        const gpFrac = Math.max(0, res.grossProfit / rev);
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.cogsFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.gpFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (bar) bar.style.width = `${(cogsFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(gpFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(res.cogs);
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.grossProfit);
       }
 
-      history.replaceState(null, '', `#b=${beg}&p=${purch}&e=${end}&r=${rev}`);
+      serializeHash({ b: beg, p: purch, l: lab, o: ovh, e: end, r: rev });
     }
 
     function debounce() {
@@ -405,6 +511,7 @@ const jsonld = {
         revSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rev - 50000) / (10000000 - 50000)) * 100}%`);
       }
 
+      clearError();
       recalc();
       begInput.focus();
     });
@@ -417,13 +524,22 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('cogs-copy-btn')?.addEventListener('click', async () => {
-      const beg = parse(begInput.value);
-      const purch = parse(purchInput.value);
-      const lab = parse(labInput ? labInput.value : '0');
-      const ovh = parse(ovhInput ? ovhInput.value : '0');
-      const end = parse(endInput ? endInput.value : '0');
-      const rev = parse(revInput ? revInput.value : '0');
-      const res = calcCOGSClient(beg, purch, lab, ovh, end, rev);
+      const rawBeg = begInput.value.replace(/[^0-9.]/g, '');
+      const rawPurch = purchInput.value.replace(/[^0-9.]/g, '');
+      const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
+
+      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
+      const vPurch = validate(rawPurch, { required: true, min: 0, label: 'Purchases' });
+      const vLab = validate(rawLab, { required: true, min: 0, label: 'Labor' });
+      const vOvh = validate(rawOvh, { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(rawRev, { required: true, min: 0, label: 'Revenue' });
+      if (!vBeg.valid || !vPurch.valid || !vLab.valid || !vOvh.valid || !vEnd.valid || !vRev.valid) return;
+
+      const res = calcCOGS(vBeg.value!, vPurch.value!, vLab.value!, vOvh.value!, vEnd.value!, vRev.value!);
       const text = `COGS Calculation: COGS ${fmtVal(res.cogs)}, Gross Profit: ${fmtVal(res.grossProfit)} (${res.grossMarginPct.toFixed(1)}% margin). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('cogs-copy-btn');
@@ -443,6 +559,27 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      b: { required: true, min: 0, label: 'b' },
+      p: { required: true, min: 0, label: 'p' },
+      l: { required: false, label: 'l' },
+      o: { required: false, label: 'o' },
+      e: { required: false, label: 'e' },
+      r: { required: false, label: 'r' },
+    });
+    if (restored.valid && restored.values.b !== undefined && restored.values.p !== undefined) {
+      begInput.value = fmtLiveInput(String(restored.values.b));
+      purchInput.value = fmtLiveInput(String(restored.values.p));
+      if (labInput && restored.values.l !== undefined) labInput.value = fmtLiveInput(String(restored.values.l));
+      if (ovhInput && restored.values.o !== undefined) ovhInput.value = fmtLiveInput(String(restored.values.o));
+      if (endInput && restored.values.e !== undefined) endInput.value = fmtLiveInput(String(restored.values.e));
+      if (revInput && restored.values.r !== undefined) revInput.value = fmtLiveInput(String(restored.values.r));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

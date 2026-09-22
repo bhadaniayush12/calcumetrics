@@ -11,12 +11,12 @@ import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { revenue: 1000000, cogs: 600000, opex: 150000, taxes: 50000 };
-const result = calcProfitMargin(DEFAULT.revenue, DEFAULT.cogs, DEFAULT.opex, DEFAULT.taxes);
+const initialResult = calcProfitMargin(DEFAULT.revenue, DEFAULT.cogs, DEFAULT.opex, DEFAULT.taxes);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'profit-margin-calculator' && t.status === 'published').slice(0, 3);
-const canonicalUrl = 'https://calcumetrics.com/profit-margin-calculator' as string;
+const canonicalUrl = 'https://calcumetrics.com/profit-margin-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -31,7 +31,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-20',
+      dateModified: '2026-09-22',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -40,6 +40,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
         { '@type': 'ListItem', position: 3, name: 'Profit Margin Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What is a good net profit margin benchmark across industries?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Profit margins vary widely by industry. Software and technology companies often achieve 20% to 30% net margins due to low incremental unit costs. Manufacturing firms typically average 8% to 15%, while grocery retail operates on thin 2% to 4% margins balanced by high inventory turnover.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the key difference between gross margin and net margin?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Gross margin evaluates product profitability after deducting only direct production costs (COGS) from revenue. Net margin evaluates overall company profitability after deducting all operational overheads (OpEx), administrative expenses, debt interest, and income taxes.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why might a company have high gross margin but low net margin?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'This common divergence indicates excessive operating expenses, such as bloated administrative payroll, aggressive customer acquisition (marketing) spend, expensive office leases, or heavy debt service draining gross earnings.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How do I calculate operating profit margin?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Operating profit margin (EBIT margin) is calculated as: Operating Profit ÷ Total Revenue × 100, where Operating Profit = Gross Profit − Operating Expenses (OpEx). It isolates core business operating efficiency prior to non-operating items like capital structure financing and taxes.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can net profit margin be negative?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. If total direct costs, operating overheads, interest, and taxes exceed total revenue, the net profit is negative, reflecting an operating net loss for the reporting period.',
+          },
+        },
       ],
     },
   ],
@@ -57,12 +102,19 @@ const jsonld = {
     toolName="Profit Margin Calculator"
     category="Business"
     categoryHref="/business"
-    heroValue={result.netMarginPct.toFixed(1) + '%'}
+    heroValue={initialResult.netMarginPct.toFixed(1) + '%'}
     heroLabel="Net Profit Margin"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Profit Margin Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Calculate gross and net profit margins, operating overheads, and true bottom-line profitability.</p>
+
+      <!-- Error alert -->
+      <div id="pm-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="pm-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
 
       <!-- Revenue -->
       <div class="mb-5">
@@ -75,6 +127,7 @@ const jsonld = {
           localeFormat="indian"
           helperText="Gross sales or total billings"
           inputmode="decimal"
+          aria-describedby="pm-error-msg"
         />
         <div class="mt-2">
           <Slider id="pm-revenue-slider" min={50000} max={10000000} step={25000} value={1000000} ariaLabel="Revenue slider" />
@@ -92,13 +145,14 @@ const jsonld = {
           localeFormat="indian"
           helperText="Direct raw materials, manufacturing, and direct labor"
           inputmode="decimal"
+          aria-describedby="pm-error-msg"
         />
         <div class="mt-2">
           <Slider id="pm-cogs-slider" min={10000} max={8000000} step={25000} value={600000} ariaLabel="COGS slider" />
         </div>
       </div>
 
-      <!-- Operating Expenses -->
+      <!-- OpEx -->
       <div class="mb-5">
         <Input
           id="pm-opex"
@@ -107,11 +161,12 @@ const jsonld = {
           value="1,50,000"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Sales, marketing, rent, utilities, and admin overhead"
+          helperText="Rent, marketing, utilities, and administrative salaries"
           inputmode="decimal"
+          aria-describedby="pm-error-msg"
         />
         <div class="mt-2">
-          <Slider id="pm-opex-slider" min={0} max={3000000} step={10000} value={150000} ariaLabel="Operating expenses slider" />
+          <Slider id="pm-opex-slider" min={0} max={3000000} step={10000} value={150000} ariaLabel="OpEx slider" />
         </div>
       </div>
 
@@ -119,22 +174,19 @@ const jsonld = {
       <div class="mb-6">
         <Input
           id="pm-taxes"
-          label="Taxes & Other Deductions"
+          label="Taxes & Interest Expense"
           prefix="₹"
           value="50,000"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Income tax liability and interest charges"
+          helperText="Corporate income tax and loan financing costs"
           inputmode="decimal"
+          aria-describedby="pm-error-msg"
         />
         <div class="mt-2">
           <Slider id="pm-taxes-slider" min={0} max={1000000} step={5000} value={50000} ariaLabel="Taxes slider" />
         </div>
       </div>
-
-      <Alert variant="info" title="Margin vs Markup">
-        Gross margin is calculated as profit divided by revenue. If you need to determine the selling price from a cost markup, use our Markup vs Margin calculator.
-      </Alert>
 
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="pm-calculate" type="button">Calculate</Button>
@@ -145,38 +197,38 @@ const jsonld = {
     <Fragment slot="outputs">
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Profit Margin</span>
-        <div id="pm-result-netmargin" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {result.netMarginPct.toFixed(1)}%
+        <div id="pm-result-netmargin" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {initialResult.netMarginPct.toFixed(1)}%
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Net Profit Amount</span>
+          <span id="pm-result-netprofit" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.netProfit)}</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Gross Profit</span>
-          <span id="pm-result-grossprofit" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.grossProfit)}</span>
+          <span id="pm-result-grossprofit" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.grossProfit)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Gross Profit Margin</span>
-          <span id="pm-result-grossmargin" class="text-sm font-medium tabular-nums text-dark-text">{result.grossMarginPct.toFixed(1)}%</span>
-        </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Operating Profit (EBITDA)</span>
-          <span id="pm-result-operatingprofit" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.grossProfit - DEFAULT.opex)}</span>
+          <span id="pm-result-grossmargin" class="text-sm font-medium tabular-nums text-dark-text">{initialResult.grossMarginPct.toFixed(1)}%</span>
         </div>
         <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Net Profit (Bottom Line)</span>
-          <span id="pm-result-netprofit" class="text-sm font-bold tabular-nums text-dark-text">{fmt(result.netProfit)}</span>
+          <span class="text-xs text-dark-muted">Operating Profit (EBIT)</span>
+          <span id="pm-result-operatingprofit" class="text-sm font-bold tabular-nums text-dark-text">{fmt(initialResult.operatingProfit)}</span>
         </div>
       </div>
 
       <div class="mb-5" id="pm-composition-wrapper">
         <CompositionBar
-          principalFraction={DEFAULT.revenue > 0 ? (DEFAULT.cogs + DEFAULT.opex + DEFAULT.taxes) / DEFAULT.revenue : 0}
-          gainFraction={DEFAULT.revenue > 0 ? Math.max(0, result.netProfit) / DEFAULT.revenue : 0}
+          principalFraction={initialResult.revenue > 0 ? (initialResult.cogs + initialResult.opex + initialResult.taxes) / initialResult.revenue : 1}
+          gainFraction={initialResult.revenue > 0 ? Math.max(0, initialResult.netProfit / initialResult.revenue) : 0}
           principalLabel="Total Costs"
           gainLabel="Net Profit"
-          principalValue={fmt(DEFAULT.cogs + DEFAULT.opex + DEFAULT.taxes)}
-          gainValue={fmt(result.netProfit)}
+          principalValue={fmt(initialResult.cogs + initialResult.opex + initialResult.taxes)}
+          gainValue={fmt(initialResult.netProfit)}
         />
       </div>
 
@@ -189,15 +241,12 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Essential financial KPI for retail, manufacturing, and SaaS businesses.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">COGS = Direct production costs; OpEx = Indirect operating overheads.</p>
     </Fragment>
 
     <Fragment slot="below">
       <section aria-labelledby="pm-calculator-how">
         <h2 id="pm-calculator-how" class="text-xl font-bold text-text-primary mb-4">How profit margins are calculated</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Profit margins show what percentage of revenue remains after covering expenses at various operational tiers:
-        </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
           <p class="text-sm text-text-muted leading-relaxed">
             <strong>Gross Profit:</strong> Revenue − Cost of Goods Sold (COGS)<br />
@@ -212,18 +261,14 @@ const jsonld = {
       <section aria-labelledby="pm-calculator-faq">
         <h2 id="pm-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good profit margin benchmark?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Software companies frequently operate with 70–85% gross margins and 20–30% net margins. Physical retail typically experiences 20–35% gross margins and 3–8% net margins. Food and restaurant businesses generally run at 10–15% net margin.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why can a business have high gross margin but low net margin?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              This indicates high operating overheads—such as elevated customer acquisition costs (marketing), high administrative payroll, expensive executive leases, or heavy debt interest payments eating away at direct product profitability.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
@@ -244,25 +289,10 @@ const jsonld = {
 </Layout>
 
 <script>
-  function calcProfitMarginClient(rev: number, cogs: number, opex: number, taxes: number) {
-    const grossProfit = rev - cogs;
-    const grossMarginPct = rev > 0 ? (grossProfit / rev) * 100 : 0;
-    const operatingProfit = grossProfit - opex;
-    const netProfit = operatingProfit - taxes;
-    const netMarginPct = rev > 0 ? (netProfit / rev) * 100 : 0;
-    const totalCosts = cogs + opex + taxes;
-
-    return {
-      grossProfit,
-      grossMarginPct,
-      operatingProfit,
-      netProfit,
-      netMarginPct,
-      totalCosts,
-      costFraction: rev > 0 ? Math.min(1, totalCosts / rev) : 1,
-      profitFraction: rev > 0 ? Math.max(0, netProfit / rev) : 0,
-    };
-  }
+  import { calcProfitMargin } from '../lib/calculators/business';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -275,6 +305,9 @@ const jsonld = {
   }
 
   function initProfitMarginCalc() {
+    if ((window as any).__cmPmBound) return;
+    (window as any).__cmPmBound = true;
+
     const revInput = document.getElementById('pm-revenue') as HTMLInputElement | null;
     const cogsInput = document.getElementById('pm-cogs') as HTMLInputElement | null;
     const opexInput = document.getElementById('pm-opex') as HTMLInputElement | null;
@@ -290,46 +323,76 @@ const jsonld = {
     const resGrossMargin = document.getElementById('pm-result-grossmargin');
     const resOpProfit = document.getElementById('pm-result-operatingprofit');
     const resNetProfit = document.getElementById('pm-result-netprofit');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('pm-error-alert');
+    const errMsg = document.getElementById('pm-error-msg');
 
     if (!revInput || !cogsInput) return;
 
     const DEFAULTS = { revenue: 1000000, cogs: 600000, opex: 150000, taxes: 50000 };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const rev = parse(revInput.value);
-      const cogs = parse(cogsInput.value);
-      const opex = parse(opexInput ? opexInput.value : '0');
-      const taxes = parse(taxesInput ? taxesInput.value : '0');
+      const rawRev = revInput!.value.replace(/[^0-9.]/g, '');
+      const rawCogs = cogsInput!.value.replace(/[^0-9.]/g, '');
+      const rawOpex = opexInput ? opexInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawTaxes = taxesInput ? taxesInput.value.replace(/[^0-9.]/g, '') : '0';
 
-      if (rev <= 0) return;
+      const vRev = validate(rawRev, { required: true, min: 1, label: 'Revenue' });
+      const vCogs = validate(rawCogs, { required: true, min: 0, label: 'COGS' });
+      const vOpex = validate(rawOpex, { required: true, min: 0, label: 'OpEx' });
+      const vTaxes = validate(rawTaxes, { required: true, min: 0, label: 'Taxes' });
 
-      const res = calcProfitMarginClient(rev, cogs, opex, taxes);
+      if (!vRev.valid) { showError(vRev.error!.message); return; }
+      if (!vCogs.valid) { showError(vCogs.error!.message); return; }
+      if (!vOpex.valid) { showError(vOpex.error!.message); return; }
+      if (!vTaxes.valid) { showError(vTaxes.error!.message); return; }
+      clearError();
 
-      if (resNetMargin) resNetMargin.textContent = res.netMarginPct.toFixed(1) + '%';
+      const rev = vRev.value!;
+      const cogs = vCogs.value!;
+      const opex = vOpex.value!;
+      const taxes = vTaxes.value!;
+
+      const res = calcProfitMargin(rev, cogs, opex, taxes);
+
+      setResult({
+        heroValue: `${res.netMarginPct.toFixed(1)}%`,
+        heroLabel: 'Net Profit Margin',
+        rows: [
+          { label: 'Net Profit', value: fmtVal(res.netProfit) },
+          { label: 'Gross Profit', value: fmtVal(res.grossProfit) },
+          { label: 'Gross Margin', value: `${res.grossMarginPct.toFixed(1)}%` },
+          { label: 'Operating Profit', value: fmtVal(res.operatingProfit) },
+        ],
+      });
+
+      if (resNetMargin) resNetMargin.textContent = `${res.netMarginPct.toFixed(1)}%`;
       if (resGrossProfit) resGrossProfit.textContent = fmtVal(res.grossProfit);
-      if (resGrossMargin) resGrossMargin.textContent = res.grossMarginPct.toFixed(1) + '%';
+      if (resGrossMargin) resGrossMargin.textContent = `${res.grossMarginPct.toFixed(1)}%`;
       if (resOpProfit) resOpProfit.textContent = fmtVal(res.operatingProfit);
       if (resNetProfit) resNetProfit.textContent = fmtVal(res.netProfit);
-      if (mobileHero) mobileHero.textContent = res.netMarginPct.toFixed(1) + '%';
 
       const wrapper = document.getElementById('pm-composition-wrapper');
-      if (wrapper) {
+      if (wrapper && rev > 0) {
+        const totalCosts = cogs + opex + taxes;
+        const costFrac = Math.min(1, totalCosts / rev);
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.costFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.profitFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalCosts);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netProfit);
+        if (bar) bar.style.width = `${(costFrac * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(totalCosts);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.netProfit);
       }
 
-      history.replaceState(null, '', `#r=${rev}&c=${cogs}&o=${opex}&t=${taxes}`);
+      serializeHash({ r: rev, c: cogs, o: opex, t: taxes });
     }
 
     function debounce() {
@@ -387,6 +450,7 @@ const jsonld = {
         taxesSlider.style.setProperty('--slider-pct', `${((DEFAULTS.taxes - 0) / (1000000 - 0)) * 100}%`);
       }
 
+      clearError();
       recalc();
       revInput.focus();
     });
@@ -397,14 +461,21 @@ const jsonld = {
       });
     });
 
-    // Copy & Share
     document.getElementById('pm-copy-btn')?.addEventListener('click', async () => {
-      const rev = parse(revInput.value);
-      const cogs = parse(cogsInput.value);
-      const opex = parse(opexInput ? opexInput.value : '0');
-      const taxes = parse(taxesInput ? taxesInput.value : '0');
-      const res = calcProfitMarginClient(rev, cogs, opex, taxes);
-      const text = `Profit Margin: Revenue ${fmtVal(rev)}, COGS ${fmtVal(cogs)} => Gross Margin: ${res.grossMarginPct.toFixed(1)}%, Net Margin: ${res.netMarginPct.toFixed(1)}% (${fmtVal(res.netProfit)}). ${location.href.split('#')[0]}`;
+      const rawRev = revInput.value.replace(/[^0-9.]/g, '');
+      const rawCogs = cogsInput.value.replace(/[^0-9.]/g, '');
+      const rawOpex = opexInput ? opexInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawTaxes = taxesInput ? taxesInput.value.replace(/[^0-9.]/g, '') : '0';
+
+      const vRev = validate(rawRev, { required: true, min: 1, label: 'Revenue' });
+      const vCogs = validate(rawCogs, { required: true, min: 0, label: 'COGS' });
+      const vOpex = validate(rawOpex, { required: true, min: 0, label: 'OpEx' });
+      const vTaxes = validate(rawTaxes, { required: true, min: 0, label: 'Taxes' });
+
+      if (!vRev.valid || !vCogs.valid || !vOpex.valid || !vTaxes.valid) return;
+
+      const res = calcProfitMargin(vRev.value!, vCogs.value!, vOpex.value!, vTaxes.value!);
+      const text = `Profit Margin: Revenue ${fmtVal(vRev.value!)}, COGS ${fmtVal(vCogs.value!)} => Gross Margin: ${res.grossMarginPct.toFixed(1)}%, Net Margin: ${res.netMarginPct.toFixed(1)}% (${fmtVal(res.netProfit)}). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('pm-copy-btn');
       if (btn) {
@@ -423,6 +494,23 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      r: { required: true, min: 1, label: 'r' },
+      c: { required: true, min: 0, label: 'c' },
+      o: { required: true, min: 0, label: 'o' },
+      t: { required: true, min: 0, label: 't' },
+    });
+    if (restored.valid && restored.values.r && restored.values.c !== undefined && restored.values.o !== undefined && restored.values.t !== undefined) {
+      revInput.value = fmtLiveInput(String(restored.values.r));
+      cogsInput.value = fmtLiveInput(String(restored.values.c));
+      if (opexInput) opexInput.value = fmtLiveInput(String(restored.values.o));
+      if (taxesInput) taxesInput.value = fmtLiveInput(String(restored.values.t));
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

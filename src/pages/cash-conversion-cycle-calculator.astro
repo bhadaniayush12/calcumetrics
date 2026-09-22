@@ -1,0 +1,488 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
+import Input from '../components/ui/Input.astro';
+import Button from '../components/ui/Button.astro';
+import Alert from '../components/ui/Alert.astro';
+import { calcCCC } from '../lib/accounting/ratios';
+import { TOOLS } from '../config/site';
+
+const DEFAULT = {
+  ar: 200000,
+  rev: 2000000,
+  inv: 300000,
+  cogs: 1200000,
+  ap: 150000,
+  days: 365,
+};
+
+const initialResult = calcCCC(DEFAULT.ar, DEFAULT.rev, DEFAULT.inv, DEFAULT.cogs, DEFAULT.ap, DEFAULT.days);
+
+const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'cash-conversion-cycle-calculator' && t.status === 'published').slice(0, 3);
+const canonicalUrl = 'https://calcumetrics.com/cash-conversion-cycle-calculator';
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Cash Conversion Cycle Calculator',
+      url: canonicalUrl,
+      description: 'Calculate the Cash Conversion Cycle (CCC) from Days Sales Outstanding (DSO), Days Inventory Outstanding (DIO), and Days Payable Outstanding (DPO).',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Any',
+      browserRequirements: 'Requires JavaScript',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      inLanguage: 'en',
+      dateModified: '2026-09-22',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
+        { '@type': 'ListItem', position: 3, name: 'Cash Conversion Cycle Calculator' },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'What does a negative Cash Conversion Cycle indicate?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A negative Cash Conversion Cycle means a business receives customer cash for inventory before it has to pay its trade suppliers. This provides free working capital float, typical of efficient retailers and just-in-time manufacturers like Amazon and Dell.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a healthy Cash Conversion Cycle duration?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A CCC below 30 days is considered excellent, while 30 to 60 days is typical for manufacturing and wholesale distribution. A cycle exceeding 90 days usually highlights excessive inventory holding or slow collections.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How can a company shorten its Cash Conversion Cycle?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Companies can shorten CCC by expediting customer collections (reducing DSO), improving inventory turnover through lean demand planning (reducing DIO), and negotiating extended trade credit terms with suppliers (increasing DPO).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Why is COGS used for DSI and DPO instead of total sales?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Inventory and accounts payable are recorded on financial balance sheets at purchase cost, not retail selling price. Dividing by Cost of Goods Sold matches both balance sheet and income statement items at the same valuation basis.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the relationship between CCC and working capital?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The longer the CCC, the more cash is locked up in non-liquid working capital (uncollected receivables and sitting inventory), necessitating external credit lines or overdrafts to finance day-to-day operations.',
+          },
+        },
+      ],
+    },
+  ],
+};
+---
+
+<Layout
+  title="Cash Conversion Cycle (CCC) Calculator: Net Operating Cycle | Calcumetrics"
+  description="Calculate your Cash Conversion Cycle in days from DSO, DIO/DSI, and DPO. Optimize working capital efficiency with our free online tool."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+
+  <CalculatorLayout
+    toolName="Cash Conversion Cycle Calculator"
+    category="Business"
+    categoryHref="/business"
+    heroValue={`${initialResult.ccc.toFixed(1)} Days`}
+    heroLabel="Cash Conversion Cycle"
+    calcType="simple"
+  >
+    <Fragment slot="inputs">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Cash Conversion Cycle Calculator</h1>
+      <p class="text-sm text-text-muted mb-6">Calculate the net days required to convert operational investments in inventory into cash inflows.</p>
+
+      <!-- Error alert -->
+      <div id="ccc-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
+        <Alert variant="error" title="Input Error">
+          <span id="ccc-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <!-- Accounts Receivable -->
+      <div class="mb-4">
+        <Input
+          id="ccc-ar"
+          label="Accounts Receivable"
+          prefix="₹"
+          value="2,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total unpaid invoices owed by customers"
+          inputmode="decimal"
+          aria-describedby="ccc-error-msg"
+        />
+      </div>
+
+      <!-- Total Revenue -->
+      <div class="mb-4">
+        <Input
+          id="ccc-rev"
+          label="Annual Sales Revenue"
+          prefix="₹"
+          value="20,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total gross sales revenue for the measurement period"
+          inputmode="decimal"
+          aria-describedby="ccc-error-msg"
+        />
+      </div>
+
+      <!-- Inventory Value -->
+      <div class="mb-4">
+        <Input
+          id="ccc-inv"
+          label="Average Inventory"
+          prefix="₹"
+          value="3,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Average inventory held during the period"
+          inputmode="decimal"
+          aria-describedby="ccc-error-msg"
+        />
+      </div>
+
+      <!-- Cost of Goods Sold -->
+      <div class="mb-4">
+        <Input
+          id="ccc-cogs"
+          label="Cost of Goods Sold (COGS)"
+          prefix="₹"
+          value="12,00,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total direct cost of manufacturing or purchasing goods sold"
+          inputmode="decimal"
+          aria-describedby="ccc-error-msg"
+        />
+      </div>
+
+      <!-- Accounts Payable -->
+      <div class="mb-6">
+        <Input
+          id="ccc-ap"
+          label="Accounts Payable"
+          prefix="₹"
+          value="1,50,000"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="Total unpaid invoices owed to trade suppliers"
+          inputmode="decimal"
+          aria-describedby="ccc-error-msg"
+        />
+      </div>
+
+      <div class="flex gap-3">
+        <Button variant="primary" id="ccc-calculate" type="button">Calculate</Button>
+        <Button variant="ghost" id="ccc-reset" type="button">Reset</Button>
+      </div>
+    </Fragment>
+
+    <Fragment slot="outputs">
+      <div class="mb-5">
+        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Net Cash Conversion Cycle</span>
+        <div id="ccc-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
+          {initialResult.ccc.toFixed(1)} Days
+        </div>
+      </div>
+
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <div>
+            <span class="text-xs font-medium text-dark-text block">Days Sales Outstanding (DSO)</span>
+            <span class="text-[11px] text-dark-muted">Receivables collection speed</span>
+          </div>
+          <span id="ccc-result-dso" class="text-sm font-semibold tabular-nums text-dark-text">{initialResult.dso.toFixed(1)} Days</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <div>
+            <span class="text-xs font-medium text-dark-text block">Days Inventory Outstanding (DIO)</span>
+            <span class="text-[11px] text-dark-muted">Inventory holding duration</span>
+          </div>
+          <span id="ccc-result-dsi" class="text-sm font-semibold tabular-nums text-dark-text">{initialResult.dsi.toFixed(1)} Days</span>
+        </div>
+        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+          <div>
+            <span class="text-xs font-medium text-dark-text block">Days Payable Outstanding (DPO)</span>
+            <span class="text-[11px] text-dark-muted">Supplier credit payment delay</span>
+          </div>
+          <span id="ccc-result-dpo" class="text-sm font-semibold tabular-nums text-dark-accent">−{initialResult.dpo.toFixed(1)} Days</span>
+        </div>
+        <div class="py-2.5">
+          <span class="text-xs text-dark-muted block mb-1">Operational Assessment</span>
+          <span id="ccc-result-assessment" class="text-xs font-medium text-dark-text leading-snug block">{initialResult.assessment}</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 mt-4">
+        <button type="button" id="ccc-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Copy Result
+        </button>
+        <button type="button" id="ccc-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
+          Share Link
+        </button>
+      </div>
+
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes a standard 365-day annual reporting period. A shorter or negative cycle represents superior working capital velocity.</p>
+    </Fragment>
+
+    <Fragment slot="formula">
+      <div class="space-y-4 text-sm text-text-secondary">
+        <p>The Cash Conversion Cycle measures working capital latency:</p>
+        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-center">
+          CCC = DSO + DIO − DPO
+        </div>
+        <p>Where DSO = (Receivables / Revenue) × 365, DIO = (Inventory / COGS) × 365, and DPO = (Payables / COGS) × 365.</p>
+      </div>
+    </Fragment>
+
+    <Fragment slot="faq">
+      <div class="space-y-3">
+        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          <details class="group bg-surface rounded-card border border-border overflow-hidden">
+            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
+              <span>{faq.name}</span>
+              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
+              {faq.acceptedAnswer.text}
+            </div>
+          </details>
+        ))}
+      </div>
+    </Fragment>
+
+    <Fragment slot="related">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {related.map((t) => (
+          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
+            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
+            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+          </a>
+        ))}
+      </div>
+    </Fragment>
+  </CalculatorLayout>
+</Layout>
+
+<script>
+  import { calcCCC } from '../lib/accounting/ratios';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+
+  let currSym = '₹';
+  let currLocale = 'en-IN';
+  function fmtVal(n: number) {
+    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtLiveInput(raw: string) {
+    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
+    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  }
+
+  function initCCCCalc() {
+    if ((window as any).__cmCccBound) return;
+    (window as any).__cmCccBound = true;
+
+    const arInput = document.getElementById('ccc-ar') as HTMLInputElement | null;
+    const revInput = document.getElementById('ccc-rev') as HTMLInputElement | null;
+    const invInput = document.getElementById('ccc-inv') as HTMLInputElement | null;
+    const cogsInput = document.getElementById('ccc-cogs') as HTMLInputElement | null;
+    const apInput = document.getElementById('ccc-ap') as HTMLInputElement | null;
+
+    const resHero = document.getElementById('ccc-result-hero');
+    const resDso = document.getElementById('ccc-result-dso');
+    const resDsi = document.getElementById('ccc-result-dsi');
+    const resDpo = document.getElementById('ccc-result-dpo');
+    const resAssessment = document.getElementById('ccc-result-assessment');
+
+    const errAlert = document.getElementById('ccc-error-alert');
+    const errMsg = document.getElementById('ccc-error-msg');
+
+    if (!arInput || !revInput || !invInput || !cogsInput || !apInput) return;
+
+    const DEFAULTS = { ar: 200000, rev: 2000000, inv: 300000, cogs: 1200000, ap: 150000 };
+
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
+    }
+
+    function recalc() {
+      const rawAr = arInput!.value.replace(/[^0-9.]/g, '');
+      const rawRev = revInput!.value.replace(/[^0-9.]/g, '');
+      const rawInv = invInput!.value.replace(/[^0-9.]/g, '');
+      const rawCogs = cogsInput!.value.replace(/[^0-9.]/g, '');
+      const rawAp = apInput!.value.replace(/[^0-9.]/g, '');
+
+      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
+      const vRev = validate(rawRev, { required: true, min: 1, label: 'Revenue' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
+      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'COGS' });
+      const vAp = validate(rawAp, { required: true, min: 0, label: 'Accounts Payable' });
+
+      if (!vAr.valid) { showError(vAr.error!.message); return; }
+      if (!vRev.valid) { showError(vRev.error!.message); return; }
+      if (!vInv.valid) { showError(vInv.error!.message); return; }
+      if (!vCogs.valid) { showError(vCogs.error!.message); return; }
+      if (!vAp.valid) { showError(vAp.error!.message); return; }
+      clearError();
+
+      const ar = vAr.value!;
+      const rev = vRev.value!;
+      const inv = vInv.value!;
+      const cogs = vCogs.value!;
+      const ap = vAp.value!;
+
+      const res = calcCCC(ar, rev, inv, cogs, ap, 365);
+
+      setResult({
+        heroValue: `${res.ccc.toFixed(1)} Days`,
+        heroLabel: 'Cash Conversion Cycle',
+        rows: [
+          { label: 'Days Sales Outstanding (DSO)', value: `${res.dso.toFixed(1)} Days` },
+          { label: 'Days Inventory Outstanding (DIO)', value: `${res.dsi.toFixed(1)} Days` },
+          { label: 'Days Payable Outstanding (DPO)', value: `${res.dpo.toFixed(1)} Days` },
+          { label: 'Assessment', value: res.assessment },
+        ],
+      });
+
+      if (resHero) resHero.textContent = `${res.ccc.toFixed(1)} Days`;
+      if (resDso) resDso.textContent = `${res.dso.toFixed(1)} Days`;
+      if (resDsi) resDsi.textContent = `${res.dsi.toFixed(1)} Days`;
+      if (resDpo) resDpo.textContent = `−${res.dpo.toFixed(1)} Days`;
+      if (resAssessment) resAssessment.textContent = res.assessment;
+
+      serializeHash({ ar, rev, inv, cogs, ap });
+    }
+
+    [arInput, revInput, invInput, cogsInput, apInput].forEach((input) => {
+      input.addEventListener('input', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        input.value = fmtLiveInput(raw);
+        recalc();
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') recalc();
+      });
+    });
+
+    document.getElementById('ccc-calculate')?.addEventListener('click', recalc);
+    document.getElementById('ccc-reset')?.addEventListener('click', () => {
+      arInput.value = fmtLiveInput(String(DEFAULTS.ar));
+      revInput.value = fmtLiveInput(String(DEFAULTS.rev));
+      invInput.value = fmtLiveInput(String(DEFAULTS.inv));
+      cogsInput.value = fmtLiveInput(String(DEFAULTS.cogs));
+      apInput.value = fmtLiveInput(String(DEFAULTS.ap));
+      clearError();
+      recalc();
+      arInput.focus();
+    });
+
+    document.getElementById('ccc-copy-btn')?.addEventListener('click', async () => {
+      const rawAr = arInput.value.replace(/[^0-9.]/g, '');
+      const rawRev = revInput.value.replace(/[^0-9.]/g, '');
+      const rawInv = invInput.value.replace(/[^0-9.]/g, '');
+      const rawCogs = cogsInput.value.replace(/[^0-9.]/g, '');
+      const rawAp = apInput.value.replace(/[^0-9.]/g, '');
+
+      const vAr = validate(rawAr, { required: true, min: 0, label: 'AR' });
+      const vRev = validate(rawRev, { required: true, min: 1, label: 'Rev' });
+      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inv' });
+      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'COGS' });
+      const vAp = validate(rawAp, { required: true, min: 0, label: 'AP' });
+
+      if (!vAr.valid || !vRev.valid || !vInv.valid || !vCogs.valid || !vAp.valid) return;
+
+      const res = calcCCC(vAr.value!, vRev.value!, vInv.value!, vCogs.value!, vAp.value!, 365);
+      const text = `Cash Conversion Cycle: ${res.ccc.toFixed(1)} Days (DSO: ${res.dso.toFixed(1)}d, DIO: ${res.dsi.toFixed(1)}d, DPO: ${res.dpo.toFixed(1)}d). ${location.href.split('#')[0]}`;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('ccc-copy-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    document.getElementById('ccc-share-btn')?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      const btn = document.getElementById('ccc-share-btn');
+      if (btn) {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied Link!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      }
+    });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      ar: { required: true, min: 0, label: 'ar' },
+      rev: { required: true, min: 1, label: 'rev' },
+      inv: { required: true, min: 0, label: 'inv' },
+      cogs: { required: true, min: 1, label: 'cogs' },
+      ap: { required: true, min: 0, label: 'ap' },
+    });
+    if (restored.valid && restored.values.ar !== undefined && restored.values.rev && restored.values.inv !== undefined && restored.values.cogs && restored.values.ap !== undefined) {
+      arInput.value = fmtLiveInput(String(restored.values.ar));
+      revInput.value = fmtLiveInput(String(restored.values.rev));
+      invInput.value = fmtLiveInput(String(restored.values.inv));
+      cogsInput.value = fmtLiveInput(String(restored.values.cogs));
+      apInput.value = fmtLiveInput(String(restored.values.ap));
+      recalc();
+    } else {
+      recalc();
+    }
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        recalc();
+      }
+    });
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+  }
+
+  initCCCCalc();
+  document.addEventListener('astro:page-load', initCCCCalc);
+</script>

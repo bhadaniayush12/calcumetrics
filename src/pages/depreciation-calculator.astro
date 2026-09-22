@@ -43,6 +43,51 @@ const jsonld = {
         { '@type': 'ListItem', position: 3, name: 'Depreciation Calculator' },
       ],
     },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Why do tax authorities prefer WDV over SLM?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Most physical assets lose market value rapidly in their initial operating years. WDV matches tax deductions to realistic economic decay and offsets higher early write-offs against rising future maintenance costs.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can an asset be depreciated below its salvage value?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. An asset cannot be depreciated below its estimated salvage or scrap value. Once the net book value matches salvage value, depreciation deductions must cease.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is the fundamental difference between SLM and WDV?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'SLM writes off an equal monetary amount every year. WDV applies a constant percentage against the declining net book value, resulting in larger depreciation charges upfront that decrease over time.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How is salvage value estimated for capital assets?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Salvage value represents the anticipated disposal or scrap price at the end of the useful life. In financial reporting, companies commonly estimate salvage at 5% of original purchase cost unless contractual salvage values exist.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does depreciation affect cash flow and taxes?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Depreciation is a non-cash expense that reduces taxable net income. The resulting tax savings (Depreciation × Tax Rate) represent a real positive cash flow shield for the business.',
+          },
+        },
+      ],
+    },
   ],
 };
 ---
@@ -64,6 +109,11 @@ const jsonld = {
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Depreciation Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Model asset book values, tax deductions, and depreciation schedules under SLM and WDV.</p>
+
+      <!-- Error alert -->
+      <div id="dep-error-alert" class="hidden mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-control text-sm text-red-400" role="alert">
+        <span id="dep-error-msg"></span>
+      </div>
 
       <!-- Asset Cost -->
       <div class="mb-5">
@@ -244,15 +294,33 @@ const jsonld = {
         <h2 id="dep-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why do tax authorities prefer WDV?</summary>
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why do tax authorities prefer WDV over SLM?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Most physical assets lose value rapidly right after acquisition (cars, computers, machinery). WDV aligns tax write-offs with realistic market depreciation and combines higher early tax deductions with lower repair costs, balancing overall annual expense.
+              Most physical assets lose market value rapidly in their initial operating years. WDV matches tax deductions to realistic economic decay and offsets higher early write-offs against rising future maintenance costs.
             </div>
           </details>
           <details class="border border-border rounded-card overflow-hidden">
             <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can an asset be depreciated below its salvage value?</summary>
             <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. An asset cannot be depreciated below its estimated salvage or scrap value. Once the net book value matches the salvage value, further depreciation deductions cease.
+              No. An asset cannot be depreciated below its estimated salvage or scrap value. Once the net book value matches salvage value, depreciation deductions must cease.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the fundamental difference between SLM and WDV?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              SLM writes off an equal monetary amount every year. WDV applies a constant percentage against the declining net book value, resulting in larger depreciation charges upfront that decrease over time.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is salvage value estimated for capital assets?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Salvage value represents the anticipated disposal or scrap price at the end of the useful life. In financial reporting, companies commonly estimate salvage at 5% of original purchase cost unless contractual salvage values exist.
+            </div>
+          </details>
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does depreciation affect cash flow and taxes?</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+              Depreciation is a non-cash expense that reduces taxable net income. The resulting tax savings (Depreciation × Tax Rate) represent a real positive cash flow shield for the business.
             </div>
           </details>
         </div>
@@ -260,66 +328,25 @@ const jsonld = {
 
       <section aria-labelledby="dep-calculator-related">
         <h2 id="dep-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {related.map((tool) => (
+            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+            </a>
+          ))}
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  function calcDepClient(cost: number, salvageVal: number, usefulLife: number, method: 'SLM' | 'WDV') {
-    const salvage = Math.min(cost, Math.max(0, salvageVal));
-    const depreciable = cost - salvage;
-    const schedule: any[] = [];
-
-    if (method === 'SLM') {
-      const annualDep = usefulLife > 0 ? depreciable / usefulLife : 0;
-      const ratePct = cost > 0 ? (annualDep / cost) * 100 : 0;
-      let opening = cost;
-      let accum = 0;
-
-      for (let yr = 1; yr <= usefulLife; yr++) {
-        const dep = Math.min(annualDep, Math.max(0, opening - salvage));
-        accum += dep;
-        const closing = Math.max(salvage, opening - dep);
-        schedule.push({ year: yr, openingValue: opening, depreciation: dep, accumulatedDepreciation: accum, closingValue: closing });
-        opening = closing;
-      }
-
-      return {
-        annualDepreciation: Math.round(annualDep),
-        depreciationRatePct: ratePct,
-        totalDepreciation: Math.round(accum),
-        salvageValue: salvage,
-        schedule,
-      };
-    } else {
-      const effectiveSalvage = salvage > 0 ? salvage : Math.max(1, cost * 0.05);
-      const rate = 1 - Math.pow(effectiveSalvage / cost, 1 / usefulLife);
-      const ratePct = rate * 100;
-      let opening = cost;
-      let accum = 0;
-
-      for (let yr = 1; yr <= usefulLife; yr++) {
-        let dep = opening * rate;
-        if (yr === usefulLife || opening - dep < salvage) {
-          dep = Math.max(0, opening - salvage);
-        }
-        accum += dep;
-        const closing = Math.max(salvage, opening - dep);
-        schedule.push({ year: yr, openingValue: opening, depreciation: dep, accumulatedDepreciation: accum, closingValue: closing });
-        opening = closing;
-      }
-
-      return {
-        annualDepreciation: schedule[0] ? Math.round(schedule[0].depreciation) : 0,
-        depreciationRatePct: ratePct,
-        totalDepreciation: Math.round(accum),
-        salvageValue: salvage,
-        schedule,
-      };
-    }
-  }
+  import { calcDepreciation } from '../lib/calculators/depreciation';
+  import { validate } from '../lib/validate';
+  import { setResult } from '../lib/result-bus';
+  import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -332,6 +359,9 @@ const jsonld = {
   }
 
   function initDepCalc() {
+    if ((window as any).__cmDeprBound) return;
+    (window as any).__cmDeprBound = true;
+
     const costInput = document.getElementById('dep-cost') as HTMLInputElement | null;
     const salvageInput = document.getElementById('dep-salvage') as HTMLInputElement | null;
     const lifeInput = document.getElementById('dep-life') as HTMLInputElement | null;
@@ -347,33 +377,60 @@ const jsonld = {
     const resClosing = document.getElementById('dep-result-closing');
     const resMethodLabel = document.getElementById('dep-result-methodlabel');
     const scheduleBody = document.getElementById('dep-schedule-body');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+
+    const errAlert = document.getElementById('dep-error-alert');
+    const errMsg = document.getElementById('dep-error-msg');
 
     if (!costInput || !lifeInput) return;
 
     const DEFAULTS = { cost: 500000, salvage: 50000, life: 5, method: 'SLM' };
     let timer: ReturnType<typeof setTimeout>;
 
-    function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+    function showError(msg: string) {
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
+    }
+    function clearError() {
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const cost = parse(costInput.value);
-      const salvage = parse(salvageInput ? salvageInput.value : '0');
-      const life = parseInt(lifeInput.value) || 1;
+      const rawCost = costInput!.value.replace(/[^0-9.]/g, '');
+      const rawSalvage = salvageInput ? salvageInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawLife = lifeInput!.value.replace(/[^0-9.]/g, '');
       const method = (methodSelect ? methodSelect.value : 'SLM') as 'SLM' | 'WDV';
 
-      if (cost <= 0 || life <= 0) return;
+      const vCost = validate(rawCost, { required: true, min: 1, label: 'Asset Cost' });
+      const vSalvage = validate(rawSalvage, { required: true, min: 0, label: 'Salvage Value' });
+      const vLife = validate(rawLife, { required: true, min: 1, max: 100, label: 'Useful Life' });
 
-      const res = calcDepClient(cost, salvage, life, method);
+      if (!vCost.valid) { showError(vCost.error!.message); return; }
+      if (!vSalvage.valid) { showError(vSalvage.error!.message); return; }
+      if (!vLife.valid) { showError(vLife.error!.message); return; }
+      clearError();
+
+      const cost = vCost.value!;
+      const salvage = Math.min(cost, vSalvage.value!);
+      const life = Math.round(vLife.value!);
+
+      const res = calcDepreciation(cost, salvage, life, method);
+
+      setResult({
+        heroValue: fmtVal(res.annualDepreciation),
+        heroLabel: 'Annual Depreciation',
+        rows: [
+          { label: 'Depreciation Rate (% p.a.)', value: `${res.depreciationRatePct.toFixed(2)}%` },
+          { label: 'Total Written-Off Amount', value: fmtVal(res.totalDepreciation) },
+          { label: 'Remaining Book / Salvage Value', value: fmtVal(res.salvageValue) },
+          { label: 'Accounting Method', value: method === 'SLM' ? 'Straight Line Method (SLM)' : 'Written Down Value (WDV)' },
+        ],
+      });
 
       if (resAnnual) resAnnual.textContent = fmtVal(res.annualDepreciation);
-      if (resRate) resRate.textContent = res.depreciationRatePct.toFixed(2) + '%';
+      if (resRate) resRate.textContent = `${res.depreciationRatePct.toFixed(2)}%`;
       if (resTotal) resTotal.textContent = fmtVal(res.totalDepreciation);
       if (resClosing) resClosing.textContent = fmtVal(res.salvageValue);
       if (resMethodLabel) resMethodLabel.textContent = method === 'SLM' ? 'Straight Line Method (SLM)' : 'Written Down Value (WDV)';
-      if (mobileHero) mobileHero.textContent = fmtVal(res.annualDepreciation);
 
       const wrapper = document.getElementById('dep-composition-wrapper');
       if (wrapper && cost > 0) {
@@ -381,9 +438,9 @@ const jsonld = {
         const salvFrac = res.salvageValue / cost;
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(depFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(salvFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+        if (bar) bar.style.width = `${(depFrac * 100).toFixed(1)}%`;
+        if (gainBar) gainBar.style.width = `${(salvFrac * 100).toFixed(1)}%`;
+        const legendEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(res.totalDepreciation);
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.salvageValue);
       }
@@ -400,7 +457,7 @@ const jsonld = {
         `).join('');
       }
 
-      history.replaceState(null, '', `#c=${cost}&s=${salvage}&l=${life}&m=${method}`);
+      serializeHash({ c: cost, s: salvage, l: life, m: method });
     }
 
     function debounce() {
@@ -454,6 +511,7 @@ const jsonld = {
         lifeSlider.style.setProperty('--slider-pct', `${((DEFAULTS.life - 1) / (30 - 1)) * 100}%`);
       }
 
+      clearError();
       recalc();
       costInput.focus();
     });
@@ -466,11 +524,19 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('dep-copy-btn')?.addEventListener('click', async () => {
-      const cost = parse(costInput.value);
-      const salvage = parse(salvageInput ? salvageInput.value : '0');
-      const life = parseInt(lifeInput.value) || 1;
+      const rawCost = costInput.value.replace(/[^0-9.]/g, '');
+      const rawSalvage = salvageInput ? salvageInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawLife = lifeInput.value.replace(/[^0-9.]/g, '');
       const method = (methodSelect ? methodSelect.value : 'SLM') as any;
-      const res = calcDepClient(cost, salvage, life, method);
+      const vCost = validate(rawCost, { required: true, min: 1, label: 'Asset Cost' });
+      const vSalvage = validate(rawSalvage, { required: true, min: 0, label: 'Salvage Value' });
+      const vLife = validate(rawLife, { required: true, min: 1, label: 'Life' });
+      if (!vCost.valid || !vSalvage.valid || !vLife.valid) return;
+
+      const cost = vCost.value!;
+      const salvage = Math.min(cost, vSalvage.value!);
+      const life = Math.round(vLife.value!);
+      const res = calcDepreciation(cost, salvage, life, method);
       const text = `Depreciation (${method}): Cost ${fmtVal(cost)}, Salvage ${fmtVal(salvage)}, Life ${life} years => Annual Dep: ${fmtVal(res.annualDepreciation)} (${res.depreciationRatePct.toFixed(2)}%). ${location.href.split('#')[0]}`;
       await navigator.clipboard.writeText(text);
       const btn = document.getElementById('dep-copy-btn');
@@ -490,6 +556,25 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    // Restore from hash
+    const restored = restoreFromHash(readCurrentHash(), {
+      c: { required: true, min: 1, label: 'c' },
+      s: { required: true, min: 0, label: 's' },
+      l: { required: true, min: 1, label: 'l' },
+      m: { required: false, label: 'm' },
+    });
+    if (restored.valid && restored.values.c && restored.values.s !== undefined && restored.values.l) {
+      costInput.value = fmtLiveInput(String(restored.values.c));
+      if (salvageInput) salvageInput.value = fmtLiveInput(String(restored.values.s));
+      lifeInput.value = String(restored.values.l);
+      if (restored.values.m && methodSelect && (restored.values.m === 'SLM' || restored.values.m === 'WDV')) {
+        methodSelect.value = restored.values.m;
+      }
+      recalc();
+    } else {
+      recalc();
+    }
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
