@@ -230,30 +230,126 @@ const jsonld = {
       <section aria-labelledby="cc-calculator-how">
         <h2 id="cc-calculator-how" class="text-xl font-bold text-text-primary mb-4">How credit card amortization works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Credit cards compute interest daily on unpaid balances. Each fixed monthly payment pays off the accrued monthly interest first:
+          Credit cards represent unsecured revolving credit where interest accrues daily on outstanding balances. Each monthly payment is applied first toward billing charges and accrued interest, with only the residual cash reducing principal:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Monthly Interest: </strong> I = Balance &times; (APR &divide; 12 &divide; 100)<br />
-            <strong>Payoff Formula: </strong> n = &minus;ln[ 1 &minus; (r &times; P &divide; PMT) ] &divide; ln(1 + r)<br />
-            <strong>Total Outflow: </strong> Total Paid = PMT &times; n
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Monthly Periodic Rate:</strong> r = Annual Interest Rate (APR %) &divide; 12 &divide; 100<br /><br />
+            <strong>2. Accrued Monthly Interest:</strong> I<sub>t</sub> = Outstanding Balance<sub>t</sub> &times; r<br /><br />
+            <strong>3. Payoff Duration Formula:</strong> n = &minus;ln[ 1 &minus; (r &times; P &divide; PMT) ] &divide; ln(1 + r)<br /><br />
+            <strong>4. Solvency Requirement:</strong> Monthly Payment (PMT) &gt; Initial Monthly Interest (P &times; r)<br /><br />
+            <strong>5. Total Financing Outflow:</strong> Total Paid = PMT &times; n<br /><br />
+            <strong>6. Cumulative Interest Burden:</strong> Total Interest = Total Paid &minus; Original Balance (P)
           </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an outstanding credit card debt of <strong>₹1,50,000</strong> at a standard revolving APR of <strong>36.00%</strong> (3.00% per month) with a disciplined commitment of <strong>₹10,000 per month</strong> toward debt elimination:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Payoff Metric / Milestone</th>
+                <th class="py-2.5 px-4">Calculation / Methodology</th>
+                <th class="py-2.5 px-4">Computed Output</th>
+                <th class="py-2.5 px-4">Financial Consequence</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Starting Revolving Balance (P)</td>
+                <td class="py-2.5 px-4 font-mono">Current Card Statement Due</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,50,000</td>
+                <td class="py-2.5 px-4">Principal debt subject to 36% annual compounding finance charges.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Interest Rate (r)</td>
+                <td class="py-2.5 px-4 font-mono">36.00% &divide; 12</td>
+                <td class="py-2.5 px-4 font-mono">3.00% / Month</td>
+                <td class="py-2.5 px-4">Vicious compounding rate (compounds to 42.58% effective annual rate EAR).</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Planned Monthly Payment (PMT)</td>
+                <td class="py-2.5 px-4 font-mono">Fixed User Commitment</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,000 / Month</td>
+                <td class="py-2.5 px-4">Well above Month 1 interest threshold (₹4,500), guaranteeing debt reduction.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
+                <td class="py-2.5 px-4 font-mono">Interest: ₹1.5L &times; 3% = ₹4,500<br />Principal: ₹10k &minus; ₹4.5k = ₹5,500</td>
+                <td class="py-2.5 px-4 font-mono">45% Interest / 55% Principal</td>
+                <td class="py-2.5 px-4">Ending balance drops to ₹1,44,500, lowering Month 2 interest to ₹4,335.</td>
+              </tr>
+              <tr class="bg-surface/50 font-semibold text-text-primary">
+                <td class="py-2.5 px-4">Total Payoff Duration</td>
+                <td class="py-2.5 px-4 font-mono">Amortization Equation Solved</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">21 Months (1.8 Years)</td>
+                <td class="py-2.5 px-4">Complete debt freedom achieved in under two years.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Cash Paid to Bank</td>
+                <td class="py-2.5 px-4 font-mono">₹10,000 &times; 21 Months</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹2,10,000</td>
+                <td class="py-2.5 px-4">Gross cash outflow required to eliminate card obligation.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Total Interest Accrued</td>
+                <td class="py-3 px-4 font-mono">₹2,10,000 &minus; ₹1,50,000</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹60,000 (28.6%)</td>
+                <td class="py-3 px-4">Pure financing cost paid to the credit card company.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The Brutal "Minimum Payment" Trap</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Paying only the standard minimum due (typically 5% of balance) on this ₹1,50,000 debt causes severe financial damage:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Minimum Due Only:</strong> Takes over <strong>14 years (170+ months)</strong> to become debt free, costing over <strong>₹1,85,000 in interest alone</strong> (exceeding original principal!).</li>
+              <li><strong>Fixed ₹10,000 Payment:</strong> Eradicates debt in <strong>21 months</strong> and saves over <strong>₹1,25,000 in interest</strong>.</li>
+              <li><strong>Accelerated ₹15,000 Payment:</strong> Eradicates debt in just <strong>12 months</strong> with only ₹32,450 total interest.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Debt Elimination Strategies</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              Maximize payoff velocity with these proven financial frameworks:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>The Avalanche Method:</strong> Direct all surplus cash toward the highest APR card first while paying minimums on others. Mathematically minimizes total interest paid across all liabilities.</li>
+              <li><strong>Personal Loan Consolidation:</strong> Refinancing ₹1,50,000 at 36% APR into a 13% personal loan drops monthly interest from ₹4,500 to ₹1,625 — instantly freeing ₹2,875/month for principal retirement.</li>
+              <li><strong>0% Balance Transfer Card:</strong> Transferring balance to a 0% introductory APR card stops interest accrual for 12–18 months, ensuring 100% of every payment retires principal.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Exclusions</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Zero New Transactions:</strong> The model assumes you immediately stop using the card. Any new purchases during the payoff period reset interest calculations and prolong payoff.</li>
+            <li><strong>GST on Finance Charges:</strong> In India, an additional 18% Goods &amp; Services Tax (GST) is levied on all credit card finance charges and processing fees, effectively inflating a 36% APR to over 42.48%.</li>
+            <li><strong>Loss of Interest-Free Grace Period:</strong> Once you carry a rolling month-to-month balance, the 45–50 day interest-free grace period is voided; interest accrues on all new purchases from the exact date of transaction.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="cc-calculator-faq">
         <h2 id="cc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            ['What happens if I only pay the minimum due on my credit card?', 'Paying only the minimum due (usually 5% of the balance) prolongs debt repayment over decades because the vast majority of your payment covers finance charges and taxes, leaving principal virtually untouched while interest continues to compound.'],
-            ['Why are credit card interest rates (APR) so high?', 'Credit cards represent unsecured revolving consumer debt without collateral. To offset high default and delinquency risks, banks charge APRs typically ranging between 24% and 42% per annum.'],
-            ['What is the debt avalanche method?', 'The debt avalanche strategy prioritizes paying down the credit card or loan with the highest interest rate first while making minimum required payments on others. Mathematically, this minimizes total interest paid across all liabilities.'],
-            ['How does a balance transfer card or personal loan help?', 'Consolidating revolving 36%–42% card debt into a lower-interest personal loan (12%–15%) or a 0% introductory APR balance transfer card drastically lowers monthly finance charges, allowing 100% of your payment to extinguish principal faster.'],
-            ['What does "insufficient payment" mean in this calculator?', 'If your monthly payment is less than or equal to the monthly interest accrued on your balance, the loan balance will never decline and the payoff period becomes mathematically infinite.'],
-          ].map(([q, a]) => (
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{q}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{a}</div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
             </details>
           ))}
         </div>
@@ -261,7 +357,23 @@ const jsonld = {
 
       <section aria-labelledby="cc-calculator-related">
         <h2 id="cc-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/debt-to-income-ratio-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Debt-to-Income Ratio Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Assess your borrowing health and loan approval eligibility using front-end and back-end DTI.</p>
+          </a>
+          <a href="/loan-amortization-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Amortization Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Generate complete month-by-month principal and interest loan amortization schedules.</p>
+          </a>
+          <a href="/loan-affordability-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Loan Affordability Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Determine maximum borrowing capacity based on monthly income and debt limits.</p>
+          </a>
+        </div>
       </section>
     </Fragment>
   </CalculatorLayout>
