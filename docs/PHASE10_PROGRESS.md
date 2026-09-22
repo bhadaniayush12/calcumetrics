@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:56:10+05:30
+- **LAST_UPDATED:** 2026-09-23T03:57:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 11
-- **IN_PROGRESS:** home-loan-calculator
+- **COMPLETED:** 12
+- **IN_PROGRESS:** NONE
 - **NEXT:** 013. car-loan-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** emi-calculator
-- **LAST_COMMIT:** f2e9b94
+- **LAST_COMPLETED_UNIT:** home-loan-calculator
+- **LAST_COMMIT:** 87347d9
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -29,7 +29,7 @@
 - [x] 009. ppf-calculator — DONE
 - [x] 010. 401k-calculator — DONE
 - [x] 011. emi-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
-- [ ] 012. home-loan-calculator — IN PROGRESS
+- [x] 012. home-loan-calculator — DONE
 - [ ] 013. car-loan-calculator — PENDING
 - [ ] 014. loan-prepayment-calculator — PENDING
 - [ ] 015. income-tax-calculator — PENDING (Phase 5 Locked, India Tax Protected)
@@ -127,3 +127,9 @@
 - **011. emi-calculator (/emi-calculator)**:
   - Audited: Phase 5 Locked Calculator. Verified reducing balance loan amortization formula EMI = P × r × (1+r)^n / ((1+r)^n − 1), step-by-step worked example (₹10,00,000 at 8.5% for 20 yrs → ₹8,678 EMI, ₹10,82,776 interest, ₹20,82,776 total payment), full dynamic year-by-year amortization schedule table, 3 targeted FAQs, and related calculators.
   - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **012. home-loan-calculator (/home-loan-calculator)**:
+  - Audited: Residential mortgage reducing balance model with down payment separation.
+  - Changes: Added step-by-step worked example using default inputs (₹50L property, 20% down payment = ₹10L, ₹40L loan at 8.5% for 20 yrs → ₹34,713 monthly EMI, ₹43,31,103 interest, ₹83,31,103 total payment), added result interpretation (front-loaded interest schedule in early years, leverage impact of increasing down payment to 30%), and added explicit assumptions/limitations (fixed vs floating EBLR rate note, stamp duty/processing fee exclusions, Section 80C and 24(b) tax rules under Old Regime).
+  - Preserved: Clean interactive inputs with down payment slider, calculation engine `calcEMI`, 5 FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.

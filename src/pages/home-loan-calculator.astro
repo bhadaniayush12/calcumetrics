@@ -250,19 +250,75 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="home-loan-calculator-how">
         <h2 id="home-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How home loan EMI is computed</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          The monthly instalment covers both principal amortization and interest according to the reducing balance method:
+          A home loan EMI (Equated Monthly Instalment) is a fixed monthly payment made to your lender over a specified loan tenure. Housing finance institutions use the <strong>reducing balance method</strong>, where monthly interest is calculated only on the remaining unpaid principal balance at the end of each billing cycle.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">EMI = [P × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Your loan principal equals the total property purchase price minus your upfront down payment. The standard mathematical formula for monthly EMI is:
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">EMI = [P &times; r &times; (1 + r)<sup>n</sup>] &divide; [(1 + r)<sup>n</sup> &minus; 1]</p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">P</strong> — Principal loan = Property Cost − Down Payment</li>
-            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual Rate / 12 / 100</li>
-            <li><strong class="text-text-primary">n</strong> — Total tenure in months = Years × 12</li>
+            <li><strong class="text-text-primary">P</strong> &mdash; Principal loan amount borrowed = Property Cost &minus; Down Payment</li>
+            <li><strong class="text-text-primary">r</strong> &mdash; Monthly periodic interest rate = Annual Interest Rate / 12 / 100</li>
+            <li><strong class="text-text-primary">n</strong> &mdash; Total repayment tenure in months = Years &times; 12</li>
           </ul>
         </div>
+      </section>
+
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="home-loan-calculator-example">
+        <h2 id="home-loan-calculator-example" class="text-xl font-bold text-text-primary mb-4">Worked example: ₹50 Lakh property, 20% down payment, 8.5% p.a. for 20 years</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an individual purchasing a home valued at ₹50,00,000 with a 20% down payment, financing the balance at 8.5% per annum over 20 years:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Property Purchase Price:</strong> ₹50,00,000</p>
+          <p><strong class="text-text-primary">2. Down Payment (20%):</strong> 0.20 &times; ₹50,00,000 = <strong class="text-text-primary">₹10,00,000</strong></p>
+          <p><strong class="text-text-primary">3. Net Loan Amount (Principal P):</strong> ₹50,00,000 &minus; ₹10,00,000 = <strong class="text-text-primary">₹40,00,000</strong></p>
+          <p><strong class="text-text-primary">4. Monthly Periodic Rate (r):</strong> 8.5 / 1200 &asymp; 0.0070833</p>
+          <p><strong class="text-text-primary">5. Total Repayment Months (n):</strong> 20 &times; 12 = 240 months</p>
+          <p><strong class="text-text-primary">6. Monthly Equated Instalment (EMI):</strong> <strong class="text-text-primary text-accent">₹34,713</strong></p>
+          <p><strong class="text-text-primary">7. Total Repayment Over 20 Years:</strong> 240 &times; ₹34,712.93 = <strong class="text-text-primary">₹83,31,103</strong></p>
+          <p><strong class="text-text-primary">8. Cumulative Lifetime Interest Paid:</strong> ₹83,31,103 &minus; ₹40,00,000 = <strong class="text-text-primary text-accent">₹43,31,103</strong></p>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          <strong>Key Insight:</strong> Over a standard 20-year term, total interest paid (₹43.31 lakh) actually exceeds the original borrowed loan amount (₹40 lakh). Making occasional partial prepayments directly accelerates principal retirement and dramatically compresses total interest.
+        </p>
+      </section>
+
+      <!-- 3. Interpreting Your Results -->
+      <section aria-labelledby="home-loan-calculator-interpretation">
+        <h2 id="home-loan-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your home loan repayment breakdown</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Front-Loaded Interest Schedule:</strong> Because interest is charged on the outstanding loan balance, the initial years of your home loan are heavily interest-weighted. In the first 3 years, approximately 65% to 70% of every monthly EMI pays interest, with only 30% reducing the principal balance.
+          </p>
+          <p>
+            <strong class="text-text-primary">Leverage and Down Payment Impact:</strong> Increasing your down payment from 20% (₹10 lakh) to 30% (₹15 lakh) reduces the loan amount to ₹35 lakh. This cuts your monthly EMI from ₹34,713 down to ₹30,374 (saving ₹4,339/month) and reduces total lifetime interest by ₹5,41,388.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4. Key Assumptions and Limitations -->
+      <section aria-labelledby="home-loan-calculator-assumptions">
+        <h2 id="home-loan-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Fixed Interest Rate Assumption:</strong> Models a steady 8.5% annual rate. Most consumer home loans operate on floating rates pegged to benchmark external rates (e.g. RBI repo rate via EBLR in India, or SOFR in the US); adjustments will alter future EMI amounts or tenure.
+          </li>
+          <li>
+            <strong class="text-text-primary">Incidental Costs Excluded:</strong> Calculation covers loan principal and interest only. It does not include stamp duty (typically 5%–7%), registration fees, bank processing fees, mortgage insurance, or property taxes.
+          </li>
+          <li>
+            <strong class="text-text-primary">Tax Relief Caveats:</strong> Tax benefits under Section 24(b) (up to ₹2 lakh interest deduction) and Section 80C (up to ₹1.5 lakh principal deduction) apply under India's Old Tax Regime for self-occupied properties and are subject to statutory eligibility rules.
+          </li>
+        </ul>
       </section>
 
       <section aria-labelledby="home-loan-calculator-faq">
