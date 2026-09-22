@@ -12,6 +12,7 @@ describe('Phase 0.4 scope invariants', () => {
   it('keeps the catalog at the locked 50-tool target', () => {
     expect(TOOLS).toHaveLength(50);
     expect(getToolCatalogCount()).toBe(50);
+    expect(getPublishedTools()).toHaveLength(50);
   });
 
   it('keeps the five locked primary categories', () => {
