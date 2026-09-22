@@ -311,6 +311,12 @@ const jsonld = {
 
     if (!pInput || !rInput || !yInput) return;
 
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
+
     const DEFAULTS = { p: 100000, r: 7.5, y: 5 };
     const siSchema = {
       p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
@@ -361,7 +367,7 @@ const jsonld = {
 
       const res = calcSimpleInterest(p, r, y);
 
-      // Phase 4.2 Canonical Result State
+      // Phase 4.2 Canonical Result State — Single Store Write
       const heroVal = fmtVal(res.totalAmount);
       const interestVal = fmtVal(res.interest);
       const principalVal = fmtVal(p);
@@ -388,12 +394,6 @@ const jsonld = {
       };
 
       setResult(canonicalResult);
-
-      const win = window as any;
-      if (win.__cmResultStore) {
-        win.__cmResultStore.setResult(canonicalResult);
-      }
-      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
       // Update Desktop fallback and composition bar
       if (resMaturity) resMaturity.textContent = heroVal;
@@ -483,11 +483,18 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('si-copy-btn')?.addEventListener('click', async () => {
-      const p = parseFloat(pInput.value.replace(/[^0-9.]/g, '')) || 0;
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseFloat(yInput.value) || 0;
+      const valP = validate(pInput.value, siSchema.p);
+      const valR = validate(rInput.value, siSchema.r);
+      const valY = validate(yInput.value, siSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
       const res = calcSimpleInterest(p, r, y);
-      const text = `Simple Interest: Principal ${fmtVal(p)} at ${r}% for ${y} years => Total Interest: ${fmtVal(res.interest)}, Maturity: ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}`;
+      const text = `Simple Interest: Principal ${fmtVal(p)} at ${r}% for ${y} years => Total Interest: ${fmtVal(res.interest)}, Maturity: ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -509,11 +516,22 @@ const jsonld = {
     });
 
     document.getElementById('si-share-btn')?.addEventListener('click', async () => {
+      const valP = validate(pInput.value, siSchema.p);
+      const valR = validate(rInput.value, siSchema.r);
+      const valY = validate(yInput.value, siSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const shareUrl = `${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -529,13 +547,17 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmSICurrencyBound) {
+      win.__cmSICurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {

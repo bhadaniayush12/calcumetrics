@@ -109,4 +109,55 @@ describe('5.3 Simple Interest Calculator', () => {
       expect(restored.values.y).toBe(5);
     });
   });
+
+  describe('Canonical Result & Validation Audit (Phase 5 Repair)', () => {
+    it('notifies subscribers exactly once per setResult call (single canonical write)', async () => {
+      const { setResult, subscribeResult, resetResult } = await import('../result-bus');
+      resetResult();
+
+      let updates = 0;
+      const unsub = subscribeResult(() => {
+        updates++;
+      });
+
+      setResult({
+        heroValue: '₹1,37,500',
+        heroLabel: 'Maturity Value',
+        fields: { 'si-result-maturity': '₹1,37,500' },
+      });
+
+      expect(updates).toBe(1);
+      unsub();
+    });
+
+    it('rejects empty input and invalid text without silent coercion to 0', () => {
+      const siSchema = {
+        p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal' },
+        r: { required: true, min: 0, max: 100, decimal: true, label: 'Rate' },
+        y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Years' },
+      };
+
+      // Empty strings
+      expect(validate('', siSchema.p).valid).toBe(false);
+      expect(validate('   ', siSchema.r).valid).toBe(false);
+
+      // Non-numeric text
+      expect(validate('abc', siSchema.p).valid).toBe(false);
+      expect(validate('xyz', siSchema.y).valid).toBe(false);
+
+      // Valid zero rate
+      const zeroRate = validate('0', siSchema.r);
+      expect(zeroRate.valid).toBe(true);
+      if (zeroRate.valid) expect(zeroRate.value).toBe(0);
+
+      // Valid decimal rate and tenure
+      const decRate = validate('7.25', siSchema.r);
+      expect(decRate.valid).toBe(true);
+      if (decRate.valid) expect(decRate.value).toBe(7.25);
+
+      const decTenure = validate('2.5', siSchema.y);
+      expect(decTenure.valid).toBe(true);
+      if (decTenure.valid) expect(decTenure.value).toBe(2.5);
+    });
+  });
 });
