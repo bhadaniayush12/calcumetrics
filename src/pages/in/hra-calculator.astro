@@ -104,7 +104,7 @@ const jsonld = {
     category="Taxes"
     categoryHref="/taxes"
     heroValue={fmt(initialResult.exemption)}
-    heroLabel="HRA Exemption Amount"
+    heroLabel="Estimated HRA Exemption"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">HRA Calculator (India)</h1>
@@ -360,7 +360,7 @@ const jsonld = {
 
       setResult({
         heroValue: fmtVal(res.exemption),
-        heroLabel: 'HRA Exemption Amount',
+        heroLabel: 'Estimated HRA Exemption',
         rows: [
           { label: 'Taxable HRA', value: fmtVal(res.taxableHRA) },
           { label: 'Actual HRA Received', value: fmtVal(res.actualHRA) },

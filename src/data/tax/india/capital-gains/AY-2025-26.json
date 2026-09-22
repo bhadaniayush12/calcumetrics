@@ -12,6 +12,20 @@
   "sourceTitle": "CBDT e-Filing ITR-2 Validation Rules AY 2025-26",
   "verifiedOn": "2026-09-23",
   "notes": "Rates revised under Finance Act 2024 for transfers executed on or after 23 July 2024. STCG on listed equity/equity funds increased to 20% (Section 111A); LTCG increased to 12.5% with annual exemption of ₹1,25,000 (Section 112A); immovable property LTCG set at 12.5% without indexation (24 months holding). Cess is 4%.",
+  "assumptions": [
+    "Reflects revised statutory capital gains rates under the Finance Act 2024 for transfers executed on or after 23 July 2024.",
+    "Listed equity shares and equity-oriented mutual funds: Short-Term Capital Gains (STCG) taxed at 20% under Section 111A; Long-Term Capital Gains (LTCG) taxed at 12.5% on gains exceeding the ₹1,25,000 annual exemption under Section 112A.",
+    "Immovable property held for 24 months or more qualifies as LTCG and is taxed at 12.5% without indexation benefit.",
+    "A mandatory 4% Health and Education Cess is added to computed tax."
+  ],
+  "limitations": [
+    "Does not calculate statutory rollover exemptions under Section 54, Section 54EC, or Section 54F for reinvestment into property or specified bonds.",
+    "Does not compute Fair Market Value (FMV) grandfathering adjustments for equity assets acquired prior to 1 February 2018.",
+    "Does not compute set-off of capital losses against capital gains or inter-year loss carry-forward balances under Section 70 and 71.",
+    "High-net-worth surcharge (>₹50L income) is excluded.",
+    "Estimated tax computation; consult Schedule CG of official ITR-2 form for definitive filing."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2024-25 (AY 2025-26) for transfers on or after 23 July 2024. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
   "values": {
     "equitySTCGRatePct": 20,
     "equityLTCGRatePct": 12.5,

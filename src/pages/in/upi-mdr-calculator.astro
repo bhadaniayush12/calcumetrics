@@ -116,7 +116,7 @@ const jsonld = {
     category="Business"
     categoryHref="/business"
     heroValue={fmt(initialResult.netSettlement)}
-    heroLabel="Net Merchant Settlement"
+    heroLabel="Estimated Net Settlement"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">UPI MDR Calculator</h1>
@@ -374,7 +374,7 @@ const jsonld = {
 
       setResult({
         heroValue: fmtVal(res.netSettlement),
-        heroLabel: 'Net Settlement',
+        heroLabel: 'Estimated Net Settlement',
         rows: [
           { label: 'Total Fee Deductions', value: fmtVal(res.totalDeductions) },
           { label: 'Base MDR Fee', value: fmtVal(res.baseMdrFee) },

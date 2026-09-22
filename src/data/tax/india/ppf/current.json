@@ -10,6 +10,20 @@
   "sourceTitle": "Ministry of Finance — Small Savings Schemes Interest Rates",
   "verifiedOn": "2026-09-23",
   "notes": "Statutory interest rate of 7.1% per annum compounded annually. Sourced from Ministry of Finance quarterly small savings notifications. Mandatory 15-year tenure with 5-year extension blocks. Minimum annual deposit is ₹500, maximum ₹1,50,000. Interest is calculated on the lowest balance between the 5th and the end of each calendar month.",
+  "assumptions": [
+    "Annual interest rate of 7.1% compounded annually per Ministry of Finance small savings notifications.",
+    "Annual contributions are deposited on or before the 5th of April, allowing interest to accrue for all 12 calendar months.",
+    "Complies with statutory limits: minimum ₹500 and maximum ₹1,50,000 deposit per financial year.",
+    "Initial account tenure is exactly 15 complete financial years (extendable in blocks of 5 years)."
+  ],
+  "limitations": [
+    "PPF interest rates are reviewed and notified quarterly by the Government of India; actual multi-decade maturity returns may vary if rates change.",
+    "Does not calculate premature partial withdrawals (permitted from the 7th financial year onward).",
+    "Does not model loan against PPF facilities (available from the 3rd to 6th financial year) or penalty interest for inactive accounts.",
+    "Exempt-Exempt-Exempt (EEE) tax benefit under Section 80C is available under the Old Tax Regime only.",
+    "Estimated financial projection for informational purposes; consult official bank/post office account records."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Ministry of Finance, Government of India for Current (FY 2020-21 onward). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official notifications for your specific situation.",
   "values": {
     "annualInterestRatePct": 7.1,
     "lockInYears": 15,

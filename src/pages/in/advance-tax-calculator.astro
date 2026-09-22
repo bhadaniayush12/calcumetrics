@@ -52,7 +52,7 @@ const jsonld = {
           name: 'Who is required to pay advance tax in India?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Under Section 208 of the Income-tax Act, 1961, every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the financial year (after deducting TDS and TCS) is ₹10,000 or more must pay advance tax.',
+            text: 'Under Section 208 of the Income-tax Act, 1961, every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the financial year (after deducting TDS and TCS) is ₹10,000 or more is required to pay advance tax.',
           },
         },
         {
@@ -105,7 +105,7 @@ const jsonld = {
     category="Taxes"
     categoryHref="/taxes"
     heroValue={initialResult.required ? fmt(initialResult.annualTaxLiability) : '₹0 (Exempt)'}
-    heroLabel="Total Advance Tax Due"
+    heroLabel="Estimated Advance Tax Due"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Advance Tax Calculator (India)</h1>
@@ -282,7 +282,7 @@ const jsonld = {
 
       setResult({
         heroValue: res.required ? fmtVal(res.annualTaxLiability) : 'Exempt (< ₹10k)',
-        heroLabel: 'Total Advance Tax',
+        heroLabel: 'Estimated Advance Tax',
         rows: res.instalments.map((inst) => ({
           label: `${inst.dueDate} (${inst.cumulativePct}%)`,
           value: fmtVal(inst.instalment),

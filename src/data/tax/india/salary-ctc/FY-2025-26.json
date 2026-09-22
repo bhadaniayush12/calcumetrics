@@ -7,10 +7,23 @@
   "governingFramework": "Employees' Provident Funds and Miscellaneous Provisions Act, 1952",
   "framework": "EPF & MP Act 1952; Payment of Gratuity Act 1972",
   "source": "Employees' Provident Fund Organisation (EPFO)",
-  "sourceUrl": "https://www.epfindia.gov.in/site_docs/PDFs/MiscPDFs/ContributionRate.pdf",
-  "sourceTitle": "Employees' Provident Fund Organisation (EPFO) — Present Contribution Rates",
+  "sourceUrl": "https://www.epfindia.gov.in",
+  "sourceTitle": "Employees' Provident Fund Organisation (EPFO) — Contribution Rates",
   "verifiedOn": "2026-09-23",
   "notes": "Salary package assumptions for FY 2025-26. Standard basic salary assumed at 40% of CTC, HRA at 40% of basic. EPF statutory ceiling is ₹15,000 monthly with 12% employer and 12% employee contribution. State-specific professional tax and income-tax TDS deductions are not included.",
+  "assumptions": [
+    "Standard industry normative structure: Basic Salary at 40% of CTC and House Rent Allowance (HRA) at 40% of Basic Salary.",
+    "Statutory EPF contribution modeled on the standard wage ceiling of ₹15,000 monthly (capped at 12% = ₹1,800/month each for employer and employee).",
+    "Special Allowance represents the residual balancing component of gross salary after Basic and HRA allocations."
+  ],
+  "limitations": [
+    "Corporate salary structures vary widely by individual employment contract; actual component percentages may differ from standard norms.",
+    "State-specific Professional Tax (PT) varies across Indian states (typically ₹0 to ₹2,500 annually) and is omitted here.",
+    "Does not model employer Gratuity contributions (4.81% of basic under Payment of Gratuity Act, 1972) or flexible benefit plans (LTA, meal vouchers).",
+    "Net monthly take-home salary excludes income-tax withholding (TDS); users should refer to the Income Tax Calculator for comprehensive tax calculations.",
+    "Informational tool for salary analysis; verify exact compensation breakdown on employer appointment letters and pay slips."
+  ],
+  "disclaimer": "This calculator uses statutory EPF rules published by EPFO for FY 2025-26 and standard salary package assumptions. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or compensation advice. Check your employer compensation annexure for your specific terms.",
   "values": {
     "epfCeilingMonthly": 15000,
     "epfEmployerContributionPct": 12,

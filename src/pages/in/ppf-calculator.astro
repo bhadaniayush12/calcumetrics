@@ -106,7 +106,7 @@ const jsonld = {
     category="Investments"
     categoryHref="/investments"
     heroValue={fmt(result.maturity)}
-    heroLabel="Maturity Value"
+    heroLabel="Estimated Maturity Value"
     calcType="simple"
   >
     <Fragment slot="inputs">
@@ -369,7 +369,7 @@ const jsonld = {
 
       setResult({
         heroValue: fmtVal(res.maturity),
-        heroLabel: 'Maturity Value',
+        heroLabel: 'Estimated Maturity Value',
         rows: [
           { label: 'Total Invested', value: fmtVal(res.invested) },
           { label: 'Total Interest', value: fmtVal(res.gain) },

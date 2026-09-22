@@ -10,6 +10,18 @@
   "sourceTitle": "NPCI Circular on Interchange Fee on UPI PPI Merchant Transactions",
   "verifiedOn": "2026-09-23",
   "notes": "Per NPCI circular, an interchange fee up to 1.1% applies on merchant transactions conducted via Prepaid Payment Instruments (PPI wallets) on UPI for transaction values exceeding ₹2,000. Standard bank account-to-bank account UPI transactions remain at 0% MDR per Ministry of Finance directives. GST on interchange/MDR is 18%.",
+  "assumptions": [
+    "Bank account-to-bank account peer-to-peer (P2P) and peer-to-merchant (P2M) UPI transactions incur 0% MDR per Ministry of Finance mandate.",
+    "Interchange fee of up to 1.1% applies strictly on commercial merchant payments executed via Prepaid Payment Instruments (PPI wallets) on UPI exceeding ₹2,000.",
+    "A statutory GST rate of 18% is levied on merchant interchange and MDR processing charges."
+  ],
+  "limitations": [
+    "Merchant acquiring banks and aggregators may negotiate custom pricing tiers based on Merchant Category Codes (MCC) and monthly volume commitments.",
+    "Does not calculate RuPay credit card-on-UPI interchange fee structures or specific fuel/education surcharge concessions.",
+    "Regular consumer-facing UPI payments from savings bank accounts remain 100% free with zero MDR deduction.",
+    "Estimated calculations for business planning; verify actual net bank settlement rates on your payment gateway dashboard."
+  ],
+  "disclaimer": "This calculator uses guidelines published by National Payments Corporation of India (NPCI) for Current (FY 2023-24 onward). Estimated result based on the inputs and assumptions provided. Educational tool only; not financial or banking advice. Check your merchant acquiring agreement for your specific rates.",
   "values": {
     "standardAccountToAccountMDR": 0,
     "ppiWalletInterchangeRatePct": 1.1,

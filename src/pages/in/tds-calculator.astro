@@ -118,7 +118,7 @@ const SECTION_OPTIONS = [
     category="Taxes"
     categoryHref="/taxes"
     heroValue={fmt(initialResult.tdsAmount)}
-    heroLabel="TDS Deducted"
+    heroLabel="Estimated TDS Deducted"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">TDS Calculator (India)</h1>
@@ -318,7 +318,7 @@ const SECTION_OPTIONS = [
 
       setResult({
         heroValue: fmtVal(res.tdsAmount),
-        heroLabel: 'TDS Deducted',
+        heroLabel: 'Estimated TDS Deducted',
         rows: [
           { label: 'Net Payable Amount', value: fmtVal(res.netAmount) },
           { label: 'Gross Invoice Amount', value: fmtVal(res.grossAmount) },

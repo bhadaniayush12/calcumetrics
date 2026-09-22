@@ -12,6 +12,21 @@
   "sourceTitle": "CBDT e-Filing ITR-2 Validation Rules AY 2025-26",
   "verifiedOn": "2026-09-23",
   "notes": "Rules per Finance Act 2024 (enacted July 2024). Governed by Income-tax Act, 1961. Standard deduction under New Regime is ₹75,000 and Section 87A rebate applies up to taxable income of ₹7,00,000.",
+  "assumptions": [
+    "Taxpayer is an individual tax resident of India below 60 years of age.",
+    "Standard deduction under the New Tax Regime is ₹75,000 (available exclusively for salaried individuals and pensioners).",
+    "Standard deduction under the Old Tax Regime is ₹50,000.",
+    "Section 87A rebate eliminates tax liability up to ₹7,00,000 taxable income under New Regime and ₹5,00,000 under Old Regime.",
+    "A mandatory 4% Health and Education Cess is calculated on total tax after rebate."
+  ],
+  "limitations": [
+    "Does not model special-rate incomes such as capital gains (Sections 111A/112A) or lottery/cryptocurrency winnings (Section 115BBH).",
+    "High-net-worth surcharge (applicable for taxable incomes exceeding ₹50 lakh) is not modeled.",
+    "Senior citizen slabs (ages 60 to 79) and super senior citizen slabs (age 80+) under the Old Regime are not included.",
+    "Non-resident Indian (NRI) tax rules, presumptive taxation under Section 44AD/ADA, and corporate entities are excluded.",
+    "This calculator is an educational estimation tool and does not substitute for filing an official return on the Income Tax e-filing portal."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2024-25 (AY 2025-26). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal, tax, or filing advice. Check the applicable law, rules, notifications, and official guidance for your specific situation.",
   "values": {
     "newRegime": {
       "standardDeduction": 75000,

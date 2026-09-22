@@ -10,6 +10,18 @@
   "sourceTitle": "Income-tax Act, 2025 Statutory Framework",
   "verifiedOn": "2026-09-23",
   "notes": "Governed by the Income-tax Act, 2025 (in force 1 April 2026). Succeeded the legacy Income-tax Act, 1961. Adopts Tax Year (TY) terminology instead of Assessment Year (AY).",
+  "assumptions": [
+    "Governed by the newly enacted Income-tax Act, 2025 taking effect 1 April 2026.",
+    "Adopts the streamlined 'Tax Year' (TY) framework replacing Assessment Year terminology.",
+    "Standard deduction of ₹75,000 for salaried employees and rebate up to ₹7,00,000.",
+    "4% Health and Education Cess."
+  ],
+  "limitations": [
+    "Applies exclusively to Tax Year 2026-27 onward under the 2025 legislation.",
+    "Excludes surcharge, complex business provisions, and specific schedule deductions.",
+    "Official Income-tax Rules, 2026 notifications should be referenced for finalized reporting formats."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for TY 2026-27 under the Income-tax Act, 2025. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal, tax, or filing advice. Check official notifications for your specific situation.",
   "values": {
     "frameworkType": "Income-tax Act, 2025",
     "standardDeduction": 75000,

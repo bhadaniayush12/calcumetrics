@@ -326,3 +326,79 @@ describe('Calculator Integration & INR-Lock Status (Section 11 & C5)', () => {
   });
 });
 
+describe('Phase 8 Legal Safety, Disclosures, Assumptions, and Limitations', () => {
+  const PROHIBITED_PHRASES = [
+    'You are legally required to',
+    'Your exact tax liability is',
+    'This is the final amount you must pay',
+    'definitely eligible',
+  ];
+
+  it('guarantees every active India tax record contains structured assumptions, limitations, and disclaimers', () => {
+    const records = getAllIndiaTaxRecords();
+    expect(records.length).toBeGreaterThanOrEqual(10);
+
+    for (const record of records) {
+      // 1. Assumptions
+      expect(record.assumptions, `Missing assumptions in ${record.sourceTitle}`).toBeDefined();
+      const assumptions = Array.isArray(record.assumptions) ? record.assumptions : [record.assumptions!];
+      expect(assumptions.length).toBeGreaterThanOrEqual(1);
+      assumptions.forEach((a) => {
+        expect(typeof a).toBe('string');
+        expect(a.trim().length).toBeGreaterThan(5);
+      });
+
+      // 2. Limitations
+      expect(record.limitations, `Missing limitations in ${record.sourceTitle}`).toBeDefined();
+      expect(record.limitations!.length).toBeGreaterThanOrEqual(1);
+      record.limitations!.forEach((l) => {
+        expect(typeof l).toBe('string');
+        expect(l.trim().length).toBeGreaterThan(5);
+      });
+
+      // 3. Disclaimer
+      expect(record.disclaimer, `Missing disclaimer in ${record.sourceTitle}`).toBeDefined();
+      expect(record.disclaimer!.toLowerCase()).toContain('educational');
+      expect(record.disclaimer!.toLowerCase()).toContain('advice');
+
+      // 4. Prohibited phrase checks
+      const serialized = JSON.stringify({
+        assumptions: record.assumptions,
+        limitations: record.limitations,
+        disclaimer: record.disclaimer,
+        notes: record.notes,
+      });
+
+      for (const phrase of PROHIBITED_PHRASES) {
+        expect(serialized.toLowerCase()).not.toContain(phrase.toLowerCase());
+      }
+    }
+  });
+
+  it('verifies route resolution provides complete Phase 8 legal safety metadata for all 9 India routes', () => {
+    const TARGET_ROUTES = [
+      '/in/income-tax-calculator',
+      '/in/gst-calculator',
+      '/in/hra-calculator',
+      '/in/tds-calculator',
+      '/in/capital-gains-tax-calculator',
+      '/in/advance-tax-calculator',
+      '/in/salary-ctc-calculator',
+      '/in/ppf-calculator',
+      '/in/upi-mdr-calculator',
+    ];
+
+    for (const route of TARGET_ROUTES) {
+      const record = resolveTaxRecordForRoute(route);
+      expect(record, `Route ${route} returned null`).toBeDefined();
+      expect(record?.assumptions).toBeDefined();
+      expect(record?.limitations).toBeDefined();
+      expect(record?.disclaimer).toBeDefined();
+      expect(record?.verifiedOn).toBeDefined();
+      expect(record?.governingFramework).toBeDefined();
+      expect(record?.sourceUrl).toMatch(/^https?:\/\//);
+    }
+  });
+});
+
+

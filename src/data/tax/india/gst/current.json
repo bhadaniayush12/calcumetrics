@@ -10,6 +10,21 @@
   "sourceTitle": "CBIC GST Goods and Services Rates Schedule",
   "verifiedOn": "2026-09-23",
   "notes": "Standard GST slabs (0%, 5%, 12%, 18%, 28%) established per CGST Act 2017 and updated via CBIC notifications. Intra-state supplies split equally into CGST and SGST; inter-state supplies apply full rate as IGST.",
+  "assumptions": [
+    "The GST rate slab (0%, 5%, 12%, 18%, or 28%) selected by the user accurately represents the statutory classification of the good or service.",
+    "Exclusive mode calculation assumes base price does not include GST and adds statutory tax.",
+    "Inclusive mode calculation extracts embedded GST backwards from gross price: Base = Total ÷ (1 + Rate%).",
+    "Intra-state supplies (within same state/UT) are split exactly 50% as CGST and 50% as SGST/UTGST.",
+    "Inter-state supplies (between different states) apply the full tax rate as IGST."
+  ],
+  "limitations": [
+    "Does not automatically determine product or service classification or assign HSN/SAC tariff codes.",
+    "Does not compute composition scheme tax rates (e.g. 1% for traders/manufacturers, 5% for restaurants, 6% for service providers under Section 10).",
+    "Does not calculate GST Compensation Cess applicable to specified demerit goods (e.g. luxury motor vehicles, aerated waters, pan masala, tobacco).",
+    "Does not verify Input Tax Credit (ITC) eligibility, blocked credits under Section 17(5), or Reverse Charge Mechanism (RCM) applicability under Section 9(3)/9(4).",
+    "Educational calculator; not binding legal tax advice. Consult CBIC notifications for specific tariff classifications."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Central Board of Indirect Taxes and Customs (CBIC) for Current (FY 2017-18 onward). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official CBIC notifications for your specific situation.",
   "values": {
     "standardRates": [0, 5, 12, 18, 28],
     "intraStateSplit": {

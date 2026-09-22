@@ -38,7 +38,9 @@ export interface TaxRecord {
   sourceTitle: string;
   verifiedOn: string;
   notes: string;
-  assumptions?: string;
+  assumptions?: string[] | string;
+  limitations?: string[];
+  disclaimer?: string;
   values: Record<string, unknown>;
   version?: string;
 }
@@ -213,6 +215,29 @@ export function validateTaxRecord(record: unknown): ValidationResult {
     errors.push('Missing or empty values payload');
   } else {
     checkValuesRecursive(r.values, '', errors);
+  }
+
+  // 6. Assumptions and Limitations validation (if present)
+  if (r.assumptions !== undefined) {
+    if (Array.isArray(r.assumptions)) {
+      if (r.assumptions.length === 0 || r.assumptions.some((a) => typeof a !== 'string' || a.trim() === '')) {
+        errors.push('assumptions array must contain non-empty strings');
+      }
+    } else if (typeof r.assumptions !== 'string' || r.assumptions.trim() === '') {
+      errors.push('assumptions must be a non-empty string or array of strings');
+    }
+  }
+
+  if (r.limitations !== undefined) {
+    if (!Array.isArray(r.limitations) || r.limitations.length === 0 || r.limitations.some((l) => typeof l !== 'string' || l.trim() === '')) {
+      errors.push('limitations must be a non-empty array of strings');
+    }
+  }
+
+  if (r.disclaimer !== undefined) {
+    if (typeof r.disclaimer !== 'string' || r.disclaimer.trim() === '') {
+      errors.push('disclaimer must be a non-empty string');
+    }
   }
 
   return {

@@ -12,6 +12,20 @@
   "sourceTitle": "CBDT e-Filing ITR-3 Validation Rules AY 2026-27",
   "verifiedOn": "2026-09-23",
   "notes": "HRA exemption is claimable under the Old Tax Regime only as the minimum of (1) actual HRA received, (2) rent paid minus 10% of basic salary, (3) 50% of basic (Delhi, Mumbai, Kolkata, Chennai) or 40% (other cities).",
+  "assumptions": [
+    "Taxpayer is a salaried employee opting for the Old Tax Regime (HRA exemption is not allowable under the New Tax Regime).",
+    "Basic salary includes Dearness Allowance (DA) forming part of retirement benefits, if applicable, but excludes non-statutory allowances.",
+    "Metro classification is strictly limited by Rule 2A to Delhi, Mumbai, Kolkata, and Chennai (50% of Basic Salary); non-metro cities receive 40%.",
+    "Assumes employee actually incurred expenditure on rent for residential accommodation occupied by them during the period."
+  ],
+  "limitations": [
+    "HRA exemption cannot be claimed by taxpayers filing under the New Tax Regime (Section 115BAC).",
+    "Does not calculate month-by-month variances if rent, basic salary, or city of residence changed mid-financial year.",
+    "Does not verify compliance with mandatory landlord PAN submission rules (required when annual rent paid exceeds ₹1,00,000).",
+    "Cannot be claimed if the employee resides in their own house or accommodation for which no rent is paid.",
+    "Estimated result for educational purposes; check official ITR filing instructions for specific deduction claims."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2025-26 (AY 2026-27). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
   "values": {
     "metroCities": ["delhi", "mumbai", "kolkata", "chennai"],
     "metroBasicRatePct": 50,

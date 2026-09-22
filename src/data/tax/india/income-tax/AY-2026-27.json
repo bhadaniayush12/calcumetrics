@@ -12,6 +12,19 @@
   "sourceTitle": "CBDT e-Filing ITR-3 Validation Rules AY 2026-27",
   "verifiedOn": "2026-09-23",
   "notes": "Rules for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961 transitional framework prior to full cutover to the Income-tax Act, 2025.",
+  "assumptions": [
+    "Taxpayer is an individual resident below 60 years of age filing under transitional rules for FY 2025-26.",
+    "Standard deduction under New Tax Regime is ₹75,000.",
+    "Standard deduction under Old Tax Regime is ₹50,000.",
+    "Section 87A rebate applies up to ₹7,00,000 under New Regime and ₹5,00,000 under Old Regime.",
+    "4% Health & Education Cess applies to total tax liability."
+  ],
+  "limitations": [
+    "Transitional provision valid for FY 2025-26 (AY 2026-27) only under the legacy 1961 Act.",
+    "Excludes surcharge (>₹50L), special-rate incomes, capital gains, and corporate provisions.",
+    "For tax years commencing 1 April 2026 onward, the Income-tax Act, 2025 must be referenced."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2025-26 (AY 2026-27). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal, tax, or filing advice. Check official guidance for your specific situation.",
   "values": {
     "newRegime": {
       "standardDeduction": 75000,

@@ -104,7 +104,7 @@ const jsonld = {
     category="Taxes"
     categoryHref="/taxes"
     heroValue={fmt(initialResult.gstAmount)}
-    heroLabel="Total GST Amount"
+    heroLabel="Estimated GST Amount"
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">GST Calculator (India)</h1>
@@ -353,7 +353,7 @@ const jsonld = {
 
       setResult({
         heroValue: fmtVal(res.gstAmount),
-        heroLabel: 'Total GST Amount',
+        heroLabel: 'Estimated GST Amount',
         rows: [
           { label: 'Net Base Amount', value: fmtVal(res.baseAmount) },
           { label: isInter ? 'IGST Amount' : 'CGST / SGST Split', value: isInter ? fmtVal(res.igst) : `${fmtVal(res.cgst)} each` },

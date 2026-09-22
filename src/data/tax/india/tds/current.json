@@ -11,6 +11,19 @@
   "sourceTitle": "Income Tax Department — TDS Compliance FAQs",
   "verifiedOn": "2026-09-23",
   "notes": "Statutory TDS rates and thresholds for individual payees furnishing PAN. For payments or credits credited on or before 31 March 2026, legacy Chapter XVII-B sections apply. For payments or credits from 1 April 2026, consult the corresponding sections (e.g. sections 392/393) under the Income-tax Act, 2025.",
+  "assumptions": [
+    "Payee is a resident individual who has furnished a valid Permanent Account Number (PAN) to the deductor.",
+    "Calculations reflect statutory base rates under Chapter XVII-B of the Income-tax Act, 1961 for payments or credits up to 31 March 2026.",
+    "Section-specific statutory threshold limits apply on an aggregate financial year basis per payer-payee relationship."
+  ],
+  "limitations": [
+    "A punitive higher tax rate of 20% applies under Section 206AA if a valid PAN is not furnished by the payee.",
+    "Higher withholding rates apply under Section 206AB for specified non-filers of income tax returns.",
+    "For payments or credits on or after 1 April 2026, corresponding provisions (such as sections 392/393) under the Income-tax Act, 2025 apply.",
+    "Does not process Lower or Nil Tax Deduction Certificates issued under Section 197 or self-declarations under Form 15G / 15H.",
+    "Educational calculator for compliance estimation; deductor must issue Form 16 / Form 16A as statutory proof of tax deducted."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department for FY 2025-26. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
   "values": {
     "sections": {
       "192": { "ratePct": 0, "threshold": 0, "description": "Salary — as per applicable slab rates" },

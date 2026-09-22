@@ -1,8 +1,11 @@
 ---
 /**
- * IndiaTaxSourceNotice.astro — Section 12 & 13 authoritative tax source disclosure.
+ * IndiaTaxSourceNotice.astro — Section 8, 9, 10 legal-safety & tax source disclosure.
  *
  * Sourced dynamically from versioned tax-data metadata in src/data/tax/india/.
+ * Renders the Section 8 content hierarchy:
+ *   CALCULATOR -> RESULT -> ASSUMPTIONS -> SOURCE / PERIOD -> LIMITATIONS -> EDUCATIONAL DISCLAIMER
+ *
  * Keeping this in the shared CalculatorLayout shell allows the Phase 5 Income Tax
  * page and engine to remain byte-for-byte untouched (Constraint C3 & C6).
  */
@@ -20,59 +23,149 @@ const periodLabel = record
     ? record.financialYear
     : `In force since ${record.effectiveFrom}`
   : '';
+
+const assumptionsList: string[] = record
+  ? Array.isArray(record.assumptions)
+    ? record.assumptions
+    : record.assumptions
+    ? [record.assumptions]
+    : []
+  : [];
+
+const limitationsList: string[] = record?.limitations ?? [];
+
+const legalDisclaimer = record?.disclaimer ||
+  'This calculator is provided for educational and informational purposes only. It does not constitute professional tax, legal, or financial advice. Tax laws are subject to change and individual circumstances vary. Consult a qualified Chartered Accountant (CA) or tax professional for advice specific to your situation.';
 ---
 
 {record && (
   <section
-    id="tax-source-verification"
-    aria-labelledby="tax-source-verification-heading"
-    class="border border-border rounded-card bg-surface p-5 space-y-3"
+    id="tax-legal-safety-boundary"
+    aria-labelledby="tax-legal-safety-heading"
+    class="border border-border rounded-card bg-surface p-6 sm:p-7 space-y-6"
   >
-    <div class="flex items-center justify-between gap-2 flex-wrap">
-      <h2 id="tax-source-verification-heading" class="text-base font-bold text-text-primary">
-        Tax source & regulatory provenance
-      </h2>
-      <span class="text-xs font-mono px-2 py-0.5 rounded bg-surface-muted text-text-muted border border-border">
+    {/* Header / Primary Section Label */}
+    <div class="flex items-center justify-between gap-3 flex-wrap border-b border-border pb-4">
+      <div class="space-y-1">
+        <h2 id="tax-legal-safety-heading" class="text-base sm:text-lg font-bold text-text-primary">
+          Regulatory baseline, assumptions & legal safety
+        </h2>
+        <p class="text-xs text-text-muted">
+          Operational boundaries and statutory provenance governing this calculation model.
+        </p>
+      </div>
+      <span class="inline-flex items-center text-xs font-mono px-2.5 py-1 rounded bg-canvas text-text-muted border border-border">
         Verified {record.verifiedOn}
       </span>
     </div>
 
-    <dl class="space-y-1.5 text-sm text-text-muted leading-relaxed">
-      <div>
-        <dt class="font-semibold text-text-primary inline">Authoritative source: </dt>
-        <dd class="inline">
-          <a
-            href={record.sourceUrl}
-            class="text-accent underline underline-offset-2 hover:text-accent-hover"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {record.sourceTitle}
-          </a>
-          <span class="text-xs text-text-muted"> ({record.source})</span>
-        </dd>
+    {/* Section 8 Order: ASSUMPTIONS */}
+    {assumptionsList.length > 0 && (
+      <div class="space-y-2.5">
+        <h3 class="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Key Operational Assumptions
+        </h3>
+        <ul class="space-y-1.5 pl-6 list-disc text-xs sm:text-sm text-text-muted leading-relaxed">
+          {assumptionsList.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
       </div>
+    )}
 
-      <div>
-        <dt class="font-semibold text-text-primary inline">Governing framework: </dt>
-        <dd class="inline">{record.governingFramework}</dd>
-      </div>
+    {/* Section 8 Order: SOURCE / PERIOD */}
+    <div class="space-y-3 pt-2 border-t border-border">
+      <h3 class="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+        <svg class="w-4 h-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+        Authoritative Source & Regulatory Baseline
+      </h3>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-text-muted">
+        <div class="bg-canvas p-3 rounded-control border border-border">
+          <dt class="font-semibold text-text-primary text-xs uppercase tracking-wider mb-1">Authoritative Source</dt>
+          <dd class="leading-snug">
+            <a
+              href={record.sourceUrl}
+              class="text-accent font-medium underline underline-offset-2 hover:text-accent-hover focus-visible:outline-accent"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              {record.sourceTitle}
+            </a>
+            <span class="text-xs text-text-muted block mt-0.5">({record.source})</span>
+          </dd>
+        </div>
 
-      <div>
-        <dt class="font-semibold text-text-primary inline">Applicable period: </dt>
-        <dd class="inline">{periodLabel}</dd>
-      </div>
-    </dl>
+        <div class="bg-canvas p-3 rounded-control border border-border">
+          <dt class="font-semibold text-text-primary text-xs uppercase tracking-wider mb-1">Governing Framework</dt>
+          <dd class="leading-snug text-text-primary">{record.governingFramework}</dd>
+        </div>
 
-    <div class="pt-2 border-t border-border/60 text-xs text-text-muted space-y-1">
-      <p class="font-medium text-text-primary">
-        This calculator uses the rules/data published by {record.source} for {periodLabel}. Estimated result based on the inputs and assumptions provided.
-      </p>
+        <div class="bg-canvas p-3 rounded-control border border-border">
+          <dt class="font-semibold text-text-primary text-xs uppercase tracking-wider mb-1">Applicable Period</dt>
+          <dd class="leading-snug text-text-primary font-medium">{periodLabel}</dd>
+        </div>
+
+        <div class="bg-canvas p-3 rounded-control border border-border">
+          <dt class="font-semibold text-text-primary text-xs uppercase tracking-wider mb-1">Jurisdiction & Verification</dt>
+          <dd class="leading-snug text-text-primary">
+            {record.jurisdiction === 'IN' ? 'Republic of India' : record.jurisdiction} • Verified {record.verifiedOn}
+          </dd>
+        </div>
+      </dl>
+
       {record.notes && (
-        <p class="leading-relaxed">
+        <p class="text-xs text-text-muted leading-relaxed italic bg-canvas/60 p-2.5 rounded-control border border-border/60">
+          <strong class="font-medium text-text-primary not-italic">Statutory context: </strong>
           {record.notes}
         </p>
       )}
+    </div>
+
+    {/* Section 8 Order: LIMITATIONS */}
+    {limitationsList.length > 0 && (
+      <div class="space-y-2.5 pt-2 border-t border-border">
+        <h3 class="text-sm font-semibold text-text-primary flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Model Scope & Specific Limitations
+        </h3>
+        <p class="text-xs text-text-muted">
+          This calculator does not model the following scenarios or provisions:
+        </p>
+        <ul class="space-y-1.5 pl-6 list-disc text-xs sm:text-sm text-text-muted leading-relaxed">
+          {limitationsList.map((item) => (
+            <li>{item}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {/* Section 8 Order: EDUCATIONAL DISCLAIMER */}
+    <div
+      role="note"
+      aria-label="Legal and tax advice disclaimer"
+      class="pt-3 border-t border-border space-y-2"
+    >
+      <div class="p-3.5 rounded-control bg-canvas border border-border text-xs text-text-muted space-y-1.5 leading-relaxed">
+        <p class="font-semibold text-text-primary flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-accent flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Educational & Legal Disclaimer
+        </p>
+        <p>
+          This calculator uses the rules and published rates by {record.source} for {periodLabel}. Estimated result based on the inputs and assumptions provided.
+        </p>
+        <p>
+          {legalDisclaimer}
+        </p>
+      </div>
     </div>
   </section>
 )}
