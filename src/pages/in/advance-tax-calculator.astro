@@ -178,47 +178,150 @@ const jsonld = {
       <p class="text-xs text-dark-muted mt-4 leading-relaxed">Threshold: Required only when net tax liability exceeds ₹10,000. Non-business resident senior citizens (60+) are exempt.</p>
     </Fragment>
 
-    <Fragment slot="formula">
-      <div class="space-y-4 text-sm text-text-secondary">
-        <p>Advance Tax Installment Schedule under Section 211 of the Income-tax Act:</p>
-        <div class="bg-surface-elevated p-4 rounded-card border border-border font-mono text-xs overflow-x-auto text-left space-y-1">
-          <div>1. On or before 15 June: 15% of total tax liability</div>
-          <div>2. On or before 15 September: 45% cumulative (less prior installment)</div>
-          <div>3. On or before 15 December: 75% cumulative (less prior installments)</div>
-          <div>4. On or before 15 March: 100% cumulative (less prior installments)</div>
+    <Fragment slot="below">
+      <section aria-labelledby="at-calculator-how">
+        <h2 id="at-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Advance Tax Works in India (Pay-As-You-Earn Scheme)</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Advance tax, governed by Sections 207 to 219 of the Income-tax Act, 1961, is India's "pay-as-you-earn" direct taxation mechanism. Under this scheme, taxpayers must discharge their income tax liability in periodic quarterly installments throughout the financial year in which income is earned, rather than deferring the entire tax payment until the annual return filing date.
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed font-mono">
+            <strong>1. Mandatory Payment Condition (Section 208):</strong><br />
+            Advance Tax is Required IF: Estimated Annual Tax Payable &minus; (TDS + TCS + Tax Credits) &ge; ₹10,000<br /><br />
+            <strong>2. Statutory Quarterly Installment Schedule (Section 211):</strong><br />
+            &bull; Installment 1 (On or before 15 June): 15% of estimated total tax liability<br />
+            &bull; Installment 2 (On or before 15 September): 45% cumulative &minus; amount previously paid (incremental 30%)<br />
+            &bull; Installment 3 (On or before 15 December): 75% cumulative &minus; amounts previously paid (incremental 30%)<br />
+            &bull; Installment 4 (On or before 15 March): 100% cumulative &minus; amounts previously paid (incremental 25%)<br /><br />
+            <strong>3. Presumptive Taxation Exception (Sec 44AD / 44ADA):</strong><br />
+            Eligible businesses and professionals opting for presumptive taxation pay 100% of advance tax in a single installment on or before 15 March.<br /><br />
+            <strong>4. Statutory Interest Penalties for Delay or Shortfall:</strong><br />
+            &bull; Section 234C: 1% simple interest per month for 3 months on quarterly installment shortfalls.<br />
+            &bull; Section 234B: 1% simple interest per month from 1 April if cumulative advance tax paid is &lt;90% of assessed tax.
+          </p>
         </div>
-        <p>Shortfall or delay attracts interest under Section 234C @ 1% per month for the period of default.</p>
-      </div>
-    </Fragment>
 
-    <Fragment slot="faq">
-      <div class="space-y-3">
-        {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-          <details class="group bg-surface rounded-card border border-border overflow-hidden">
-            <summary class="flex items-center justify-between p-4 text-sm font-medium text-text-primary cursor-pointer hover:bg-surface-elevated transition-colors">
-              <span>{faq.name}</span>
-              <svg class="w-4 h-4 text-text-muted transition-transform group-open:rotate-180 shrink-0 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div class="px-4 pb-4 pt-1 text-xs text-text-secondary leading-relaxed border-t border-border/50">
-              {faq.acceptedAnswer.text}
-            </div>
-          </details>
-        ))}
-      </div>
-    </Fragment>
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an individual consultant, freelancer, or taxpayer with an estimated net annual income tax liability of <strong>₹1,00,000</strong> after deducting all TDS and TCS credits:
+        </p>
 
-    <Fragment slot="related">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {related.map((t) => (
-          <a href={t.path} class="p-4 bg-surface rounded-card border border-border hover:border-accent/40 transition-colors block">
-            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{t.category}</span>
-            <span class="text-sm font-semibold text-text-primary block mb-1">{t.name}</span>
-            <p class="text-xs text-text-muted line-clamp-2">{t.description}</p>
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                <th class="py-2.5 px-4">Instalment Due Date</th>
+                <th class="py-2.5 px-4">Statutory Cumulative %</th>
+                <th class="py-2.5 px-4">Cumulative Target (₹)</th>
+                <th class="py-2.5 px-4">Quarterly Payment Due</th>
+                <th class="py-2.5 px-4">Safe-Harbor Threshold</th>
+                <th class="py-2.5 px-4">Section 234C Consequence</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">15 June (Q1)</td>
+                <td class="py-2.5 px-4 font-mono">15% Cumulative</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹15,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹15,000</td>
+                <td class="py-2.5 px-4 font-mono">12% (₹12,000)</td>
+                <td class="py-2.5 px-4">1% / month for 3 months on shortfall if cumulative &lt;12%.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">15 September (Q2)</td>
+                <td class="py-2.5 px-4 font-mono">45% Cumulative</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹45,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹30,000</td>
+                <td class="py-2.5 px-4 font-mono">36% (₹36,000)</td>
+                <td class="py-2.5 px-4">1% / month for 3 months on shortfall if cumulative &lt;36%.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">15 December (Q3)</td>
+                <td class="py-2.5 px-4 font-mono">75% Cumulative</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹75,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹30,000</td>
+                <td class="py-2.5 px-4 font-mono">75% (₹75,000)</td>
+                <td class="py-2.5 px-4">1% / month for 3 months on shortfall from ₹75,000.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">15 March (Q4)</td>
+                <td class="py-2.5 px-4 font-mono">100% Cumulative</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹25,000</td>
+                <td class="py-2.5 px-4 font-mono">100% (₹1,00,000)</td>
+                <td class="py-2.5 px-4">1% / month for 1 month on shortfall from ₹1,00,000.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">Full Financial Year Total</td>
+                <td class="py-3 px-4 font-mono">100% Discharged</td>
+                <td class="py-3 px-4 font-mono">₹1,00,000</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹1,00,000 (100%)</td>
+                <td class="py-3 px-4 font-mono">&ge;90% by 31 March</td>
+                <td class="py-3 px-4">Zero interest penalty under Section 234B and Section 234C.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Statutory Exemptions &amp; Special Rules</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Senior Citizens Exemption (Sec 207(2)):</strong> Resident individuals aged <strong>60 years or older</strong> who do not have any income from business or profession are entirely exempt from advance tax.</li>
+              <li><strong>Salaried Employees:</strong> If salary is the sole income source and the employer appropriately deducts TDS under Section 192, standalone advance tax payment is unnecessary. However, non-salary income (rent, capital gains, interest) exceeding TDS deductions triggers advance tax obligations.</li>
+              <li><strong>Capital Gains &amp; Dividend Influx:</strong> Since capital gains and dividend income cannot be accurately forecasted, the proviso to Section 234C waives interest penalties provided the tax is deposited in remaining installments after the date of realization.</li>
+              <li><strong>Payment Mechanism:</strong> Advance tax is deposited online through the Income Tax e-filing portal via <strong>Challan 280 / e-Pay Tax</strong> selecting "Advance Tax (100)" as the type of payment.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Penal Interest Mechanics (Sections 234B &amp; 234C)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-3">
+              The Income-tax Act enforces strict compliance through compounding interest charges on late or inadequate payments:
+            </p>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Section 234C (Deferment Interest):</strong> Charged at <strong>1% simple interest per month</strong> for 3 months each on shortfalls at the June 15, Sept 15, and Dec 15 gates (1 month for March 15).</li>
+              <li><strong>Safe-Harbor Gateways:</strong> Taxpayers are protected from 234C interest if they pay at least <strong>12%</strong> by 15 June and at least <strong>36%</strong> by 15 September.</li>
+              <li><strong>Section 234B (Shortfall at Year-End):</strong> If cumulative advance tax paid by 31 March is less than <strong>90%</strong> of the final assessed tax liability, interest at <strong>1% per month</strong> runs from 1 April of the Assessment Year until the date of actual payment.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="at-calculator-faq">
+        <h2 id="at-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="at-calculator-related">
+        <h2 id="at-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related tax calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <a href="/in/income-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Income Tax Calculator (India)</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compare Old vs New Tax Regime tax liability per Finance Act 2024-25.</p>
           </a>
-        ))}
-      </div>
+          <a href="/in/tds-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">TDS Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate Tax Deducted at Source withholding amounts across commercial and professional sections.</p>
+          </a>
+          <a href="/in/capital-gains-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
+            <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Capital Gains Tax Calculator</h3>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compute STCG and LTCG tax liabilities across equity, real estate, and gold under Budget 2024 rules.</p>
+          </a>
+        </div>
+      </section>
     </Fragment>
   </CalculatorLayout>
 </Layout>

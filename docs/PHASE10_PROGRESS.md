@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:46:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:47:30+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 43
-- **IN_PROGRESS:** 044. advance-tax-calculator
-- **NEXT:** 045. salary-ctc-calculator
+- **COMPLETED:** 44
+- **IN_PROGRESS:** 045. salary-ctc-calculator
+- **NEXT:** 046. cash-conversion-cycle-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** capital-gains-tax-calculator
-- **LAST_COMMIT:** c0879d5
+- **LAST_COMPLETED_UNIT:** advance-tax-calculator
+- **LAST_COMMIT:** 6332ab4
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -61,8 +61,8 @@
 - [x] 041. interest-rate-calculator — DONE
 - [x] 042. tds-calculator — DONE (India Tax Protected)
 - [x] 043. capital-gains-tax-calculator — DONE (India Tax Protected)
-- [ ] 044. advance-tax-calculator — IN PROGRESS (India Tax Protected)
-- [ ] 045. salary-ctc-calculator — PENDING (India Tax Protected)
+- [x] 044. advance-tax-calculator — DONE (India Tax Protected)
+- [ ] 045. salary-ctc-calculator — IN PROGRESS (India Tax Protected)
 - [ ] 046. cash-conversion-cycle-calculator — PENDING
 - [ ] 047. dscr-calculator — PENDING
 - [ ] 048. discounted-payback-period-calculator — PENDING
@@ -308,4 +308,10 @@
   - Audited: India capital gains tax engine computing STCG and LTCG liability across equities, real estate, gold, and debt funds reflecting the Finance (No. 2) Act, 2024 (Budget 2024) overhaul.
   - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added 5-stage statutory mathematical equations (consideration minus acquisition cost, holding period classification thresholds, statutory rates under Sections 111A/112A/112, 4% Health & Education cess, and net retained gain), complete step-by-step worked example schedule matching default inputs (₹5,00,000 sale, ₹3,00,000 purchase of listed equity mutual funds held for 24 months → LTCG under Section 112A, ₹2,00,000 gross gain, ₹1,25,000 annual statutory exemption deducted, ₹75,000 net taxable gain @ 12.50% = ₹9,375 base tax, ₹375 cess @ 4%, ₹9,750 total tax payable, ₹1,90,250 net retained gain / 95.12% retained, effective 4.88% tax on gross gain), asset class comparison table (listed equity vs real estate vs gold vs debt funds post-July 23, 2024), capital gains exemptions and reinvestment framework (Sections 54, 54F, 54EC bonds, and Capital Gains Account Scheme CGAS), and statutory loss set-off and carry-forward rules (8-year carry forward under Section 139(1), 15% surcharge cap on Sec 111A/112A).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcCapitalGains`, post-Budget 2024 rates (20% STCG, 12.5% LTCG, ₹1.25L exemption), INR currency locks, 5 FAQs matching JSON-LD schema, and curated related links (`/in/income-tax-calculator`, `/in/advance-tax-calculator`, `/in/tds-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
+
+- **044. advance-tax-calculator (/in/advance-tax-calculator)**:
+  - Audited: India direct tax installment scheduling engine computing quarterly advance tax obligations, statutory deadlines, and interest penalties under Sections 208, 211, 234B, and 234C of the Income-tax Act, 1961.
+  - Changes: **Resolved critical slot routing bug** (migrated dropped `<Fragment slot="formula">`, `<Fragment slot="faq">`, `<Fragment slot="related">` into unified `<Fragment slot="below">` supported by `CalculatorLayout.astro`), added statutory formula breakdown (Section 208 ₹10,000 threshold requirement, Section 211 quarterly schedule percentages, Section 44AD/44ADA presumptive single-installment exception, Section 234B/234C interest penalties), complete step-by-step worked example schedule matching default inputs (₹1,00,000 estimated annual tax liability after TDS/TCS → Q1 June 15: ₹15,000 / 15%, Q2 Sept 15: ₹30,000 / cumulative ₹45,000, Q3 Dec 15: ₹30,000 / cumulative ₹75,000, Q4 March 15: ₹25,000 / cumulative ₹1,00,000, 100% discharged with zero penal interest), statutory exemptions and special provisions (Section 207(2) resident senior citizen non-business full exemption, salaried employees TDS coverage, capital gains and dividend windfall exception under Section 234C proviso), and penal interest mechanics (Section 234C 1%/month on deferment with 12% and 36% safe harbors, Section 234B 1%/month if &lt;90% paid by March 31).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcAdvanceTax`, Section 211 quarterly installment math, INR currency locks, 5 FAQs matching JSON-LD schema, and curated related links (`/in/income-tax-calculator`, `/in/tds-calculator`, `/in/capital-gains-tax-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS, HTML content inspection verified How section, Worked Example, FAQs, and Related links render in the DOM.
