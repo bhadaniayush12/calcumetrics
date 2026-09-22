@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:55:25+05:30
+- **LAST_UPDATED:** 2026-09-23T03:56:10+05:30
 - **TOTAL:** 50
 - **COMPLETED:** 11
-- **IN_PROGRESS:** NONE
-- **NEXT:** 012. home-loan-calculator
+- **IN_PROGRESS:** home-loan-calculator
+- **NEXT:** 013. car-loan-calculator
 - **BLOCKER:** NONE
 - **LAST_COMPLETED_UNIT:** emi-calculator
-- **LAST_COMMIT:** f075a04
+- **LAST_COMMIT:** f2e9b94
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -29,7 +29,7 @@
 - [x] 009. ppf-calculator — DONE
 - [x] 010. 401k-calculator — DONE
 - [x] 011. emi-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
-- [ ] 012. home-loan-calculator — PENDING
+- [ ] 012. home-loan-calculator — IN PROGRESS
 - [ ] 013. car-loan-calculator — PENDING
 - [ ] 014. loan-prepayment-calculator — PENDING
 - [ ] 015. income-tax-calculator — PENDING (Phase 5 Locked, India Tax Protected)
