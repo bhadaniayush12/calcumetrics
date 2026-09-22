@@ -30,7 +30,8 @@ const result = calcWorkingCapital(
 
 const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'working-capital-calculator' && t.status === 'published').slice(0, 3);
+const relatedSlugs = ['cash-conversion-cycle-calculator', 'liquidity-ratios-calculator', 'inventory-turnover-calculator'];
+const related = TOOLS.filter((t) => relatedSlugs.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/working-capital-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -240,51 +241,139 @@ const jsonld = {
     <Fragment slot="below">
       <section aria-labelledby="wc-calculator-how">
         <h2 id="wc-calculator-how" class="text-xl font-bold text-text-primary mb-4">Working Capital formulas and definitions</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Working capital indicates whether a company can pay its short-term debt obligations within one fiscal year:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Net Working Capital (NWC) = </strong> Total Current Assets − Total Current Liabilities<br />
-            <strong>Current Ratio = </strong> Total Current Assets ÷ Total Current Liabilities<br />
-            <strong>Quick (Acid-Test) Ratio = </strong> (Current Assets − Inventory) ÷ Total Current Liabilities
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed mb-4">
+            Working capital measures an enterprise's short-term financial health, operational liquidity, and ability to cover maturing obligations within a 12-month commercial cycle:
           </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono mb-4">
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Net Working Capital (NWC)</span>
+              <span class="text-text-muted">NWC = Current Assets − Current Liabilities</span><br />
+              <span class="text-accent font-semibold mt-1 block">Monetary liquidity buffer</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Current Ratio</span>
+              <span class="text-text-muted">CR = Current Assets ÷ Current Liabilities</span><br />
+              <span class="text-accent font-semibold mt-1 block">Benchmark: 1.5× – 2.0×</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Quick (Acid-Test) Ratio</span>
+              <span class="text-text-muted">QR = (Current Assets − Inventory) ÷ Current Liab.</span><br />
+              <span class="text-accent font-semibold mt-1 block">Benchmark: &ge; 1.0×</span>
+            </div>
+          </div>
+          <p class="text-xs text-text-muted leading-relaxed">
+            <strong>Operating Working Capital (OWC):</strong> In corporate valuation and DCF modeling, analysts often compute <em>OWC = (Accounts Receivable + Inventory) − Accounts Payable</em>, which isolates core operating working capital requirements from non-operating excess cash and financing notes.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-step worked example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider an operating trading enterprise with the default baseline parameters: cash balances of <strong>₹2,50,000</strong>, trade receivables of <strong>₹3,50,000</strong>, physical inventory of <strong>₹4,00,000</strong>, accounts payable of <strong>₹3,00,000</strong>, and bank overdraft debt of <strong>₹1,50,000</strong>:
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Balance Sheet Category</th>
+                <th class="py-3 px-4">Component</th>
+                <th class="py-3 px-4">Book Value</th>
+                <th class="py-3 px-4">Subtotal / Ratio Impact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary" rowspan="3">Current Assets</td>
+                <td class="py-2.5 px-4">Cash & Bank Balances</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-text-muted" rowspan="3">
+                  <strong class="text-text-primary">Total Current Assets:</strong><br />
+                  <span class="text-accent font-bold">₹10,00,000</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4">Accounts Receivable (Debtors)</td>
+                <td class="py-2.5 px-4 font-mono">₹3,50,000</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4">Inventory / Stock</td>
+                <td class="py-2.5 px-4 font-mono">₹4,00,000</td>
+              </tr>
+              <tr class="border-t-2 border-border">
+                <td class="py-2.5 px-4 font-medium text-text-primary" rowspan="2">Current Liabilities</td>
+                <td class="py-2.5 px-4">Accounts Payable (Creditors)</td>
+                <td class="py-2.5 px-4 font-mono">₹3,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-text-muted" rowspan="2">
+                  <strong class="text-text-primary">Total Current Liabilities:</strong><br />
+                  <span class="text-error font-bold">₹4,50,000</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4">Short-Term Debt & Overdrafts</td>
+                <td class="py-2.5 px-4 font-mono">₹1,50,000</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium border-t-2 border-border">
+                <td class="py-2.5 px-4 text-text-primary" colspan="2">Net Working Capital (Assets − Liabilities)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold" colspan="2">₹10,00,000 − ₹4,50,000 = ₹5,50,000 Cushion</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary">
+                <td class="py-2.5 px-4" colspan="2">Current Ratio (Solvency Coverage)</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary" colspan="2">₹10,00,000 ÷ ₹4,50,000 = <strong>2.22×</strong> (Healthy Cushion)</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary" colspan="2">Quick Ratio (Near-Cash Coverage Excl. Stock)</td>
+                <td class="py-2.5 px-4 font-mono text-accent" colspan="2">(₹10,00,000 − ₹4,00,000) ÷ ₹4,50,000 = <strong>1.33×</strong> (Safe &gt; 1.0×)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Can Negative Working Capital Be Advantageous?</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              While negative NWC signifies imminent insolvency for capital-intensive manufacturers, it can be a hallmark of supreme capital efficiency in specific business models:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Hypermarket & Retail Platforms:</strong> Companies like Amazon or supermarkets collect cash from customers immediately at the point of sale (0 to 2 days) while negotiating 60- to 90-day payment terms with suppliers.</li>
+              <li><strong>Free Vendor Financing:</strong> Operating with negative working capital means suppliers effectively provide interest-free capital to fund company expansion.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Bank Financing Norms (MPBF Framework)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Commercial banks in India evaluate working capital credit limits using the Tandon Committee &amp; Maximum Permissible Bank Finance (MPBF) norms:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Borrower Margin Money:</strong> Banks require corporate borrowers to finance at least 25% of current assets (or the working capital gap) from long-term equity/surplus funds.</li>
+              <li><strong>Mandatory Benchmark:</strong> Banks generally mandate a minimum Current Ratio of 1.33× before sanctioning cash credit (CC) or bank overdraft (OD) facilities.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Balance Sheet Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Balance Sheet Point-in-Time Snapshot:</strong> Ratios reflect balances on a single calendar day (e.g., March 31). Seasonal businesses may appear highly liquid during inventory ramp-up while suffering severe mid-year cash shortages.</li>
+            <li><strong>Receivables Collectibility Risk:</strong> The standard Current Ratio assumes 100% of accounts receivable will convert to cash. Aging debtors (> 90 days overdue) or uncollectible bad debts inflate apparent working capital without providing actual liquidity.</li>
+            <li><strong>Inventory Liquidation Reality:</strong> Finished goods may suffer from obsolescence, spoilage, or demand drops, meaning forced liquidation would yield substantially less than recorded book cost.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="wc-calculator-faq">
         <h2 id="wc-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can negative working capital ever be positive for a business?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, in specific asset-light businesses with rapid cash cycles (like supermarkets, McDonald’s, or Amazon). They receive immediate cash from customers while enjoying 30 to 90 days to pay suppliers, allowing them to fund growth on vendor float.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why is inventory deducted from the Quick Ratio?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Inventory takes time to manufacture, market, and sell, and may only be liquidated at steep fire-sale discounts in an immediate cash crisis. The Quick Ratio tests pure near-cash liquidity.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is an ideal Current Ratio benchmark?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              A Current Ratio between 1.5x and 2.0x is generally considered healthy across most operating industries, indicating sufficient liquid assets to cover maturing short-term obligations without tying up excess idle cash.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does lengthening supplier payment terms improve working capital?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Negotiating longer payment terms with suppliers (higher Accounts Payable) delays cash outflows, directly preserving cash balances and increasing net operating liquidity.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between Gross Working Capital and Net Working Capital?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Gross Working Capital refers to the total monetary sum of all current assets. Net Working Capital subtracts total current liabilities from current assets, quantifying the true liquidity cushion.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 

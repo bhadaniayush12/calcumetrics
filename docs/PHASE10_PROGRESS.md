@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:13:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:14:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 24
-- **IN_PROGRESS:** 025. working-capital-calculator
-- **NEXT:** 026. cogs-calculator
+- **COMPLETED:** 25
+- **IN_PROGRESS:** 026. cogs-calculator
+- **NEXT:** 027. inventory-turnover-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** depreciation-calculator
-- **LAST_COMMIT:** fb896ea
+- **LAST_COMPLETED_UNIT:** working-capital-calculator
+- **LAST_COMMIT:** 3a245ed
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -42,8 +42,8 @@
 - [x] 022. roi-calculator — DONE
 - [x] 023. eoq-calculator — DONE
 - [x] 024. depreciation-calculator — DONE
-- [ ] 025. working-capital-calculator — IN PROGRESS
-- [ ] 026. cogs-calculator — PENDING
+- [x] 025. working-capital-calculator — DONE
+- [ ] 026. cogs-calculator — IN PROGRESS
 - [ ] 027. inventory-turnover-calculator — PENDING
 - [ ] 028. liquidity-ratios-calculator — PENDING
 - [ ] 029. wacc-calculator — PENDING (Phase 5 Locked)
@@ -200,4 +200,10 @@
   - Audited: Capital asset write-off model comparing Straight Line Method (SLM) and Written Down Value (WDV).
   - Changes: Added comparative SLM vs WDV formulas including exact WDV rate derivation, dual worked examples matching default parameters (₹5L asset, ₹50k salvage, 5 years → SLM ₹90k uniform yearly write-off at 18.0% vs WDV 36.90% rate starting at ₹1,84,521 Year 1 and declining to ₹29,246 Year 5), year-by-year write-off comparison schedule, "Tax Shield" timing advantage analysis explaining higher present value of early write-offs, statutory framework (Income Tax Act Section 32 block of assets vs Companies Act 2013 Schedule II component depreciation), and accounting assumptions/limitations.
   - Preserved: Dynamic full write-off schedule table, calculation engine `calcDepreciation`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `cogs-calculator`, `cash-conversion-cycle-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **025. working-capital-calculator (/working-capital-calculator)**:
+  - Audited: Balance sheet liquidity model calculating Net Working Capital (NWC), Current Ratio, and Quick (Acid-Test) Ratio.
+  - Changes: Added comprehensive multi-tier liquidity definitions, step-by-step worked example matching default inputs (₹10L current assets vs ₹4.5L current liabilities → ₹5.5L NWC cushion, 2.22x Current Ratio, 1.33x Quick Ratio), balance sheet classification table, operating working capital (OWC) concepts for DCF valuation, analysis of why negative working capital can be a massive operational advantage for retail platforms (free vendor financing float), Indian banking Maximum Permissible Bank Finance (MPBF) credit norms (1.33x minimum ratio requirement), and balance sheet snapshot limitations.
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcWorkingCapital`, 5 FAQs matching JSON-LD schema, and curated related links (`cash-conversion-cycle-calculator`, `liquidity-ratios-calculator`, `inventory-turnover-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
