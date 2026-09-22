@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:16:30+05:30
+- **LAST_UPDATED:** 2026-09-23T04:17:45+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 26
-- **IN_PROGRESS:** 027. inventory-turnover-calculator
-- **NEXT:** 028. liquidity-ratios-calculator
+- **COMPLETED:** 27
+- **IN_PROGRESS:** 028. liquidity-ratios-calculator
+- **NEXT:** 029. wacc-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** cogs-calculator
-- **LAST_COMMIT:** e42c5a7
+- **LAST_COMPLETED_UNIT:** inventory-turnover-calculator
+- **LAST_COMMIT:** bcbf22f
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -44,8 +44,8 @@
 - [x] 024. depreciation-calculator — DONE
 - [x] 025. working-capital-calculator — DONE
 - [x] 026. cogs-calculator — DONE
-- [ ] 027. inventory-turnover-calculator — IN PROGRESS
-- [ ] 028. liquidity-ratios-calculator — PENDING
+- [x] 027. inventory-turnover-calculator — DONE
+- [ ] 028. liquidity-ratios-calculator — IN PROGRESS
 - [ ] 029. wacc-calculator — PENDING (Phase 5 Locked)
 - [ ] 030. npv-calculator — PENDING (Phase 5 Locked)
 - [ ] 031. irr-calculator — PENDING (Phase 5 Locked)
@@ -212,4 +212,10 @@
   - Audited: Cost of Goods Sold (COGS) model calculating direct production costs, cost additions waterfall, and gross margin.
   - Changes: Added mathematical formula and direct vs indirect cost breakdown, step-by-step worked example accounting schedule matching default inputs (₹1.5L beginning inventory + ₹4.5L purchases + ₹1L direct labor + ₹50k overhead − ₹1.2L ending inventory = ₹6.3L COGS; yielding ₹3.2L gross profit / 33.68% margin on ₹9.5L revenue), sector-specific cost models (retail vs manufacturing vs SaaS Cost of Revenue), explicit exclusions list (SG&A, executive salaries, advertising), and inventory valuation assumptions/limitations (FIFO vs Weighted Average cost, shrinkage, periodic system).
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcCOGS`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `markup-vs-margin-calculator`, `inventory-turnover-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **027. inventory-turnover-calculator (/inventory-turnover-calculator)**:
+  - Audited: Supply chain velocity model computing Inventory Turnover Ratio, Average Inventory, and Days Sales of Inventory (DSI / DIO).
+  - Changes: Added mathematical formula progression, step-by-step worked example schedule matching default inputs (₹8L COGS, ₹1.2L beginning inventory, ₹80k ending inventory → ₹1L average inventory, 8.00x inventory turnover ratio, 45.6 days ~46 days DSI/DIO, Balanced velocity rating), industry turnover and DSI benchmarks (Grocery 14–22x vs Electronics 6–10x vs Apparel 4–6x vs Heavy Industrial 2–4x), operational diagnostics on the "High Turnover Trap" (stockouts, freight expediting) vs low turnover carrying costs, connection to Cash Conversion Cycle (DIO in CCC), and measurement assumptions/limitations (2-point average distortion, costing methods, product-mix aggregation).
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcInventoryTurnover`, 5 FAQs matching JSON-LD schema, and curated related links (`cogs-calculator`, `eoq-calculator`, `cash-conversion-cycle-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.

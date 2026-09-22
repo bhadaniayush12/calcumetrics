@@ -15,7 +15,8 @@ const result = calcInventoryTurnover(DEFAULT.cogs, DEFAULT.beginning, DEFAULT.en
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'inventory-turnover-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['cogs-calculator', 'eoq-calculator', 'cash-conversion-cycle-calculator'];
+const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/inventory-turnover-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -226,53 +227,137 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="it-calculator-how">
-        <h2 id="it-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Inventory Turnover and DSI are calculated</h2>
+      <section aria-labelledby="it-calculator-how" class="mb-8">
+        <h2 id="it-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Inventory Turnover &amp; DSI (DIO) Are Calculated</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Inventory turnover gauges how efficiently a firm sells through its merchandise:
+          Inventory turnover measures the operational velocity at which a business sells through and replenishes its stock over an accounting period. Rather than measuring sales revenue—which includes distortive gross profit markups—turnover compares the actual cost of merchandise cleared against the average capital tied up in warehouses.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Average Inventory = </strong> (Beginning Inventory + Ending Inventory) ÷ 2<br />
-            <strong>Inventory Turnover Ratio = </strong> COGS ÷ Average Inventory<br />
-            <strong>Days Sales of Inventory (DSI) = </strong> 365 ÷ Inventory Turnover Ratio
-          </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Step 1: Average Inventory</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">Avg Inv = (Beg Inv + End Inv) ÷ 2</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Smooths seasonal fluctuations between opening and closing warehouse balances.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Step 2: Turnover Ratio</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">Turnover = COGS ÷ Avg Inv</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Indicates how many times inventory is completely cleared and restocked annually.
+            </p>
+          </div>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Step 3: Days Sales (DSI/DIO)</span>
+            <div class="font-mono text-sm text-text-primary font-bold mb-2">DSI = 365 ÷ Turnover Ratio</div>
+            <p class="text-xs text-text-muted leading-relaxed">
+              Expresses inventory holding duration in calendar days before being converted to sales.
+            </p>
+          </div>
+        </div>
+
+        <h3 class="text-base font-bold text-text-primary mb-3">Worked Example: Baseline Inventory Velocity Analysis</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider an enterprise with annual Cost of Goods Sold of ₹8,00,000, beginning inventory of ₹1,20,000, and ending inventory of ₹80,000:
+        </p>
+
+        <div class="overflow-x-auto border border-border rounded-card mb-6">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr class="border-b border-border bg-surface text-text-primary">
+                <th class="py-3 px-4 font-semibold">Calculation Metric</th>
+                <th class="py-3 px-4 font-semibold">Formula / Input</th>
+                <th class="py-3 px-4 font-semibold">Value</th>
+                <th class="py-3 px-4 font-semibold">Operational Interpretation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Cost of Goods Sold (COGS)</td>
+                <td class="py-2.5 px-4 font-mono">User Input</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹8,00,000</td>
+                <td class="py-2.5 px-4">Total direct manufacturing/purchasing cost of goods sold.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Beginning Inventory</td>
+                <td class="py-2.5 px-4 font-mono">Balance Sheet (Jan 1)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,20,000</td>
+                <td class="py-2.5 px-4">Warehouse valuation at start of reporting period.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Ending Inventory</td>
+                <td class="py-2.5 px-4 font-mono">Balance Sheet (Dec 31)</td>
+                <td class="py-2.5 px-4 font-mono">₹80,000</td>
+                <td class="py-2.5 px-4">Physical count valuation at close of fiscal year.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">Average Inventory Maintained</td>
+                <td class="py-2.5 px-4 font-mono">(₹1,20,000 + ₹80,000) ÷ 2</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary font-bold">₹1,00,000</td>
+                <td class="py-2.5 px-4">Working capital tied up in stock across the year.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary">
+                <td class="py-3 px-4">Inventory Turnover Ratio</td>
+                <td class="py-3 px-4 font-mono">₹8,00,000 ÷ ₹1,00,000</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">8.00x</td>
+                <td class="py-3 px-4">The company clears and turns over its inventory 8 times annually.</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t border-border">
+                <td class="py-3 px-4">Days Sales of Inventory (DSI / DIO)</td>
+                <td class="py-3 px-4 font-mono">365 ÷ 8.00</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">45.6 Days (~46 Days)</td>
+                <td class="py-3 px-4">Goods sit in the warehouse for 46 days before being converted to sales.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Industry Turnover &amp; DSI Benchmarks</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Grocery &amp; Supermarkets:</strong> 14x – 22x turnover (16–26 days DSI). Perishable goods demand rapid stock velocity to avoid spoilage.</li>
+              <li><strong>Consumer Electronics:</strong> 6x – 10x turnover (36–60 days DSI). Fast technology lifecycles necessitate tight inventory controls against depreciation.</li>
+              <li><strong>Apparel &amp; Fashion Retail:</strong> 4x – 6x turnover (60–90 days DSI). Driven by seasonal fashion lines; excess inventory triggers markdown discounting.</li>
+              <li><strong>Automotive &amp; Heavy Industrial Machinery:</strong> 2x – 4x turnover (90–180 days DSI). High unit cost and specialized manufacturing allow longer holding windows.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">The "High Turnover Trap" vs. Sluggish Stock</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              While high turnover is generally praised, extremes reveal operational friction:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Danger of Overly High Turnover (>25x):</strong> Frequent stockouts, unfulfilled customer orders, missed bulk supplier discounts, and high freight expediting fees.</li>
+              <li><strong>Danger of Low Turnover (<3x):</strong> High carrying costs (insurance, warehousing, security = 15–25% of stock value), dead stock write-downs, and tied-up cash flow.</li>
+              <li><strong>Impact on CCC:</strong> DSI is Days Inventory Outstanding (DIO). Every day shaved off DSI directly accelerates cash flow in the Cash Conversion Cycle (DIO + DSO − DPO).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Analytical Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Two-Point Average Distortion:</strong> Using only beginning and ending balances can skew ratios if a business experiences seasonal peaks (e.g., Diwali or holiday stocking) or intentionally dumps stock prior to fiscal year-end. Monthly 12-point averages provide superior accuracy.</li>
+            <li><strong>Inventory Valuation Rule (FIFO vs. Weighted Average):</strong> Under inflation, FIFO produces a higher ending inventory and slightly lower turnover ratio than Weighted Average costing. (LIFO is prohibited under IFRS and Indian AS 2).</li>
+            <li><strong>Product-Mix Aggregation:</strong> Blended turnover can mask critical operational imbalances where top-selling items turn 30 times a year while obsolete SKUs linger on shelves for 400 days without moving.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="it-calculator-faq">
         <h2 id="it-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good inventory turnover ratio?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Fast-moving consumer goods (FMCG) and grocery retailers typically turn over inventory 12 to 20 times per year (DSI of 18–30 days). Luxury retailers and heavy machinery manufacturers may turn inventory only 2 to 4 times per year (DSI of 90–180 days).
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Why use COGS instead of Sales Revenue?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Inventory is valued at historical cost on the balance sheet. Using Sales Revenue would artificially inflate the turnover ratio with gross profit markups, creating an apples-to-oranges comparison. COGS accurately measures cost-to-cost.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the relationship between Inventory Turnover and DSI (DIO)?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Days Sales of Inventory (DSI, also known as Days Inventory Outstanding or DIO) is the inverse of the turnover ratio expressed in days: DSI = 365 / Inventory Turnover Ratio. A higher turnover ratio yields a shorter DSI.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can an inventory turnover ratio be too high?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes. An excessively high inventory turnover ratio may indicate inadequate stock levels, frequent stockouts, lost sales opportunities, or excessive freight costs from rushed replenishment orders.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inventory turnover affect cash flow and working capital?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Higher inventory turnover shortens the Cash Conversion Cycle (CCC), freeing up tied-up working capital, reducing holding and storage expenses, and lowering the risk of product obsolescence.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
