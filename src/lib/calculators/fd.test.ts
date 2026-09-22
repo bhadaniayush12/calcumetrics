@@ -104,4 +104,55 @@ describe('5.5 FD Calculator', () => {
       expect(restored.invalidKeys).toContain('y');
     });
   });
+
+  describe('Canonical Result & Validation Audit (Phase 5 Repair)', () => {
+    it('notifies subscribers exactly once per setResult call (single canonical write)', async () => {
+      const { setResult, subscribeResult, resetResult } = await import('../result-bus');
+      resetResult();
+
+      let updates = 0;
+      const unsub = subscribeResult(() => {
+        updates++;
+      });
+
+      setResult({
+        heroValue: '₹1,41,478',
+        heroLabel: 'Maturity Value',
+        fields: { 'fd-result-maturity': '₹1,41,478' },
+      });
+
+      expect(updates).toBe(1);
+      unsub();
+    });
+
+    it('rejects empty and invalid strings without silent coercion to 0', () => {
+      const fdSchema = {
+        p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
+        r: { required: true, min: 0, max: 30, decimal: true, label: 'Annual Interest Rate' },
+        y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Tenure (Years)' },
+      };
+
+      // Empty strings
+      expect(validate('', fdSchema.p).valid).toBe(false);
+      expect(validate('  ', fdSchema.r).valid).toBe(false);
+
+      // Non-numeric strings
+      expect(validate('abc', fdSchema.p).valid).toBe(false);
+      expect(validate('invalid', fdSchema.y).valid).toBe(false);
+
+      // Valid zero where allowed (rate min: 0)
+      const zeroRate = validate('0', fdSchema.r);
+      expect(zeroRate.valid).toBe(true);
+      if (zeroRate.valid) expect(zeroRate.value).toBe(0);
+
+      // Valid decimal values
+      const decimalRate = validate('7.25', fdSchema.r);
+      expect(decimalRate.valid).toBe(true);
+      if (decimalRate.valid) expect(decimalRate.value).toBe(7.25);
+
+      const decimalYears = validate('2.5', fdSchema.y);
+      expect(decimalYears.valid).toBe(true);
+      if (decimalYears.valid) expect(decimalYears.value).toBe(2.5);
+    });
+  });
 });

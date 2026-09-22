@@ -335,6 +335,12 @@ const jsonld = {
 
     if (!pInput || !rInput || !yInput) return;
 
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
+
     const DEFAULTS = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' as FDCompoundFreq };
     const fdSchema = {
       p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
@@ -410,12 +416,6 @@ const jsonld = {
       };
 
       setResult(canonicalResult);
-
-      const win = window as any;
-      if (win.__cmResultStore) {
-        win.__cmResultStore.setResult(canonicalResult);
-      }
-      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
       // Fallback desktop node updates
       if (resMaturity) resMaturity.textContent = maturityStr;
@@ -501,12 +501,19 @@ const jsonld = {
     });
 
     document.getElementById('fd-copy-btn')?.addEventListener('click', async () => {
-      const p = parseFloat(pInput.value.replace(/[^0-9.]/g, '')) || 0;
-      const r = parseFloat(rInput.value) || 0;
-      const y = parseFloat(yInput.value) || 0;
+      const valP = validate(pInput.value, fdSchema.p);
+      const valR = validate(rInput.value, fdSchema.r);
+      const valY = validate(yInput.value, fdSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
       const f = (fSelect ? fSelect.value : 'quarterly') as FDCompoundFreq;
       const res = calcFD(p, r, y, f);
-      const text = `Fixed Deposit: ${fmtVal(p)} at ${r}% p.a. for ${y} years gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}`;
+      const text = `Fixed Deposit: ${fmtVal(p)} at ${r}% p.a. for ${y} years gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}&f=${f}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -528,11 +535,23 @@ const jsonld = {
     });
 
     document.getElementById('fd-share-btn')?.addEventListener('click', async () => {
+      const valP = validate(pInput.value, fdSchema.p);
+      const valR = validate(rInput.value, fdSchema.r);
+      const valY = validate(yInput.value, fdSchema.y);
+      if (!valP.valid || !valR.valid || !valY.valid) {
+        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
+        return;
+      }
+      const p = valP.value!;
+      const r = valR.value!;
+      const y = valY.value!;
+      const f = (fSelect ? fSelect.value : 'quarterly') as FDCompoundFreq;
+      const shareUrl = `${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}&f=${f}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -548,13 +567,17 @@ const jsonld = {
       }
     });
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-        recalc();
-      }
-    });
+    const win = window as any;
+    if (!win.__cmFDCurrencyBound) {
+      win.__cmFDCurrencyBound = true;
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          currSym = e.detail.symbol;
+          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+          recalc();
+        }
+      });
+    }
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
