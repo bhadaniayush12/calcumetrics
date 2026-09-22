@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:48:45+05:30
+- **LAST_UPDATED:** 2026-09-23T03:49:45+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 5
-- **IN_PROGRESS:** xirr-calculator
+- **COMPLETED:** 6
+- **IN_PROGRESS:** NONE
 - **NEXT:** 007. fd-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** cagr-calculator
-- **LAST_COMMIT:** 178ed41
+- **LAST_COMPLETED_UNIT:** xirr-calculator
+- **LAST_COMMIT:** df91651
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -23,7 +23,7 @@
 - [x] 003. compound-interest-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 004. simple-interest-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 005. cagr-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
-- [ ] 006. xirr-calculator — IN PROGRESS
+- [x] 006. xirr-calculator — DONE
 - [ ] 007. fd-calculator — PENDING (Phase 5 Locked)
 - [ ] 008. rd-calculator — PENDING
 - [ ] 009. ppf-calculator — PENDING
@@ -95,3 +95,9 @@
 - **005. cagr-calculator (/cagr-calculator)**:
   - Audited: Phase 5 Locked Calculator. Verified formula CAGR = (FV/PV)^(1/n) − 1, step-by-step worked example (₹1,00,000 to ₹2,50,000 in 5 yrs → 20.11% CAGR, 2.5x growth multiple), 3 targeted FAQs (volatility limitation, negative CAGR), and related calculators.
   - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
+
+- **006. xirr-calculator (/xirr-calculator)**:
+  - Audited: Newton-Raphson irregular cash flow model.
+  - Changes: Added step-by-step worked example table using the default cash flows (4 events over 2 years, ₹1.5L outflows, ₹2.05L inflows → exact verified XIRR = 19.73%), added result interpretation (money-weighted timing impact vs short-holding distortion), and added explicit assumptions/limitations (reinvestment assumption, sign requirements, fee/tax exclusions).
+  - Preserved: Dynamic cash flow row builder, calculation engine `calcXIRR`, 5 calculator-specific FAQs matching JSON-LD schema, and related links.
+  - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.

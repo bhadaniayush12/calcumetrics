@@ -215,22 +215,114 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
+      <!-- 1. How it works -->
       <section aria-labelledby="xirr-calculator-how">
         <h2 id="xirr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the XIRR calculator works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          XIRR uses the Newton-Raphson numerical method to find the exact discount rate <em>r</em> that satisfies the net present value equation across irregular intervals:
+          The Extended Internal Rate of Return (XIRR) measures the annualized performance of an investment portfolio that experiences irregular deposits, sporadic withdrawals, or fluctuating dividend payouts. Unlike the standard Internal Rate of Return (IRR) which assumes cash flows arrive at uniform annual or monthly intervals, XIRR calculates the exact fractional day count for every individual transaction.
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">NPV = Σ [ C_i / (1 + r)^((d_i - d_0) / 365) ] = 0</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          XIRR uses the Newton-Raphson numerical iterative method to discover the discount rate <em>r</em> that sets the Net Present Value (NPV) of all historic cash flows to exactly zero:
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
+          <p class="text-base font-mono text-text-primary mb-3">NPV = &Sigma; [ C<sub>i</sub> / (1 + r)<sup>(d<sub>i</sub> &minus; d<sub>0</sub>) / 365.25</sup> ] = 0</p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">C_i</strong> — Cash flow amount at event <em>i</em></li>
-            <li><strong class="text-text-primary">d_i</strong> — Date of cash flow <em>i</em></li>
-            <li><strong class="text-text-primary">d_0</strong> — Starting date of the initial cash flow</li>
-            <li><strong class="text-text-primary">r</strong> — Annualized XIRR return rate</li>
+            <li><strong class="text-text-primary">C<sub>i</sub></strong> &mdash; Cash flow amount at event <em>i</em> (negative for outflows/investments, positive for inflows/redemptions)</li>
+            <li><strong class="text-text-primary">d<sub>i</sub></strong> &mdash; Date of transaction <em>i</em></li>
+            <li><strong class="text-text-primary">d<sub>0</sub></strong> &mdash; Date of the initial transaction</li>
+            <li><strong class="text-text-primary">r</strong> &mdash; Annualized internal rate of return (XIRR)</li>
           </ul>
         </div>
       </section>
 
+      <!-- 2. Step-by-Step Worked Example -->
+      <section aria-labelledby="xirr-calculator-example">
+        <h2 id="xirr-calculator-example" class="text-xl font-bold text-text-primary mb-4">Worked example: 4 irregular cash flow events</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Consider an investor managing an active portfolio over a two-year period with the following transactions:
+        </p>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-sm border-collapse border border-border rounded-card">
+            <thead>
+              <tr class="bg-canvas border-b border-border text-left">
+                <th class="py-2.5 px-4 font-semibold text-text-primary">Date</th>
+                <th class="py-2.5 px-4 font-semibold text-text-primary">Nature of Flow</th>
+                <th class="py-2.5 px-4 font-semibold text-right text-text-primary">Amount</th>
+                <th class="py-2.5 px-4 font-semibold text-right text-text-primary">Elapsed Days</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2 px-4 font-mono">2023-01-01</td>
+                <td class="py-2 px-4">Initial Investment (Outflow)</td>
+                <td class="py-2 px-4 text-right font-mono text-text-primary">-₹1,00,000</td>
+                <td class="py-2 px-4 text-right font-mono">0 days</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono">2023-07-01</td>
+                <td class="py-2 px-4">Follow-on Investment (Outflow)</td>
+                <td class="py-2 px-4 text-right font-mono text-text-primary">-₹50,000</td>
+                <td class="py-2 px-4 text-right font-mono">181 days</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono">2024-01-01</td>
+                <td class="py-2 px-4">Partial Profit Booking (Inflow)</td>
+                <td class="py-2 px-4 text-right font-mono text-text-primary">+₹20,000</td>
+                <td class="py-2 px-4 text-right font-mono">365 days</td>
+              </tr>
+              <tr>
+                <td class="py-2 px-4 font-mono">2025-01-01</td>
+                <td class="py-2 px-4">Current Valuation (Terminal Inflow)</td>
+                <td class="py-2 px-4 text-right font-mono text-text-primary">+₹1,85,000</td>
+                <td class="py-2 px-4 text-right font-mono">731 days</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 text-sm text-text-muted space-y-2">
+          <p><strong class="text-text-primary">1. Aggregate Cash Outlays:</strong> ₹1,00,000 + ₹50,000 = ₹1,50,000</p>
+          <p><strong class="text-text-primary">2. Aggregate Recoveries & Valuation:</strong> ₹20,000 + ₹1,85,000 = ₹2,05,000</p>
+          <p><strong class="text-text-primary">3. Net Absolute Gain:</strong> ₹2,05,000 &minus; ₹1,50,000 = <strong class="text-text-primary text-accent">₹55,000</strong> (+36.67% absolute return)</p>
+          <p><strong class="text-text-primary">4. Newton-Raphson Solving:</strong> Finding discount rate <em>r</em> such that NPV = 0:</p>
+          <p class="font-mono text-xs pl-3">
+            -100000 + [-50000 / (1 + r)<sup>0.496</sup>] + [20000 / (1 + r)<sup>0.999</sup>] + [185000 / (1 + r)<sup>2.001</sup>] = 0
+          </p>
+          <p><strong class="text-text-primary">5. Resulting Annualized Return:</strong> <strong class="text-text-primary text-accent">XIRR = 19.73%</strong></p>
+        </div>
+      </section>
+
+      <!-- 3. Interpreting Your Results -->
+      <section aria-labelledby="xirr-calculator-interpretation">
+        <h2 id="xirr-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your XIRR results</h2>
+        <div class="space-y-3 text-sm text-text-muted leading-relaxed">
+          <p>
+            <strong class="text-text-primary">Money-Weighted Rate of Return:</strong> XIRR is fundamentally a money-weighted return metric. It is sensitive to both the magnitude and the timing of your deposits. Deploying large sums just before an asset surge boosts your XIRR, while investing right before a correction depresses it.
+          </p>
+          <p>
+            <strong class="text-text-primary">Distortion Over Short Horizons:</strong> Because XIRR annualizes all rates, short holding durations can produce misleadingly high numbers. For instance, making 3% profit over 5 days equates to an annualized XIRR exceeding 700%, even though the actual cash gain was modest. Always evaluate XIRR alongside the net absolute monetary gain.
+          </p>
+        </div>
+      </section>
+
+      <!-- 4. Assumptions & Limitations -->
+      <section aria-labelledby="xirr-calculator-assumptions">
+        <h2 id="xirr-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
+        <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
+          <li>
+            <strong class="text-text-primary">Reinvestment Rate Assumption:</strong> Mathematically, XIRR presumes that all intermediate positive cash flows (such as dividend payouts) are reinvested in instruments earning the same internal rate of return until the terminal date.
+          </li>
+          <li>
+            <strong class="text-text-primary">Sign Variation Required:</strong> The calculation requires at least one negative outflow (purchase) and at least one positive inflow (sale or current valuation). If all flows share the same sign, the internal rate cannot be computed.
+          </li>
+          <li>
+            <strong class="text-text-primary">Exclusion of Taxes and Friction:</strong> Figures represent gross internal performance and do not incorporate capital gains taxes, trading slippage, brokerage fees, or exit loads.
+          </li>
+        </ul>
+      </section>
+
+      <!-- 5. Frequently Asked Questions -->
       <section aria-labelledby="xirr-calculator-faq">
         <h2 id="xirr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
