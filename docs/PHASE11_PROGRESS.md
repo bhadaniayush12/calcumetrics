@@ -2,24 +2,24 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:10:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:12:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 0
-- **IN_PROGRESS:** RESEARCH_STAGE
-- **NEXT:** 001. cagr-vs-xirr
+- **COMPLETED_ARTICLES:** 1
+- **IN_PROGRESS:** 002. home-loan-prepayment-vs-sip
+- **NEXT:** 003. old-vs-new-tax-regime
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** NONE
-- **LAST_COMMIT:** 5beccad
-- **TEST_STATUS:** PASS (385/385 tests)
-- **BUILD_STATUS:** PASS (65 pages)
+- **LAST_COMPLETED_ARTICLE:** cagr-vs-xirr
+- **LAST_COMMIT:** 4d3e6ed
+- **TEST_STATUS:** PASS (389/389 tests)
+- **BUILD_STATUS:** PASS (67 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
 
 ## Target Articles Checklist (10 Evidenced Articles)
 
-- [ ] 001. cagr-vs-xirr — PENDING (Evergreen)
-- [ ] 002. home-loan-prepayment-vs-sip — PENDING (Hybrid)
+- [x] 001. cagr-vs-xirr — DONE (Evergreen)
+- [ ] 002. home-loan-prepayment-vs-sip — IN PROGRESS (Hybrid)
 - [ ] 003. old-vs-new-tax-regime — PENDING (Trending/Hybrid)
 - [ ] 004. capital-gains-tax-rules — PENDING (Trending/Hybrid)
 - [ ] 005. markup-vs-margin — PENDING (Evergreen)
@@ -63,4 +63,13 @@
 ---
 
 ## Session-Safe Audit Log
-*(Articles will be logged here individually as they are completed, verified, and committed)*
+
+- **001. cagr-vs-xirr (/blog/cagr-vs-xirr)**:
+  - Title: CAGR vs. XIRR: How to Accurately Measure Your Investment Returns
+  - Intent: Compare time-weighted geometric growth (CAGR) with money-weighted cash flow timing (XIRR) for SIPs, lump-sums, and portfolios.
+  - Linked Calculators: `/cagr-calculator`, `/xirr-calculator`, `/sip-calculator`, `/lump-sum-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/cagr-calculator` and `/xirr-calculator` pointing directly to the guide.
+  - Key Content: Mathematical formulas (geometric root vs Newton-Raphson polynomial iteration), side-by-side 3-year worked example schedule (Investor A ₹1L lump sum = 16.96% CAGR/XIRR vs Investor B staggered SIP = 25.12% XIRR), metric comparison matrix, and 3 dangerous traps (short-tenure annualization distortion, benchmark comparison errors, polynomial multiple roots).
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS (389/389), `npm run build` PASS (67 pages built), `git diff --check` PASS.
+

@@ -1,9 +1,11 @@
 import type { APIRoute } from 'astro';
+import { BLOG_POSTS } from '../data/blog/posts';
 
 export const GET: APIRoute = async () => {
-  const pages = [
+  const staticPages = [
     '/',
     '/calculators',
+    '/blog',
     '/about',
     '/contact',
     '/methodology',
@@ -13,11 +15,14 @@ export const GET: APIRoute = async () => {
     '/cookie-policy',
   ];
 
+  const blogPages = BLOG_POSTS.map((post) => `/blog/${post.slug}`);
+  const pages = [...staticPages, ...blogPages];
+
   const urls = pages
     .map(
       (path) => `  <url>
     <loc>https://calcumetrics.com${path === '/' ? '/' : path}</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
   </url>`
     )
     .join('\n');
