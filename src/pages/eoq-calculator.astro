@@ -15,7 +15,8 @@ const result = calcEOQ(DEFAULT.demand, DEFAULT.orderingCost, DEFAULT.holdingCost
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'eoq-calculator' && t.status === 'published').slice(0, 3);
+const relatedSlugs = ['inventory-turnover-calculator', 'cogs-calculator', 'working-capital-calculator'];
+const related = TOOLS.filter((t) => relatedSlugs.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/eoq-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -228,17 +229,185 @@ const jsonld = {
     <Fragment slot="below">
       <section aria-labelledby="eoq-calculator-how">
         <h2 id="eoq-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Economic Order Quantity is calculated</h2>
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed mb-4">
+            The Economic Order Quantity (EOQ) formula, formulated by Ford W. Harris in 1913, identifies the exact purchase order size that <strong>minimizes total annual inventory costs</strong> by balancing fixed purchase order setup fees against ongoing storage carrying costs.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono mb-4">
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Optimal Batch Size (EOQ)</span>
+              <span class="text-accent font-semibold text-sm">EOQ = √ [ (2 × D × S) ÷ H ]</span><br />
+              <span class="text-text-muted mt-1 block">D = Annual demand in units<br />S = Fixed setup/ordering fee per order<br />H = Annual carrying cost per unit</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Inventory Cost Equations</span>
+              <span class="text-text-muted">Orders / Year (N) = D ÷ EOQ</span><br />
+              <span class="text-text-muted">Annual Ordering Cost = N × S</span><br />
+              <span class="text-text-muted">Annual Holding Cost = (EOQ ÷ 2) × H</span><br />
+              <span class="text-accent font-semibold">Total Cost = Ordering Cost + Holding Cost</span>
+            </div>
+          </div>
+          <p class="text-xs text-text-muted leading-relaxed">
+            <strong>The Equilibrium Principle:</strong> At the mathematical minimum of the total cost curve, <em>Annual Ordering Cost exactly equals Annual Holding Cost</em>.
+          </p>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-step worked example</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          The EOQ model calculates the order quantity that minimizes the sum of inventory carrying costs and ordering fees:
+          Consider a distribution facility operating with the default baseline parameters: an annual demand of <strong>10,000 units</strong>, a fixed procurement cost of <strong>₹500 per purchase order</strong>, and an annual holding cost of <strong>₹25 per unit per year</strong>:
         </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">EOQ = &radic; [ (2 &times; D &times; S) &divide; H ]</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">D</strong> — Annual demand in units</li>
-            <li><strong class="text-text-primary">S</strong> — Fixed ordering / procurement cost per purchase order</li>
-            <li><strong class="text-text-primary">H</strong> — Annual holding cost per unit</li>
-            <li><strong class="text-text-primary">Orders / Year</strong> = D &divide; EOQ</li>
-            <li><strong class="text-text-primary">Total Inventory Cost</strong> = (D &divide; EOQ &times; S) + (EOQ &divide; 2 &times; H)</li>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Calculation Step</th>
+                <th class="py-3 px-4">Formula</th>
+                <th class="py-3 px-4">Substitution & Computation</th>
+                <th class="py-3 px-4">Verified Result</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">1. Numerator (2 × D × S)</td>
+                <td class="py-2.5 px-4 font-mono">2 × Annual Demand × Order Cost</td>
+                <td class="py-2.5 px-4 font-mono">2 × 10,000 × ₹500</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">₹1,00,00,000</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">2. Cost Ratio</td>
+                <td class="py-2.5 px-4 font-mono">(2 × D × S) ÷ H</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,00,000 ÷ 25</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">400,000</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">3. Optimal EOQ</td>
+                <td class="py-2.5 px-4 font-mono">√400,000</td>
+                <td class="py-2.5 px-4 font-mono">Exact square root</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">632.46 Units (632 Units)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">4. Order Frequency</td>
+                <td class="py-2.5 px-4 font-mono">D ÷ EOQ</td>
+                <td class="py-2.5 px-4 font-mono">10,000 ÷ 632.46</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-semibold">15.81 Orders / Year</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">5. Cycle Time (Days)</td>
+                <td class="py-2.5 px-4 font-mono">365 ÷ Orders / Year</td>
+                <td class="py-2.5 px-4 font-mono">365 ÷ 15.81</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">23.08 Days (~23 Days)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">6. Annual Ordering Cost</td>
+                <td class="py-2.5 px-4 font-mono">15.81 × ₹500</td>
+                <td class="py-2.5 px-4 font-mono">15.81139 × 500</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">₹7,906</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">7. Annual Holding Cost</td>
+                <td class="py-2.5 px-4 font-mono">(632.46 ÷ 2) × ₹25</td>
+                <td class="py-2.5 px-4 font-mono">316.23 × 25</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">₹7,906</td>
+              </tr>
+              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                <td class="py-3 px-4">8. Minimized Total Cost</td>
+                <td class="py-3 px-4 font-mono">Ordering + Holding</td>
+                <td class="py-3 px-4 font-mono">₹7,906 + ₹7,906</td>
+                <td class="py-3 px-4 font-mono text-accent font-bold">₹15,811 / Year</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Cost Trade-off Matrix: Batch Size Sensitivity</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Ordering too little wastes money on repetitive purchase orders and delivery charges; ordering too much clogs warehouse capacity and burns working capital in carrying charges:
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Batch Policy</th>
+                <th class="py-3 px-4">Order Size</th>
+                <th class="py-3 px-4">Orders / Year</th>
+                <th class="py-3 px-4">Annual Ordering</th>
+                <th class="py-3 px-4">Annual Holding</th>
+                <th class="py-3 px-4">Total Inventory Cost</th>
+                <th class="py-3 px-4">Operational Trade-off</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Under-ordering</td>
+                <td class="py-2.5 px-4 font-mono">200 Units</td>
+                <td class="py-2.5 px-4 font-mono">50.0</td>
+                <td class="py-2.5 px-4 font-mono text-error">₹25,000</td>
+                <td class="py-2.5 px-4 font-mono">₹2,500</td>
+                <td class="py-2.5 px-4 font-mono font-medium text-text-primary">₹27,500</td>
+                <td class="py-2.5 px-4">Excessive purchase order paperwork and inbound inspection overhead.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-accent font-semibold">Optimal (EOQ)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">632 Units</td>
+                <td class="py-2.5 px-4 font-mono text-accent">15.8</td>
+                <td class="py-2.5 px-4 font-mono text-accent">₹7,906</td>
+                <td class="py-2.5 px-4 font-mono text-accent">₹7,906</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹15,811</td>
+                <td class="py-2.5 px-4 text-text-primary">Perfect balance point; total inventory overhead minimized.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Moderate Bulk</td>
+                <td class="py-2.5 px-4 font-mono">2,000 Units</td>
+                <td class="py-2.5 px-4 font-mono">5.0</td>
+                <td class="py-2.5 px-4 font-mono">₹2,500</td>
+                <td class="py-2.5 px-4 font-mono text-error">₹25,000</td>
+                <td class="py-2.5 px-4 font-mono font-medium text-text-primary">₹27,500</td>
+                <td class="py-2.5 px-4">Warehousing congestion and bloated working capital debt carrying costs.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Extreme Bulk</td>
+                <td class="py-2.5 px-4 font-mono">5,000 Units</td>
+                <td class="py-2.5 px-4 font-mono">2.0</td>
+                <td class="py-2.5 px-4 font-mono">₹1,000</td>
+                <td class="py-2.5 px-4 font-mono text-error">₹62,500</td>
+                <td class="py-2.5 px-4 font-mono font-bold text-error">₹63,500</td>
+                <td class="py-2.5 px-4">Severe cash lockup; 4× higher carrying expense than optimal EOQ.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Anatomy of Holding vs. Ordering Costs</h3>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
+              <li><strong>Holding Costs (H):</strong> Warehouse lease per sq ft, climate control, insurance policies, security personnel, product shrinkage/theft, damage, obsolescence, and the opportunity cost of working capital (typically 15%–25% of unit purchase value).</li>
+              <li><strong>Ordering Costs (S):</strong> Procurement staff salary time to generate POs, vendor negotiation, shipping freight handling charges per delivery, pallet unloading, and quality assurance inspection fees.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">When Suppliers Offer Volume Discounts</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              If a vendor offers a price break at a higher order threshold (e.g., 5% discount for orders &ge; 1,000 units), you should evaluate:
+            </p>
+            <p class="text-xs font-mono text-text-primary bg-canvas border border-border rounded p-2">
+              Net Savings = Annual Price Discount − Increase in Total Carrying & Ordering Costs
+            </p>
+            <p class="text-xs text-text-muted mt-2">
+              If annual purchase discount exceeds the added inventory holding cost, ordering above the standard EOQ is financially advantageous.
+            </p>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Supply Chain Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Uniform Steady Demand:</strong> Assumes consumption is flat and predictable throughout 365 days. Highly seasonal items (apparel, holiday goods) require dynamic safety stock models.</li>
+            <li><strong>Instantaneous Replenishment:</strong> Assumes delivery lead time is zero. In practice, procurement managers establish a Reorder Point (ROP = Lead Time Demand + Safety Stock) to avoid stockouts.</li>
+            <li><strong>Unlimited Storage & Working Capital:</strong> Assumes the business has unrestricted warehouse footprint and available liquidity to finance any batch size calculated.</li>
           </ul>
         </div>
       </section>
@@ -246,36 +415,14 @@ const jsonld = {
       <section aria-labelledby="eoq-calculator-faq">
         <h2 id="eoq-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What assumptions does the EOQ model make?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              The classic Wilson EOQ model assumes: (1) demand is known and constant throughout the year, (2) replenishment lead time is instantaneous or zero, (3) unit purchase price is constant (no quantity tier discounts), and (4) stockouts never happen.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is typically included in holding cost per unit?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Holding costs typically include warehouse rent, electricity, insurance, security, physical breakage/theft (shrinkage), obsolescence, and the opportunity cost of capital locked up in inventory (often 15%–25% of unit value annually).
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is included in ordering or setup cost?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Ordering costs include clerical costs of preparing purchase orders, invoice processing, receiving inspection, vendor communication, and fixed freight/shipping handling charges per shipment.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How do quantity discounts affect the standard EOQ calculation?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              When suppliers offer volume discounts, the optimal order quantity may be larger than the standard EOQ if annual purchase price savings exceed the additional carrying costs of the larger inventory batch.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What happens if actual demand differs from estimated demand?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Because EOQ uses a square root function, total costs are relatively flat near the optimal point. A 20% forecasting error in annual demand changes total inventory costs by only about 2%.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 

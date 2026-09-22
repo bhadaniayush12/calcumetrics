@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:10:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:11:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 22
-- **IN_PROGRESS:** 023. eoq-calculator
-- **NEXT:** 024. depreciation-calculator
+- **COMPLETED:** 23
+- **IN_PROGRESS:** 024. depreciation-calculator
+- **NEXT:** 025. working-capital-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** roi-calculator
-- **LAST_COMMIT:** 068803e
+- **LAST_COMPLETED_UNIT:** eoq-calculator
+- **LAST_COMMIT:** 56dec9f
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -40,8 +40,8 @@
 - [x] 020. profit-margin-calculator — DONE
 - [x] 021. markup-vs-margin-calculator — DONE
 - [x] 022. roi-calculator — DONE
-- [ ] 023. eoq-calculator — IN PROGRESS
-- [ ] 024. depreciation-calculator — PENDING
+- [x] 023. eoq-calculator — DONE
+- [ ] 024. depreciation-calculator — IN PROGRESS
 - [ ] 025. working-capital-calculator — PENDING
 - [ ] 026. cogs-calculator — PENDING
 - [ ] 027. inventory-turnover-calculator — PENDING
@@ -188,4 +188,10 @@
   - Audited: Capital efficiency model computing simple (absolute) return on investment and annualised CAGR.
   - Changes: Added mathematical formulas for simple ROI, annualised ROI (CAGR), and Multiple on Invested Capital (MOIC), a step-by-step worked example matching default inputs (₹1L initial capital, ₹2.5L final return over 3 years → ₹1.5L net profit, 2.50x MOIC, 150.0% total ROI, 35.72% annualised CAGR), a duration sensitivity matrix proving why time horizon redefines returns (150% ROI across 1, 3, 5, and 10 years yielding 150%, 35.7%, 20.1%, and 9.6% p.a.), a capital decision framework contrasting ROI vs IRR vs Payback Period, real vs nominal returns (inflation and tax drag), and explicit investment assumptions/limitations.
   - Preserved: Clean interactive inputs with sliders, calculation engine `calcROI`, 5 FAQs matching JSON-LD schema, and curated related links (`cagr-calculator`, `profit-margin-calculator`, `payback-period-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **023. eoq-calculator (/eoq-calculator)**:
+  - Audited: Ford W. Harris Economic Order Quantity inventory optimization model.
+  - Changes: Added mathematical formula and component breakdown, step-by-step worked example matching default inputs (10,000 units demand, ₹500 order fee, ₹25 holding cost → 632 units EOQ, 15.8 orders/year, 23.1-day cycle, ₹7,906 ordering cost = ₹7,906 holding cost = ₹15,811 total cost), batch size sensitivity matrix comparing small orders vs optimal EOQ vs bulk orders, detailed anatomy of holding vs ordering cost components, vendor volume discount decision rule, and supply chain assumptions/limitations.
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcEOQ`, 5 FAQs matching JSON-LD schema, and curated related links (`inventory-turnover-calculator`, `cogs-calculator`, `working-capital-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
