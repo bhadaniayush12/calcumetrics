@@ -149,6 +149,9 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
     const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"]');
 
     inputs.forEach((input) => {
+      if (input.dataset.digitGroupingBound) return;
+      input.dataset.digitGroupingBound = 'true';
+
       const mode = input.getAttribute('data-digit-grouping');
 
       input.addEventListener('input', (e) => {

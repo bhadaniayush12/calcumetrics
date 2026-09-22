@@ -1,52 +1,127 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { SITE_EMAIL } from '../config/site';
+import WindowFrame from '../components/calculator/WindowFrame.astro';
+import { getToolCount, CATEGORIES } from '../config/site';
+
 const canonicalUrl = 'https://calcumetrics.com/about';
+const toolCount = getToolCount();
+const categoryCount = CATEGORIES.length;
 ---
 <Layout
   title="About Calcumetrics | Calcumetrics"
   description="Learn about Calcumetrics — who runs it, our mission, what the tools are, how we make money, and our approach to formula accuracy."
   canonical={canonicalUrl}
 >
-  <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
-    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">About Calcumetrics</h1>
+  <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- 1. WindowFrame Hero -->
+    <WindowFrame urlPill="calcumetrics.com/about" class="mb-8">
+      <div class="p-6 sm:p-8">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-chip bg-disabled-bg border border-border text-xs font-medium text-text-muted mb-4">
+          100% Free · No signup · Zero data collected
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary mb-3">About Calcumetrics</h1>
+        <p class="text-sm text-text-muted leading-relaxed max-w-xl">
+          Independent, free financial calculators with transparent formulas, client-side execution, and zero personal data collection.
+        </p>
+        <p class="text-xs text-text-muted mt-4">Last updated: 20 September 2026</p>
+      </div>
+    </WindowFrame>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Who runs this site</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics is operated by an independent developer based in India.
-      <!-- TODO (owner): Replace the above sentence with your real name/entity and country before launching.
-           Example: "Calcumetrics is operated by [Your Full Name / Company Name], based in [City, Country]."
-           This is required for AdSense eligibility (publisher identity must be verifiable). -->
-    </p>
+    <!-- 2. Three-Stat Strip -->
+    <section class="mb-10" aria-label="Platform statistics">
+      <div class="bg-surface border border-border rounded-card p-4 sm:p-5">
+        <div class="grid grid-cols-3 divide-x divide-border">
+          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
+            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">{toolCount}</span>
+            <span class="text-xs text-text-muted mt-1 font-medium">Calculators</span>
+          </div>
+          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
+            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">{categoryCount}</span>
+            <span class="text-xs text-text-muted mt-1 font-medium">Categories</span>
+          </div>
+          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
+            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">100%</span>
+            <span class="text-xs text-text-muted mt-1 font-medium">Client-side</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">What Calcumetrics is</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server. There is no sign-up, no account, and no data stored about you.
-    </p>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      The site covers five categories: investments, loans, taxes, business and corporate finance. Tools include both global financial calculators (WACC, IRR, NPV, DCF, SIP, CAGR) and jurisdiction-specific tools for India and the US.
-    </p>
+    <!-- 3. Three Feature Cards -->
+    <section class="mb-12" aria-labelledby="differentiators-heading">
+      <h2 id="differentiators-heading" class="text-xl font-bold text-text-primary mb-4">
+        What makes Calcumetrics different
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-surface border border-border rounded-card p-5">
+          <h3 class="font-bold text-sm text-text-primary mb-2">Client-side calculation</h3>
+          <p class="text-xs text-text-muted leading-relaxed">
+            Every computation executes directly in your browser. Financial inputs are never transmitted to or processed on an external server.
+          </p>
+        </div>
+        <div class="bg-surface border border-border rounded-card p-5">
+          <h3 class="font-bold text-sm text-text-primary mb-2">Transparent formulas</h3>
+          <p class="text-xs text-text-muted leading-relaxed">
+            Every calculator documents its underlying equations, mathematical conventions, and assumptions. We operate without hidden logic.
+          </p>
+        </div>
+        <div class="bg-surface border border-border rounded-card p-5">
+          <h3 class="font-bold text-sm text-text-primary mb-2">Zero data collection</h3>
+          <p class="text-xs text-text-muted leading-relaxed">
+            No sign-up, no user accounts, and no tracking of your calculation scenarios. Your financial models remain entirely private.
+          </p>
+        </div>
+      </div>
+    </section>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Our mission</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      To give finance professionals, CAs, analysts, students and retail investors accurate, transparent tools — with every formula documented, every assumption stated, and every result validated against published test fixtures.
-    </p>
+    <!-- Preserved Editorial and Legal Content -->
+    <div class="space-y-8 pt-4 border-t border-border">
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Who runs this site</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calcumetrics is operated by an independent developer based in India.
+          <!-- TODO (owner): Replace the above sentence with your real name/entity and country before launching.
+               Example: "Calcumetrics is operated by [Your Full Name / Company Name], based in [City, Country]."
+               This is required for AdSense eligibility (publisher identity must be verifiable). -->
+        </p>
+      </section>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">How this site makes money</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality and policy requirements. Ads will appear only on calculator and category pages — never on the homepage, legal pages, policy pages, or error pages. A Google-certified consent management platform (CMP) will be installed before any ads are served to users in the EU, UK, and Switzerland.
-    </p>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      No sponsored content, paid placements, or affiliate links are currently on the site.
-    </p>
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">What Calcumetrics is</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server. There is no sign-up, no account, and no data stored about you.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed">
+          The site covers five categories: investments, loans, taxes, business and corporate finance. Tools include both global financial calculators (WACC, IRR, NPV, DCF, SIP, CAGR) and jurisdiction-specific tools for India and the US.
+        </p>
+      </section>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Accuracy and corrections</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We validate every calculator against published test fixtures before launch. Tax rates and law-dependent data are stored in a versioned data file with a "Rates last verified" date on each relevant tool. If you find an error in a formula, a rate, or any page content, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the "Last updated" date and schema <code>dateModified</code>.
-    </p>
-    <p class="text-sm text-text-muted leading-relaxed">
-      See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, rate sources, and the correction policy.
-    </p>
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Our mission</h2>
+        <p class="text-sm text-text-muted leading-relaxed">
+          To give finance professionals, CAs, analysts, students and retail investors accurate, transparent tools — with every formula documented, every assumption stated, and every result validated against published test fixtures.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">How this site makes money</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality and policy requirements. Ads will appear only on calculator and category pages — never on the homepage, legal pages, policy pages, or error pages. A Google-certified consent management platform (CMP) will be installed before any ads are served to users in the EU, UK, and Switzerland.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed">
+          No sponsored content, paid placements, or affiliate links are currently on the site.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Accuracy and corrections</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          We validate every calculator against published test fixtures before launch. Tax rates and law-dependent data are stored in a versioned data file with a "Rates last verified" date on each relevant tool. If you find an error in a formula, a rate, or any page content, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the "Last updated" date and schema <code>dateModified</code>.
+        </p>
+        <p class="text-sm text-text-muted leading-relaxed">
+          See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, rate sources, and the correction policy.
+        </p>
+      </section>
+    </div>
   </div>
 </Layout>

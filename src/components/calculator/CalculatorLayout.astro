@@ -31,6 +31,12 @@ interface Props {
   /** Pre-rendered hero value for mobile bottom bar (SSR) */
   heroValue: string;
   heroLabel?: string;
+  /**
+   * Declares the calculator archetype for tooling and future logic.
+   * Use values from `CalculatorType` in `src/lib/calculator-types.ts`.
+   * Optional — omit for legacy calculators; stamped as `data-calc-type` when set.
+   */
+  calcType?: string;
 }
 
 const {
@@ -40,6 +46,7 @@ const {
   breadcrumbs = [],
   heroValue,
   heroLabel = 'Estimated Maturity',
+  calcType,
 } = Astro.props;
 ---
 
@@ -68,10 +75,10 @@ const {
 </nav>
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->
-<div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+<div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8" data-calc-type={calcType}>
 
   <!-- Desktop: 12-col grid split -->
-  <div class="lg:grid lg:grid-cols-12 lg:gap-6 lg:items-start">
+  <div class="lg:grid lg:grid-cols-12 lg:gap-6">
 
     <!-- Left: Input card (7 cols) -->
     <div class="lg:col-span-7">
@@ -80,13 +87,51 @@ const {
       </div>
     </div>
 
-    <!-- Right: Dark output panel (5 cols), sticky on desktop -->
-    <div class="hidden lg:block lg:col-span-5">
+    <!-- Right: Dark output panel (5 cols), sticky on desktop, becomes full-screen sheet on mobile when opened -->
+    <div class="lg:col-span-5 lg:self-stretch">
       <div
-        class="bg-dark-bg border border-dark-border rounded-card p-6 sticky top-6"
+        id="calc-bottom-sheet"
+        class="bg-dark-bg lg:border lg:border-dark-border lg:rounded-card lg:p-6 lg:sticky lg:top-6"
         aria-label="Calculation results"
       >
-        <slot name="outputs" />
+        <!-- Mobile sheet header (hidden on desktop) -->
+        <div class="lg:hidden flex items-center justify-between px-4 pt-4 pb-3 border-b border-dark-border flex-shrink-0">
+          <h2 class="text-base font-semibold text-dark-text">Results</h2>
+          <button
+            type="button"
+            id="calc-sheet-close"
+            aria-label="Close results panel"
+            class="w-11 h-11 flex items-center justify-center rounded-control text-dark-muted hover:text-dark-text transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer"
+          >
+            <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Sheet body (scrollable on mobile, natural on desktop) -->
+        <div class="p-4 lg:p-0 flex-1 overflow-y-auto lg:overflow-visible">
+          <slot name="outputs">
+            <!-- Generic layout-owned result presentation (Option A fallback) -->
+            <div id="calc-generic-outputs" class="space-y-5">
+              <div>
+                <span id="calc-desktop-hero-label" class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">
+                  {heroLabel}
+                </span>
+                <div
+                  id="calc-desktop-hero"
+                  class="text-[40px] leading-none font-semibold tabular-nums text-dark-text"
+                  aria-live="polite"
+                  aria-atomic="true"
+                >
+                  {heroValue}
+                </div>
+              </div>
+              <div id="calc-generic-metrics" class="space-y-0 border-t border-dark-border pt-4 empty:hidden"></div>
+            </div>
+          </slot>
+        </div>
       </div>
     </div>
   </div>
@@ -112,7 +157,7 @@ const {
   aria-label="Calculator result"
 >
   <div class="py-3 min-w-0 flex-1">
-    <p class="text-xs text-dark-muted leading-none mb-0.5">{heroLabel}</p>
+    <p id="calc-mobile-hero-label" class="text-xs text-dark-muted leading-none mb-0.5">{heroLabel}</p>
     <p
       id="calc-mobile-hero"
       class="text-xl font-bold text-dark-text tabular-nums truncate"
@@ -133,60 +178,136 @@ const {
   </button>
 </div>
 
-<!-- Mobile: Bottom sheet (full height, flat) -->
-<div
-  id="calc-bottom-sheet"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Full calculation results"
-  class="lg:hidden fixed inset-0 z-50 bg-dark-bg flex-col hidden"
-  style="padding-bottom: env(safe-area-inset-bottom);"
->
-  <!-- Sheet header -->
-  <div class="flex items-center justify-between px-4 pt-4 pb-3 border-b border-dark-border flex-shrink-0">
-    <h2 class="text-base font-semibold text-dark-text">Results</h2>
-    <button
-      type="button"
-      id="calc-sheet-close"
-      aria-label="Close results panel"
-      class="w-11 h-11 flex items-center justify-center rounded-control text-dark-muted hover:text-dark-text transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer"
-    >
-      <svg class="w-5 h-5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <line x1="18" y1="6" x2="6" y2="18" />
-        <line x1="6" y1="6" x2="18" y2="18" />
-      </svg>
-    </button>
-  </div>
-
-  <!-- Sheet body (scrollable) -->
-  <div class="flex-1 overflow-y-auto p-4">
-    <slot name="outputs" />
-  </div>
-</div>
-
 <!-- Reserve bottom padding so fixed bar doesn't cover content -->
 <div class="lg:hidden h-20" aria-hidden="true"></div>
 
+<style>
+  /* Mobile bottom sheet state (<1024px) */
+  @media (max-width: 1023px) {
+    #calc-bottom-sheet {
+      display: none;
+    }
+    #calc-bottom-sheet[data-open="true"] {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+</style>
+
 <script>
+  /**
+   * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.
+   *
+   * Single Source of Truth Architecture:
+   *
+   *   recalc()
+   *       ↓
+   *   ONE canonical result state (_store._state)
+   *       ↓
+   *   desktop presentation (layout-owned hero / render adapter / fields)
+   *   mobile presentation (#calc-mobile-hero)
+   *
+   * API:
+   *   window.__cmResultStore.setResult({ heroValue, heroLabel?, rows?, fields?, meta? })
+   *   window.__cmResultStore.getResult()              → CalcResult | null
+   *   window.__cmResultStore.subscribeResult(fn)      → unsubscribe()
+   *   window.__cmResultStore.registerRenderAdapter(fn)→ unsubscribe()
+   *   window.__cmResultStore.resetResult()
+   *
+   * Legacy bridge:
+   *   window.dispatchEvent(new CustomEvent('cm:result', { detail: { heroValue } }))
+   *   is intercepted and routed through setResult() automatically.
+   */
+  type ResultRow = {
+    label: string;
+    value: string;
+    subValue?: string;
+    variant?: 'primary' | 'secondary' | 'accent' | 'muted';
+  };
+
+  type CalcResult = {
+    heroValue: string;
+    heroLabel?: string;
+    rows?: ResultRow[];
+    fields?: Record<string, string>;
+    meta?: Record<string, unknown>;
+  };
+
+  type ResultHandler = (r: CalcResult) => void;
+
+  interface CmResultStore {
+    _state: CalcResult | null;
+    _subs: Set<ResultHandler>;
+    setResult(r: CalcResult): void;
+    getResult(): CalcResult | null;
+    subscribeResult(fn: ResultHandler): () => void;
+    registerRenderAdapter(fn: ResultHandler): () => void;
+    resetResult(): void;
+  }
+
+  // Augment window type locally for this script
+  const _win = window as unknown as {
+    __cmResultStore?: CmResultStore;
+    __calcShellGlobalBound?: boolean;
+  };
+
+  // Bootstrap store once — persists across astro:page-load re-inits
+  if (!_win.__cmResultStore) {
+    _win.__cmResultStore = {
+      _state: null,
+      _subs: new Set<ResultHandler>(),
+      setResult(r: CalcResult) {
+        this._state = r;
+        this._subs.forEach((fn) => { try { fn(r); } catch {} });
+      },
+      getResult() { return this._state; },
+      subscribeResult(fn: ResultHandler) {
+        this._subs.add(fn);
+        return () => this._subs.delete(fn);
+      },
+      registerRenderAdapter(fn: ResultHandler) {
+        const unsub = this.subscribeResult(fn);
+        if (this._state) {
+          try { fn(this._state); } catch {}
+        }
+        return unsub;
+      },
+      resetResult() { this._state = null; },
+    };
+  }
+  const _store = _win.__cmResultStore;
+
+  // ──────────────────────────────────────────────────────────────────────────
+
   function initCalculatorShell() {
     const detailsBtn = document.getElementById('calc-details-btn');
     const sheet = document.getElementById('calc-bottom-sheet');
     const closeBtn = document.getElementById('calc-sheet-close');
 
+    // Ensure body scroll is unlocked on page load or client transition
+    document.body.style.overflow = '';
+
     if (!detailsBtn || !sheet || !closeBtn) return;
+    if (detailsBtn.dataset.shellBound === 'true') return;
+    detailsBtn.dataset.shellBound = 'true';
 
     const openSheet = () => {
-      sheet.classList.remove('hidden');
-      sheet.classList.add('flex');
+      sheet.dataset.open = 'true';
+      sheet.setAttribute('role', 'dialog');
+      sheet.setAttribute('aria-modal', 'true');
       detailsBtn.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
-      // Focus trap: move focus to close button
       closeBtn.focus();
     };
 
     const closeSheet = () => {
-      sheet.classList.add('hidden');
-      sheet.classList.remove('flex');
+      sheet.dataset.open = 'false';
+      sheet.removeAttribute('role');
+      sheet.removeAttribute('aria-modal');
       detailsBtn.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
       detailsBtn.focus();
@@ -195,14 +316,6 @@ const {
     detailsBtn.addEventListener('click', openSheet);
     closeBtn.addEventListener('click', closeSheet);
 
-    // Esc closes
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !sheet.classList.contains('hidden')) {
-        closeSheet();
-      }
-    });
-
-    // Outside tap (on the ::before overlay) — sheet itself is full-screen so no outside
     // Focus trap within sheet
     sheet.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab') return;
@@ -223,28 +336,135 @@ const {
       }
     });
 
-    // ── Generic currency prefix updater across calculators ──────────────────
-    const syncCurrencyPrefixes = (symbol: string) => {
-      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-        el.textContent = symbol;
+    // Helper to render/update DOM from canonical result state
+    const applyCanonicalResult = (result: CalcResult) => {
+      // 1. Mobile presentation
+      const mobileHero = document.getElementById('calc-mobile-hero');
+      if (mobileHero) mobileHero.textContent = result.heroValue;
+      const mobileLabel = document.getElementById('calc-mobile-hero-label');
+      if (mobileLabel && result.heroLabel) mobileLabel.textContent = result.heroLabel;
+
+      // 2. Desktop presentation (where layout owns generic presentation)
+      const desktopHero = document.getElementById('calc-desktop-hero');
+      if (desktopHero) desktopHero.textContent = result.heroValue;
+      const desktopLabel = document.getElementById('calc-desktop-hero-label');
+      if (desktopLabel && result.heroLabel) desktopLabel.textContent = result.heroLabel;
+
+      // Generic metrics/rows rendering (if generic container exists)
+      const metricsContainer = document.getElementById('calc-generic-metrics');
+      if (metricsContainer && result.rows) {
+        metricsContainer.innerHTML = '';
+        result.rows.forEach((row) => {
+          const rowDiv = document.createElement('div');
+          rowDiv.className = 'flex items-center justify-between py-2.5 border-b border-dark-border last:border-b-0';
+          const labelSpan = document.createElement('span');
+          labelSpan.className = 'text-xs text-dark-muted';
+          labelSpan.textContent = row.label;
+          const valueSpan = document.createElement('span');
+          const colorClass = row.variant === 'accent' ? 'text-dark-accent font-semibold' : 'text-dark-text font-medium';
+          valueSpan.className = `text-sm tabular-nums ${colorClass}`;
+          valueSpan.textContent = row.value;
+          rowDiv.appendChild(labelSpan);
+          rowDiv.appendChild(valueSpan);
+          metricsContainer.appendChild(rowDiv);
+        });
+      }
+
+      // 3. Declarative field updates (render adapter pattern)
+      if (result.fields) {
+        for (const [id, val] of Object.entries(result.fields)) {
+          const el = document.getElementById(id);
+          if (el) el.textContent = val;
+        }
+      }
+
+      // 4. Declarative data-attribute bindings: [data-cm-result]
+      document.querySelectorAll<HTMLElement>('[data-cm-result]').forEach((el) => {
+        const key = el.dataset.cmResult;
+        if (key === 'heroValue') el.textContent = result.heroValue;
+        else if (key === 'heroLabel' && result.heroLabel) el.textContent = result.heroLabel;
+        else if (key && result.fields && key in result.fields) el.textContent = result.fields[key];
       });
     };
 
-    window.addEventListener('cm:currency-change', (e: any) => {
-      if (e.detail?.symbol) {
-        syncCurrencyPrefixes(e.detail.symbol);
-      }
-    });
+    // Global listeners — registered only once across app lifetime
+    if (!_win.__calcShellGlobalBound) {
+      _win.__calcShellGlobalBound = true;
 
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const currentSheet = document.getElementById('calc-bottom-sheet');
+          if (currentSheet && currentSheet.dataset.open === 'true') {
+            const currentDetailsBtn = document.getElementById('calc-details-btn');
+            currentSheet.dataset.open = 'false';
+            currentSheet.removeAttribute('role');
+            currentSheet.removeAttribute('aria-modal');
+            currentDetailsBtn?.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+            currentDetailsBtn?.focus();
+          }
+        }
+      });
+
+      // Generic currency prefix updater — registered only once
+      window.addEventListener('cm:currency-change', (e: any) => {
+        if (e.detail?.symbol) {
+          document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+            el.textContent = e.detail.symbol;
+          });
+        }
+      });
+
+      // ── Phase 4.2 Canonical Result Architecture ──────────────────────────
+      //
+      // 1. Legacy bridge: existing calcs dispatch raw cm:result CustomEvent.
+      //    Feed into canonical store → triggers all subscribers.
+      window.addEventListener('cm:result', (e: any) => {
+        if (e.detail?.heroValue) {
+          _store.setResult(e.detail);
+        }
+      });
+
+      // 2. Canonical result subscriber: drives both desktop and mobile presentations.
+      _store.subscribeResult(applyCanonicalResult);
+
+      // 3. Catch-up: apply any result already in store before this guard ran.
+      const existing = _store.getResult();
+      if (existing) {
+        applyCanonicalResult(existing);
+      }
+    } else {
+      // On repeated page visits (e.g. astro:page-load), sync freshly rendered DOM
+      // with the current store state if one exists.
+      const existing = _store.getResult();
+      if (existing) {
+        applyCanonicalResult(existing);
+      }
+    }
+  }
+
+  // Sync currency prefix from localStorage on current page DOM
+  function syncCurrencyFromStorage() {
     try {
       const saved = localStorage.getItem('cm_currency');
       if (saved) {
         const symbol = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        syncCurrencyPrefixes(symbol);
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = symbol;
+        });
       }
     } catch (e) {}
   }
 
   initCalculatorShell();
-  document.addEventListener('astro:page-load', initCalculatorShell);
+  syncCurrencyFromStorage();
+
+  document.addEventListener('astro:page-load', () => {
+    initCalculatorShell();
+    syncCurrencyFromStorage();
+  });
+
+  // Reset canonical store on View Transitions navigation — prevents stale state
+  // from a previous calculator page bleeding into the next page's hero value.
+  document.addEventListener('astro:before-preparation', () => _store.resetResult());
 </script>

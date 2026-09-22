@@ -1,14 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
-import CompositionBar from '../components/calculator/CompositionBar.astro';
-import Slider from '../components/calculator/Slider.astro';
-import Input from '../components/ui/Input.astro';
-import Button from '../components/ui/Button.astro';
-import Alert from '../components/ui/Alert.astro';
-import { calcUPIMDR } from '../lib/calculators/upi-mdr';
-import { formatIndian } from '../lib/formatters';
-import { TOOLS } from '../config/site';
+import Layout from '../../layouts/Layout.astro';
+import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
+import CompositionBar from '../../components/calculator/CompositionBar.astro';
+import Slider from '../../components/calculator/Slider.astro';
+import Input from '../../components/ui/Input.astro';
+import Button from '../../components/ui/Button.astro';
+import Alert from '../../components/ui/Alert.astro';
+import { calcUPIMDR } from '../../lib/calculators/upi-mdr';
+import { formatIndian } from '../../lib/formatters';
+import { TOOLS } from '../../config/site';
 
 const DEFAULT = {
   monthlyVolume: 500000,
@@ -29,7 +29,7 @@ const result = calcUPIMDR(
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'upi-mdr-calculator' && t.status === 'published').slice(0, 3);
-const canonicalUrl = 'https://calcumetrics.com/upi-mdr-calculator' as string;
+const canonicalUrl = 'https://calcumetrics.com/in/upi-mdr-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [

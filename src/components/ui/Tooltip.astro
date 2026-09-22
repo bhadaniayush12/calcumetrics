@@ -49,10 +49,15 @@ const {
 
 <script>
   // Touch support & keyboard escape for tooltips per Section 5 & 25
+  let hasGlobalListener = false;
+
   function setupTooltips() {
     const containers = document.querySelectorAll<HTMLElement>('[data-tooltip-container]');
 
     containers.forEach((container) => {
+      if (container.dataset.tooltipBound === 'true') return;
+      container.dataset.tooltipBound = 'true';
+
       const trigger = container.querySelector<HTMLButtonElement>('[data-tooltip-trigger]');
       const bubble = container.querySelector<HTMLElement>('[data-tooltip-bubble]');
       if (!trigger || !bubble) return;
@@ -80,13 +85,18 @@ const {
     });
 
     // Close on outside tap / click
-    document.addEventListener('click', () => {
-      document.querySelectorAll('[data-tooltip-bubble][data-open="true"]').forEach((bubble) => {
-        bubble.setAttribute('data-open', 'false');
-        const trigger = bubble.parentElement?.querySelector('[data-tooltip-trigger]');
-        trigger?.setAttribute('aria-expanded', 'false');
+    const win = typeof window !== 'undefined' ? (window as unknown as { __tooltipOutsideBound?: boolean }) : null;
+    if (!hasGlobalListener && (!win || !win.__tooltipOutsideBound)) {
+      if (win) win.__tooltipOutsideBound = true;
+      hasGlobalListener = true;
+      document.addEventListener('click', () => {
+        document.querySelectorAll('[data-tooltip-bubble][data-open="true"]').forEach((bubble) => {
+          bubble.setAttribute('data-open', 'false');
+          const trigger = bubble.parentElement?.querySelector('[data-tooltip-trigger]');
+          trigger?.setAttribute('aria-expanded', 'false');
+        });
       });
-    });
+    }
   }
 
   setupTooltips();
