@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T04:09:00+05:30
+- **LAST_UPDATED:** 2026-09-23T04:10:00+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 21
-- **IN_PROGRESS:** 022. roi-calculator
-- **NEXT:** 023. eoq-calculator
+- **COMPLETED:** 22
+- **IN_PROGRESS:** 023. eoq-calculator
+- **NEXT:** 024. depreciation-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** markup-vs-margin-calculator
-- **LAST_COMMIT:** 0be2ec8
+- **LAST_COMPLETED_UNIT:** roi-calculator
+- **LAST_COMMIT:** 068803e
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -39,8 +39,8 @@
 - [x] 019. break-even-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 020. profit-margin-calculator — DONE
 - [x] 021. markup-vs-margin-calculator — DONE
-- [ ] 022. roi-calculator — IN PROGRESS
-- [ ] 023. eoq-calculator — PENDING
+- [x] 022. roi-calculator — DONE
+- [ ] 023. eoq-calculator — IN PROGRESS
 - [ ] 024. depreciation-calculator — PENDING
 - [ ] 025. working-capital-calculator — PENDING
 - [ ] 026. cogs-calculator — PENDING
@@ -182,4 +182,10 @@
   - Audited: Pricing model converting between markup on unit cost and gross margin on selling price.
   - Changes: Added bidirectional conversion formulas with mathematical notation, quick reference conversion table spanning 10% to 300% markup tiers, dual worked examples for Cost-Plus Pricing (₹1,000 cost with 25% markup → ₹1,250 selling price, ₹250 profit, 20.0% margin) and Target Margin Pricing (₹1,200 cost with 40% margin → ₹2,000 selling price, ₹800 profit, 66.67% markup), an in-depth "Overhead Trap" analysis exposing how confusing markup with margin produces involuntary losses, and explicit pricing assumptions/limitations.
   - Preserved: Dual-mode dropdown toggle, calculation engine `calcMarkupMargin`, 5 FAQs matching JSON-LD schema, and curated related links (`profit-margin-calculator`, `break-even-calculator`, `cogs-calculator`).
+  - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.
+
+- **022. roi-calculator (/roi-calculator)**:
+  - Audited: Capital efficiency model computing simple (absolute) return on investment and annualised CAGR.
+  - Changes: Added mathematical formulas for simple ROI, annualised ROI (CAGR), and Multiple on Invested Capital (MOIC), a step-by-step worked example matching default inputs (₹1L initial capital, ₹2.5L final return over 3 years → ₹1.5L net profit, 2.50x MOIC, 150.0% total ROI, 35.72% annualised CAGR), a duration sensitivity matrix proving why time horizon redefines returns (150% ROI across 1, 3, 5, and 10 years yielding 150%, 35.7%, 20.1%, and 9.6% p.a.), a capital decision framework contrasting ROI vs IRR vs Payback Period, real vs nominal returns (inflation and tax drag), and explicit investment assumptions/limitations.
+  - Preserved: Clean interactive inputs with sliders, calculation engine `calcROI`, 5 FAQs matching JSON-LD schema, and curated related links (`cagr-calculator`, `profit-margin-calculator`, `payback-period-calculator`).
   - Verification: `npm test` PASS (385/385), `npm run build` PASS (65 pages built), `git diff --check` PASS.

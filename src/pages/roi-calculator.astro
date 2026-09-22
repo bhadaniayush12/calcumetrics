@@ -15,7 +15,8 @@ const result = calcROI(DEFAULT.initial, DEFAULT.final, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'roi-calculator' && t.status === 'published').slice(0, 3);
+const relatedSlugs = ['cagr-calculator', 'profit-margin-calculator', 'payback-period-calculator'];
+const related = TOOLS.filter((t) => relatedSlugs.includes(t.slug) && t.status === 'published');
 const canonicalUrl = 'https://calcumetrics.com/roi-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',
@@ -227,52 +228,165 @@ const jsonld = {
     <Fragment slot="below">
       <section aria-labelledby="roi-calculator-how">
         <h2 id="roi-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Return on Investment is calculated</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          ROI quantifies the efficiency of an investment relative to its cost:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-sm text-text-muted leading-relaxed">
-            <strong>Net Profit = </strong> Final Value − Initial Cost<br />
-            <strong>Absolute ROI % = </strong> (Net Profit ÷ Initial Cost) × 100<br />
-            <strong>Annualised ROI % = </strong> [(Final Value ÷ Initial Cost)<sup>(1 / Years)</sup> − 1] × 100<br />
-            <strong>Investment Multiple = </strong> Final Value ÷ Initial Cost
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <p class="text-sm text-text-muted leading-relaxed mb-4">
+            Return on Investment (ROI) evaluates the financial profitability and capital efficiency of an asset, commercial project, or corporate initiative. While total ROI shows the cumulative return over the entire investment lifecycle, <strong>Annualised ROI (CAGR)</strong> normalizes performance across time to enable direct comparisons between short-term and multi-year commitments.
           </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono mb-4">
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Simple (Absolute) ROI</span>
+              <span class="text-text-muted">Net Profit = Final Value − Initial Cost</span><br />
+              <span class="text-accent font-semibold">ROI % = (Net Profit ÷ Initial Cost) × 100</span>
+            </div>
+            <div class="bg-canvas border border-border rounded p-3">
+              <span class="font-bold text-text-primary block mb-1">Annualised Compounded ROI (CAGR)</span>
+              <span class="text-text-muted">Investment Multiple = Final Value ÷ Initial Cost</span><br />
+              <span class="text-accent font-semibold">CAGR % = [(Final Value ÷ Initial Cost)<sup>(1 / Years)</sup> − 1] × 100</span>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-step worked example</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Consider an enterprise initiative with the default baseline parameters: an initial capital expenditure of <strong>₹1,00,000</strong> that yields a terminal gross return of <strong>₹2,50,000</strong> over a <strong>3-year</strong> investment horizon:
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Metric</th>
+                <th class="py-3 px-4">Formula / Calculation</th>
+                <th class="py-3 px-4">Result</th>
+                <th class="py-3 px-4">Financial Meaning</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">1. Net Profit / Gain</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000 − ₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-semibold">₹1,50,000</td>
+                <td class="py-2.5 px-4">Absolute monetary surplus generated above the original capital committed.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">2. Investment Multiple (MOIC)</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000 ÷ ₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary font-semibold">2.50×</td>
+                <td class="py-2.5 px-4">Every ₹1.00 invested returned ₹2.50 in total gross value.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-medium text-text-primary">3. Cumulative (Absolute) ROI</td>
+                <td class="py-2.5 px-4 font-mono">(₹1,50,000 ÷ ₹1,00,000) × 100</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-semibold">150.0%</td>
+                <td class="py-2.5 px-4">Total percentage gain across the entire 36-month period.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 text-text-primary">4. Annualised ROI (CAGR)</td>
+                <td class="py-2.5 px-4 font-mono">[(2.50)<sup>(1/3)</sup> − 1] × 100</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-semibold">35.72% p.a.</td>
+                <td class="py-2.5 px-4 text-text-primary">Effective compound annual growth rate required to turn ₹1L into ₹2.5L in 3 years.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-lg font-bold text-text-primary mb-3">Why Time Horizon Redefines Capital Performance</h3>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          A 150% total ROI sounds impressive in isolation, but its annual efficiency changes drastically based on holding duration:
+        </p>
+
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
+            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+              <tr>
+                <th class="py-3 px-4">Duration</th>
+                <th class="py-3 px-4">Initial Capital</th>
+                <th class="py-3 px-4">Final Value</th>
+                <th class="py-3 px-4">Cumulative ROI</th>
+                <th class="py-3 px-4">Annualised Return (CAGR)</th>
+                <th class="py-3 px-4">Performance Evaluation</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-text-muted">
+              <tr>
+                <td class="py-2.5 px-4 font-mono font-medium text-text-primary">1 Year</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-medium">150.0%</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">150.00%</td>
+                <td class="py-2.5 px-4">Exceptional turnaround velocity; venture capital scale.</td>
+              </tr>
+              <tr class="bg-surface/50 font-medium">
+                <td class="py-2.5 px-4 font-mono text-text-primary">3 Years (Default)</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent">150.0%</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">35.72%</td>
+                <td class="py-2.5 px-4 text-text-primary">Strong commercial growth rate; beats private equity hurdle.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-mono font-medium text-text-primary">5 Years</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-medium">150.0%</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">20.11%</td>
+                <td class="py-2.5 px-4">Solid equity market outperformance.</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-mono font-medium text-text-primary">10 Years</td>
+                <td class="py-2.5 px-4 font-mono">₹1,00,000</td>
+                <td class="py-2.5 px-4 font-mono">₹2,50,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-medium">150.0%</td>
+                <td class="py-2.5 px-4 font-mono text-text-primary">9.60%</td>
+                <td class="py-2.5 px-4">Modest return; roughly tracks broad market index funds.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">When to Use ROI vs. IRR vs. Payback Period</h3>
+            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+              <li><strong>Use Simple ROI:</strong> When assessing discrete, single-inflow/single-outflow events, such as a marketing ad campaign, stock purchase, or quick equipment refurbishment.</li>
+              <li><strong>Use Internal Rate of Return (IRR):</strong> When projects involve staggered capital expenditures or phased cash inflows occurring over multiple years (e.g., real estate rentals or corporate capital budgeting).</li>
+              <li><strong>Use Payback Period:</strong> When capital recovery speed and liquidity risk take priority over lifetime project profitability.</li>
+            </ul>
+          </div>
+
+          <div class="bg-surface border border-border rounded-card p-5">
+            <h3 class="text-base font-bold text-text-primary mb-2">Inflation & Tax Impact (Real vs. Nominal ROI)</h3>
+            <p class="text-xs text-text-muted leading-relaxed mb-2">
+              Unadjusted nominal figures do not reflect the purchasing power eroded by consumer inflation:
+            </p>
+            <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
+              <li><strong>Real ROI Formula:</strong> Real ROI ≈ Nominal ROI − Cumulative Inflation Rate.</li>
+              <li><strong>Tax Drag:</strong> Capital gains taxes and corporate income taxes directly reduce terminal cash values. A 35.7% pre-tax CAGR under a 20% capital gains tax drops to an effective post-tax return of ~28.6% p.a.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-surface border border-border rounded-card p-5 mb-6">
+          <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Financial Limitations</h3>
+          <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+            <li><strong>Lump-Sum Timing Assumption:</strong> The model assumes the entire initial capital is deployed at day zero and the final value is liquidated in a single transaction at year n. Intermediate dividends, follow-on funding, or phased exits require an XIRR or DCF model.</li>
+            <li><strong>Exclusion of Frictional Friction:</strong> Figures do not automatically deduct transaction fees, legal retainers, exchange fees, brokerage commissions, or carry charges unless pre-adjusted in the input values.</li>
+            <li><strong>Risk Non-Adjustment:</strong> ROI is an unhedged metric that ignores downside volatility. A 40% ROI on speculative crypto entails vastly greater insolvency risk than a 15% ROI on blue-chip industrial infrastructure.</li>
+          </ul>
         </div>
       </section>
 
       <section aria-labelledby="roi-calculator-faq">
         <h2 id="roi-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is a good ROI for business projects?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Most corporate finance teams benchmark internal projects against their Weighted Average Cost of Capital (WACC), typically requiring projects to yield at least 15% to 20% annualised ROI to justify capital risk.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does ROI differ from IRR?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Simple ROI only examines starting cost and final payoff, ignoring cash inflows or outflows occurring along the way. The Internal Rate of Return (IRR) accounts for the exact timing and magnitude of intermittent cash flows.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between total ROI and annualised ROI (CAGR)?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Total ROI measures the overall percentage gain across the entire investment lifecycle. Annualised ROI (CAGR) calculates the geometric compound annual growth rate, allowing direct comparison between investments of different durations.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can ROI be negative?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes. If the final value is less than the initial capital invested, the net profit is negative, resulting in a negative ROI representing a capital loss.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does inflation impact real ROI?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Nominal ROI does not reflect the loss of purchasing power over time. Real ROI adjusts nominal returns for inflation using the Fisher equation: Real ROI ≈ Nominal ROI − Inflation Rate.
-            </div>
-          </details>
+          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
+                {faq.acceptedAnswer.text}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
