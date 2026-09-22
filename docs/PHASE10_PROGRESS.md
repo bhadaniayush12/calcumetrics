@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 10
-- **LAST_UPDATED:** 2026-09-23T03:49:45+05:30
+- **LAST_UPDATED:** 2026-09-23T03:50:25+05:30
 - **TOTAL:** 50
-- **COMPLETED:** 6
-- **IN_PROGRESS:** NONE
-- **NEXT:** 007. fd-calculator
+- **COMPLETED:** 7
+- **IN_PROGRESS:** rd-calculator
+- **NEXT:** 009. ppf-calculator
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** xirr-calculator
-- **LAST_COMMIT:** df91651
+- **LAST_COMPLETED_UNIT:** fd-calculator
+- **LAST_COMMIT:** 9f1e40d
 - **TEST_STATUS:** PASS (385/385 tests)
 - **BUILD_STATUS:** PASS (65 pages)
 - **BROWSER_QA_STATUS:** PASS (1440, 1024, 768, 390, 375 viewports)
@@ -24,8 +24,8 @@
 - [x] 004. simple-interest-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 005. cagr-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
 - [x] 006. xirr-calculator — DONE
-- [ ] 007. fd-calculator — PENDING (Phase 5 Locked)
-- [ ] 008. rd-calculator — PENDING
+- [x] 007. fd-calculator — DONE (Phase 5 Locked, Intentionally Preserved)
+- [ ] 008. rd-calculator — IN PROGRESS
 - [ ] 009. ppf-calculator — PENDING
 - [ ] 010. 401k-calculator — PENDING
 - [ ] 011. emi-calculator — PENDING (Phase 5 Locked)
@@ -101,3 +101,7 @@
   - Changes: Added step-by-step worked example table using the default cash flows (4 events over 2 years, ₹1.5L outflows, ₹2.05L inflows → exact verified XIRR = 19.73%), added result interpretation (money-weighted timing impact vs short-holding distortion), and added explicit assumptions/limitations (reinvestment assumption, sign requirements, fee/tax exclusions).
   - Preserved: Dynamic cash flow row builder, calculation engine `calcXIRR`, 5 calculator-specific FAQs matching JSON-LD schema, and related links.
   - Verification: `npm test` PASS, `npm run build` PASS (65 pages built), HTML content inspection verified.
+
+- **007. fd-calculator (/fd-calculator)**:
+  - Audited: Phase 5 Locked Calculator. Verified formula A = P × (1 + r/n)^(n×t) with quarterly compounding, step-by-step worked example (₹1,00,000 at 7.0% for 5 yrs → ₹1,41,477.82 maturity, ₹41,477.82 interest), 3 targeted FAQs (senior citizen premium, quarterly compounding, TDS thresholds), and related calculators.
+  - Action: **INTENTIONALLY PRESERVED**. Zero code or text changes needed.
