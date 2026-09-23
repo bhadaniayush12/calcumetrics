@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T12:58:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Terms of Use (/terms)
-- **COMPLETED_UNITS:** 4
-- **IN_PROGRESS:** Supporting Page: Terms of Use (/terms)
-- **NEXT:** Supporting Page: Disclaimer (/disclaimer)
+- **LAST_UPDATED:** 2026-09-23T12:59:00+05:30
+- **CURRENT_UNIT:** Supporting Page: Disclaimer (/disclaimer)
+- **COMPLETED_UNITS:** 5
+- **IN_PROGRESS:** Supporting Page: Disclaimer (/disclaimer)
+- **NEXT:** Supporting Page: Cookie Policy (/cookie-policy)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 04: Privacy Policy (/privacy-policy & /privacy redirect)
-- **LAST_COMMIT:** 848650b
+- **LAST_COMPLETED_UNIT:** Unit 05: Terms of Use (/terms)
+- **LAST_COMMIT:** 10ef99c
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -22,7 +22,7 @@
 - [x] Methodology (/methodology) — PASS
 - [x] Contact (/contact) — PASS
 - [x] Privacy Policy (/privacy-policy & /privacy) — PASS
-- [ ] Terms of Use (/terms)
+- [x] Terms of Use (/terms) — PASS
 - [ ] Disclaimer (/disclaimer)
 - [ ] Cookie Policy (/cookie-policy)
 - [ ] 404 Page (/404)
@@ -118,3 +118,17 @@
   - Interactive CMP trigger button (`privacy-cookie-settings-link`) wired to `calcumetrics:open-cookie-settings`.
   - Comprehensive statutory coverage (GDPR, UK GDPR, India DPDP Act 2023, US state privacy laws CCPA/CPRA).
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages + `/privacy/index.html` redirect generated), `git diff --check` PASS.
+
+### Unit 05: Terms of Use (/terms) — PASS
+- **Status:** PASS (§11: fully compliant, real usage boundaries).
+- **Changed:**
+  - Expanded terms to cover real usage boundaries: acceptable use (personal, educational, professional planning; no commercial scraping or redistribution of engines).
+  - Explicit user responsibility section for input accuracy, chosen rates, and financial assumptions.
+  - Comprehensive educational/informational limitation clause stating results do not guarantee future financial returns or credit approvals.
+  - Third-party data and statutory rates clause explaining that tax and statutory rates are updated periodically from official sources and may not reflect same-day gazette updates.
+  - Imported `SITE_EMAIL` from `../config/site` for dispute and terms inquiries.
+  - Updated "Last updated" and "Effective date" to 23 September 2026.
+- **Intentionally Preserved:**
+  - Standard intellectual property protections distinguishing public-domain math formulas from proprietary implementation and copy.
+  - Disclaimer of warranties and standard limitation of liability.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.

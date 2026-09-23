@@ -1,23 +1,64 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { SITE_EMAIL } from '../config/site';
+
 const canonicalUrl = 'https://calcumetrics.com/terms';
 ---
-<Layout title="Terms of Use | Calcumetrics" description="Terms and conditions for using the Calcumetrics financial calculator website." canonical={canonicalUrl}>
+<Layout
+  title="Terms of Use | Calcumetrics"
+  description="Terms and conditions for using the Calcumetrics financial calculator website."
+  canonical={canonicalUrl}
+>
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Terms of Use</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">Effective date: 20 September 2026. By using this website, you agree to these terms.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Acceptable use</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">You may use Calcumetrics for personal, educational, or professional planning purposes. You may not scrape, reproduce, or redistribute our content commercially without written permission.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. No warranty</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">This site is provided &ldquo;as is&rdquo; without any warranty. Results are estimates based on stated assumptions. We do not warrant that the results are accurate, complete, or suitable for any particular purpose.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Limitation of liability</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">To the fullest extent permitted by applicable law, Calcumetrics and its operators are not liable for any loss, damage, or financial decision made in reliance on the results from this site.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Intellectual property</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">The content, design, and code of this site are the property of Calcumetrics and its operators. Mathematical formulas are in the public domain; their specific implementation and explanatory content on this site are not.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Changes to terms</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">We may update these terms from time to time. Continued use after a change constitutes acceptance of the updated terms.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Governing law</h2>
-      <p class="text-sm text-text-muted leading-relaxed">These terms are governed by applicable law. For legal disputes, contact us at hello@calcumetrics.com before initiating legal proceedings.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-6">
+      Effective date: 23 September 2026. By accessing or using Calcumetrics (calcumetrics.com), you agree to be bound by these Terms of Use. If you do not agree, please do not use the website.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Acceptable use</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      You may use Calcumetrics for personal, educational, or professional planning purposes. You may not scrape, systematically copy, reverse engineer, or redistribute our calculator engines or proprietary editorial content commercially without prior written authorization.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. Informational and educational use only</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      All calculations, models, articles, and outputs provided on Calcumetrics are strictly for informational and educational purposes. They do not constitute financial, investment, tax, legal, or accounting advice. No output guarantees future financial performance, investment return, debt approval, or tax savings.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. User responsibility for inputs and assumptions</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Every calculation relies on user-supplied variables (such as initial principal, assumed annual rate of return, loan tenure, salary deductions, and cash flow timing). You are solely responsible for ensuring that your inputs, chosen rates, and financial assumptions reflect your actual situation.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Third-party data and statutory rates</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Statutory tax rates, government interest rates (e.g. PPF, GST, advance tax calendars), and financial metrics are referenced from published official sources as of the dates noted on each tool. Tax laws and regulatory guidelines change periodically; Calcumetrics does not warrant that statutory figures reflect immediate same-day gazette updates. Always consult official gazettes or a qualified Chartered Accountant (CA) or certified financial professional before executing financial or tax actions.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Disclaimer of warranties</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      This site is provided &ldquo;as is&rdquo; and &ldquo;as available&rdquo; without warranties of any kind, whether express or implied. While we validate formulas against standardized test suites, we do not warrant that calculations are error-free, uninterrupted, or suitable for any specific legal or commercial transaction.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Limitation of liability</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      To the fullest extent permitted by applicable law, Calcumetrics and its operators will not be liable for any direct, indirect, incidental, consequential, or punitive damages arising from your access to, use of, or inability to use this site, or any decision made in reliance on site calculations.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">7. Intellectual property</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      The website architecture, design system, user interface, brand assets, and explanatory articles are the intellectual property of Calcumetrics. Standard financial formulas themselves reside in the public domain; our specific software implementations, page copy, and visual styling are protected by copyright and intellectual property laws.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">8. Changes to terms</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      We may revise these Terms of Use at any time. The &ldquo;Last updated&rdquo; date at the top indicates when revisions were made. Continued use of Calcumetrics after revisions constitutes your acceptance of the updated terms.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">9. Contact and dispute resolution</h2>
+    <p class="text-sm text-text-muted leading-relaxed">
+      These terms are governed by applicable law. For questions regarding these terms or to raise a concern, contact us at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a> before initiating formal proceedings.
+    </p>
   </div>
 </Layout>
