@@ -42,7 +42,9 @@ const columns: FooterColumn[] = [
       { label: 'EMI Calculator', href: '/emi-calculator' },
       { label: 'Home Loan Calculator', href: '/home-loan-calculator' },
       { label: 'Car Loan Calculator', href: '/car-loan-calculator' },
+      { label: 'Mortgage Calculator', href: '/mortgage-calculator' },
       { label: 'Loan Prepayment', href: '/loan-prepayment-calculator' },
+      { label: 'Loan Amortization', href: '/loan-amortization-calculator' },
     ],
   },
   {
@@ -52,6 +54,8 @@ const columns: FooterColumn[] = [
       { label: 'Income Tax Calculator (IN)', href: '/in/income-tax-calculator' },
       { label: 'GST Calculator (IN)', href: '/in/gst-calculator' },
       { label: 'HRA Calculator (IN)', href: '/in/hra-calculator' },
+      { label: 'Capital Gains Tax (IN)', href: '/in/capital-gains-tax-calculator' },
+      { label: 'TDS Calculator (IN)', href: '/in/tds-calculator' },
     ],
   },
   {
@@ -62,6 +66,7 @@ const columns: FooterColumn[] = [
       { label: 'Profit Margin', href: '/profit-margin-calculator' },
       { label: 'Markup vs Margin', href: '/markup-vs-margin-calculator' },
       { label: 'ROI Calculator', href: '/roi-calculator' },
+      { label: 'Depreciation Calculator', href: '/depreciation-calculator' },
     ],
   },
   {
@@ -71,16 +76,18 @@ const columns: FooterColumn[] = [
       { label: 'WACC Calculator', href: '/wacc-calculator' },
       { label: 'NPV Calculator', href: '/npv-calculator' },
       { label: 'IRR Calculator', href: '/irr-calculator' },
-      { label: 'Payback Period', href: '/payback-period-calculator' },
       { label: 'DCF Calculator', href: '/dcf-calculator' },
+      { label: 'Payback Period', href: '/payback-period-calculator' },
     ],
   },
   {
     title: 'Company & Legal',
     links: [
       { label: 'About', href: '/about' },
+      { label: 'Blog', href: '/blog' },
       { label: 'Contact', href: '/contact' },
       { label: 'Methodology', href: '/methodology' },
+      { label: 'All Calculators', href: '/calculators' },
       { label: 'Privacy Policy', href: '/privacy-policy' },
       { label: 'Terms of Use', href: '/terms' },
       { label: 'Disclaimer', href: '/disclaimer' },
@@ -115,71 +122,101 @@ const columns: FooterColumn[] = [
         <span class="text-[11px] text-text-muted shrink-0">100% Client-Side Calculations</span>
       </div>
     ) : (
-      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
-        {columns.map((col) => (
-          <div class="flex flex-col gap-3">
-            <h3 class="text-[13px] font-semibold tracking-wider uppercase text-text-primary">
-              {col.href ? (
-                <a href={col.href} class="hover:text-accent transition-standard">
-                  {col.title}
-                </a>
-              ) : (
-                col.title
-              )}
-            </h3>
-            <ul class="flex flex-col gap-2 text-[13px] text-text-muted">
-              {col.links.map((link) => (
-                <li>
-                  {link.isCookieSettings ? (
-                    <button
-                      type="button"
-                      id="cookie-settings-button"
-                      class="text-left text-text-muted hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
-                    >
-                      {link.label}
-                    </button>
-                  ) : (
-                    <a
-                      href={link.href}
-                      class="hover:text-accent transition-standard focus-visible:outline-accent"
-                    >
-                      {link.label}
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
+      <>
+        {/* Top brand + tagline row */}
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
+          <div class="flex items-center gap-3">
+            <img src="/logo.svg" alt="Calcumetrics Logo" width="36" height="36" class="w-9 h-9 rounded-control shrink-0" />
+            <div>
+              <p class="font-serif font-bold text-text-primary text-[18px] tracking-[-0.01em]">
+                Calcumetr<span class="text-accent">i</span>cs
+              </p>
+              <p class="text-[11px] text-text-muted leading-tight mt-0.5">Free financial calculators · 100% client-side</p>
+            </div>
           </div>
-        ))}
-      </div>
+          <div class="flex flex-wrap items-center gap-2">
+            {[
+              { label: 'SIP', href: '/sip-calculator' },
+              { label: 'EMI', href: '/emi-calculator' },
+              { label: 'WACC', href: '/wacc-calculator' },
+              { label: 'IRR', href: '/irr-calculator' },
+              { label: 'GST', href: '/in/gst-calculator' },
+            ].map((t) => (
+              <a href={t.href} class="inline-flex items-center px-2.5 py-1 rounded-control border border-border text-xs font-medium text-text-muted hover:text-accent hover:border-accent transition-standard">
+                {t.label}
+              </a>
+            ))}
+            <a href="/calculators" class="inline-flex items-center px-2.5 py-1 rounded-control border border-accent/30 bg-accent/5 text-xs font-semibold text-accent hover:bg-accent/10 transition-standard">
+              All {'{'}50+{'}'} →
+            </a>
+          </div>
+        </div>
+
+        {/* 6-column link grid */}
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-10">
+          {columns.map((col) => (
+            <div class="flex flex-col gap-3">
+              <h3 class="text-[11px] font-bold tracking-widest uppercase text-text-primary">
+                {col.href ? (
+                  <a href={col.href} class="hover:text-accent transition-standard">
+                    {col.title}
+                  </a>
+                ) : (
+                  col.title
+                )}
+              </h3>
+              <ul class="flex flex-col gap-2 text-[12px] text-text-muted">
+                {col.links.map((link) => (
+                  <li>
+                    {link.isCookieSettings ? (
+                      <button
+                        type="button"
+                        id="cookie-settings-button"
+                        class="text-left text-text-muted hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
+                      >
+                        {link.label}
+                      </button>
+                    ) : (
+                      <a
+                        href={link.href}
+                        class="hover:text-accent transition-standard focus-visible:outline-accent"
+                      >
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </>
     )}
 
     <!-- Bottom Bar: Branding, Disclaimer & Copyright per Section 6 & 16 -->
-    <div class="pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-text-muted">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2.5">
-          <img
-            src="/logo.svg"
-            alt="Calcumetrics Logo"
-            width="20"
-            height="20"
-            class="w-5 h-5 rounded"
-          />
-          <span class="font-serif font-bold text-text-primary text-[15px] tracking-[-0.01em]">
-            Calcumetr<span class="text-accent">i</span>cs
-          </span>
-          <span>— Free, 100% client-side financial calculations.</span>
+    <div class="pt-6 border-t border-border">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-text-muted">
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-semibold text-text-primary">Calcumetrics</span>
+            <span class="text-border">·</span>
+            <a href="/about" class="hover:text-accent transition-standard">About</a>
+            <span class="text-border">·</span>
+            <a href="/contact" class="hover:text-accent transition-standard">Contact</a>
+            <span class="text-border">·</span>
+            <a href="/methodology" class="hover:text-accent transition-standard">Methodology</a>
+            <span class="text-border">·</span>
+            <a href="/privacy-policy" class="hover:text-accent transition-standard">Privacy</a>
+            <span class="text-border">·</span>
+            <a href="/terms" class="hover:text-accent transition-standard">Terms</a>
+          </div>
+          <p class="text-[11px] text-text-muted">
+            &copy; {new Date().getFullYear()} Calcumetrics. Free for personal and educational use.
+          </p>
         </div>
-        <a href="/calculators" class="text-accent font-medium hover:underline focus-visible:outline-accent transition-standard w-fit">
-          View All Calculators &rarr;
-        </a>
-      </div>
-
-      <div class="flex flex-col md:items-end gap-1">
-        <p class="leading-relaxed">
+        <p class="text-[11px] text-text-muted leading-relaxed max-w-xs sm:text-right">
           For information only. Not financial advice. Results are estimates; returns are not guaranteed.
         </p>
-        <p>&copy; {new Date().getFullYear()} Calcumetrics. All rights reserved.</p>
       </div>
     </div>
   </div>

@@ -871,6 +871,16 @@ const totalToolsCount = getToolCount();
         }
       });
     }
+    // ── 9. Cookie Settings Handler ───────────────────────────────────────────
+    // When no CMP is active, show an informational toast so the button is always functional
+    window.addEventListener('calcumetrics:open-cookie-settings', () => {
+      // Try to open control center as the primary settings UI
+      toggleControlCenter(true);
+      // Also show an informational toast
+      if (window.__cmShowToast) {
+        window.__cmShowToast('Cookie preferences: We use essential cookies only. No tracking or advertising cookies are active.', 'info');
+      }
+    });
   }
 
   initHeaderScripts();
