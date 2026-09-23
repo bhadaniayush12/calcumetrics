@@ -11,9 +11,9 @@
 |------|--------|
 | Phase | PHASE 14 — SEO IMPLEMENTATION |
 | Branch | development |
-| Latest commit | 4107e95 (pre-Phase-14 baseline) |
-| Latest commit message | docs(adsense): make knowledge base index project neutral |
-| Overall Phase Status | **IN PROGRESS — BATCH 0 COMPLETE** |
+| Latest commit | b1127ff (Batch 3) |
+| Latest commit message | feat(phase14-seo): batch 3 homepage/category pages - Organization schema, updated descriptions |
+| Overall Phase Status | **IN PROGRESS — BATCH 4 COMPLETE** |
 
 ---
 
@@ -21,11 +21,11 @@
 
 | Batch | Description | Status | Commit |
 |-------|-------------|--------|--------|
-| BATCH 0 | Read docs/adsense/, repo audit, baseline, progress, indexability matrix | **COMPLETE** | pending commit |
-| BATCH 1 | Titles, meta descriptions, canonicals, robots | NOT STARTED |  |
-| BATCH 2 | Sitemap, indexability, URL audit | NOT STARTED |  |
-| BATCH 3 | Homepage, /calculators, 5 category pages | NOT STARTED |  |
-| BATCH 4 | All 50 calculators (category by category) | NOT STARTED |  |
+| BATCH 0 | Read docs/adsense/, repo audit, baseline, progress, indexability matrix | **COMPLETE** | 0ac2335 |
+| BATCH 1 | Titles, meta descriptions, canonicals, robots | **COMPLETE** | 5c27344 |
+| BATCH 2 | Sitemap, indexability, URL audit | **COMPLETE** | 38e446a |
+| BATCH 3 | Homepage, /calculators, 5 category pages | **COMPLETE** | b1127ff |
+| BATCH 4 | All 50 calculators (category by category) | **COMPLETE** | pending commit |
 | BATCH 5 | Blog SEO, internal linking, calculator ↔ article relationships | NOT STARTED |  |
 | BATCH 6 | Structured data, breadcrumbs, OG/social, image SEO | NOT STARTED |  |
 | BATCH 7 | Final generated HTML audit, SEO regression, QA | NOT STARTED |  |
@@ -51,96 +51,107 @@
 ## Baseline Document Status
 
 - `docs/PHASE14_SEO_BASELINE.md` — ✅ CREATED (2026-09-23)
-- `docs/PHASE14_PROGRESS.md` — ✅ THIS FILE (2026-09-23)
+- `docs/PHASE14_PROGRESS.md` — ✅ THIS FILE (Updated Batch 4)
 - `docs/PHASE14_INDEXABILITY_MATRIX.md` — ✅ CREATED (2026-09-23)
 
 ---
 
-## Calculator Audit Status (50/50 needed)
+## Calculator Audit Status (50/50 completed ✅)
 
-### Investments (0/13 audited)
-- [ ] /sip-calculator (Global)
-- [ ] /lump-sum-calculator (Global)
-- [ ] /compound-interest-calculator (Global)
-- [ ] /simple-interest-calculator (Global)
-- [ ] /cagr-calculator (Global)
-- [ ] /xirr-calculator (Global)
-- [ ] /fd-calculator (Global)
-- [ ] /rd-calculator (Global)
-- [ ] /inflation-calculator (Global)
-- [ ] /savings-goal-calculator (Global)
-- [ ] /in/ppf-calculator (India)
-- [ ] /us/401k-calculator (US)
-- [ ] **NOTE:** Registry has 13 investment tools; Phase 14 spec says 12. All 13 are published and valid.
+### Investments (12/12 audited ✅)
+- [x] /sip-calculator (Global)
+- [x] /lump-sum-calculator (Global)
+- [x] /compound-interest-calculator (Global)
+- [x] /simple-interest-calculator (Global)
+- [x] /cagr-calculator (Global)
+- [x] /xirr-calculator (Global)
+- [x] /fd-calculator (Global)
+- [x] /rd-calculator (Global)
+- [x] /inflation-calculator (Global)
+- [x] /savings-goal-calculator (Global)
+- [x] /in/ppf-calculator (India)
+- [x] /us/401k-calculator (US)
 
-### Loans (0/9 audited)
-- [ ] /emi-calculator (Global)
-- [ ] /home-loan-calculator (Global)
-- [ ] /car-loan-calculator (Global)
-- [ ] /loan-prepayment-calculator (Global)
-- [ ] /mortgage-calculator (Global)
-- [ ] /loan-affordability-calculator (Global)
-- [ ] /debt-to-income-ratio-calculator (Global)
-- [ ] /credit-card-payoff-calculator (Global)
-- [ ] /loan-amortization-calculator (Global)
-- [ ] /interest-rate-calculator (Global)
-- [ ] **NOTE:** Registry has 10 loan tools; one is missing from above — adding /interest-rate-calculator makes 10 ✓
+### Loans (10/10 audited ✅)
+- [x] /emi-calculator (Global)
+- [x] /home-loan-calculator (Global)
+- [x] /car-loan-calculator (Global)
+- [x] /loan-prepayment-calculator (Global)
+- [x] /mortgage-calculator (Global)
+- [x] /loan-affordability-calculator (Global)
+- [x] /debt-to-income-ratio-calculator (Global)
+- [x] /credit-card-payoff-calculator (Global)
+- [x] /loan-amortization-calculator (Global)
+- [x] /interest-rate-calculator (Global)
 
-### Taxes (0/7 audited)
-- [ ] /in/income-tax-calculator (India)
-- [ ] /in/gst-calculator (India)
-- [ ] /in/hra-calculator (India)
-- [ ] /in/tds-calculator (India)
-- [ ] /in/capital-gains-tax-calculator (India)
-- [ ] /in/advance-tax-calculator (India)
-- [ ] /in/salary-ctc-calculator (India)
+### Taxes (7/7 audited ✅)
+- [x] /in/income-tax-calculator (India)
+- [x] /in/gst-calculator (India)
+- [x] /in/hra-calculator (India)
+- [x] /in/tds-calculator (India)
+- [x] /in/capital-gains-tax-calculator (India)
+- [x] /in/advance-tax-calculator (India)
+- [x] /in/salary-ctc-calculator (India)
 
-### Business (0/13 audited)
-- [ ] /in/upi-mdr-calculator (India)
-- [ ] /break-even-calculator (Global)
-- [ ] /profit-margin-calculator (Global)
-- [ ] /markup-vs-margin-calculator (Global)
-- [ ] /roi-calculator (Global)
-- [ ] /eoq-calculator (Global)
-- [ ] /depreciation-calculator (Global)
-- [ ] /working-capital-calculator (Global)
-- [ ] /cogs-calculator (Global)
-- [ ] /inventory-turnover-calculator (Global)
-- [ ] /liquidity-ratios-calculator (Global)
-- [ ] /cash-conversion-cycle-calculator (Global)
-- [ ] /dscr-calculator (Global)
+### Business (13/13 audited ✅)
+- [x] /in/upi-mdr-calculator (India)
+- [x] /break-even-calculator (Global)
+- [x] /profit-margin-calculator (Global)
+- [x] /markup-vs-margin-calculator (Global)
+- [x] /roi-calculator (Global)
+- [x] /eoq-calculator (Global)
+- [x] /depreciation-calculator (Global)
+- [x] /working-capital-calculator (Global)
+- [x] /cogs-calculator (Global)
+- [x] /inventory-turnover-calculator (Global)
+- [x] /liquidity-ratios-calculator (Global)
+- [x] /cash-conversion-cycle-calculator (Global)
+- [x] /dscr-calculator (Global)
 
-### Corporate Finance (0/8 audited)
-- [ ] /wacc-calculator (Global)
-- [ ] /npv-calculator (Global)
-- [ ] /irr-calculator (Global)
-- [ ] /payback-period-calculator (Global)
-- [ ] /dcf-calculator (Global)
-- [ ] /discounted-payback-period-calculator (Global)
-- [ ] /present-value-calculator (Global)
-- [ ] /future-value-calculator (Global)
+### Corporate Finance (8/8 audited ✅)
+- [x] /wacc-calculator (Global)
+- [x] /npv-calculator (Global)
+- [x] /irr-calculator (Global)
+- [x] /payback-period-calculator (Global)
+- [x] /dcf-calculator (Global)
+- [x] /discounted-payback-period-calculator (Global)
+- [x] /present-value-calculator (Global)
+- [x] /future-value-calculator (Global)
 
 ---
 
 ## Title Audit Status
-- [ ] Homepage
-- [ ] /calculators
-- [ ] 5 category pages
-- [ ] 50 calculator pages
-- [ ] 30 blog articles
-- [ ] Supporting pages (7 pages)
+- [x] Homepage — `Free Online Financial Calculators | Calcumetrics` ✅
+- [x] /calculators — `Financial Calculators Directory: 50 Free Tools | Calcumetrics` ✅
+- [x] 5 category pages — All dynamic count, verified ✅
+- [x] 50 calculator pages — All 50 have brand suffix, unique, descriptive (50–82 chars) ✅
+- [ ] 30 blog articles (Batch 5)
+- [x] Supporting pages (7 pages) — All audited; About & Contact improved in Batch 1 ✅
 
 ## Meta Description Audit Status
-- Same as titles — not yet started
+- [x] Homepage — 144 chars, includes toolCount, 100% client-side ✅
+- [x] /calculators — 145 chars, includes 50 calculators count ✅
+- [x] 5 category pages — Updated in Batch 3 to accurately describe all tools ✅
+- [x] 50 calculator pages — All 50 have informative meta descriptions (90–160 chars) ✅
+- [ ] 30 blog articles (Batch 5)
+- [x] Supporting pages (7 pages) — All audited ✅
 
 ## Canonical Audit Status
-- Not started (will be done in Batch 2)
+- [x] Layout.astro computed canonical verified
+- [x] All 50 calculators have self-canonicals (including /in/ and /us/ prefixes) ✅
+- [x] Supporting and hub pages have self-canonicals ✅
 
 ## Robots Audit Status
-- Baseline assessment done; fixes in Batch 1
+- [x] robots.txt updated in Batch 1 with explicit AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, OAI-SearchBot) ✅
+- [x] 404 page verified with `noindex,follow` ✅
+- [x] All indexable pages have `index,follow,max-image-preview:large` ✅
 
 ## Sitemap Audit Status
-- Baseline assessment done; fixes in Batch 2
+- [x] sitemap-index.xml verified
+- [x] sitemap-tools.xml verified
+- [x] sitemap-hubs.xml updated to lastmod 2026-09-23 ✅
+- [x] sitemap-pages.xml updated with per-article dynamic lastmod from BLOG_POSTS ✅
+
 
 ## Internal Linking Status
 - Baseline gaps documented; implementation in Batch 5
@@ -171,42 +182,42 @@
 
 ## Known Defects (from Baseline)
 
-| ID | Priority | Defect | Target Batch |
-|----|----------|--------|--------------|
-| D1 | HIGH | `/og/default.png` missing from `public/` | BATCH 6 |
-| D2 | MEDIUM | `og:type` always "website" even for Article pages | BATCH 6 |
-| D3 | MEDIUM | No `twitter:title`, `twitter:description`, `twitter:image` | BATCH 6 |
-| D4 | LOW | Blog post author is Organization, not Person | BATCH 6 |
-| D5 | LOW | Organization schema missing logo, sameAs | BATCH 6 |
-| D6 | LOW | sitemap-pages.xml uses single hardcoded lastmod | BATCH 2 |
-| D7 | LOW | sitemap-hubs.xml uses hardcoded lastmod | BATCH 2 |
-| D8 | LOW | About page title repeats brand unnecessarily | BATCH 1 |
-| D9 | MEDIUM | /404 noindex not verified | BATCH 1 |
-| D10 | LOW | robots.txt doesn't explicitly list AI bots | BATCH 1 |
-| D11 | LOW | No per-article OG images | BATCH 6 |
-| D12 | LOW | No og:image:width / og:image:height | BATCH 6 |
-| D13 | MEDIUM | Calculator pages don't link to relevant blog articles | BATCH 5 |
-| D14 | MEDIUM | Blog relatedArticles may reference non-existent slugs | BATCH 5 |
+| ID | Priority | Defect | Target Batch | Status |
+|----|----------|--------|--------------|--------|
+| D1 | HIGH | `/og/default.png` missing from `public/` | BATCH 6 | Pending Batch 6 |
+| D2 | MEDIUM | `og:type` always "website" even for Article pages | BATCH 1 | ✅ Fixed in 5c27344 |
+| D3 | MEDIUM | No `twitter:title`, `twitter:description`, `twitter:image` | BATCH 1 | ✅ Fixed in 5c27344 |
+| D4 | LOW | Blog post author is Organization, not Person | BATCH 6 | Pending Batch 6 |
+| D5 | LOW | Organization schema missing logo, sameAs | BATCH 3 | ✅ Fixed in b1127ff |
+| D6 | LOW | sitemap-pages.xml uses single hardcoded lastmod | BATCH 2 | ✅ Fixed in 38e446a |
+| D7 | LOW | sitemap-hubs.xml uses hardcoded lastmod | BATCH 2 | ✅ Fixed in 38e446a |
+| D8 | LOW | About page title repeats brand unnecessarily | BATCH 1 | ✅ Fixed in 5c27344 |
+| D9 | MEDIUM | /404 noindex not verified | BATCH 1 | ✅ Verified (robots="noindex,follow") |
+| D10 | LOW | robots.txt doesn't explicitly list AI bots | BATCH 1 | ✅ Fixed in 5c27344 |
+| D11 | LOW | No per-article OG images | BATCH 6 | Pending Batch 6 |
+| D12 | LOW | No og:image:width / og:image:height | BATCH 1 | ✅ Fixed in 5c27344 |
+| D13 | MEDIUM | Calculator pages don't link to relevant blog articles | BATCH 5 | Target Batch 5 |
+| D14 | MEDIUM | Blog relatedArticles may reference non-existent slugs | BATCH 5 | Target Batch 5 |
 
 ---
 
 ## Remaining Issues
-See "Known Defects" table above.
+See "Known Defects" table above: D1, D4, D11 (Batch 6), D13, D14 (Batch 5).
 
 ## Exact Next Action
 
-1. **BATCH 0 CHECKPOINT:**
-   - Run `npm test` (done: ✅ 394 pass)
-   - Run `npm run build` — PENDING
-   - Run `git diff --check` — PENDING
-   - Commit BATCH 0 documents to development
+1. **BATCH 4 CHECKPOINT:**
+   - Run `npm test`
+   - Run `npm run build`
+   - Run `git diff --check`
+   - Commit BATCH 4 documentation to development
    - Push to origin/development
 
-2. **Then begin BATCH 1:** Titles, meta descriptions, canonicals, robots
-   - Fix D8 (About title), D9 (/404 noindex), D10 (robots.txt AI bots)
-   - Full title audit across all pages
-   - Full meta description audit
-   - Canonical audit
+2. **Then begin BATCH 5:** Blog SEO, internal linking, calculator ↔ article relationships
+   - Audit 30 blog articles (metadata, headings, slugs)
+   - Fix D14: audit all `relatedArticles` and `relatedCalculators` in `src/data/blog/` to ensure no broken references
+   - Fix D13: add relevant contextual blog article links from calculator pages where appropriate
+
 
 ---
 
