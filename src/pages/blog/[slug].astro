@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { BLOG_POSTS } from '../../data/blog/posts';
 import type { BlogPost } from '../../data/blog/types';
+import { formatDisplayDate } from '../../lib/formatters';
 
 export function getStaticPaths() {
   return BLOG_POSTS.map((post) => ({
@@ -32,8 +33,7 @@ const jsonld = {
       dateModified: post.dateModified,
       image: [articleOgImageUrl],
       author: {
-        '@type': 'Organization',
-        '@id': 'https://calcumetrics.com/#org',
+        '@type': 'Person',
         name: post.author,
         url: 'https://calcumetrics.com/about',
       },
@@ -79,6 +79,7 @@ const jsonld = {
   canonical={canonicalUrl}
   ogType="article"
   ogImage={articleOgImage}
+  slimFooter={true}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
 
@@ -100,11 +101,6 @@ const jsonld = {
         <span class="text-xs font-semibold px-2.5 py-1 rounded bg-accent/10 text-accent uppercase tracking-wider">
           {post.category}
         </span>
-        {post.market === 'Global' && (
-          <span class="text-[11px] font-medium px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            🌍 Global Analysis
-          </span>
-        )}
         {post.market === 'India-Only' && (
           <span class="text-[11px] font-medium px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
             🇮🇳 India-Specific
@@ -112,7 +108,7 @@ const jsonld = {
         )}
         {post.market === 'Both' && (
           <span class="text-[11px] font-medium px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
-            🌐 Global &amp; India
+            🇮🇳 / Global
           </span>
         )}
       </div>
@@ -122,13 +118,26 @@ const jsonld = {
       </h1>
 
       <div class="flex items-center gap-2 text-xs text-text-muted mb-6 pb-4 border-b border-border/60 flex-wrap">
-        <span>By <strong class="text-text-primary font-medium">{post.author}</strong></span>
+        <span>By <a href="/about" class="text-text-primary font-medium hover:text-accent transition-standard underline decoration-border/60 underline-offset-2">{post.author}</a></span>
         <span>•</span>
-        <span>Fact-checked</span>
-        <span>•</span>
-        <span>Updated <time datetime={post.dateModified} class="text-text-primary font-medium">{post.dateModified}</time></span>
+        <span>Published {formatDisplayDate(post.publishDate)}</span>
+        {post.dateModified !== post.publishDate && (
+          <>
+            <span>•</span>
+            <span>Updated <time datetime={post.dateModified} class="text-text-primary font-medium">{formatDisplayDate(post.dateModified)}</time></span>
+          </>
+        )}
         <span>•</span>
         <span>{post.readTime}</span>
+        {post.reviewer && (
+          <>
+            <span>•</span>
+            <span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+              <span>✓</span>
+              <span>{post.reviewer}</span>
+            </span>
+          </>
+        )}
       </div>
 
       <!-- Direct Answer / Featured Snippet Box (§5) -->
@@ -232,6 +241,33 @@ const jsonld = {
         </div>
       </section>
     )}
+
+    <!-- Founder & Author Bio Box (§12) -->
+    <div class="mt-12 p-6 bg-surface border border-border rounded-card flex flex-col sm:flex-row items-start sm:items-center gap-5">
+      <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-lg font-bold shrink-0 shadow-sm">
+        PB
+      </div>
+      <div class="flex-1">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+          <div>
+            <h3 class="text-sm font-bold text-text-primary">
+              Written by <a href="/about" class="text-accent hover:underline">Priyanshu Bhadauriya</a>
+            </h3>
+            <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">Founder &amp; Lead Developer · Calcumetrics</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-text-muted">
+            <a href="https://linkedin.com/in/priyanshubhadauriya" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-standard">LinkedIn</a>
+            <span>•</span>
+            <a href="https://x.com/calcumetrics" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-standard">X</a>
+            <span>•</span>
+            <a href="/about" class="hover:text-accent transition-standard">About</a>
+          </div>
+        </div>
+        <p class="text-xs text-text-muted leading-relaxed">
+          Priyanshu builds independent, client-side financial engines engineered specifically for commerce students, CA aspirants, and everyday retail investors who require exact formulas and zero promotional clutter.
+        </p>
+      </div>
+    </div>
 
     <!-- Author & Trust Disclaimer Note (§4) -->
     <div class="mt-12 p-5 bg-surface/50 border border-border rounded-card text-xs text-text-muted leading-relaxed space-y-2">

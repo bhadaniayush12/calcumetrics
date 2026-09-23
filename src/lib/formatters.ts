@@ -94,3 +94,91 @@ export function formatLiveInput(raw: string, format: LocaleFormat): string {
 export function parseFormattedNumber(value: string): number {
   return parseFloat(value.replace(/[^0-9.-]/g, ''));
 }
+
+/**
+ * Format a number into compact Indian notation (e.g. ₹1.26 Cr, ₹81.14 Lakh, ₹25,000).
+ */
+export function formatIndianCompact(value: number, symbol = '₹', decimals = 2): string {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  if (abs >= 10000000) {
+    const cr = abs / 10000000;
+    const str = cr.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str} Cr`;
+  }
+  if (abs >= 100000) {
+    const lakh = abs / 100000;
+    const str = lakh.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str} Lakh`;
+  }
+  return `${sign}${symbol}${formatIndian(abs)}`;
+}
+
+/**
+ * Format a number into full Indian words (e.g. ₹1.26 Crore, ₹81.14 Lakh, ₹25,000).
+ */
+export function formatIndianWords(value: number, symbol = '₹', decimals = 2): string {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  if (abs >= 10000000) {
+    const cr = abs / 10000000;
+    const str = cr.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str} Crore`;
+  }
+  if (abs >= 100000) {
+    const lakh = abs / 100000;
+    const str = lakh.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str} Lakh`;
+  }
+  return `${sign}${symbol}${formatIndian(abs)}`;
+}
+
+/**
+ * Universal compact currency formatter that respects active currency.
+ * In INR mode: uses Lakhs and Crores (₹1.26 Cr, ₹81.14 Lakh).
+ * In international mode: uses K, M, B ($1.26M, €500K).
+ */
+export function formatCompactCurrency(value: number, currency: Currency = 'INR', decimals = 2): string {
+  const symbol = CURRENCY_SYMBOLS[currency] || '₹';
+  if (currency === 'INR') {
+    return formatIndianCompact(value, symbol, decimals);
+  }
+
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  if (abs >= 1000000000) {
+    const b = abs / 1000000000;
+    const str = b.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str}B`;
+  }
+  if (abs >= 1000000) {
+    const m = abs / 1000000;
+    const str = m.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
+    return `${sign}${symbol}${str}M`;
+  }
+  if (abs >= 1000) {
+    const k = abs / 1000;
+    const str = k.toFixed(1).replace(/\.0$/, '');
+    return `${sign}${symbol}${str}K`;
+  }
+  return `${sign}${symbol}${new Intl.NumberFormat(CURRENCY_LOCALE[currency].locale, { maximumFractionDigits: decimals }).format(abs)}`;
+}
+
+/**
+ * Format an ISO date string (YYYY-MM-DD) into human-friendly format (e.g. '24 Sep 2026').
+ */
+export function formatDisplayDate(isoDate: string): string {
+  if (!isoDate) return '';
+  const parts = isoDate.split('-');
+  if (parts.length < 3) return isoDate;
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+  if (isNaN(year) || isNaN(month) || isNaN(day) || month < 1 || month > 12) return isoDate;
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${day} ${months[month - 1]} ${year}`;
+}
+

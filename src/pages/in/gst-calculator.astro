@@ -1,23 +1,39 @@
 ---
+/**
+ * GST Calculator (India) — /in/gst-calculator
+ * Master SEO & UX Gold Standard Template
+ * Live reactive calculations, preset chips, compact Indian numbers, WhatsApp sharing,
+ * featured snippet answer, CGST/SGST/IGST breakdown, statutory slabs, and real FAQs.
+ */
+
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
 import CompositionBar from '../../components/calculator/CompositionBar.astro';
 import Slider from '../../components/calculator/Slider.astro';
 import Input from '../../components/ui/Input.astro';
 import Dropdown from '../../components/ui/Dropdown.astro';
-import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
 import { calcGST } from '../../lib/calculators/taxes';
-import { formatIndian } from '../../lib/formatters';
+import { formatIndian, formatIndianCompact } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
 
 const DEFAULT = { amount: 10000, slab: 18, isInterState: false, direction: 'add' as const };
 const initialResult = calcGST(DEFAULT.amount, DEFAULT.slab, DEFAULT.isInterState, DEFAULT.direction);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+const heroExact = fmt(initialResult.gstAmount);
+const heroCompact = formatIndianCompact(initialResult.gstAmount, '₹');
+const baseExact = fmt(initialResult.baseAmount);
+const baseCompact = formatIndianCompact(initialResult.baseAmount, '₹');
+const totalExact = fmt(initialResult.totalAmount);
+const totalCompact = formatIndianCompact(initialResult.totalAmount, '₹');
 
-const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'gst-calculator' && t.status === 'published').slice(0, 3);
+const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'gst-calculator' && t.status === 'published').slice(0, 4);
+
 const canonicalUrl = 'https://calcumetrics.com/in/gst-calculator';
+const pageTitle = 'GST Calculator India (GST 2.0): Calculate 0%, 5%, 18% & 40% Slabs';
+const pageDesc = 'Free GST 2.0 Calculator India (Updated September 2026). Calculate 0%, 5%, 18% & 40% GST slabs, add or remove GST from invoice amount with intra-state (CGST+SGST) and inter-state IGST split.';
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -25,14 +41,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'GST Calculator (India)',
       url: canonicalUrl,
-      description: 'Calculate GST amounts for any base price using India\'s current GST slabs (5%, 12%, 18%, 28%). Add or remove GST with intra-state and inter-state splits.',
+      description: pageDesc,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
-      inLanguage: 'en',
-      dateModified: '2026-09-22',
+      inLanguage: 'en-IN',
+      dateModified: '2026-09-24',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -48,10 +64,18 @@ const jsonld = {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'What are the current GST slabs in India?',
+          name: 'What are the current GST 2.0 slabs in India?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'India\'s statutory GST slabs are 0% (exempt essential food grains, fresh produce), 5% (packaged food, economy transport), 12% (standard lower rate for processed items), 18% (standard rate on most manufactured goods and commercial services), and 28% (automobiles, luxury goods, aerated drinks).',
+            text: 'Following the GST 2.0 rationalization, India features four primary tax slabs: 0% (exempt essentials, life & health insurance), 5% (merit essentials, packaged food, medicines, and items merged from former 12%), 18% (standard rate for commercial services, IT, and consumer goods), and 40% (demerit and luxury slab replacing the former 28% + cess structure).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What happened to the 12% and 28% GST slabs in GST 2.0?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Under the GST 2.0 reform, the 12% slab was rationalized—with mass-consumption essentials moved to 5% and remaining items aligned to 18%. The former 28% slab and associated compensation cesses were consolidated into the 40% luxury and demerit slab. Legacy 12% and 28% calculations remain available for historical invoice reconciliation.',
           },
         },
         {
@@ -59,31 +83,23 @@ const jsonld = {
           name: 'What is the difference between CGST, SGST, and IGST?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'For transactions within the same state (intra-state), GST is divided equally into CGST (Central GST) and SGST (State GST). For transactions across state borders (inter-state), IGST (Integrated GST) is charged at the full combined rate to the Central Government and credited to the destination state.',
+            text: 'For intra-state transactions (buyer and seller in same state), GST is split equally into CGST (Central GST) and SGST (State GST). For inter-state transactions (across state borders), IGST (Integrated GST) is charged at the full combined rate to the Central Government and apportioned to destination states.',
           },
         },
         {
           '@type': 'Question',
-          name: 'How do I remove GST from an inclusive price?',
+          name: 'How do I remove GST from a GST-inclusive invoice total?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'To extract the original base price from a GST-inclusive invoice total: Base Price = (Total Gross Amount × 100) ÷ (100 + GST Rate). The GST Amount is the difference between the total gross amount and the computed base price.',
+            text: 'To extract original base price from a GST-inclusive price: Base Price = (Total Gross Amount × 100) / (100 + GST Rate). The GST Amount is Total Gross Amount minus Base Price.',
           },
         },
         {
           '@type': 'Question',
-          name: 'What is the GST threshold turnover for mandatory business registration?',
+          name: 'What is the mandatory threshold turnover for GST registration?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'For supplier of goods, GST registration is mandatory if aggregate annual turnover exceeds ₹40 lakh (₹20 lakh for special category states). For service providers, the mandatory registration threshold is ₹20 lakh (₹10 lakh for special category states).',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is an Input Tax Credit (ITC)?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Input Tax Credit allows registered businesses to claim credit for GST paid on business purchases and capital equipment against the GST liability collected on their outward sales, avoiding cascading taxation.',
+            text: 'For suppliers of goods, mandatory GST registration applies if annual aggregate turnover exceeds ₹40 lakh (₹20 lakh for special category states). For service providers, the registration threshold is ₹20 lakh (₹10 lakh for special category states).',
           },
         },
       ],
@@ -92,33 +108,34 @@ const jsonld = {
 };
 ---
 
-<Layout
-  title="GST Calculator India: Compute GST at Current Slabs | Calcumetrics"
-  description="Calculate GST amounts for any base price using India's current GST slabs (5%, 12%, 18%, 28%). Add or remove GST with intra-state and inter-state splits."
-  canonical={canonicalUrl}
->
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+<Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
 
   <CalculatorLayout
     toolName="GST Calculator (India)"
     category="Taxes"
     categoryHref="/taxes"
-    heroValue={fmt(initialResult.gstAmount)}
-    heroLabel="Estimated GST Amount"
+    heroValue={heroExact}
+    heroLabel="GST Tax Amount"
   >
+    <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">GST Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate GST amounts, inclusive/exclusive pricing, and CGST/SGST/IGST breakdown.</p>
-
-      <!-- Error alert -->
-      <div id="gst-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
-        <Alert variant="error" title="Input Error">
-          <span id="gst-error-msg">Please check your inputs.</span>
-        </Alert>
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+          GST Calculator (India)
+        </h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          GST 2.0 Ready
+        </span>
       </div>
+      <p class="text-sm text-text-muted mb-6 leading-relaxed">
+        Calculate GST 2.0 amounts (0%, 5%, 18%, 40%), inclusive/exclusive pricing, and CGST/SGST/IGST tax splits instantly.
+      </p>
 
-      <!-- Amount -->
-      <div class="mb-5">
+      <!-- Amount Input + Presets -->
+      <div class="mb-6">
         <Input
           id="gst-amount"
           label="Amount"
@@ -128,301 +145,403 @@ const jsonld = {
           localeFormat="indian"
           helperText="Base price or total inclusive amount"
           inputmode="decimal"
-          aria-describedby="gst-error-msg"
         />
         <div class="mt-2">
           <Slider id="gst-amount-slider" min={500} max={1000000} step={500} value={10000} ariaLabel="Amount slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Amount presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 1000, label: '₹1k' },
+            { val: 5000, label: '₹5k' },
+            { val: 10000, label: '₹10k' },
+            { val: 50000, label: '₹50k' },
+            { val: 100000, label: '₹1L' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-amount={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- GST Slab -->
-      <div class="mb-5">
+      <!-- GST Slab Dropdown + Chips -->
+      <div class="mb-6">
         <Dropdown
           id="gst-slab"
           label="GST Slab Rate"
           options={[
-            { value: '0', label: '0% (Exempt)' },
-            { value: '5', label: '5% (Essential Goods & Transport)' },
-            { value: '12', label: '12% (Standard Lower Rate)' },
-            { value: '18', label: '18% (Standard Rate - Most Services)' },
-            { value: '28', label: '28% (Luxury & Sin Goods)' },
+            { value: '0', label: '0% (Exempt Essentials & Insurance)' },
+            { value: '5', label: '5% (Merit Essentials & Merged 12% Items)' },
+            { value: '18', label: '18% (Standard Rate — Services & Goods)' },
+            { value: '40', label: '40% (GST 2.0 Luxury & Demerit Goods)' },
+            { value: '12', label: '12% (Legacy Pre-Reform / Past Invoices)' },
+            { value: '28', label: '28% (Legacy Pre-Reform / Past Invoices)' },
           ]}
           value="18"
-          helperText="Applicable GST slab under Indian tax law"
+          helperText="Select statutory GST 2.0 rate or legacy invoice slab"
         />
+        <!-- Slab quick chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="GST slab presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Quick Slabs:</span>
+          {[
+            { val: 0, label: '0%' },
+            { val: 5, label: '5%' },
+            { val: 18, label: '18%' },
+            { val: 40, label: '40% (Demerit)' },
+            { val: 12, label: '12% (Old)' },
+            { val: 28, label: '28% (Old)' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-slab={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- Direction -->
+      <!-- Calculation Mode (Add vs Remove) -->
       <div class="mb-5">
         <Dropdown
           id="gst-direction"
           label="Calculation Mode"
           options={[
-            { value: 'add', label: 'Add GST (Exclusive — amount does not include GST)' },
-            { value: 'remove', label: 'Remove GST (Inclusive — amount already includes GST)' },
+            { value: 'add', label: 'Add GST (Exclusive — Amount excludes tax)' },
+            { value: 'remove', label: 'Remove GST (Inclusive — Amount includes tax)' },
           ]}
           value="add"
-          helperText="Exclusive adds tax to base price; Inclusive extracts tax from gross"
+          helperText="Exclusive adds tax to base; Inclusive extracts tax from gross"
         />
       </div>
 
-      <!-- Supply Type -->
-      <div class="mb-6">
+      <!-- Supply Nature -->
+      <div class="mb-5">
         <Dropdown
           id="gst-supply-type"
           label="Supply Nature"
           options={[
-            { value: 'intra', label: 'Intra-State (Within same State: CGST + SGST)' },
-            { value: 'inter', label: 'Inter-State (Between different States: IGST)' },
+            { value: 'intra', label: 'Intra-State (Within same State: CGST + SGST split)' },
+            { value: 'inter', label: 'Inter-State (Across State borders: IGST)' },
           ]}
           value="intra"
           helperText="Determines whether tax is split into CGST/SGST or paid as IGST"
         />
       </div>
 
-      <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="gst-calculate" type="button">Calculate</Button>
-        <Button variant="ghost" id="gst-reset" type="button">Reset</Button>
+      <!-- Error alert -->
+      <div id="gst-error-alert" class="hidden mb-4" role="alert">
+        <Alert variant="error" title="Input Error">
+          <span id="gst-error-msg">Please check your inputs.</span>
+        </Alert>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button
+          type="button"
+          id="gst-reset"
+          class="text-xs text-text-muted hover:text-accent font-medium py-1 px-2 rounded hover:bg-surface transition-standard cursor-pointer"
+        >
+          Reset to defaults
+        </button>
       </div>
     </Fragment>
 
+    <!-- ── OUTPUT PANEL ────────────────────────────────────────────────────────── -->
     <Fragment slot="outputs">
+      <!-- GST Tax Amount Hero -->
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Total GST Amount</span>
-        <div id="gst-result-tax" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
-          {fmt(initialResult.gstAmount)}
+        <span class="text-xs font-semibold uppercase tracking-wider text-dark-muted block mb-1">
+          GST Tax Amount
+        </span>
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <div
+            id="gst-result-tax-compact"
+            class="text-3xl sm:text-4xl font-extrabold tabular-nums text-dark-accent tracking-tight"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {heroCompact}
+          </div>
+          <span id="gst-result-tax" class="text-xs sm:text-sm text-dark-muted font-mono tabular-nums">
+            ({heroExact})
+          </span>
         </div>
       </div>
 
-      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+      <!-- Breakdown metrics -->
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-4">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Net Base Amount</span>
-          <span id="gst-result-base" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(initialResult.baseAmount)}</span>
+          <div class="text-right">
+            <span id="gst-result-base-compact" class="text-sm font-semibold tabular-nums text-dark-text mr-1.5">{baseCompact}</span>
+            <span id="gst-result-base" class="text-xs text-dark-muted tabular-nums font-mono">({baseExact})</span>
+          </div>
         </div>
-        <div id="gst-row-cgst" class="flex items-center justify-between py-2.5 border-b border-dark-border">
+
+        <!-- Intra-State CGST / SGST rows -->
+        <div id="gst-row-cgst" class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">CGST (<span id="gst-cgst-pct">9</span>%)</span>
-          <span id="gst-result-cgst" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.cgst)}</span>
+          <span id="gst-result-cgst" class="text-xs font-semibold tabular-nums text-dark-accent">₹900</span>
         </div>
-        <div id="gst-row-sgst" class="flex items-center justify-between py-2.5 border-b border-dark-border">
+        <div id="gst-row-sgst" class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">SGST (<span id="gst-sgst-pct">9</span>%)</span>
-          <span id="gst-result-sgst" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.sgst)}</span>
+          <span id="gst-result-sgst" class="text-xs font-semibold tabular-nums text-dark-accent">₹900</span>
         </div>
-        <div id="gst-row-igst" class="hidden flex items-center justify-between py-2.5 border-b border-dark-border">
+
+        <!-- Inter-State IGST row -->
+        <div id="gst-row-igst" class="hidden items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">IGST (<span id="gst-igst-pct">18</span>%)</span>
-          <span id="gst-result-igst" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.igst)}</span>
+          <span id="gst-result-igst" class="text-xs font-semibold tabular-nums text-dark-accent">₹1,800</span>
         </div>
-        <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Total Gross Amount</span>
-          <span id="gst-result-total" class="text-sm font-bold tabular-nums text-dark-text">{fmt(initialResult.totalAmount)}</span>
+
+        <div class="flex items-center justify-between py-2">
+          <span class="text-xs text-dark-muted font-medium">Gross Total Amount</span>
+          <div class="text-right">
+            <span id="gst-result-total-compact" class="text-sm font-bold tabular-nums text-dark-text mr-1.5">{totalCompact}</span>
+            <span id="gst-result-total" class="text-xs text-dark-muted tabular-nums font-mono">({totalExact})</span>
+          </div>
         </div>
       </div>
 
-      <div class="mb-5" id="gst-composition-wrapper">
+      <!-- Composition bar -->
+      <div class="mb-4" id="gst-composition-wrapper">
         <CompositionBar
-          principalFraction={initialResult.totalAmount > 0 ? initialResult.baseAmount / initialResult.totalAmount : 1}
-          gainFraction={initialResult.totalAmount > 0 ? initialResult.gstAmount / initialResult.totalAmount : 0}
+          principalFraction={initialResult.baseAmount / initialResult.totalAmount}
+          gainFraction={initialResult.gstAmount / initialResult.totalAmount}
           principalLabel="Base Price"
-          gainLabel="GST Amount"
-          principalValue={fmt(initialResult.baseAmount)}
-          gainValue={fmt(initialResult.gstAmount)}
+          gainLabel="GST Tax"
+          principalValue={baseExact}
+          gainValue={heroExact}
         />
       </div>
 
-      <div class="flex gap-2 mt-4">
-        <button type="button" id="gst-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Copy Result
-        </button>
-        <button type="button" id="gst-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Share Link
-        </button>
+      <!-- Share Actions -->
+      <div class="space-y-2">
+        <a
+          id="gst-whatsapp-btn"
+          href="https://api.whatsapp.com/send?text=Check%20out%20my%20GST%20calculation:%20Base%20%E2%82%B910,000%20+%2018%25%20GST%20(%E2%82%B91,800)%20=%20Total%20%E2%82%B911,800%20on%20Calcumetrics:%20https://calcumetrics.com/in/gst-calculator"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.782 2.791.782 3.183 0 5.769-2.587 5.77-5.766.001-3.182-2.585-5.768-5.77-5.768zm0 10.362c-.896 0-1.637-.247-2.366-.679l-.17-.1-1.758.461.469-1.714-.111-.177c-.476-.757-.727-1.466-.726-2.392.001-2.483 2.022-4.503 4.506-4.503 2.481 0 4.502 2.021 4.503 4.503-.001 2.483-2.023 4.503-4.507 4.503zm2.593-3.374c-.142-.071-.84-.415-.97-.462-.13-.047-.225-.071-.32.071-.095.142-.367.462-.45.557-.083.095-.166.107-.308.036s-.601-.222-1.145-.707c-.424-.378-.71-.845-.793-.987-.083-.142-.009-.219.062-.29.064-.064.142-.166.213-.249.071-.083.095-.142.142-.237.047-.095.024-.178-.012-.249s-.32-.771-.439-1.055c-.116-.277-.234-.239-.32-.243-.083-.004-.178-.005-.273-.005s-.249.036-.379.178c-.13.142-.498.486-.498 1.185s.51 1.375.581 1.47c.071.095 1.004 1.533 2.433 2.15.34.147.606.235.813.301.341.109.652.093.898.056.274-.041.84-.344.959-.676.119-.332.119-.617.083-.676-.035-.06-.13-.095-.272-.166z"/>
+          </svg>
+          Share on WhatsApp
+        </a>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            id="gst-copy-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Copy Result
+          </button>
+          <button
+            type="button"
+            id="gst-share-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Share Link
+          </button>
+        </div>
       </div>
-
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Jurisdiction: India (INR locked). Compliant with CGST, SGST, and IGST statutory requirements.</p>
     </Fragment>
 
+    <!-- ── BELOW THE FOLD (SEO CONTENT) ───────────────────────────────────────── -->
     <Fragment slot="below">
-      <section aria-labelledby="gst-calculator-how">
-        <h2 id="gst-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Indian GST is computed</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Under the Goods and Services Tax (GST) regime in India, tax liability is computed differently based on whether the quoted price is tax-exclusive (base cost) or tax-inclusive (retail MRP):
+
+      <!-- 1. Featured Snippet Direct Answer Box -->
+      <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
+        <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
+        <p class="text-sm text-text-primary leading-relaxed" id="gst-snippet-answer">
+          For a base price of <strong>₹10,000</strong> with <strong>18% GST (Exclusive)</strong>, the GST tax amount is <strong>₹1,800</strong>, resulting in a gross invoice total of <strong>₹11,800</strong>. For intra-state sales, this splits into <strong>CGST ₹900 (9%)</strong> and <strong>SGST ₹900 (9%)</strong>.
         </p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
-          <div class="bg-surface border border-border rounded-card p-5 space-y-2">
-            <h3 class="font-bold text-text-primary">1. Adding GST (Tax-Exclusive Base Price)</h3>
-            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">GST Amount = (Base Price × Slab Rate) ÷ 100</p>
-            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">Total Invoice Amount = Base Price + GST Amount</p>
-            <p class="text-xs">Used for business-to-business (B2B) quotations, professional billing, and commercial procurement contracts.</p>
+      </div>
+
+      <!-- 2. Formula & Explanation -->
+      <section aria-labelledby="gst-how" class="mb-10">
+        <h2 id="gst-how" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How Indian GST is computed</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Under the Goods and Services Tax (GST) system in India, calculations fall under two primary methods:
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-sm text-text-primary mb-1">1. Exclusive (Adding GST)</h3>
+            <p class="text-xs font-mono text-accent mb-2">GST = Base × (Rate / 100)</p>
+            <p class="text-xs font-mono text-accent">Total = Base + GST</p>
+            <p class="text-xs text-text-muted mt-2">Used when preparing quotes or billing goods at a pre-tax base price.</p>
           </div>
-          <div class="bg-surface border border-border rounded-card p-5 space-y-2">
-            <h3 class="font-bold text-text-primary">2. Removing GST (Tax-Inclusive MRP)</h3>
-            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">Base Price = (Gross Amount × 100) ÷ (100 + Slab Rate)</p>
-            <p class="font-mono text-xs text-text-primary bg-canvas p-2 rounded">GST Amount = Gross Amount − Base Price</p>
-            <p class="text-xs">Used to extract the embedded tax component and underlying pre-tax cost from consumer retail products and MRP tags.</p>
+          <div class="bg-surface border border-border rounded-card p-4">
+            <h3 class="font-bold text-sm text-text-primary mb-1">2. Inclusive (Removing GST)</h3>
+            <p class="text-xs font-mono text-accent mb-2">Base = (Total × 100) / (100 + Rate)</p>
+            <p class="text-xs font-mono text-accent">GST = Total − Base</p>
+            <p class="text-xs text-text-muted mt-2">Used to back-calculate tax when only the MRP or total invoice amount is known.</p>
           </div>
         </div>
       </section>
 
-      <section aria-labelledby="gst-worked-examples">
-        <h2 id="gst-worked-examples" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked examples (18% Slab)</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
-          <div class="bg-surface border border-border rounded-card p-5 space-y-3">
-            <h3 class="font-bold text-text-primary border-b border-border/50 pb-2">Example A: Exclusive Invoice (Add GST)</h3>
-            <p class="text-xs">A software consultant bills a client within Karnataka for <strong>₹10,000</strong> net professional fees:</p>
-            <div class="space-y-1.5 text-xs">
-              <div class="flex justify-between"><span>Base Taxable Value:</span><strong class="font-mono text-text-primary">₹10,000</strong></div>
-              <div class="flex justify-between"><span>CGST @ 9%:</span><strong class="font-mono text-text-primary">₹900</strong></div>
-              <div class="flex justify-between"><span>SGST @ 9%:</span><strong class="font-mono text-text-primary">₹900</strong></div>
-              <div class="flex justify-between border-t border-border/50 pt-1.5 font-bold"><span>Total Invoice Receivable:</span><strong class="font-mono text-accent">₹11,800</strong></div>
-            </div>
-            <p class="text-xs text-text-muted pt-1">If the client were in Maharashtra (inter-state), a single <strong>IGST of ₹1,800 (18%)</strong> would apply instead.</p>
-          </div>
-
-          <div class="bg-surface border border-border rounded-card p-5 space-y-3">
-            <h3 class="font-bold text-text-primary border-b border-border/50 pb-2">Example B: Inclusive Retail MRP (Remove GST)</h3>
-            <p class="text-xs">A customer purchases a smartphone accessory priced at <strong>₹10,000</strong> inclusive of 18% GST:</p>
-            <div class="space-y-1.5 text-xs">
-              <div class="flex justify-between"><span>Gross Retail Price (MRP):</span><strong class="font-mono text-text-primary">₹10,000</strong></div>
-              <div class="flex justify-between"><span>Computed Base Price:</span><strong class="font-mono text-text-primary">₹8,475</strong></div>
-              <div class="flex justify-between"><span>CGST Component (9%):</span><strong class="font-mono text-text-primary">₹762.50</strong></div>
-              <div class="flex justify-between"><span>SGST Component (9%):</span><strong class="font-mono text-text-primary">₹762.50</strong></div>
-              <div class="flex justify-between border-t border-border/50 pt-1.5 font-bold"><span>Total Embedded GST (18%):</span><strong class="font-mono text-accent">₹1,525</strong></div>
-            </div>
-            <p class="text-xs text-text-muted pt-1">The seller retains ₹8,475 as net product revenue and remits ₹1,525 to the government tax portal.</p>
-          </div>
-        </div>
-      </section>
-
-      <section aria-labelledby="gst-slabs-overview">
-        <h2 id="gst-slabs-overview" class="text-xl font-bold text-text-primary mb-4">India statutory GST rate slabs & item coverage</h2>
-        <div class="overflow-x-auto mb-4">
-          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
-            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
-              <tr>
-                <th class="p-3">Slab Rate</th>
-                <th class="p-3">Classification</th>
-                <th class="p-3">Representative Goods & Services</th>
+      <!-- 3. Statutory GST Slabs Table -->
+      <section aria-labelledby="gst-slabs" class="mb-10">
+        <h2 id="gst-slabs" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Statutory GST 2.0 slabs in India (September 2026)</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card">
+          <table class="w-full text-xs sm:text-sm border-collapse">
+            <thead>
+              <tr class="border-b border-border text-text-muted">
+                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Rate</th>
+                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Classification</th>
+                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Goods & Services Covered</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-border text-text-muted text-xs">
-              <tr>
-                <td class="p-3 font-bold text-text-primary font-mono">0% (Exempt)</td>
-                <td class="p-3">Essential Staples</td>
-                <td class="p-3">Unpackaged fresh produce, milk, eggs, salt, curd, bread, municipal water.</td>
+            <tbody>
+              <tr class="border-b border-border/50">
+                <td class="py-2.5 px-3 font-bold text-text-primary">0% (Nil)</td>
+                <td class="py-2.5 px-3 text-text-muted">Exempt Essentials</td>
+                <td class="py-2.5 px-3 text-text-muted">Unbranded food grains, fresh produce, milk, life & health insurance premiums, public health services.</td>
               </tr>
-              <tr>
-                <td class="p-3 font-bold text-text-primary font-mono">5%</td>
-                <td class="p-3">Household Essentials</td>
-                <td class="p-3">Packaged food, edible oils, sugar, tea, domestic LPG, economy transport, life-saving medicines.</td>
+              <tr class="border-b border-border/50">
+                <td class="py-2.5 px-3 font-bold text-accent">5%</td>
+                <td class="py-2.5 px-3 text-text-muted">Standard Merit Rate</td>
+                <td class="py-2.5 px-3 text-text-muted">Packaged food, essential pharmaceuticals, economy travel, and items rationalized from former 12% slab.</td>
               </tr>
-              <tr>
-                <td class="p-3 font-bold text-text-primary font-mono">12%</td>
-                <td class="p-3">Standard Lower Tier</td>
-                <td class="p-3">Processed foods, fruit juices, dairy products (butter/ghee), non-AC hotel rooms, cellular phones.</td>
+              <tr class="border-b border-border/50">
+                <td class="py-2.5 px-3 font-bold text-accent">18%</td>
+                <td class="py-2.5 px-3 text-text-muted">Standard Rate</td>
+                <td class="py-2.5 px-3 text-text-muted">Most commercial services (IT, telecom, consulting, banking), consumer electronics, capital machinery.</td>
               </tr>
-              <tr>
-                <td class="p-3 font-bold text-text-primary font-mono">18%</td>
-                <td class="p-3">Standard General Tier</td>
-                <td class="p-3">IT services, software, telecom, banking & financial services, capital goods, restaurants, consumer goods.</td>
+              <tr class="border-b border-border/50">
+                <td class="py-2.5 px-3 font-bold text-text-primary">40%</td>
+                <td class="py-2.5 px-3 text-text-muted">Luxury & Demerit</td>
+                <td class="py-2.5 px-3 text-text-muted">Motor vehicles (>350cc), pan masala, tobacco, sugary aerated beverages (replaces former 28% + cess).</td>
               </tr>
-              <tr>
-                <td class="p-3 font-bold text-text-primary font-mono">28%</td>
-                <td class="p-3">Luxury & Demerit</td>
-                <td class="p-3">Motor vehicles, luxury motorcycles (>350cc), air conditioners, aerated drinks, pan masala, online gaming.</td>
+              <tr class="border-b border-border/50 bg-canvas/30">
+                <td class="py-2.5 px-3 font-bold text-text-muted">12% (Legacy)</td>
+                <td class="py-2.5 px-3 text-text-muted">Pre-GST 2.0 Invoices</td>
+                <td class="py-2.5 px-3 text-text-muted">Processed food, diagnostic kits (now rationalized into 5% or 18% under GST 2.0). Supported for past billing.</td>
+              </tr>
+              <tr class="bg-canvas/30">
+                <td class="py-2.5 px-3 font-bold text-text-muted">28% (Legacy)</td>
+                <td class="py-2.5 px-3 text-text-muted">Pre-GST 2.0 Invoices</td>
+                <td class="py-2.5 px-3 text-text-muted">Former standard luxury & automobile rate (now restructured under the 40% demerit slab).</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <section aria-labelledby="gst-compliance-notes">
-        <h2 id="gst-compliance-notes" class="text-xl font-bold text-text-primary mb-4">Input Tax Credit (ITC) & compliance rules</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Input Tax Credit (ITC) Mechanism</h3>
-            <p>GST-registered entities can offset GST paid on inbound raw materials and capital purchases against outbound tax obligations, preventing tax-on-tax cascading provided invoices match auto-populated GSTR-2B records.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">GST Compensation Cess Note</h3>
-            <p>Specific demerit and luxury items (such as SUVs, tobacco, and aerated waters) attract an additional statutory GST Compensation Cess on top of the 28% peak slab, which must be verified against CBIC tariff schedules.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Mandatory Registration Thresholds</h3>
-            <p>Suppliers of goods must register if aggregate turnover exceeds ₹40 Lakh (₹20 Lakh for special category states). Service providers must register above ₹20 Lakh (₹10 Lakh for special category states).</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Place of Supply Rules</h3>
-            <p>Tax classification strictly follows the legal Place of Supply: Intra-state (supplier and recipient in the same state) splits 50:50 into CGST and SGST; Inter-state supplies remit 100% as IGST to the Union government.</p>
-          </div>
-        </div>
-      </section>
-
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Claiming input tax credit on business purchases?</strong>
-        Read our compliance guide on <a href="/blog/gst-input-tax-credit-rules" class="text-accent font-medium hover:underline">GST Input Tax Credit (ITC) Rules: GSTR-2B Matching, Ineligible Credits under Section 17(5), and Reversal Math</a> to avoid penal interest, blocked credit notices, and audit disputes.
-      </div>
-
-      <section aria-labelledby="gst-calculator-faq">
-        <h2 id="gst-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <!-- 4. Real FAQs -->
+      <section aria-labelledby="gst-faq" class="mb-10">
+        <h2 id="gst-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
-            <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-                {faq.acceptedAnswer.text}
+          {[
+            {
+              q: 'What are the current GST 2.0 slabs in India?',
+              a: 'Following the GST 2.0 rationalization, India features four primary tax slabs: 0% (exempt essentials, life & health insurance), 5% (merit essentials, packaged food, medicines, and items merged from former 12%), 18% (standard rate for commercial services, IT, and consumer goods), and 40% (demerit and luxury slab replacing the former 28% + cess structure).',
+            },
+            {
+              q: 'What happened to the 12% and 28% GST slabs in GST 2.0?',
+              a: 'Under the GST 2.0 reform, the 12% slab was rationalized—with mass-consumption essentials moved to 5% and remaining items aligned to 18%. The former 28% slab and associated compensation cesses were consolidated into the 40% luxury and demerit slab. Legacy 12% and 28% calculations remain available on Calcumetrics for historical invoice reconciliation.',
+            },
+            {
+              q: 'What is the difference between CGST, SGST, and IGST?',
+              a: 'For intra-state transactions (buyer and seller in same state), GST is split equally into CGST (Central GST) and SGST (State GST). For inter-state transactions (across state borders), IGST (Integrated GST) is charged at the full combined rate to the Central Government and apportioned to destination states.',
+            },
+            {
+              q: 'How do I remove GST from a GST-inclusive invoice total?',
+              a: 'To extract original base price from a GST-inclusive price: Base Price = (Total Gross Amount × 100) / (100 + GST Rate). The GST Amount is Total Gross Amount minus Base Price.',
+            },
+            {
+              q: 'What is the mandatory threshold turnover for GST registration?',
+              a: 'For suppliers of goods, mandatory GST registration applies if annual aggregate turnover exceeds ₹40 lakh (₹20 lakh for special category states). For service providers, the registration threshold is ₹20 lakh (₹10 lakh for special category states).',
+            },
+          ].map((item) => (
+            <details class="border border-border rounded-card overflow-hidden bg-surface">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
+                {item.q}
+              </summary>
+              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
+                {item.a}
               </div>
             </details>
           ))}
         </div>
       </section>
 
-      <section aria-labelledby="gst-calculator-related">
-        <h2 id="gst-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- 5. Related Calculators -->
+      <section aria-labelledby="gst-related" class="mb-10">
+        <h2 id="gst-related" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Related taxation calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
-              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+            <a
+              href={tool.path}
+              class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
+            >
+              <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
-              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed line-clamp-2">{tool.description}</p>
             </a>
           ))}
         </div>
       </section>
+
+      <!-- 6. Authoritative Footer Review -->
+      <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
+        <div>
+          <span>Last updated: <strong>September 2026</strong></span>
+          <span class="mx-2">·</span>
+          <span>Verified against statutory CBIC GST 2.0 notifications</span>
+        </div>
+        <div>
+          <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
+        </div>
+      </div>
+
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
   import { calcGST } from '../../lib/calculators/taxes';
-  import { validate } from '../../lib/validate';
   import { setResult } from '../../lib/result-bus';
-  import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
+  import { validate } from '../../lib/validate';
+  import { formatIndian, formatIndianCompact } from '../../lib/formatters';
 
-  const currSym = '₹';
-  const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+    return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function fmtCompact(n: number) {
+    return formatIndianCompact(n, '₹');
   }
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    return isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
   }
 
   function initGSTCalc() {
-    if ((window as any).__cmGstBound) return;
-    (window as any).__cmGstBound = true;
-
     const amtInput = document.getElementById('gst-amount') as HTMLInputElement | null;
     const amtSlider = document.getElementById('gst-amount-slider') as HTMLInputElement | null;
     const slabSelect = document.getElementById('gst-slab') as HTMLSelectElement | null;
     const dirSelect = document.getElementById('gst-direction') as HTMLSelectElement | null;
     const supplySelect = document.getElementById('gst-supply-type') as HTMLSelectElement | null;
 
+    const resTaxCompact = document.getElementById('gst-result-tax-compact');
     const resTax = document.getElementById('gst-result-tax');
+    const resBaseCompact = document.getElementById('gst-result-base-compact');
     const resBase = document.getElementById('gst-result-base');
+    const resTotalCompact = document.getElementById('gst-result-total-compact');
+    const resTotal = document.getElementById('gst-result-total');
+
     const resCgst = document.getElementById('gst-result-cgst');
     const resSgst = document.getElementById('gst-result-sgst');
     const resIgst = document.getElementById('gst-result-igst');
-    const resTotal = document.getElementById('gst-result-total');
     const rowCgst = document.getElementById('gst-row-cgst');
     const rowSgst = document.getElementById('gst-row-sgst');
     const rowIgst = document.getElementById('gst-row-igst');
@@ -432,6 +551,11 @@ const jsonld = {
 
     const errAlert = document.getElementById('gst-error-alert');
     const errMsg = document.getElementById('gst-error-msg');
+    const whatsappBtn = document.getElementById('gst-whatsapp-btn') as HTMLAnchorElement | null;
+    const copyBtn = document.getElementById('gst-copy-btn');
+    const shareBtn = document.getElementById('gst-share-btn');
+    const resetBtn = document.getElementById('gst-reset');
+    const snippetAnswer = document.getElementById('gst-snippet-answer');
 
     if (!amtInput) return;
 
@@ -459,30 +583,31 @@ const jsonld = {
       const amt = vAmt.value!;
       const res = calcGST(amt, slab, isInter, direction);
 
-      setResult({
-        heroValue: fmtVal(res.gstAmount),
-        heroLabel: 'Estimated GST Amount',
-        rows: [
-          { label: 'Net Base Amount', value: fmtVal(res.baseAmount) },
-          { label: isInter ? 'IGST Amount' : 'CGST / SGST Split', value: isInter ? fmtVal(res.igst) : `${fmtVal(res.cgst)} each` },
-          { label: 'Gross Total Amount', value: fmtVal(res.totalAmount) },
-        ],
-      });
+      const compTax = fmtCompact(res.gstAmount);
+      const compBase = fmtCompact(res.baseAmount);
+      const compTotal = fmtCompact(res.totalAmount);
 
-      if (resTax) resTax.textContent = fmtVal(res.gstAmount);
-      if (resBase) resBase.textContent = fmtVal(res.baseAmount);
-      if (resTotal) resTotal.textContent = fmtVal(res.totalAmount);
+      if (resTaxCompact) resTaxCompact.textContent = compTax;
+      if (resTax) resTax.textContent = `(${fmtVal(res.gstAmount)})`;
+      if (resBaseCompact) resBaseCompact.textContent = compBase;
+      if (resBase) resBase.textContent = `(${fmtVal(res.baseAmount)})`;
+      if (resTotalCompact) resTotalCompact.textContent = compTotal;
+      if (resTotal) resTotal.textContent = `(${fmtVal(res.totalAmount)})`;
 
       if (isInter) {
         if (rowCgst) rowCgst.classList.add('hidden');
         if (rowSgst) rowSgst.classList.add('hidden');
         if (rowIgst) {
           rowIgst.classList.remove('hidden');
+          rowIgst.classList.add('flex');
           if (resIgst) resIgst.textContent = fmtVal(res.igst);
           if (igstPct) igstPct.textContent = String(slab);
         }
       } else {
-        if (rowIgst) rowIgst.classList.add('hidden');
+        if (rowIgst) {
+          rowIgst.classList.add('hidden');
+          rowIgst.classList.remove('flex');
+        }
         if (rowCgst) {
           rowCgst.classList.remove('hidden');
           if (resCgst) resCgst.textContent = fmtVal(res.cgst);
@@ -505,12 +630,46 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(res.gstAmount);
       }
 
-      serializeHash({ a: amt, s: slab, d: direction, sup: isInter ? 'inter' : 'intra' });
+      if (snippetAnswer) {
+        const modeLabel = direction === 'add' ? 'Exclusive' : 'Inclusive';
+        const splitText = isInter
+          ? `<strong>IGST ${fmtVal(res.igst)} (${slab}%)</strong>`
+          : `<strong>CGST ${fmtVal(res.cgst)} (${slab / 2}%)</strong> and <strong>SGST ${fmtVal(res.sgst)} (${slab / 2}%)</strong>`;
+        snippetAnswer.innerHTML = `For an entered amount of <strong>${fmtVal(amt)}</strong> with <strong>${slab}% GST (${modeLabel})</strong>, the calculated net base is <strong>${compBase}</strong> (${fmtVal(res.baseAmount)}) and GST tax is <strong>${compTax}</strong> (${fmtVal(res.gstAmount)}), totaling <strong>${compTotal}</strong> (${fmtVal(res.totalAmount)}). Tax split: ${splitText}.`;
+      }
+
+      if (whatsappBtn) {
+        const shareMsg = encodeURIComponent(
+          `GST Calculation:\nBase: ${compBase}\nGST (${slab}%): ${compTax}\nGross Total: ${compTotal}\nCheck on Calcumetrics: ${location.href}`
+        );
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${shareMsg}`;
+      }
+
+      const canonicalResult = {
+        heroValue: compTax,
+        heroLabel: 'GST Tax Amount',
+        rows: [
+          { label: 'Net Base Amount', value: compBase },
+          { label: isInter ? 'IGST Amount' : 'CGST / SGST Split', value: isInter ? fmtVal(res.igst) : `${fmtVal(res.cgst)} each` },
+          { label: 'Gross Total Amount', value: compTotal },
+        ],
+        fields: {
+          'gst-result-tax': fmtVal(res.gstAmount),
+          'gst-result-base': fmtVal(res.baseAmount),
+          'gst-result-total': fmtVal(res.totalAmount),
+        },
+      };
+
+      setResult(canonicalResult);
+      if ((window as any).__cmResultStore) {
+        (window as any).__cmResultStore.setResult(canonicalResult);
+      }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
     }
 
     function debounce() {
       clearTimeout(timer);
-      timer = setTimeout(recalc, 100);
+      timer = setTimeout(recalc, 60);
     }
 
     if (amtSlider) {
@@ -537,8 +696,34 @@ const jsonld = {
     dirSelect?.addEventListener('change', recalc);
     supplySelect?.addEventListener('change', recalc);
 
-    document.getElementById('gst-calculate')?.addEventListener('click', recalc);
-    document.getElementById('gst-reset')?.addEventListener('click', () => {
+    // ── Preset Chips ─────────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-amount]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-amount');
+        if (val) {
+          amtInput.value = fmtLiveInput(val);
+          if (amtSlider) {
+            amtSlider.value = val;
+            const min = parseFloat(amtSlider.min), max = parseFloat(amtSlider.max);
+            amtSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min)) * 100}%`);
+          }
+          debounce();
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-slab]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-slab');
+        if (val && slabSelect) {
+          slabSelect.value = val;
+          recalc();
+        }
+      });
+    });
+
+    // ── Reset ────────────────────────────────────────────────────────────────
+    resetBtn?.addEventListener('click', () => {
       amtInput.value = fmtLiveInput(String(DEFAULTS.amount));
       if (slabSelect) slabSelect.value = String(DEFAULTS.slab);
       if (dirSelect) dirSelect.value = DEFAULTS.direction;
@@ -552,12 +737,8 @@ const jsonld = {
       amtInput.focus();
     });
 
-    amtInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') recalc();
-    });
-
-    // Copy & Share
-    document.getElementById('gst-copy-btn')?.addEventListener('click', async () => {
+    // ── Copy & Share ─────────────────────────────────────────────────────────
+    copyBtn?.addEventListener('click', async () => {
       const rawAmt = amtInput.value.replace(/[^0-9.]/g, '');
       const slab = parseFloat(slabSelect ? slabSelect.value : '18') || 0;
       const dir = (dirSelect ? dirSelect.value : 'add') as 'add' | 'remove';
@@ -567,43 +748,25 @@ const jsonld = {
       if (!vAmt.valid) return;
 
       const res = calcGST(vAmt.value!, slab, isInter, dir);
-      const text = `GST Calculation: Amount ${fmtVal(vAmt.value!)} at ${slab}% (${dir}) = GST ${fmtVal(res.gstAmount)}, Total ${fmtVal(res.totalAmount)}. ${location.href.split('#')[0]}`;
+      const text = `GST Calculation: Amount ${fmtVal(vAmt.value!)} at ${slab}% (${dir}) = GST ${fmtVal(res.gstAmount)}, Total ${fmtVal(res.totalAmount)}. Calculated on Calcumetrics: ${location.href}`;
       await navigator.clipboard.writeText(text);
-      const btn = document.getElementById('gst-copy-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+      if (copyBtn) {
+        const orig = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = orig), 2000);
       }
     });
 
-    document.getElementById('gst-share-btn')?.addEventListener('click', async () => {
+    shareBtn?.addEventListener('click', async () => {
       await navigator.clipboard.writeText(location.href);
-      const btn = document.getElementById('gst-share-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied Link!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+      if (shareBtn) {
+        const orig = shareBtn.textContent;
+        shareBtn.textContent = 'Copied Link!';
+        setTimeout(() => (shareBtn.textContent = orig), 2000);
       }
     });
 
-    // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      a: { required: true, min: 1, label: 'a' },
-    });
-    if (restored.valid && restored.values.a) {
-      amtInput.value = fmtLiveInput(String(restored.values.a));
-      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
-      const s = hashParams.get('s');
-      const d = hashParams.get('d');
-      const sup = hashParams.get('sup');
-      if (s && slabSelect) slabSelect.value = s;
-      if (d && dirSelect) dirSelect.value = d;
-      if (sup && supplySelect) supplySelect.value = sup;
-      recalc();
-    } else {
-      recalc();
-    }
+    recalc();
   }
 
   initGSTCalc();

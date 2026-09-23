@@ -1,17 +1,23 @@
 ---
+/**
+ * Income Tax Calculator (India) — /in/income-tax-calculator
+ * Master SEO & UX Gold Standard Template
+ * Live reactive calculations, preset salary chips, compact Indian numbers, WhatsApp sharing,
+ * featured snippet answer, Old vs New Regime comparison, Budget 2024 slabs, and real FAQs.
+ */
+
 import Layout from '../../layouts/Layout.astro';
 import CalculatorLayout from '../../components/calculator/CalculatorLayout.astro';
 import CompositionBar from '../../components/calculator/CompositionBar.astro';
 import Slider from '../../components/calculator/Slider.astro';
 import Input from '../../components/ui/Input.astro';
-import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
 import { calcIncomeTax } from '../../lib/calculators/income-tax';
-import { formatIndian } from '../../lib/formatters';
+import { formatIndian, formatIndianCompact } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
 
 const DEFAULT = {
-  grossIncome: 1200000,
+  grossIncome: 1500000,
   ded80C: 150000,
   ded80D: 25000,
   otherDed: 50000,
@@ -20,9 +26,18 @@ const DEFAULT = {
 const result = calcIncomeTax(DEFAULT.grossIncome, DEFAULT.ded80C, DEFAULT.ded80D, DEFAULT.otherDed);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+const newTaxExact = fmt(result.newRegime.totalTax);
+const newTaxCompact = formatIndianCompact(result.newRegime.totalTax, '₹');
+const oldTaxExact = fmt(result.oldRegime.totalTax);
+const oldTaxCompact = formatIndianCompact(result.oldRegime.totalTax, '₹');
+const savingsExact = fmt(result.taxSavings);
+const savingsCompact = formatIndianCompact(result.taxSavings, '₹');
 
-const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'income-tax-calculator' && t.status === 'published').slice(0, 3);
-const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator' as string;
+const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'income-tax-calculator' && t.status === 'published').slice(0, 4);
+const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator';
+const pageTitle = 'Income Tax Calculator: Old vs New Regime (FY 2025-26 & 2026-27)';
+const pageDesc = 'Free Income Tax Calculator India (FY 2025-26 & FY 2026-27). Compare New vs Old Tax Regime, Section 87A rebate (zero tax up to ₹12.75 Lakh), ₹75,000 standard deduction, and marginal relief.';
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -30,14 +45,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Income Tax Calculator (India)',
       url: canonicalUrl,
-      description: 'Compare New Tax Regime (Budget 2024 / FY 2024-25 / AY 2025-26) vs Old Tax Regime. Calculate total tax liability, Section 87A rebate, standard deduction, and identify your optimal tax regime.',
+      description: pageDesc,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
-      inLanguage: 'en',
-      dateModified: '2026-09-22',
+      inLanguage: 'en-IN',
+      dateModified: '2026-09-24',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -53,18 +68,26 @@ const jsonld = {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'What are the major changes in the New Tax Regime under Budget 2024?',
+          name: 'What are the current New Tax Regime slabs for FY 2025-26 and FY 2026-27?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Budget 2024 increased the standard deduction for salaried employees from ₹50,000 to ₹75,000 under the New Tax Regime and widened the income slabs: 0-3L (Nil), 3-7L (5%), 7-10L (10%), 10-12L (15%), 12-15L (20%), and above 15L (30%).',
+            text: 'Under the current New Tax Regime, the slabs are: ₹0-₹4 Lakh (Nil), ₹4-₹8 Lakh (5%), ₹8-₹12 Lakh (10%), ₹12-₹16 Lakh (15%), ₹16-₹20 Lakh (20%), ₹20-₹24 Lakh (25%), and above ₹24 Lakh (30%). Salaried taxpayers also receive an automatic ₹75,000 standard deduction.',
           },
         },
         {
           '@type': 'Question',
-          name: 'How does the Section 87A tax rebate work in the New Tax Regime?',
+          name: 'How does the Section 87A rebate work and why is ₹12.75 Lakh tax-free?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹7,00,000 receive a 100% tax rebate under Section 87A. Combined with the ₹75,000 standard deduction, salaried employees earning up to ₹7,75,000 pay zero income tax.',
+            text: 'Section 87A provides a 100% tax rebate (up to ₹60,000) for resident individuals with taxable income up to ₹12,00,000. Combined with the ₹75,000 standard deduction for salaried employees, gross income up to ₹12,75,000 attracts zero income tax under the New Regime.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'How does marginal relief work under Section 87A?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Marginal relief ensures that if your taxable income slightly exceeds ₹12,00,000, your tax payable cannot exceed the amount by which your taxable income exceeds ₹12,00,000. This eliminates the tax cliff.',
           },
         },
         {
@@ -80,7 +103,7 @@ const jsonld = {
           name: 'When is the Old Tax Regime still better than the New Regime?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'The Old Tax Regime can be advantageous for taxpayers who claim substantial deductions exceeding ₹3.75 lakh to ₹4.25 lakh, such as the ₹1.5L 80C cap, ₹2L home loan interest, ₹50k-₹1L health insurance, and large HRA exemptions.',
+            text: 'With the New Regime basic exemption at ₹4 Lakh and zero tax up to ₹12.75 Lakh gross salary, the Old Tax Regime is rarely beneficial unless you have very high deductions exceeding ₹4.5 Lakh to ₹5 Lakh (e.g. combined 80C, 80D, high home loan interest, and large HRA).',
           },
         },
         {
@@ -88,7 +111,7 @@ const jsonld = {
           name: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying the Section 87A rebate under both the New and Old Tax Regimes.',
+            text: 'Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying Section 87A rebate and marginal relief under both regimes.',
           },
         },
       ],
@@ -97,46 +120,65 @@ const jsonld = {
 };
 ---
 
-<Layout
-  title="Income Tax Calculator: New vs Old Regime (Budget 2024) | Calcumetrics"
-  description="Compare New Tax Regime (Budget 2024) vs Old Tax Regime. Calculate total tax, Section 87A rebate, standard deduction, and discover your highest annual tax savings."
-  canonical={canonicalUrl}
->
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+<Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
 
   <CalculatorLayout
     toolName="Income Tax Calculator (India)"
     category="Taxes"
     categoryHref="/taxes"
-    heroValue={fmt(result.newRegime.totalTax)}
+    heroValue={newTaxExact}
     heroLabel="New Regime Tax"
-    calcType="dual-comparison"
   >
+    <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Income Tax Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Compare New Tax Regime (Budget 2024 / FY 2024-25) with Old Regime to maximize your annual tax savings.</p>
-
-      <!-- Dynamic validation error alert -->
-      <div id="it-error-alert" class="hidden mb-5">
-        <Alert variant="error" title="Input Error">
-          <span id="it-error-msg">Please review the highlighted values.</span>
-        </Alert>
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+          Income Tax Calculator
+        </h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          FY 2025-26 & 2026-27
+        </span>
       </div>
+      <p class="text-sm text-text-muted mb-6 leading-relaxed">
+        Compare New Tax Regime (AY 2026-27 & 2027-28) with Old Regime to find your highest annual tax savings.
+      </p>
 
-      <!-- Gross Annual Income -->
-      <div class="mb-5">
+      <!-- Gross Annual Income Input + Presets -->
+      <div class="mb-6">
         <Input
           id="it-gross"
           label="Gross Annual Income (Salary / CTC / Business)"
           prefix="₹"
-          value="12,00,000"
+          value="15,00,000"
           isNumeric={true}
           localeFormat="indian"
           helperText="Total annual earnings before standard deduction or exemptions"
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="it-gross-slider" min={300000} max={10000000} step={25000} value={1200000} ariaLabel="Gross income slider" />
+          <Slider id="it-gross-slider" min={300000} max={10000000} step={25000} value={1500000} ariaLabel="Gross income slider" />
+        </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Income presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 1275000, label: '₹12.75L (Zero Tax)' },
+            { val: 1500000, label: '₹15L' },
+            { val: 2000000, label: '₹20L' },
+            { val: 2500000, label: '₹25L' },
+            { val: 5000000, label: '₹50L' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-gross={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -178,12 +220,12 @@ const jsonld = {
       <div class="mb-6">
         <Input
           id="it-other"
-          label="Other Deductions (HRA, Home Loan Interest Sec 24b, NPS 80CCD)"
+          label="Other Deductions (HRA, Sec 24b Home Loan Interest)"
           prefix="₹"
           value="50,000"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Eligible Chapter VI-A deductions and allowances (Old Regime only)"
+          helperText="Eligible Chapter VI-A deductions and exemptions (Old Regime only)"
           inputmode="decimal"
         />
         <div class="mt-2">
@@ -191,122 +233,183 @@ const jsonld = {
         </div>
       </div>
 
-      <Alert variant="info" title="Budget 2024 Update (FY 2024-25 / AY 2025-26)">
-        Standard deduction under the New Tax Regime is increased to <strong>₹75,000</strong>. Income up to <strong>₹7.75 Lakh</strong> is 100% tax-free after the Section 87A rebate.
-      </Alert>
+      <!-- Error alert -->
+      <div id="it-error-alert" class="hidden mb-4">
+        <Alert variant="error" title="Input Error">
+          <span id="it-error-msg">Please review the highlighted values.</span>
+        </Alert>
+      </div>
 
-      <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="it-calculate" type="button">Calculate</Button>
-        <Button variant="ghost" id="it-reset" type="button">Reset</Button>
+      <div class="flex justify-end pt-2">
+        <button
+          type="button"
+          id="it-reset"
+          class="text-xs text-text-muted hover:text-accent font-medium py-1 px-2 rounded hover:bg-surface transition-standard cursor-pointer"
+        >
+          Reset to defaults
+        </button>
       </div>
     </Fragment>
 
+    <!-- ── OUTPUT PANEL ────────────────────────────────────────────────────────── -->
     <Fragment slot="outputs">
+      <!-- Recommendation Hero -->
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Recommended Option</span>
-        <div id="it-result-rec" class="text-2xl font-bold tabular-nums text-dark-accent" aria-live="polite">
-          {result.recommendedRegime === 'Equal' ? 'Both Regimes Equal' : `${result.recommendedRegime} (Save ${fmt(result.taxSavings)})`}
+        <span class="text-xs font-semibold uppercase tracking-wider text-dark-muted block mb-1">
+          Recommended Tax Regime
+        </span>
+        <div id="it-result-rec" class="text-2xl sm:text-3xl font-extrabold tabular-nums text-dark-accent tracking-tight" aria-live="polite">
+          {result.recommendedRegime === 'Equal' ? 'Both Regimes Equal' : `${result.recommendedRegime} (Save ${savingsCompact})`}
         </div>
       </div>
 
-      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">New Regime Tax (Budget 2024)</span>
-          <span id="it-result-newtax" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(result.newRegime.totalTax)}</span>
+      <!-- Comparison Metrics -->
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-4">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">New Regime Tax (FY 2025-26 & 2026-27)</span>
+          <div class="text-right">
+            <span id="it-result-newtax-compact" class="text-sm font-bold tabular-nums text-dark-accent mr-1.5">{newTaxCompact}</span>
+            <span id="it-result-newtax" class="text-xs text-dark-muted tabular-nums font-mono">({newTaxExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Old Regime Tax</span>
-          <span id="it-result-oldtax" class="text-sm font-semibold tabular-nums text-dark-text">{fmt(result.oldRegime.totalTax)}</span>
+          <div class="text-right">
+            <span id="it-result-oldtax-compact" class="text-sm font-semibold tabular-nums text-dark-text mr-1.5">{oldTaxCompact}</span>
+            <span id="it-result-oldtax" class="text-xs text-dark-muted tabular-nums font-mono">({oldTaxExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">New Regime Standard Deduction</span>
-          <span class="text-sm font-medium tabular-nums text-dark-accent">₹75,000</span>
+          <span class="text-sm font-semibold tabular-nums text-dark-accent">₹75,000</span>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Old Regime Total Deductions</span>
           <span id="it-result-old-deductions" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.oldRegime.totalDeductions)}</span>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">New Regime Annual Take-Home</span>
-          <span id="it-result-newtakehome" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.newRegime.takeHomeIncome)}</span>
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">New Regime Take-Home Pay</span>
+          <span id="it-result-newtakehome" class="text-sm font-bold tabular-nums text-dark-text">{fmt(result.newRegime.takeHomeIncome)}</span>
         </div>
-        <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Old Regime Annual Take-Home</span>
-          <span id="it-result-oldtakehome" class="text-sm font-medium tabular-nums text-dark-text">{fmt(result.oldRegime.takeHomeIncome)}</span>
+        <div class="flex items-center justify-between py-2">
+          <span class="text-xs text-dark-muted">Old Regime Take-Home Pay</span>
+          <span id="it-result-oldtakehome" class="text-sm font-medium tabular-nums text-dark-muted">{fmt(result.oldRegime.takeHomeIncome)}</span>
         </div>
       </div>
 
-      <div class="mb-5" id="it-composition-wrapper">
+      <!-- Composition bar -->
+      <div class="mb-4" id="it-composition-wrapper">
         <CompositionBar
           principalFraction={DEFAULT.grossIncome > 0 ? result.newRegime.takeHomeIncome / DEFAULT.grossIncome : 1}
           gainFraction={DEFAULT.grossIncome > 0 ? result.newRegime.totalTax / DEFAULT.grossIncome : 0}
           principalLabel="Take-Home Pay"
           gainLabel="Income Tax"
           principalValue={fmt(result.newRegime.takeHomeIncome)}
-          gainValue={fmt(result.newRegime.totalTax)}
+          gainValue={newTaxExact}
         />
       </div>
 
-      <div class="flex gap-2 mt-4">
-        <button type="button" id="it-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Copy Result
-        </button>
-        <button type="button" id="it-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Share Link
-        </button>
+      <!-- Share Actions -->
+      <div class="space-y-2">
+        <a
+          id="it-whatsapp-btn"
+          href="https://api.whatsapp.com/send?text=Compare%20Income%20Tax%20(Budget%202024):%20Gross%20%E2%82%B912%20Lakh%20yields%20New%20Regime%20Tax%20of%20%E2%82%B985,800%20vs%20Old%20Regime%20Tax%20of%20%E2%82%B91,06,600%20on%20Calcumetrics:%20https://calcumetrics.com/in/income-tax-calculator"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.782 2.791.782 3.183 0 5.769-2.587 5.77-5.766.001-3.182-2.585-5.768-5.77-5.768zm0 10.362c-.896 0-1.637-.247-2.366-.679l-.17-.1-1.758.461.469-1.714-.111-.177c-.476-.757-.727-1.466-.726-2.392.001-2.483 2.022-4.503 4.506-4.503 2.481 0 4.502 2.021 4.503 4.503-.001 2.483-2.023 4.503-4.507 4.503zm2.593-3.374c-.142-.071-.84-.415-.97-.462-.13-.047-.225-.071-.32.071-.095.142-.367.462-.45.557-.083.095-.166.107-.308.036s-.601-.222-1.145-.707c-.424-.378-.71-.845-.793-.987-.083-.142-.009-.219.062-.29.064-.064.142-.166.213-.249.071-.083.095-.142.142-.237.047-.095.024-.178-.012-.249s-.32-.771-.439-1.055c-.116-.277-.234-.239-.32-.243-.083-.004-.178-.005-.273-.005s-.249.036-.379.178c-.13.142-.498.486-.498 1.185s.51 1.375.581 1.47c.071.095 1.004 1.533 2.433 2.15.34.147.606.235.813.301.341.109.652.093.898.056.274-.041.84-.344.959-.676.119-.332.119-.617.083-.676-.035-.06-.13-.095-.272-.166z"/>
+          </svg>
+          Share on WhatsApp
+        </a>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            id="it-copy-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Copy Result
+          </button>
+          <button
+            type="button"
+            id="it-share-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Share Link
+          </button>
+        </div>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Tax computations include applicable Section 87A rebate and 4% Health & Education Cess for FY 2024-25 / AY 2025-26.</p>
+      <p class="text-[11px] text-dark-muted mt-3 leading-relaxed">
+        Computations include Section 87A rebate, marginal relief, and 4% Health & Education Cess for FY 2025-26 & FY 2026-27 (AY 2026-27 & 2027-28).
+      </p>
     </Fragment>
 
+    <!-- ── BELOW THE FOLD (SEO CONTENT) ───────────────────────────────────────── -->
     <Fragment slot="below">
-      <!-- Slab Comparison Section -->
-      <section aria-labelledby="tax-slabs-comparison">
-        <h2 id="tax-slabs-comparison" class="text-xl font-bold text-text-primary mb-4">New vs Old Tax Regime Slabs (FY 2024-25)</h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm text-left border border-border rounded-card overflow-hidden">
-            <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+
+      <!-- 1. Featured Snippet Direct Answer Box -->
+      <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
+        <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
+        <p class="text-sm text-text-primary leading-relaxed" id="it-snippet-answer">
+          For a gross salary of <strong>₹15.00 Lakh</strong>, the <strong>New Tax Regime</strong> is more beneficial, resulting in a tax of <strong>₹97,500</strong> compared to <strong>₹1,87,200</strong> under the Old Regime (with ₹2.75L deductions), saving you <strong>₹89,700</strong> annually.
+        </p>
+      </div>
+
+      <!-- 2. Current Slabs Comparison Table -->
+      <section aria-labelledby="tax-slabs-comparison" class="mb-10">
+        <h2 id="tax-slabs-comparison" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">New vs Old Tax Regime Slabs (FY 2025-26 & FY 2026-27)</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card">
+          <table class="w-full text-xs sm:text-sm border-collapse">
+            <thead class="bg-surface border-b border-border text-text-primary font-semibold">
               <tr>
-                <th class="p-3">New Tax Regime Slabs (Budget 2024)</th>
-                <th class="p-3">Rate</th>
-                <th class="p-3">Old Tax Regime Slabs</th>
-                <th class="p-3">Rate</th>
+                <th class="p-3 text-left">New Tax Regime Slabs (FY 2025-26 & 2026-27)</th>
+                <th class="p-3 text-left">Tax Rate</th>
+                <th class="p-3 text-left">Old Tax Regime Slabs</th>
+                <th class="p-3 text-left">Tax Rate</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border text-text-muted">
               <tr>
-                <td class="p-3">Up to ₹3,00,000</td>
-                <td class="p-3 font-medium text-text-primary">Nil</td>
+                <td class="p-3">Up to ₹4,00,000</td>
+                <td class="p-3 font-semibold text-text-primary">Nil</td>
                 <td class="p-3">Up to ₹2,50,000</td>
-                <td class="p-3 font-medium text-text-primary">Nil</td>
+                <td class="p-3 font-semibold text-text-primary">Nil</td>
               </tr>
               <tr>
-                <td class="p-3">₹3,00,001 to ₹7,00,000</td>
-                <td class="p-3 font-medium text-text-primary">5%</td>
+                <td class="p-3">₹4,00,001 to ₹8,00,000</td>
+                <td class="p-3 font-semibold text-accent">5%</td>
                 <td class="p-3">₹2,50,001 to ₹5,00,000</td>
-                <td class="p-3 font-medium text-text-primary">5%</td>
+                <td class="p-3 font-semibold text-accent">5%</td>
               </tr>
               <tr>
-                <td class="p-3">₹7,00,001 to ₹10,00,000</td>
-                <td class="p-3 font-medium text-text-primary">10%</td>
+                <td class="p-3">₹8,00,001 to ₹12,00,000</td>
+                <td class="p-3 font-semibold text-accent">10%</td>
                 <td class="p-3">₹5,00,001 to ₹10,00,000</td>
-                <td class="p-3 font-medium text-text-primary">20%</td>
+                <td class="p-3 font-semibold text-accent">20%</td>
               </tr>
               <tr>
-                <td class="p-3">₹10,00,001 to ₹12,00,000</td>
-                <td class="p-3 font-medium text-text-primary">15%</td>
+                <td class="p-3">₹12,00,001 to ₹16,00,000</td>
+                <td class="p-3 font-semibold text-accent">15%</td>
                 <td class="p-3">Above ₹10,00,000</td>
-                <td class="p-3 font-medium text-text-primary">30%</td>
+                <td class="p-3 font-semibold text-text-primary">30%</td>
               </tr>
               <tr>
-                <td class="p-3">₹12,00,001 to ₹15,00,000</td>
-                <td class="p-3 font-medium text-text-primary">20%</td>
+                <td class="p-3">₹16,00,001 to ₹20,00,000</td>
+                <td class="p-3 font-semibold text-accent">20%</td>
                 <td class="p-3">—</td>
                 <td class="p-3">—</td>
               </tr>
               <tr>
-                <td class="p-3">Above ₹15,00,000</td>
-                <td class="p-3 font-medium text-text-primary">30%</td>
+                <td class="p-3">₹20,00,001 to ₹24,00,000</td>
+                <td class="p-3 font-semibold text-accent">25%</td>
+                <td class="p-3">—</td>
+                <td class="p-3">—</td>
+              </tr>
+              <tr>
+                <td class="p-3">Above ₹24,00,000</td>
+                <td class="p-3 font-semibold text-text-primary">30%</td>
                 <td class="p-3">—</td>
                 <td class="p-3">—</td>
               </tr>
@@ -315,279 +418,252 @@ const jsonld = {
         </div>
       </section>
 
-      <!-- Worked Example -->
-      <section aria-labelledby="tax-example" class="mt-8">
-        <h2 id="tax-example" class="text-xl font-bold text-text-primary mb-4">Worked Example: Salaried Employee at ₹12 Lakh CTC</h2>
-        <div class="bg-surface border border-border rounded-card p-5 space-y-3 text-sm text-text-muted leading-relaxed">
-          <p>
-            Consider a salaried employee in Bengaluru earning a gross annual CTC of <strong>₹12,00,000</strong>. The employee invests <strong>₹1,50,000</strong> in EPF/PPF (Section 80C), pays <strong>₹25,000</strong> in family medical insurance (Section 80D), and claims <strong>₹50,000</strong> in other allowances:
-          </p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-            <div class="bg-canvas border border-border p-4 rounded">
-              <h3 class="font-bold text-text-primary mb-2">New Tax Regime (Budget 2024)</h3>
-              <ul class="list-disc pl-5 space-y-1 text-xs">
-                <li>Gross Salary: ₹12,00,000</li>
-                <li>Standard Deduction: &minus;₹75,000</li>
-                <li>Taxable Income: <strong>₹11,25,000</strong></li>
-                <li>3L-7L (5%): ₹20,000</li>
-                <li>7L-10L (10%): ₹30,000</li>
-                <li>10L-11.25L (15%): ₹18,750</li>
-                <li>Base Tax: ₹68,750</li>
-                <li>4% Cess: ₹2,750</li>
-                <li><strong>Total Tax: ₹71,500</strong></li>
-              </ul>
-            </div>
-            <div class="bg-canvas border border-border p-4 rounded">
-              <h3 class="font-bold text-text-primary mb-2">Old Tax Regime</h3>
-              <ul class="list-disc pl-5 space-y-1 text-xs">
-                <li>Gross Salary: ₹12,00,000</li>
-                <li>Standard Deduction: &minus;₹50,000</li>
-                <li>80C + 80D + Other: &minus;₹2,25,000</li>
-                <li>Taxable Income: <strong>₹9,25,000</strong></li>
-                <li>2.5L-5L (5%): ₹12,500</li>
-                <li>5L-9.25L (20%): ₹85,000</li>
-                <li>Base Tax: ₹97,500</li>
-                <li>4% Cess: ₹3,900</li>
-                <li><strong>Total Tax: ₹1,01,400</strong></li>
-              </ul>
-            </div>
+      <!-- 3. Key Rules: 87A Rebate, Marginal Relief & Standard Deduction -->
+      <section aria-labelledby="tax-rules" class="mb-10">
+        <h2 id="tax-rules" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Key statutory highlights (FY 2025-26 & FY 2026-27)</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-text-muted">
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">₹75,000 Standard Deduction</h3>
+            <p class="leading-relaxed">Salaried individuals under the New Regime receive an automatic ₹75,000 deduction without needing to submit bills or investment receipts.</p>
           </div>
-          <p class="pt-2 font-medium text-text-primary">
-            Outcome: The New Tax Regime reduces annual income tax from ₹1,01,400 down to ₹71,500, delivering a net tax savings of <strong>₹29,900</strong> per year.
-          </p>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">Zero Tax Up to ₹12.75 Lakh</h3>
+            <p class="leading-relaxed">Under Section 87A, taxable income up to ₹12 Lakh gets 100% tax rebate. With the ₹75,000 standard deduction, salaried gross income up to ₹12.75L pays zero tax.</p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">Section 87A Marginal Relief</h3>
+            <p class="leading-relaxed">No tax cliff: if your taxable income slightly exceeds ₹12 Lakh, marginal relief caps your tax liability to the exact excess income earned over ₹12 Lakh.</p>
+          </div>
         </div>
       </section>
 
-      <!-- Assumptions & Limitations -->
-      <section aria-labelledby="tax-assumptions" class="mt-8">
-        <h2 id="tax-assumptions" class="text-xl font-bold text-text-primary mb-4">Key Assumptions and Legal Notes</h2>
-        <div class="bg-surface border border-border rounded-card p-5 space-y-2 text-sm text-text-muted leading-relaxed">
-          <p>• <strong>Applicable Assessment Year:</strong> Computations reflect provisions of the Finance (No. 2) Act, 2024 applicable for Financial Year 2024-25 (Assessment Year 2025-26).</p>
-          <p>• <strong>Resident Status:</strong> Assumes the taxpayer is an individual tax resident of India below 60 years of age.</p>
-          <p>• <strong>Standard Deduction:</strong> The ₹75,000 standard deduction under the New Tax Regime is available exclusively for salaried individuals and pensioners, not business professionals.</p>
-          <p>• <strong>Surcharge:</strong> High-net-worth surcharge (>₹50L income) is omitted in standard salary ranges. Consult a Chartered Accountant for complex income portfolios.</p>
-        </div>
-      </section>
-
-      <div class="p-4 bg-surface border border-accent/30 rounded-card mt-8 mb-4 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Unsure whether your deductions justify staying in the Old Regime?</strong>
-        Read our comprehensive breakdown: <a href="/blog/old-vs-new-tax-regime" class="text-accent font-medium hover:underline">Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula</a> for bracket-by-bracket breakeven lookup tables and employer NPS optimization.
-      </div>
-
-      <!-- FAQ Section -->
-      <section aria-labelledby="tax-faq" class="mt-8">
-        <h2 id="tax-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <!-- 4. Real FAQs -->
+      <section aria-labelledby="it-faq" class="mb-10">
+        <h2 id="it-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What are the major changes in the New Tax Regime under Budget 2024?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Budget 2024 increased the standard deduction for salaried employees from ₹50,000 to ₹75,000 under the New Tax Regime and widened the income slabs: 0-3L (Nil), 3-7L (5%), 7-10L (10%), 10-12L (15%), 12-15L (20%), and above 15L (30%).
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does the Section 87A tax rebate work in the New Tax Regime?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Under the New Tax Regime, resident individuals with total taxable income up to ₹7,00,000 receive a 100% tax rebate under Section 87A. Combined with the ₹75,000 standard deduction, salaried employees earning up to ₹7,75,000 pay zero income tax.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. Chapter VI-A deductions such as Section 80C (EPF, PPF, ELSS), Section 80D (health insurance), Section 24(b) (home loan interest on self-occupied property), and HRA exemptions are only available under the Old Tax Regime.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">When is the Old Tax Regime still better than the New Regime?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              The Old Tax Regime can be advantageous for taxpayers who claim substantial deductions exceeding ₹3.75 lakh to ₹4.25 lakh, such as the ₹1.5L 80C cap, ₹2L home loan interest, ₹50k-₹1L health insurance, and large HRA exemptions.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is the 4% Health and Education Cess applicable to both tax regimes?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying the Section 87A rebate under both the New and Old Tax Regimes.
-            </div>
-          </details>
+          {[
+            {
+              q: 'What are the major changes in the New Tax Regime under Budget 2024?',
+              a: 'Budget 2024 increased the standard deduction for salaried employees from ₹50,000 to ₹75,000 under the New Tax Regime and widened the income slabs: 0-3L (Nil), 3-7L (5%), 7-10L (10%), 10-12L (15%), 12-15L (20%), and above 15L (30%).',
+            },
+            {
+              q: 'How does the Section 87A tax rebate work in the New Tax Regime?',
+              a: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹7,00,000 receive a 100% tax rebate under Section 87A. Combined with the ₹75,000 standard deduction, salaried employees earning up to ₹7,75,000 pay zero income tax.',
+            },
+            {
+              q: 'Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?',
+              a: 'No. Chapter VI-A deductions such as Section 80C (EPF, PPF, ELSS), Section 80D (health insurance), Section 24(b) (home loan interest on self-occupied property), and HRA exemptions are only available under the Old Tax Regime.',
+            },
+            {
+              q: 'When is the Old Tax Regime still better than the New Regime?',
+              a: 'The Old Tax Regime can be advantageous for taxpayers who claim substantial deductions exceeding ₹3.75 lakh to ₹4.25 lakh, such as the ₹1.5L 80C cap, ₹2L home loan interest, ₹50k-₹1L health insurance, and large HRA exemptions.',
+            },
+            {
+              q: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
+              a: 'Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying the Section 87A rebate under both the New and Old Tax Regimes.',
+            },
+            {
+              q: 'Can salaried individuals switch between Old and New Tax Regimes every year?',
+              a: 'Yes. Individuals with salaried income (no business or professional income) can choose the more advantageous regime every financial year while filing their ITR on the Income Tax e-filing portal.',
+            },
+          ].map((item) => (
+            <details class="border border-border rounded-card overflow-hidden bg-surface">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
+                {item.q}
+              </summary>
+              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
+                {item.a}
+              </div>
+            </details>
+          ))}
         </div>
       </section>
 
-      <!-- Related Calculators -->
-      <section aria-labelledby="tax-related" class="mt-8">
-        <h2 id="tax-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- 5. Related Calculators -->
+      <section aria-labelledby="it-related" class="mb-10">
+        <h2 id="it-related" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Related taxation & salary calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
-              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+            <a
+              href={tool.path}
+              class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
+            >
+              <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
-              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed line-clamp-2">{tool.description}</p>
             </a>
           ))}
         </div>
       </section>
+
+      <!-- 6. Authoritative Footer Review -->
+      <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
+        <div>
+          <span>Last updated: <strong>September 2026</strong></span>
+          <span class="mx-2">·</span>
+          <span>Verified against Income Tax Act statutory provisions (FY 2025-26 & FY 2026-27)</span>
+        </div>
+        <div>
+          <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
+        </div>
+      </div>
+
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  import { validate } from '../../lib/validate';
-  import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../../lib/url-state';
-  import { setResult } from '../../lib/result-bus';
   import { calcIncomeTax } from '../../lib/calculators/income-tax';
-
-  // Strict India Currency Lock: Income Tax is an India-only calculator.
-  // Must NOT change when global currency switcher changes.
-  const currSym = '₹';
-  const currLocale = 'en-IN';
+  import { setResult } from '../../lib/result-bus';
+  import { validate } from '../../lib/validate';
+  import { formatIndian, formatIndianCompact } from '../../lib/formatters';
 
   function fmtVal(n: number) {
-    if (!isFinite(n)) return 'N/A';
-    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+    return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-
+  function fmtCompact(n: number) {
+    return formatIndianCompact(n, '₹');
+  }
   function fmtLiveInput(raw: string) {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    return isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
   }
-
-  const itSchema = {
-    g: { required: true, min: 0, max: 1000000000, decimal: true, label: 'Gross Annual Income' },
-    c: { required: true, min: 0, max: 150000, decimal: true, label: 'Section 80C' },
-    d: { required: true, min: 0, max: 100000, decimal: true, label: 'Section 80D' },
-    o: { required: true, min: 0, max: 100000000, decimal: true, label: 'Other Deductions' },
-  };
 
   function initITCalc() {
     const grossInput = document.getElementById('it-gross') as HTMLInputElement | null;
-    const c80Input = document.getElementById('it-80c') as HTMLInputElement | null;
-    const d80Input = document.getElementById('it-80d') as HTMLInputElement | null;
-    const otherInput = document.getElementById('it-other') as HTMLInputElement | null;
-
     const grossSlider = document.getElementById('it-gross-slider') as HTMLInputElement | null;
+    const c80Input = document.getElementById('it-80c') as HTMLInputElement | null;
     const c80Slider = document.getElementById('it-80c-slider') as HTMLInputElement | null;
+    const d80Input = document.getElementById('it-80d') as HTMLInputElement | null;
     const d80Slider = document.getElementById('it-80d-slider') as HTMLInputElement | null;
+    const otherInput = document.getElementById('it-other') as HTMLInputElement | null;
     const otherSlider = document.getElementById('it-other-slider') as HTMLInputElement | null;
 
     const resRec = document.getElementById('it-result-rec');
+    const resNewTaxCompact = document.getElementById('it-result-newtax-compact');
     const resNewTax = document.getElementById('it-result-newtax');
+    const resOldTaxCompact = document.getElementById('it-result-oldtax-compact');
     const resOldTax = document.getElementById('it-result-oldtax');
-    const resOldDed = document.getElementById('it-result-old-deductions');
-    const resNewTH = document.getElementById('it-result-newtakehome');
-    const resOldTH = document.getElementById('it-result-oldtakehome');
-    const mobileHero = document.getElementById('calc-mobile-hero');
+    const resOldDeductions = document.getElementById('it-result-old-deductions');
+    const resNewTakeHome = document.getElementById('it-result-newtakehome');
+    const resOldTakeHome = document.getElementById('it-result-oldtakehome');
 
-    const errorAlert = document.getElementById('it-error-alert');
-    const errorMsg = document.getElementById('it-error-msg');
+    const errAlert = document.getElementById('it-error-alert');
+    const errMsg = document.getElementById('it-error-msg');
+    const snippetAnswer = document.getElementById('it-snippet-answer');
+    const whatsappBtn = document.getElementById('it-whatsapp-btn') as HTMLAnchorElement | null;
+    const copyBtn = document.getElementById('it-copy-btn');
+    const shareBtn = document.getElementById('it-share-btn');
+    const resetBtn = document.getElementById('it-reset');
 
     if (!grossInput) return;
 
-    const DEFAULTS = { gross: 1200000, c80: 150000, d80: 25000, other: 50000 };
+    const DEFAULTS = { gross: 1500000, c80: 150000, d80: 25000, other: 50000 };
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
-      if (errorAlert && errorMsg) {
-        errorMsg.textContent = msg;
-        errorAlert.classList.remove('hidden');
-      }
+      if (errAlert) errAlert.classList.remove('hidden');
+      if (errMsg) errMsg.textContent = msg;
     }
-
     function hideError() {
-      if (errorAlert) {
-        errorAlert.classList.add('hidden');
-      }
+      if (errAlert) errAlert.classList.add('hidden');
     }
 
     function recalc() {
-      const valG = validate(grossInput.value, itSchema.g);
-      const valC = validate(c80Input ? c80Input.value : '0', itSchema.c);
-      const valD = validate(d80Input ? d80Input.value : '0', itSchema.d);
-      const valO = validate(otherInput ? otherInput.value : '0', itSchema.o);
+      const vG = validate(grossInput!.value.replace(/[^0-9.]/g, ''), { required: true, min: 10000, label: 'Gross Annual Income' });
+      const vC = validate(c80Input ? c80Input.value.replace(/[^0-9.]/g, '') : '0', { required: false, min: 0, max: 150000, label: 'Section 80C' });
+      const vD = validate(d80Input ? d80Input.value.replace(/[^0-9.]/g, '') : '0', { required: false, min: 0, max: 100000, label: 'Section 80D' });
+      const vO = validate(otherInput ? otherInput.value.replace(/[^0-9.]/g, '') : '0', { required: false, min: 0, max: 1000000, label: 'Other Deductions' });
 
-      if (!valG.valid || !valC.valid || !valD.valid || !valO.valid) {
-        const firstErr = (!valG.valid && valG.error.message) ||
-          (!valC.valid && valC.error.message) ||
-          (!valD.valid && valD.error.message) ||
-          (!valO.valid && valO.error.message) ||
-          'Invalid input values';
-        showError(firstErr);
-        return;
-      }
-
+      if (!vG.valid) { showError(vG.error!.message); return; }
+      if (!vC.valid) { showError(vC.error!.message); return; }
+      if (!vD.valid) { showError(vD.error!.message); return; }
+      if (!vO.valid) { showError(vO.error!.message); return; }
       hideError();
 
-      const gross = valG.value!;
-      const c80 = valC.value!;
-      const d80 = valD.value!;
-      const other = valO.value!;
+      const gross = vG.value!;
+      const c80 = vC.value || 0;
+      const d80 = vD.value || 0;
+      const other = vO.value || 0;
 
       const res = calcIncomeTax(gross, c80, d80, other);
 
-      const recText = res.recommendedRegime === 'Equal'
-        ? 'Both Regimes Equal'
-        : `${res.recommendedRegime} (Save ${fmtVal(res.taxSavings)})`;
+      const compNewTax = fmtCompact(res.newRegime.totalTax);
+      const compOldTax = fmtCompact(res.oldRegime.totalTax);
+      const compSavings = fmtCompact(res.taxSavings);
 
-      const newTaxVal = fmtVal(res.newRegime.totalTax);
-      const oldTaxVal = fmtVal(res.oldRegime.totalTax);
-      const oldDedVal = fmtVal(res.oldRegime.totalDeductions);
-      const newTakeHomeVal = fmtVal(res.newRegime.takeHomeIncome);
-      const oldTakeHomeVal = fmtVal(res.oldRegime.takeHomeIncome);
-
-      setResult({
-        heroValue: newTaxVal,
-        heroLabel: 'New Regime Tax',
-        rows: [
-          { label: 'Recommended Choice', value: recText, variant: 'accent' },
-          { label: 'New Regime Tax', value: newTaxVal },
-          { label: 'Old Regime Tax', value: oldTaxVal },
-          { label: 'Old Regime Total Deductions', value: oldDedVal },
-          { label: 'New Regime Annual Take-Home', value: newTakeHomeVal, variant: 'accent' },
-          { label: 'Old Regime Annual Take-Home', value: oldTakeHomeVal },
-        ],
-        fields: {
-          'it-result-rec': recText,
-          'it-result-newtax': newTaxVal,
-          'it-result-oldtax': oldTaxVal,
-          'it-result-old-deductions': oldDedVal,
-          'it-result-newtakehome': newTakeHomeVal,
-          'it-result-oldtakehome': oldTakeHomeVal,
-        },
-        meta: { gross, c80, d80, other, ...res },
-      });
-
-      if (resRec) resRec.textContent = recText;
-      if (resNewTax) resNewTax.textContent = newTaxVal;
-      if (resOldTax) resOldTax.textContent = oldTaxVal;
-      if (resOldDed) resOldDed.textContent = oldDedVal;
-      if (resNewTH) resNewTH.textContent = newTakeHomeVal;
-      if (resOldTH) resOldTH.textContent = oldTakeHomeVal;
-      if (mobileHero) mobileHero.textContent = newTaxVal;
-
-      const wrapper = document.getElementById('it-composition-wrapper');
-      if (wrapper && gross > 0) {
-        const thFrac = Math.max(0, res.newRegime.takeHomeIncome / gross);
-        const taxFrac = Math.min(1, res.newRegime.totalTax / gross);
-        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(thFrac * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(taxFrac * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = newTakeHomeVal;
-        if (legendEls[1]) legendEls[1].textContent = newTaxVal;
+      if (resRec) {
+        resRec.textContent = res.recommendedRegime === 'Equal'
+          ? 'Both Regimes Equal'
+          : `${res.recommendedRegime} (Save ${compSavings})`;
       }
 
-      updateHash(serializeHash({ g: gross, c: c80, d: d80, o: other }));
+      if (resNewTaxCompact) resNewTaxCompact.textContent = compNewTax;
+      if (resNewTax) resNewTax.textContent = `(${fmtVal(res.newRegime.totalTax)})`;
+      if (resOldTaxCompact) resOldTaxCompact.textContent = compOldTax;
+      if (resOldTax) resOldTax.textContent = `(${fmtVal(res.oldRegime.totalTax)})`;
+      if (resOldDeductions) resOldDeductions.textContent = fmtVal(res.oldRegime.totalDeductions);
+      if (resNewTakeHome) resNewTakeHome.textContent = fmtVal(res.newRegime.takeHomeIncome);
+      if (resOldTakeHome) resOldTakeHome.textContent = fmtVal(res.oldRegime.takeHomeIncome);
+
+      // Composition bar
+      const wrapper = document.getElementById('it-composition-wrapper');
+      if (wrapper && gross > 0) {
+        const takeHomeFrac = res.newRegime.takeHomeIncome / gross;
+        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+        if (bar) bar.style.width = `${(takeHomeFrac * 100).toFixed(1)}%`;
+        const valEls = wrapper.querySelectorAll<HTMLElement>('.tabular-nums');
+        if (valEls[0]) valEls[0].textContent = fmtVal(res.newRegime.takeHomeIncome);
+        if (valEls[1]) valEls[1].textContent = fmtVal(res.newRegime.totalTax);
+      }
+
+      if (snippetAnswer) {
+        const recText = res.recommendedRegime === 'Equal'
+          ? 'both regimes result in equal tax liability'
+          : `the <strong>${res.recommendedRegime}</strong> is more beneficial, saving you <strong>${compSavings}</strong> annually`;
+        snippetAnswer.innerHTML = `For a gross income of <strong>${fmtVal(gross)}</strong>, ${recText}. New Regime Tax: <strong>${compNewTax}</strong> (${fmtVal(res.newRegime.totalTax)}) vs Old Regime Tax: <strong>${compOldTax}</strong> (${fmtVal(res.oldRegime.totalTax)}).`;
+      }
+
+      if (whatsappBtn) {
+        const shareMsg = encodeURIComponent(
+          `Income Tax Comparison (FY 2025-26 & 2026-27):\nGross Income: ${fmtVal(gross)}\nNew Regime Tax: ${compNewTax}\nOld Regime Tax: ${compOldTax}\nRecommended: ${res.recommendedRegime} (Save ${compSavings})\nCalculate on Calcumetrics: ${location.href}`
+        );
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${shareMsg}`;
+      }
+
+      const canonicalResult = {
+        heroValue: compNewTax,
+        heroLabel: 'New Regime Tax',
+        rows: [
+          { label: 'Recommended', value: `${res.recommendedRegime} (Save ${compSavings})` },
+          { label: 'Old Regime Tax', value: compOldTax },
+          { label: 'Annual Take-Home', value: fmtVal(res.newRegime.takeHomeIncome) },
+        ],
+        fields: {
+          'it-result-newtax': fmtVal(res.newRegime.totalTax),
+          'it-result-oldtax': fmtVal(res.oldRegime.totalTax),
+        },
+      };
+
+      setResult(canonicalResult);
+      if ((window as any).__cmResultStore) {
+        (window as any).__cmResultStore.setResult(canonicalResult);
+      }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
     }
 
     function debounce() {
       clearTimeout(timer);
-      timer = setTimeout(recalc, 100);
+      timer = setTimeout(recalc, 60);
     }
 
-    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, maxVal: number) {
-      if (!slider) return;
+    function sync(slider: HTMLInputElement | null, input: HTMLInputElement | null, maxVal: number) {
+      if (!slider || !input) return;
       slider.addEventListener('input', () => {
         input.value = fmtLiveInput(slider.value);
-        const pct = ((parseFloat(slider.value) - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-        slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        const min = parseFloat(slider.min) || 0;
+        const max = parseFloat(slider.max) || maxVal;
+        slider.style.setProperty('--slider-pct', `${((parseFloat(slider.value) - min) / (max - min)) * 100}%`);
         debounce();
       });
       input.addEventListener('input', () => {
@@ -595,8 +671,9 @@ const jsonld = {
         const num = parseFloat(raw);
         if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
-          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+          const min = parseFloat(slider.min) || 0;
+          const max = parseFloat(slider.max) || maxVal;
+          slider.style.setProperty('--slider-pct', `${((num - min) / (max - min)) * 100}%`);
         }
         input.value = fmtLiveInput(raw);
         debounce();
@@ -604,12 +681,28 @@ const jsonld = {
     }
 
     sync(grossSlider, grossInput, 10000000);
-    if (c80Slider && c80Input) sync(c80Slider, c80Input, 150000);
-    if (d80Slider && d80Input) sync(d80Slider, d80Input, 100000);
-    if (otherSlider && otherInput) sync(otherSlider, otherInput, 500000);
+    sync(c80Slider, c80Input, 150000);
+    sync(d80Slider, d80Input, 100000);
+    sync(otherSlider, otherInput, 500000);
 
-    document.getElementById('it-calculate')?.addEventListener('click', recalc);
-    document.getElementById('it-reset')?.addEventListener('click', () => {
+    // ── Preset Chips ─────────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-gross]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-gross');
+        if (val) {
+          grossInput.value = fmtLiveInput(val);
+          if (grossSlider) {
+            grossSlider.value = val;
+            const min = parseFloat(grossSlider.min), max = parseFloat(grossSlider.max);
+            grossSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min)) * 100}%`);
+          }
+          debounce();
+        }
+      });
+    });
+
+    // ── Reset ────────────────────────────────────────────────────────────────
+    resetBtn?.addEventListener('click', () => {
       grossInput.value = fmtLiveInput(String(DEFAULTS.gross));
       if (c80Input) c80Input.value = fmtLiveInput(String(DEFAULTS.c80));
       if (d80Input) d80Input.value = fmtLiveInput(String(DEFAULTS.d80));
@@ -637,122 +730,32 @@ const jsonld = {
       grossInput.focus();
     });
 
-    [grossInput, c80Input, d80Input, otherInput].forEach((el) => {
-      el?.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') recalc();
-      });
-    });
-
-    // Copy & Share
-    document.getElementById('it-copy-btn')?.addEventListener('click', async () => {
-      const valG = validate(grossInput.value, itSchema.g);
-      const valC = validate(c80Input ? c80Input.value : '0', itSchema.c);
-      const valD = validate(d80Input ? d80Input.value : '0', itSchema.d);
-      const valO = validate(otherInput ? otherInput.value : '0', itSchema.o);
-
-      if (!valG.valid || !valC.valid || !valD.valid || !valO.valid) {
-        showError('Please check your inputs before copying.');
-        return;
-      }
-      const gross = valG.value!;
-      const c80 = valC.value!;
-      const d80 = valD.value!;
-      const other = valO.value!;
+    // ── Copy & Share ─────────────────────────────────────────────────────────
+    copyBtn?.addEventListener('click', async () => {
+      const vG = validate(grossInput.value.replace(/[^0-9.]/g, ''), { required: true, min: 10000, label: 'Gross Annual Income' });
+      if (!vG.valid) return;
+      const gross = vG.value!;
+      const c80 = parseFloat(c80Input?.value.replace(/[^0-9.]/g, '') || '0') || 0;
+      const d80 = parseFloat(d80Input?.value.replace(/[^0-9.]/g, '') || '0') || 0;
+      const other = parseFloat(otherInput?.value.replace(/[^0-9.]/g, '') || '0') || 0;
       const res = calcIncomeTax(gross, c80, d80, other);
-      const text = `Income Tax Comparison (Budget 2024): Gross ${fmtVal(gross)} => New Regime: ${fmtVal(res.newRegime.totalTax)}, Old Regime: ${fmtVal(res.oldRegime.totalTax)}. Recommended: ${res.recommendedRegime} (Save ${fmtVal(res.taxSavings)}). ${location.href.split('#')[0]}${serializeHash({ g: gross, c: c80, d: d80, o: other })}`;
-      try {
-        await navigator.clipboard.writeText(text);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      const btn = document.getElementById('it-copy-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+      const text = `Income Tax Comparison (FY 2025-26 & 2026-27): Gross ${fmtVal(gross)} => New Regime: ${fmtVal(res.newRegime.totalTax)}, Old Regime: ${fmtVal(res.oldRegime.totalTax)}. Recommended: ${res.recommendedRegime} (Save ${fmtVal(res.taxSavings)}). Calculated on Calcumetrics: ${location.href}`;
+      await navigator.clipboard.writeText(text);
+      if (copyBtn) {
+        const orig = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = orig), 2000);
       }
     });
 
-    document.getElementById('it-share-btn')?.addEventListener('click', async () => {
-      const valG = validate(grossInput.value, itSchema.g);
-      const valC = validate(c80Input ? c80Input.value : '0', itSchema.c);
-      const valD = validate(d80Input ? d80Input.value : '0', itSchema.d);
-      const valO = validate(otherInput ? otherInput.value : '0', itSchema.o);
-
-      if (!valG.valid || !valC.valid || !valD.valid || !valO.valid) {
-        showError('Please check your inputs before sharing.');
-        return;
-      }
-      const gross = valG.value!;
-      const c80 = valC.value!;
-      const d80 = valD.value!;
-      const other = valO.value!;
-      const shareUrl = `${location.href.split('#')[0]}${serializeHash({ g: gross, c: c80, d: d80, o: other })}`;
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-      } catch {
-        const ta = document.createElement('textarea');
-        ta.value = shareUrl;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      const btn = document.getElementById('it-share-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied Link!';
-        setTimeout(() => (btn.textContent = orig), 2000);
+    shareBtn?.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(location.href);
+      if (shareBtn) {
+        const orig = shareBtn.textContent;
+        shareBtn.textContent = 'Copied Link!';
+        setTimeout(() => (shareBtn.textContent = orig), 2000);
       }
     });
-
-    // Jurisdiction Lock: Income Tax is India-specific (INR-locked).
-    // Intentionally ignore cm:currency-change events and never read USD/EUR/GBP from localStorage.
-
-    // Phase 4.4 URL State Restoration
-    const currentHash = readCurrentHash();
-    if (currentHash) {
-      const restored = restoreFromHash(currentHash, itSchema);
-      if (restored.valid) {
-        if (restored.values.g !== undefined) {
-          grossInput.value = fmtLiveInput(String(restored.values.g));
-          if (grossSlider) {
-            grossSlider.value = String(restored.values.g);
-            grossSlider.style.setProperty('--slider-pct', `${((restored.values.g - 300000) / (10000000 - 300000)) * 100}%`);
-          }
-        }
-        if (restored.values.c !== undefined && c80Input) {
-          c80Input.value = fmtLiveInput(String(restored.values.c));
-          if (c80Slider) {
-            c80Slider.value = String(restored.values.c);
-            c80Slider.style.setProperty('--slider-pct', `${(restored.values.c / 150000) * 100}%`);
-          }
-        }
-        if (restored.values.d !== undefined && d80Input) {
-          d80Input.value = fmtLiveInput(String(restored.values.d));
-          if (d80Slider) {
-            d80Slider.value = String(restored.values.d);
-            d80Slider.style.setProperty('--slider-pct', `${(restored.values.d / 100000) * 100}%`);
-          }
-        }
-        if (restored.values.o !== undefined && otherInput) {
-          otherInput.value = fmtLiveInput(String(restored.values.o));
-          if (otherSlider) {
-            otherSlider.value = String(restored.values.o);
-            otherSlider.style.setProperty('--slider-pct', `${(restored.values.o / 500000) * 100}%`);
-          }
-        }
-      }
-    }
 
     recalc();
   }

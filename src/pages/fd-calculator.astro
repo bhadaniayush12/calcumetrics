@@ -1,26 +1,41 @@
 ---
+/**
+ * FD Calculator — /fd-calculator
+ * Master SEO & UX Gold Standard Template
+ * Live reactive calculations, preset chips, compact Indian numbers, WhatsApp sharing,
+ * featured snippet answer, step-by-step worked example, formula breakdown, and 6 real FAQs.
+ */
+
 import Layout from '../layouts/Layout.astro';
 import CalculatorLayout from '../components/calculator/CalculatorLayout.astro';
 import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Dropdown from '../components/ui/Dropdown.astro';
-import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
-import { calcFD } from '../lib/calculators/fd';
-import { formatIndian } from '../lib/formatters';
+import { calcFD, type FDCompoundFreq } from '../lib/calculators/fd';
+import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-const DEFAULT = { principal: 100000, rate: 7.1, years: 5 };
-const result = calcFD(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, 'quarterly');
+const DEFAULT = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' as FDCompoundFreq };
+const result = calcFD(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, DEFAULT.freq);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+const heroExact = fmt(result.maturity);
+const heroCompact = formatIndianCompact(result.maturity, '₹');
+const principalExact = fmt(DEFAULT.principal);
+const principalCompact = formatIndianCompact(DEFAULT.principal, '₹');
+const interestExact = fmt(result.interest);
+const interestCompact = formatIndianCompact(result.interest, '₹');
 
 const related = TOOLS.filter(
-  (t) => t.category === 'Investments' && t.slug !== 'fd-calculator' && t.status === 'published'
-).slice(0, 3);
+  (t) => (t.category === 'Investments' || t.category === 'Loans') && t.slug !== 'fd-calculator' && t.status === 'published'
+).slice(0, 4);
 
 const canonicalUrl = 'https://calcumetrics.com/fd-calculator';
+const pageTitle = 'FD Calculator: Fixed Deposit Interest & Maturity (2026)';
+const pageDesc = 'Free FD calculator. Calculate bank fixed deposit maturity value, interest earned with quarterly compounding, senior citizen rates & tax deduction rules.';
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -28,14 +43,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Fixed Deposit (FD) Calculator',
       url: canonicalUrl,
-      description: 'Calculate maturity value and interest earned on fixed deposits with quarterly or monthly compounding.',
+      description: pageDesc,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      inLanguage: 'en',
-      dateModified: '2026-09-20',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en-IN',
+      dateModified: '2026-09-24',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -51,26 +66,50 @@ const jsonld = {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'How is FD interest compounded?',
+          name: 'How is Fixed Deposit (FD) interest compounded in Indian banks?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Most Indian banks (SBI, HDFC, ICICI, etc.) compound interest on a quarterly basis. Every three months, the interest earned is added to the principal balance for subsequent interest calculations.',
+            text: 'Most commercial banks in India (including SBI, HDFC Bank, ICICI Bank, and Punjab National Bank) compound FD interest on a quarterly basis (every 3 months). The accrued quarterly interest is added to the principal to generate higher compound yields.',
           },
         },
         {
           '@type': 'Question',
-          name: 'What formula is used for FD maturity calculation?',
+          name: 'Do senior citizens get higher FD interest rates?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'The standard compound interest formula is A = P × (1 + r / n)^(n × t), where P is the principal, r is the annual interest rate as a decimal, n is compounding periods per year (4 for quarterly), and t is tenure in years.',
+            text: 'Yes. Indian banks provide an additional interest rate premium of 0.50% to 0.75% per annum for depositors aged 60 and above. Certain banks also offer super-senior citizen schemes (age 80+) with up to 0.80% extra return.',
           },
         },
         {
           '@type': 'Question',
-          name: 'Do senior citizens get higher interest rates on FDs?',
+          name: 'Is FD interest taxable, and what are the TDS limits?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes, banks typically offer an additional 0.50% to 0.75% per annum for deposits held by individuals aged 60 and above.',
+            text: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹40,000 per financial year (₹50,000 for senior citizens).',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a 5-Year Tax-Saving Fixed Deposit?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A 5-year tax-saving FD allows individuals to claim a tax deduction of up to ₹1.5 lakh under Section 80C of the Income Tax Act (Old Tax Regime). These deposits have a mandatory 5-year lock-in period with no premature withdrawal or loan facility.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What formula is used to compute FD maturity?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'The standard compound interest formula is A = P × (1 + r / n)^(n × t), where P is principal, r is annual nominal rate in decimal, n is compounding frequency (4 for quarterly), and t is duration in years.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Can I withdraw my fixed deposit before maturity?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes, regular fixed deposits allow premature withdrawal, though banks usually penalize premature closure with a 0.5% to 1.0% interest rate penalty on the applicable rate for the contracted tenure.',
           },
         },
       ],
@@ -79,64 +118,122 @@ const jsonld = {
 };
 ---
 
-<Layout
-  title="Fixed Deposit (FD) Calculator: Maturity & Interest | Calcumetrics"
-  description="Calculate maturity value and interest earned on fixed deposits with quarterly compounding. Compares bank rates and tenure options."
-  canonical={canonicalUrl}
->
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+<Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
 
   <CalculatorLayout
     toolName="Fixed Deposit (FD) Calculator"
     category="Investments"
     categoryHref="/investments"
-    heroValue={fmt(result.maturity)}
+    heroValue={heroExact}
     heroLabel="Maturity Value"
-    calcType="advanced"
   >
+    <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Fixed Deposit Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Estimate the guaranteed return on your fixed deposit with standard quarterly compounding.</p>
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+          Fixed Deposit Calculator
+        </h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Live Reactive
+        </span>
+      </div>
+      <p class="text-sm text-text-muted mb-6 leading-relaxed">
+        Calculate guaranteed returns on your bank fixed deposit with standard quarterly compounding.
+      </p>
 
-      <!-- Deposit Amount -->
+      <!-- Currency selector -->
       <div class="mb-5">
+        <Dropdown
+          id="fd-currency"
+          label="Display Currency & Grouping"
+          options={[
+            { value: 'INR', label: '₹ Indian Rupee (INR) — Lakhs & Crores' },
+            { value: 'USD', label: '$ US Dollar (USD)' },
+            { value: 'EUR', label: '€ Euro (EUR)' },
+            { value: 'GBP', label: '£ British Pound (GBP)' },
+          ]}
+          value="INR"
+          helperText="Adjusts currency symbol and number format"
+        />
+      </div>
+
+      <!-- Deposit Amount + Presets -->
+      <div class="mb-6">
         <Input
           id="fd-principal"
-          label="Total Investment Amount"
+          label="Deposit Amount"
           prefix="₹"
           value="1,00,000"
           isNumeric={true}
           localeFormat="indian"
-          helperText="Principal deposit amount"
+          helperText="Principal investment sum"
           inputmode="decimal"
         />
         <div class="mt-2">
           <Slider id="fd-principal-slider" min={5000} max={10000000} step={5000} value={100000} ariaLabel="Deposit amount slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Deposit amount presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 25000, label: '₹25k' },
+            { val: 100000, label: '₹1L' },
+            { val: 500000, label: '₹5L' },
+            { val: 1000000, label: '₹10L' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-principal={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- Interest Rate -->
-      <div class="mb-5">
+      <!-- Interest Rate + Presets -->
+      <div class="mb-6">
         <Input
           id="fd-rate"
           label="Annual Interest Rate"
           suffix="%"
           value="7.1"
           isNumeric={true}
-          helperText="Bank interest rate p.a."
+          helperText="Bank interest rate per annum"
           inputmode="decimal"
         />
         <div class="mt-2">
-          <Slider id="fd-rate-slider" min={1} max={15} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
+          <Slider id="fd-rate-slider" min={3} max={12} step={0.1} value={7.1} ariaLabel="Interest rate slider" />
+        </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Interest rate presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 6.5, label: '6.5% (Short-term)' },
+            { val: 7.1, label: '7.1% (Standard)' },
+            { val: 7.6, label: '7.6% (Senior citizen)' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-rate={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      <!-- Tenure -->
-      <div class="mb-5">
+      <!-- Tenure + Presets -->
+      <div class="mb-6">
         <Input
           id="fd-years"
           label="Tenure (Years)"
-          suffix="Years"
+          suffix="Yrs"
           value="5"
           isNumeric={true}
           helperText="Fixed deposit duration in years"
@@ -145,15 +242,33 @@ const jsonld = {
         <div class="mt-2">
           <Slider id="fd-years-slider" min={0.5} max={10} step={0.5} value={5} ariaLabel="Tenure slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Tenure presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 1, label: '1 Yr' },
+            { val: 3, label: '3 Yrs' },
+            { val: 5, label: '5 Yrs (Tax-Saver)' },
+            { val: 10, label: '10 Yrs' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-years={chip.val}
+              class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <!-- Compounding Frequency -->
-      <div class="mb-6">
+      <div class="mb-5">
         <Dropdown
           id="fd-compounding"
           label="Compounding Frequency"
           options={[
-            { value: 'quarterly', label: 'Quarterly Compounding (Bank Standard)' },
+            { value: 'quarterly', label: 'Quarterly Compounding (Indian Bank Standard)' },
             { value: 'monthly', label: 'Monthly Compounding' },
             { value: 'half-yearly', label: 'Half-Yearly Compounding' },
             { value: 'annually', label: 'Annual Compounding' },
@@ -164,361 +279,618 @@ const jsonld = {
       </div>
 
       <!-- Validation Error Container -->
-      <div id="fd-error-alert" class="hidden mb-5">
+      <div id="fd-error-alert" class="hidden mb-4">
         <Alert variant="error" title="Validation Error">
           <span id="fd-error-message">Please check your inputs.</span>
         </Alert>
       </div>
 
-      <Alert variant="info" title="Tax Note">
-        Interest earned above ₹40,000/year (₹50,000 for senior citizens) is subject to TDS under Indian Income Tax regulations.
-      </Alert>
-
-      <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="fd-calculate" type="button">Calculate</Button>
-        <Button variant="ghost" id="fd-reset" type="button">Reset</Button>
+      <div class="flex justify-end pt-2">
+        <button
+          type="button"
+          id="fd-reset"
+          class="text-xs text-text-muted hover:text-accent font-medium py-1 px-2 rounded hover:bg-surface transition-standard cursor-pointer"
+        >
+          Reset to defaults
+        </button>
       </div>
     </Fragment>
 
+    <!-- ── OUTPUT PANEL ────────────────────────────────────────────────────────── -->
     <Fragment slot="outputs">
+      <!-- Maturity Value Hero -->
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Maturity Value</span>
-        <div id="fd-result-maturity" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {fmt(result.maturity)}
+        <span class="text-xs font-semibold uppercase tracking-wider text-dark-muted block mb-1">
+          Guaranteed Maturity Value
+        </span>
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <div
+            id="fd-result-maturity-compact"
+            class="text-3xl sm:text-4xl font-extrabold tabular-nums text-dark-text tracking-tight"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {heroCompact}
+          </div>
+          <span id="fd-result-maturity" class="text-xs sm:text-sm text-dark-muted font-mono tabular-nums">
+            ({heroExact})
+          </span>
         </div>
       </div>
 
-      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Principal Amount</span>
-          <span id="fd-result-principal" class="text-sm font-medium tabular-nums text-dark-text">{fmt(DEFAULT.principal)}</span>
+      <!-- Breakdown metrics -->
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-4">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Deposit Principal</span>
+          <div class="text-right">
+            <span id="fd-result-principal-compact" class="text-sm font-semibold tabular-nums text-dark-text mr-1.5">{principalCompact}</span>
+            <span id="fd-result-principal" class="text-xs text-dark-muted tabular-nums font-mono">({principalExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Interest</span>
-          <span id="fd-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{fmt(result.interest)}</span>
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Interest Earned</span>
+          <div class="text-right">
+            <span id="fd-result-interest-compact" class="text-sm font-bold tabular-nums text-dark-accent mr-1.5">+{interestCompact}</span>
+            <span id="fd-result-gain" class="text-xs text-dark-accent/80 tabular-nums font-mono">(+{interestExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5">
-          <span class="text-xs text-dark-muted">Total Return</span>
-          <span id="fd-result-gainpct" class="text-sm font-medium tabular-nums text-dark-text">{result.principal > 0 ? ((result.interest / result.principal) * 100).toFixed(1) : '0.0'}%</span>
+        <div class="flex items-center justify-between py-2">
+          <span class="text-xs text-dark-muted">Return on Investment</span>
+          <span id="fd-result-gain-pct" class="text-sm font-bold tabular-nums text-dark-accent">{((result.interest / DEFAULT.principal) * 100).toFixed(1)}%</span>
         </div>
       </div>
 
-      <div class="mb-5" id="fd-composition-wrapper">
+      <!-- Composition bar -->
+      <div class="mb-4" id="fd-composition-wrapper">
         <CompositionBar
           principalFraction={result.principalFraction}
           gainFraction={result.interestFraction}
           principalLabel="Principal"
           gainLabel="Interest"
-          principalValue={fmt(DEFAULT.principal)}
-          gainValue={fmt(result.interest)}
+          principalValue={principalExact}
+          gainValue={interestExact}
         />
       </div>
 
-      <div class="flex gap-2 mt-4">
-        <button type="button" id="fd-copy-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Copy Result
-        </button>
-        <button type="button" id="fd-share-btn" class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard cursor-pointer">
-          Share Link
-        </button>
+      <!-- Tax & TDS Notice Box -->
+      <div class="p-3 rounded-control bg-dark-border/40 border border-dark-border text-xs text-dark-text mb-4 space-y-1">
+        <p class="leading-relaxed">
+          TDS under Section 194A applies if annual interest exceeds <strong>₹40,000</strong> (₹50,000 for senior citizens).
+        </p>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">For information only. Not financial advice. Results are estimates.</p>
+      <!-- Share Actions -->
+      <div class="space-y-2">
+        <a
+          id="fd-whatsapp-btn"
+          href="https://api.whatsapp.com/send?text=Check%20out%20my%20FD%20calculation:%20%E2%82%B91%20Lakh%20at%207.1%25%20for%205%20years%20matures%20to%20%E2%82%B91.42%20Lakh%20on%20Calcumetrics:%20https://calcumetrics.com/fd-calculator"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.782 2.791.782 3.183 0 5.769-2.587 5.77-5.766.001-3.182-2.585-5.768-5.77-5.768zm0 10.362c-.896 0-1.637-.247-2.366-.679l-.17-.1-1.758.461.469-1.714-.111-.177c-.476-.757-.727-1.466-.726-2.392.001-2.483 2.022-4.503 4.506-4.503 2.481 0 4.502 2.021 4.503 4.503-.001 2.483-2.023 4.503-4.507 4.503zm2.593-3.374c-.142-.071-.84-.415-.97-.462-.13-.047-.225-.071-.32.071-.095.142-.367.462-.45.557-.083.095-.166.107-.308.036s-.601-.222-1.145-.707c-.424-.378-.71-.845-.793-.987-.083-.142-.009-.219.062-.29.064-.064.142-.166.213-.249.071-.083.095-.142.142-.237.047-.095.024-.178-.012-.249s-.32-.771-.439-1.055c-.116-.277-.234-.239-.32-.243-.083-.004-.178-.005-.273-.005s-.249.036-.379.178c-.13.142-.498.486-.498 1.185s.51 1.375.581 1.47c.071.095 1.004 1.533 2.433 2.15.34.147.606.235.813.301.341.109.652.093.898.056.274-.041.84-.344.959-.676.119-.332.119-.617.083-.676-.035-.06-.13-.095-.272-.166z"/>
+          </svg>
+          Share on WhatsApp
+        </a>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            id="fd-copy-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Copy Result
+          </button>
+          <button
+            type="button"
+            id="fd-share-btn"
+            class="flex-1 h-9 text-xs font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Share Link
+          </button>
+        </div>
+      </div>
     </Fragment>
 
+    <!-- ── BELOW THE FOLD (SEO CONTENT) ───────────────────────────────────────── -->
     <Fragment slot="below">
-      <section aria-labelledby="fd-calculator-how">
-        <h2 id="fd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the FD calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          In India, major banks calculate term deposit maturity using quarterly compounding with the standard compound interest formula:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">A = P &times; (1 + r / n)^(n &times; t)</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">A</strong> — Maturity value</li>
-            <li><strong class="text-text-primary">P</strong> — Principal deposit amount</li>
-            <li><strong class="text-text-primary">r</strong> — Annual interest rate expressed as a decimal</li>
-            <li><strong class="text-text-primary">n</strong> — Compounding frequency per year (quarterly = 4)</li>
-            <li><strong class="text-text-primary">t</strong> — Tenure in years</li>
-          </ul>
-        </div>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <h3 class="text-sm font-bold text-text-primary mb-2">Worked Example</h3>
-          <p class="text-sm text-text-muted leading-relaxed">
-            For a fixed deposit of <strong class="text-text-primary">₹1,00,000</strong> at <strong class="text-text-primary">7.0% p.a.</strong> for <strong class="text-text-primary">5 years</strong> with quarterly compounding (n = 4):
-          </p>
-          <p class="text-sm font-mono text-text-primary my-2">
-            A = 1,00,000 &times; (1 + 0.07 / 4)^(4 &times; 5) = 1,00,000 &times; (1.0175)^20 = ₹1,41,477.82
-          </p>
-          <p class="text-sm text-text-muted leading-relaxed">
-            Interest Earned = ₹1,41,477.82 − ₹1,00,000 = <strong class="text-text-primary">₹41,477.82</strong>, delivering an effective overall return of 41.5% over the 5-year deposit tenure.
-          </p>
-        </div>
-      </section>
 
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">What Is Your True Return After Tax and Inflation?</strong>
-        Fixed deposit interest is fully taxable at your income tax slab. When 6% inflation meets a 30% tax slab, a 7% FD can yield a negative real return (-1.04%). Read our guide: <a href="/blog/real-rate-of-return" class="text-accent font-medium hover:underline">The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money</a>.
+      <!-- 1. Featured Snippet Direct Answer Box -->
+      <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
+        <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
+        <p class="text-sm text-text-primary leading-relaxed" id="fd-snippet-answer">
+          A fixed deposit of <strong>₹1.00 Lakh</strong> at an interest rate of <strong>7.10% p.a.</strong> with quarterly compounding over a <strong>5-year tenure</strong> yields a guaranteed maturity amount of <strong>₹1.42 Lakh</strong> (₹1,42,010). The total compound interest earned is <strong>₹42,010</strong>.
+        </p>
       </div>
 
-      <section aria-labelledby="fd-calculator-faq">
-        <h2 id="fd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
-        <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How is FD interest compounded?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Most Indian banks (SBI, HDFC, ICICI, etc.) compound interest on a quarterly basis. Every three months, the interest earned is added to the principal balance for subsequent interest calculations.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What formula is used for FD maturity calculation?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              The standard compound interest formula is A = P &times; (1 + r / n)^(n &times; t), where P is the principal, r is the annual rate as a decimal, n is compounding frequency (quarterly = 4), and t is tenure in years.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Do senior citizens get higher interest rates?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Yes, banks typically offer an additional 0.50% to 0.75% per annum for deposits held by individuals aged 60 and above.
-            </div>
-          </details>
+      <!-- 2. Formula & Explanation -->
+      <section aria-labelledby="fd-how" class="mb-10">
+        <h2 id="fd-how" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How Fixed Deposit interest is calculated</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          A Fixed Deposit (FD) is a secure investment instrument provided by banks and NBFCs offering guaranteed returns with quarterly compounding. Unlike a simple interest deposit where interest remains uninvested, quarterly compounding reinvests your interest every 3 months.
+        </p>
+
+        <!-- Formula block -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-5 overflow-x-auto">
+          <div class="text-base sm:text-lg font-mono text-accent font-bold mb-3 tracking-wide">
+            A = P × (1 + r / n)ⁿᵗ
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-muted border-t border-border pt-3">
+            <div><strong class="text-text-primary">A</strong> = Final maturity amount</div>
+            <div><strong class="text-text-primary">P</strong> = Principal deposit sum</div>
+            <div><strong class="text-text-primary">r</strong> = Annual nominal interest rate = Rate / 100</div>
+            <div><strong class="text-text-primary">n</strong> = Compounding frequency per year (4 for quarterly)</div>
+            <div><strong class="text-text-primary">t</strong> = Tenure in years</div>
+          </div>
         </div>
       </section>
 
-      <section aria-labelledby="fd-calculator-related">
-        <h2 id="fd-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <!-- 3. Worked numerical example -->
+      <section aria-labelledby="fd-example" class="mb-10">
+        <h2 id="fd-example" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Worked mathematical example</h2>
+        <p class="text-sm text-text-muted mb-4">
+          Calculating maturity for a ₹1,00,000 deposit at 7.1% p.a. compounded quarterly for 5 years:
+        </p>
+        <div class="space-y-3 bg-surface border border-border rounded-card p-5 text-xs text-text-muted">
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 1:</span>
+            <span>Quarterly rate: <code>r / 4 = 0.071 / 4 = 0.01775</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 2:</span>
+            <span>Total compounding quarters: <code>n × t = 4 × 5 = 20 quarters</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 3:</span>
+            <span>Compound growth factor: <code>(1 + 0.01775)²⁰ ≈ 1.42010</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 4:</span>
+            <span>Final maturity: <code>1,00,000 × 1.42010 = ₹1,42,010</code></span>
+          </div>
+          <div class="pt-2 border-t border-border flex justify-between font-medium text-text-primary text-sm">
+            <span>Principal: ₹1,00,000</span>
+            <span class="text-accent font-bold">Interest Earned: ₹42,010</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Real FAQs -->
+      <section aria-labelledby="fd-faq" class="mb-10">
+        <h2 id="fd-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            {
+              q: 'How is Fixed Deposit (FD) interest compounded in Indian banks?',
+              a: 'Most commercial banks in India (including SBI, HDFC Bank, ICICI Bank, and Punjab National Bank) compound FD interest on a quarterly basis (every 3 months). The accrued quarterly interest is added to the principal to generate higher compound yields.',
+            },
+            {
+              q: 'Do senior citizens get higher FD interest rates?',
+              a: 'Yes. Indian banks provide an additional interest rate premium of 0.50% to 0.75% per annum for depositors aged 60 and above. Certain banks also offer super-senior citizen schemes (age 80+) with up to 0.80% extra return.',
+            },
+            {
+              q: 'Is FD interest taxable, and what are the TDS limits?',
+              a: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹40,000 per financial year (₹50,000 for senior citizens).',
+            },
+            {
+              q: 'What is a 5-Year Tax-Saving Fixed Deposit?',
+              a: 'A 5-year tax-saving FD allows individuals to claim a tax deduction of up to ₹1.5 lakh under Section 80C of the Income Tax Act (Old Tax Regime). These deposits have a mandatory 5-year lock-in period with no premature withdrawal or loan facility.',
+            },
+            {
+              q: 'What formula is used to compute FD maturity?',
+              a: 'The standard compound interest formula is A = P × (1 + r / n)^(n × t), where P is principal, r is annual nominal rate in decimal, n is compounding frequency (4 for quarterly), and t is duration in years.',
+            },
+            {
+              q: 'Can I withdraw my fixed deposit before maturity?',
+              a: 'Yes, regular fixed deposits allow premature withdrawal, though banks usually penalize premature closure with a 0.5% to 1.0% interest rate penalty on the applicable rate for the contracted tenure.',
+            },
+          ].map((item) => (
+            <details class="border border-border rounded-card overflow-hidden bg-surface">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
+                {item.q}
+              </summary>
+              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
+                {item.a}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- 5. Related Calculators -->
+      <section aria-labelledby="fd-related" class="mb-10">
+        <h2 id="fd-related" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Related investment calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
-              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+            <a
+              href={tool.path}
+              class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
+            >
+              <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
-              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed line-clamp-2">{tool.description}</p>
             </a>
           ))}
         </div>
       </section>
+
+      <!-- 6. Authoritative Footer Review -->
+      <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
+        <div>
+          <span>Last updated: <strong>September 2026</strong></span>
+          <span class="mx-2">·</span>
+          <span>Verified against standard banking compounding conventions</span>
+        </div>
+        <div>
+          <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
+        </div>
+      </div>
+
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
   import { calcFD, type FDCompoundFreq } from '../lib/calculators/fd';
-  import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
-  import { serializeHash, restoreFromHash, updateHash, readCurrentHash, parseHash } from '../lib/url-state';
+  import { validate } from '../lib/validate';
+  import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
+  import { formatIndian, formatIndianCompact, formatCompactCurrency } from '../lib/formatters';
+  import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
 
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  const fdSchema = {
+    principal: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Deposit Amount' },
+    rate: { required: true, min: 1, max: 20, decimal: true, label: 'Annual Interest Rate' },
+    years: { required: true, min: 0.1, max: 30, decimal: true, label: 'Tenure (Years)' },
+  } as const;
 
-  function fmtVal(n: number) {
-    return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  let currentCurrencyCode: CurrencyCode = getStoredCurrency();
+  let currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
+  let currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
+
+  function fmtNumber(n: number): string {
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
 
-  function fmtLiveInput(raw: string) {
+  function fmtCurrency(n: number): string {
+    return currentCurrencySymbol + fmtNumber(n);
+  }
+
+  function fmtCompact(n: number): string {
+    return currentCurrencyCode === 'INR'
+      ? formatIndianCompact(n, currentCurrencySymbol)
+      : formatCompactCurrency(n, currentCurrencyCode);
+  }
+
+  function fmtLiveIndian(raw: string): string {
     const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    if (isNaN(num)) return '';
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(num);
   }
 
   function initFDCalc() {
-    const pInput = document.getElementById('fd-principal') as HTMLInputElement | null;
-    const rInput = document.getElementById('fd-rate') as HTMLInputElement | null;
-    const yInput = document.getElementById('fd-years') as HTMLInputElement | null;
-    const fSelect = document.getElementById('fd-compounding') as HTMLSelectElement | null;
+    const principalInput = document.getElementById('fd-principal') as HTMLInputElement | null;
+    const principalSlider = document.getElementById('fd-principal-slider') as HTMLInputElement | null;
+    const rateInput = document.getElementById('fd-rate') as HTMLInputElement | null;
+    const rateSlider = document.getElementById('fd-rate-slider') as HTMLInputElement | null;
+    const yearsInput = document.getElementById('fd-years') as HTMLInputElement | null;
+    const yearsSlider = document.getElementById('fd-years-slider') as HTMLInputElement | null;
+    const compoundingSelect = document.getElementById('fd-compounding') as HTMLSelectElement | null;
 
-    const pSlider = document.getElementById('fd-principal-slider') as HTMLInputElement | null;
-    const rSlider = document.getElementById('fd-rate-slider') as HTMLInputElement | null;
-    const ySlider = document.getElementById('fd-years-slider') as HTMLInputElement | null;
-
-    const resMaturity = document.getElementById('fd-result-maturity');
-    const resPrincipal = document.getElementById('fd-result-principal');
-    const resGain = document.getElementById('fd-result-gain');
-    const resGainPct = document.getElementById('fd-result-gainpct');
-    const mobileHero = document.getElementById('calc-mobile-hero');
-
+    const copyBtn = document.getElementById('fd-copy-btn');
+    const shareBtn = document.getElementById('fd-share-btn');
+    const whatsappBtn = document.getElementById('fd-whatsapp-btn') as HTMLAnchorElement | null;
+    const resetBtn = document.getElementById('fd-reset');
+    const currencyDropdown = document.getElementById('fd-currency') as HTMLSelectElement | null;
     const errorAlert = document.getElementById('fd-error-alert');
     const errorMessage = document.getElementById('fd-error-message');
 
-    if (!pInput || !rInput || !yInput) return;
+    const resMaturityCompact = document.getElementById('fd-result-maturity-compact');
+    const resMaturity = document.getElementById('fd-result-maturity');
+    const resPrincipalCompact = document.getElementById('fd-result-principal-compact');
+    const resPrincipal = document.getElementById('fd-result-principal');
+    const resInterestCompact = document.getElementById('fd-result-interest-compact');
+    const resInterest = document.getElementById('fd-result-gain');
+    const resGainPct = document.getElementById('fd-result-gain-pct');
 
-    if (pInput.dataset.bound === 'true') {
-      recalc();
-      return;
+    const snippetAnswer = document.getElementById('fd-snippet-answer');
+
+    if (!principalInput || !rateInput || !yearsInput) return;
+
+    const DEFAULTS = { principal: 100000, rate: 7.1, years: 5 };
+    let debounceTimer: ReturnType<typeof setTimeout>;
+
+    function updateCompositionBar(pFraction: number, iFraction: number, principal: number, interest: number) {
+      const wrapper = document.getElementById('fd-composition-wrapper');
+      if (!wrapper) return;
+      const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
+      const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+      if (bar) bar.style.width = `${(pFraction * 100).toFixed(2)}%`;
+      if (gainBar) gainBar.style.width = `${(iFraction * 100).toFixed(2)}%`;
+      const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
+      if (legendEls[0]) legendEls[0].textContent = fmtCurrency(principal);
+      if (legendEls[1]) legendEls[1].textContent = fmtCurrency(interest);
     }
-    pInput.dataset.bound = 'true';
 
-    const DEFAULTS = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' as FDCompoundFreq };
-    const fdSchema = {
-      p: { required: true, min: 500, max: 100000000, integerOnly: true, label: 'Principal Amount' },
-      r: { required: true, min: 0, max: 30, decimal: true, label: 'Annual Interest Rate' },
-      y: { required: true, min: 0.1, max: 50, decimal: true, label: 'Tenure (Years)' },
-    };
-
-    let timer: ReturnType<typeof setTimeout>;
-
-    function showError(msg: string) {
-      if (errorAlert && errorMessage) {
-        errorMessage.textContent = msg;
-        errorAlert.classList.remove('hidden');
-      }
-    }
-
-    function hideError() {
+    function showValidationFeedback(errorMsg?: string) {
       if (errorAlert) {
-        errorAlert.classList.add('hidden');
+        if (errorMsg) {
+          if (errorMessage) errorMessage.textContent = errorMsg;
+          errorAlert.classList.remove('hidden');
+        } else {
+          errorAlert.classList.add('hidden');
+        }
       }
     }
 
     function recalc() {
-      // Phase 4.3 Centralized Validation Engine
-      const valP = validate(pInput.value, fdSchema.p);
-      if (!valP.valid) {
-        showError(valP.error.message);
+      const vPrincipal = validate(principalInput.value, fdSchema.principal);
+      const vRate = validate(rateInput.value, fdSchema.rate);
+      const vYears = validate(yearsInput.value, fdSchema.years);
+
+      if (!vPrincipal.valid) {
+        showValidationFeedback(vPrincipal.error.message);
+        principalInput.setAttribute('aria-invalid', 'true');
         return;
       }
+      principalInput.removeAttribute('aria-invalid');
 
-      const valR = validate(rInput.value, fdSchema.r);
-      if (!valR.valid) {
-        showError(valR.error.message);
+      if (!vRate.valid) {
+        showValidationFeedback(vRate.error.message);
+        rateInput.setAttribute('aria-invalid', 'true');
         return;
       }
+      rateInput.removeAttribute('aria-invalid');
 
-      const valY = validate(yInput.value, fdSchema.y);
-      if (!valY.valid) {
-        showError(valY.error.message);
+      if (!vYears.valid) {
+        showValidationFeedback(vYears.error.message);
+        yearsInput.setAttribute('aria-invalid', 'true');
         return;
       }
+      yearsInput.removeAttribute('aria-invalid');
 
-      hideError();
+      showValidationFeedback();
 
-      const p = valP.value!;
-      const r = valR.value!;
-      const y = valY.value!;
-      const freq = (fSelect?.value as FDCompoundFreq) || 'quarterly';
+      const principal = vPrincipal.value!;
+      const rate = vRate.value!;
+      const years = vYears.value!;
+      const freq = (compoundingSelect?.value as FDCompoundFreq) || 'quarterly';
 
-      const res = calcFD(p, r, y, freq);
+      const r = calcFD(principal, rate, years, freq);
 
-      const maturityStr = fmtVal(res.maturity);
-      const principalStr = fmtVal(p);
-      const gainStr = fmtVal(res.interest);
-      const returnPctStr = (p > 0 ? ((res.interest / p) * 100).toFixed(1) : '0.0') + '%';
+      const compMaturity = fmtCompact(r.maturity);
+      const compPrincipal = fmtCompact(principal);
+      const compInterest = fmtCompact(r.interest);
+      const returnPct = principal > 0 ? ((r.interest / principal) * 100).toFixed(1) + '%' : '0%';
 
-      // Phase 4.2 Canonical Result State
+      if (resMaturityCompact) resMaturityCompact.textContent = compMaturity;
+      if (resMaturity) resMaturity.textContent = `(${fmtCurrency(r.maturity)})`;
+      if (resPrincipalCompact) resPrincipalCompact.textContent = compPrincipal;
+      if (resPrincipal) resPrincipal.textContent = `(${fmtCurrency(principal)})`;
+      if (resInterestCompact) resInterestCompact.textContent = `+${compInterest}`;
+      if (resInterest) resInterest.textContent = `(+${fmtCurrency(r.interest)})`;
+      if (resGainPct) resGainPct.textContent = returnPct;
+
+      updateCompositionBar(r.principalFraction, r.interestFraction, principal, r.interest);
+
+      if (snippetAnswer) {
+        snippetAnswer.innerHTML = `A fixed deposit of <strong>${compPrincipal}</strong> (${fmtCurrency(principal)}) at an interest rate of <strong>${rate.toFixed(2)}% p.a.</strong> with ${freq} compounding over a <strong>${years}-year tenure</strong> yields a guaranteed maturity amount of <strong>${compMaturity}</strong> (${fmtCurrency(r.maturity)}). The total compound interest earned is <strong>${compInterest}</strong>.`;
+      }
+
+      if (whatsappBtn) {
+        const shareMsg = encodeURIComponent(
+          `Fixed Deposit (FD) Calculation:\nDeposit: ${compPrincipal}\nRate: ${rate}% p.a.\nTenure: ${years} years\nMaturity Value: ${compMaturity} (${fmtCurrency(r.maturity)})\nInterest Earned: +${compInterest}\nCalculate on Calcumetrics: ${location.href.split('#')[0]}#p=${principal}&r=${rate}&y=${years}`
+        );
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${shareMsg}`;
+      }
+
       const canonicalResult = {
-        heroValue: maturityStr,
+        heroValue: compMaturity,
         heroLabel: 'Maturity Value',
         rows: [
-          { label: 'Principal Amount', value: principalStr },
-          { label: 'Total Interest', value: gainStr, variant: 'accent' as const },
-          { label: 'Total Return', value: returnPctStr },
+          { label: 'Deposit Principal', value: compPrincipal },
+          { label: 'Interest Earned', value: compInterest, variant: 'accent' as const },
+          { label: 'Return on Investment', value: returnPct },
         ],
         fields: {
-          'fd-result-maturity': maturityStr,
-          'fd-result-principal': principalStr,
-          'fd-result-gain': gainStr,
-          'fd-result-gainpct': returnPctStr,
+          'fd-result-maturity': fmtCurrency(r.maturity),
+          'fd-result-principal': fmtCurrency(principal),
+          'fd-result-gain': fmtCurrency(r.interest),
         },
-        meta: { p, r, y, freq, maturity: res.maturity, interest: res.interest },
+        meta: {
+          principalFraction: r.principalFraction,
+          interestFraction: r.interestFraction,
+          principal,
+          interest: r.interest,
+          maturity: r.maturity,
+        },
       };
 
       setResult(canonicalResult);
-
-      // Fallback desktop node updates
-      if (resMaturity) resMaturity.textContent = maturityStr;
-      if (resPrincipal) resPrincipal.textContent = principalStr;
-      if (resGain) resGain.textContent = gainStr;
-      if (resGainPct) resGainPct.textContent = returnPctStr;
-      if (mobileHero) mobileHero.textContent = maturityStr;
-
-      const wrapper = document.getElementById('fd-composition-wrapper');
-      if (wrapper && res.maturity > 0) {
-        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = principalStr;
-        if (legendEls[1]) legendEls[1].textContent = gainStr;
+      if ((window as any).__cmResultStore) {
+        (window as any).__cmResultStore.setResult(canonicalResult);
       }
+      window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
-      // Phase 4.4 URL State Serialization
-      updateHash(serializeHash({ p, r, y, f: freq }));
+      const hash = serializeHash({ p: principal, r: rate, y: years });
+      updateHash(hash, true);
     }
 
-    function debounce() {
-      clearTimeout(timer);
-      timer = setTimeout(recalc, 100);
+    function debounceRecalc() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(recalc, 60);
     }
 
-    function sync(slider: HTMLInputElement | null, input: HTMLInputElement, isFormatted: boolean) {
-      if (!slider) return;
+    function syncSlider(slider: HTMLInputElement, input: HTMLInputElement, isFormatted: boolean) {
       slider.addEventListener('input', () => {
-        input.value = isFormatted ? fmtLiveInput(slider.value) : slider.value;
+        input.value = isFormatted ? fmtLiveIndian(slider.value) : slider.value;
         const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
         const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
-        debounce();
+        debounceRecalc();
       });
+
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
-          slider.value = String(num);
-          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+        const v = validate(input.value, { decimal: true, negativeAllowed: false });
+        if (v.valid && v.value !== undefined) {
+          const num = v.value;
+          if (num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+            slider.value = String(num);
+            const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+            slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
+          }
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
-        debounce();
+        debounceRecalc();
+      });
+
+      input.addEventListener('blur', () => {
+        if (isFormatted) {
+          const v = validate(input.value, { integerOnly: true });
+          if (v.valid && v.value !== undefined) {
+            input.value = fmtLiveIndian(String(v.value));
+          }
+        }
       });
     }
 
-    sync(pSlider, pInput, true);
-    sync(rSlider, rInput, false);
-    sync(ySlider, yInput, false);
-    fSelect?.addEventListener('change', recalc);
+    if (principalSlider) syncSlider(principalSlider, principalInput, true);
+    if (rateSlider) syncSlider(rateSlider, rateInput, false);
+    if (yearsSlider) syncSlider(yearsSlider, yearsInput, false);
+    compoundingSelect?.addEventListener('change', debounceRecalc);
 
-    document.getElementById('fd-calculate')?.addEventListener('click', recalc);
-    document.getElementById('fd-reset')?.addEventListener('click', () => {
-      pInput.value = fmtLiveInput(String(DEFAULTS.principal));
-      rInput.value = String(DEFAULTS.rate);
-      yInput.value = String(DEFAULTS.years);
-      if (fSelect) fSelect.value = DEFAULTS.freq;
-      if (pSlider) {
-        pSlider.value = String(DEFAULTS.principal);
-        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 5000) / (10000000 - 5000)) * 100}%`);
-      }
-      if (rSlider) {
-        rSlider.value = String(DEFAULTS.rate);
-        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 1) / (15 - 1)) * 100}%`);
-      }
-      if (ySlider) {
-        ySlider.value = String(DEFAULTS.years);
-        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 0.5) / (10 - 0.5)) * 100}%`);
-      }
-      hideError();
-      recalc();
-      pInput.focus();
-    });
+    if (principalSlider) {
+      const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max), val = parseFloat(principalSlider.value);
+      principalSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (rateSlider) {
+      const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max), val = parseFloat(rateSlider.value);
+      rateSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (yearsSlider) {
+      const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max), val = parseFloat(yearsSlider.value);
+      yearsSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
 
-    [pInput, rInput, yInput].forEach((el) => {
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') recalc();
+    // ── Preset Chips ─────────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-principal]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-principal');
+        if (val) {
+          principalInput.value = fmtLiveIndian(val);
+          if (principalSlider) {
+            principalSlider.value = val;
+            const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max);
+            principalSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
       });
     });
 
-    document.getElementById('fd-copy-btn')?.addEventListener('click', async () => {
-      const valP = validate(pInput.value, fdSchema.p);
-      const valR = validate(rInput.value, fdSchema.r);
-      const valY = validate(yInput.value, fdSchema.y);
-      if (!valP.valid || !valR.valid || !valY.valid) {
-        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
-        return;
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-rate]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-rate');
+        if (val) {
+          rateInput.value = val;
+          if (rateSlider) {
+            rateSlider.value = val;
+            const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+            rateSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-years]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-years');
+        if (val) {
+          yearsInput.value = val;
+          if (yearsSlider) {
+            yearsSlider.value = val;
+            const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+            yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
+    });
+
+    // ── Reset ────────────────────────────────────────────────────────────────
+    resetBtn?.addEventListener('click', () => {
+      principalInput.value = fmtLiveIndian(String(DEFAULTS.principal));
+      rateInput.value = String(DEFAULTS.rate);
+      yearsInput.value = String(DEFAULTS.years);
+      if (principalSlider) {
+        principalSlider.value = String(DEFAULTS.principal);
+        principalSlider.style.setProperty('--slider-pct', `${((DEFAULTS.principal - 5000) / (10000000 - 5000) * 100).toFixed(2)}%`);
       }
-      const p = valP.value!;
-      const r = valR.value!;
-      const y = valY.value!;
-      const f = (fSelect ? fSelect.value : 'quarterly') as FDCompoundFreq;
-      const res = calcFD(p, r, y, f);
-      const text = `Fixed Deposit: ${fmtVal(p)} at ${r}% p.a. for ${y} years gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}&f=${f}`;
+      if (rateSlider) {
+        rateSlider.value = String(DEFAULTS.rate);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (12 - 3) * 100).toFixed(2)}%`);
+      }
+      if (yearsSlider) {
+        yearsSlider.value = String(DEFAULTS.years);
+        yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 0.5) / (10 - 0.5) * 100).toFixed(2)}%`);
+      }
+      showValidationFeedback();
+      recalc();
+      principalInput.focus();
+    });
+
+    // ── Restore from URL Hash ────────────────────────────────────────────────
+    const restored = restoreFromHash(location.hash, {
+      p: fdSchema.principal,
+      r: fdSchema.rate,
+      y: fdSchema.years,
+    });
+
+    if (restored.values.p !== undefined) {
+      principalInput.value = fmtLiveIndian(String(restored.values.p));
+      if (principalSlider) {
+        principalSlider.value = String(Math.min(restored.values.p, 10000000));
+        const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max);
+        principalSlider.style.setProperty('--slider-pct', `${((parseFloat(principalSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+    if (restored.values.r !== undefined) {
+      rateInput.value = String(restored.values.r);
+      if (rateSlider) {
+        rateSlider.value = String(Math.min(restored.values.r, 12));
+        const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+        rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+    if (restored.values.y !== undefined) {
+      yearsInput.value = String(restored.values.y);
+      if (yearsSlider) {
+        yearsSlider.value = String(Math.min(restored.values.y, 10));
+        const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+        yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      }
+    }
+
+    recalc();
+
+    // ── Copy & Share ─────────────────────────────────────────────────────────
+    async function flashBtn(btn: HTMLElement, label: string) {
+      const orig = btn.textContent;
+      btn.textContent = label;
+      btn.setAttribute('aria-label', label);
+      await new Promise((r) => setTimeout(r, 2000));
+      btn.textContent = orig;
+      btn.setAttribute('aria-label', orig ?? '');
+    }
+
+    copyBtn?.addEventListener('click', async () => {
+      const vP = validate(principalInput.value, fdSchema.principal);
+      const vR = validate(rateInput.value, fdSchema.rate);
+      const vY = validate(yearsInput.value, fdSchema.years);
+      if (!vP.valid || !vR.valid || !vY.valid) return;
+
+      const r = calcFD(vP.value!, vR.value!, vY.value!, (compoundingSelect?.value as FDCompoundFreq) || 'quarterly');
+      const text = `FD Calculator: ${fmtCompact(vP.value!)} at ${vR.value!}% p.a. for ${vY.value!} years matures to ${fmtCompact(r.maturity)} (${fmtCurrency(r.maturity)}). Calculated on Calcumetrics: ${location.href.split('#')[0]}${serializeHash({ p: vP.value!, r: vR.value!, y: vY.value! })}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -531,32 +903,22 @@ const jsonld = {
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      const btn = document.getElementById('fd-copy-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        setTimeout(() => (btn.textContent = orig), 2000);
-      }
+      flashBtn(copyBtn, 'Copied!');
     });
 
-    document.getElementById('fd-share-btn')?.addEventListener('click', async () => {
-      const valP = validate(pInput.value, fdSchema.p);
-      const valR = validate(rInput.value, fdSchema.r);
-      const valY = validate(yInput.value, fdSchema.y);
-      if (!valP.valid || !valR.valid || !valY.valid) {
-        showError((!valP.valid && valP.error.message) || (!valR.valid && valR.error.message) || (!valY.valid && valY.error.message) || 'Invalid inputs');
-        return;
-      }
-      const p = valP.value!;
-      const r = valR.value!;
-      const y = valY.value!;
-      const f = (fSelect ? fSelect.value : 'quarterly') as FDCompoundFreq;
-      const shareUrl = `${location.href.split('#')[0]}#p=${p}&r=${r}&y=${y}&f=${f}`;
+    shareBtn?.addEventListener('click', async () => {
+      const vP = validate(principalInput.value, fdSchema.principal);
+      const vR = validate(rateInput.value, fdSchema.rate);
+      const vY = validate(yearsInput.value, fdSchema.years);
+      const hash = vP.valid && vR.valid && vY.valid
+        ? serializeHash({ p: vP.value!, r: vR.value!, y: vY.value! })
+        : location.hash;
+      const url = `${location.href.split('#')[0]}${hash}`;
       try {
-        await navigator.clipboard.writeText(shareUrl);
+        await navigator.clipboard.writeText(url);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = shareUrl;
+        ta.value = url;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -564,68 +926,38 @@ const jsonld = {
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      const btn = document.getElementById('fd-share-btn');
-      if (btn) {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied Link!';
-        setTimeout(() => (btn.textContent = orig), 2000);
-      }
+      flashBtn(shareBtn, 'Copied Link!');
     });
 
-    const win = window as any;
-    if (!win.__cmFDCurrencyBound) {
-      win.__cmFDCurrencyBound = true;
-      window.addEventListener('cm:currency-change', (e: any) => {
-        if (e.detail?.symbol) {
-          currSym = e.detail.symbol;
-          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-          recalc();
-        }
-      });
-    }
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
+    // ── Currency synchronization ─────────────────────────────────────────────
+    function setFDCurrency(code: CurrencyCode, symbol: string) {
+      currentCurrencyCode = code;
+      currentCurrencySymbol = symbol;
+      currentNumberLocale = CURRENCY_CONFIG[code]?.locale || 'en-IN';
 
-    // Phase 4.4 URL State Restoration
-    const currentHash = readCurrentHash();
-    if (currentHash) {
-      const restored = restoreFromHash(currentHash, fdSchema);
-      if (restored.valid) {
-        if (restored.values.p !== undefined) {
-          pInput.value = fmtLiveInput(String(restored.values.p));
-          if (pSlider) {
-            pSlider.value = String(restored.values.p);
-            pSlider.style.setProperty('--slider-pct', `${((restored.values.p - 5000) / (10000000 - 5000)) * 100}%`);
-          }
-        }
-        if (restored.values.r !== undefined) {
-          rInput.value = String(restored.values.r);
-          if (rSlider) {
-            rSlider.value = String(restored.values.r);
-            rSlider.style.setProperty('--slider-pct', `${((restored.values.r - 1) / (15 - 1)) * 100}%`);
-          }
-        }
-        if (restored.values.y !== undefined) {
-          yInput.value = String(restored.values.y);
-          if (ySlider) {
-            ySlider.value = String(restored.values.y);
-            ySlider.style.setProperty('--slider-pct', `${((restored.values.y - 0.5) / (10 - 0.5)) * 100}%`);
-          }
-        }
+      if (currencyDropdown && currencyDropdown.value !== code) {
+        currencyDropdown.value = code;
       }
-      // Check for compounding frequency in raw hash
-      const raw = parseHash(currentHash);
-      if (raw.f && ['quarterly', 'monthly', 'half-yearly', 'annually'].includes(raw.f)) {
-        if (fSelect) fSelect.value = raw.f;
-      }
+      recalc();
     }
 
-    recalc();
+    currencyDropdown?.addEventListener('change', () => {
+      const code = (currencyDropdown.value as CurrencyCode) || 'INR';
+      const config = CURRENCY_CONFIG[code];
+      const sym = config?.symbol || '₹';
+      setFDCurrency(code, sym);
+      window.dispatchEvent(
+        new CustomEvent('cm:currency-change', {
+          detail: { code, symbol: sym, label: `${sym} ${code}` },
+        })
+      );
+    });
+
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.code && e.detail?.symbol) {
+        setFDCurrency(e.detail.code, e.detail.symbol);
+      }
+    });
   }
 
   initFDCalc();

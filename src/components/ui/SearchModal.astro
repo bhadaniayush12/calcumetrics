@@ -1,6 +1,6 @@
 ---
 // src/components/ui/SearchModal.astro
-// Global Command Palette / Search Modal (Section 26.4 & 26.6)
+// macOS-Style Spotlight Search Modal (⌘K / Ctrl+K)
 import { getPublishedTools } from '../../config/site';
 
 const tools = getPublishedTools();
@@ -16,24 +16,24 @@ const popularSearches = [
 ] as const;
 ---
 
-<!--
-  Overlay: starts below the 64px header (top-16), restrained black/40 backdrop,
-  no blur, no heavy shadow. Flex column: search row full-width, results panel centered.
--->
+<!-- macOS Spotlight Center Overlay -->
 <div
   id="search-palette-backdrop"
-  class="fixed inset-x-0 bottom-0 bg-black/40 z-[100] hidden flex-col"
-  style="top: 64px;"
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] hidden items-start justify-center pt-[8vh] sm:pt-[12vh] px-3 sm:px-4"
   role="dialog"
   aria-modal="true"
-  aria-label="Search Calculators"
+  aria-label="Spotlight Search"
 >
-  <!-- Full-width 64px search row -->
-  <div class="w-full bg-surface border-b border-border shrink-0" style="height: 64px;">
-    <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center gap-3">
+  <!-- Floating Spotlight Window -->
+  <div
+    id="search-palette-container"
+    class="w-full max-w-[640px] bg-surface border border-border rounded-card shadow-mac flex flex-col max-h-[80vh] overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+  >
+    <!-- Spotlight Search Bar -->
+    <div class="px-4 py-3.5 border-b border-border flex items-center gap-3 bg-surface">
       <!-- Search Icon -->
       <svg
-        class="w-5 h-5 text-text-muted shrink-0"
+        class="w-5 h-5 text-accent shrink-0"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -52,7 +52,7 @@ const popularSearches = [
         placeholder={`Search ${tools.length} calculators (e.g. SIP, EMI, GST, NPV)...`}
         autocomplete="off"
         spellcheck="false"
-        class="flex-1 bg-transparent border-none text-[18px] text-text-primary placeholder:text-text-muted focus:outline-none min-w-0"
+        class="flex-1 bg-transparent border-none text-[17px] text-text-primary placeholder:text-text-muted focus:outline-none min-w-0"
         aria-label="Search all calculators"
       />
 
@@ -69,10 +69,10 @@ const popularSearches = [
         </svg>
       </button>
 
-      <!-- ESC pill (desktop) -->
-      <kbd class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-text-muted bg-canvas border border-border px-1.5 py-0.5 rounded-chip select-none shrink-0">
-        ESC
-      </kbd>
+      <!-- macOS Shortcut Badge -->
+      <div class="hidden sm:flex items-center gap-1 text-[11px] font-medium text-text-muted bg-canvas border border-border px-1.5 py-0.5 rounded-chip select-none shrink-0">
+        <kbd>ESC</kbd>
+      </div>
 
       <!-- Mobile Close Button -->
       <button
@@ -87,177 +87,203 @@ const popularSearches = [
         </svg>
       </button>
     </div>
-  </div>
 
-  <!-- Results panel: centered ~640px, bg-surface, border, rounded bottom corners -->
-  <div class="flex-1 overflow-y-auto">
-    <div class="mx-auto w-full max-w-[640px] px-4 sm:px-0 pb-6">
+    <!-- Category filter chips strip -->
+    <div class="px-3 py-2 border-b border-border bg-canvas/60 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+      {categories.map((cat) => (
+        <button
+          type="button"
+          data-filter-category={cat}
+          class:list={[
+            'search-category-btn px-2.5 py-1 rounded-chip font-medium whitespace-nowrap transition-standard cursor-pointer',
+            cat === 'All'
+              ? 'bg-accent text-surface'
+              : 'text-text-muted hover:text-text-primary hover:bg-surface border border-transparent',
+          ]}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+
+    <!-- Scrollable results panel -->
+    <div class="flex-1 overflow-y-auto divide-y divide-border">
+      <!-- Recent Searches (rendered from localStorage) -->
+      <div id="search-palette-recent-wrapper" class="hidden divide-y divide-border bg-surface">
+        <div class="px-4 pt-3 pb-1 flex items-center justify-between">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-text-muted select-none flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Recently Used
+          </span>
+          <button
+            type="button"
+            id="clear-recent-tools-btn"
+            class="text-[11px] text-text-muted hover:text-accent font-medium cursor-pointer transition-standard"
+          >
+            Clear
+          </button>
+        </div>
+        <div id="search-palette-recent-list" class="divide-y divide-border"></div>
+      </div>
+
+      <!-- Popular Searches (shown when input is empty) -->
       <div
-        id="search-palette-container"
-        class="bg-surface border border-t-0 border-border rounded-b-card overflow-hidden"
+        id="search-palette-popular"
+        role="listbox"
+        aria-label="Popular searches"
+        class="divide-y divide-border"
       >
-        <!-- Category filter chips strip -->
-        <div class="px-3 py-2 border-b border-border bg-canvas flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
-          {categories.map((cat) => (
-            <button
-              type="button"
-              data-filter-category={cat}
-              class:list={[
-                'search-category-btn px-2.5 py-1 rounded-chip font-medium whitespace-nowrap transition-standard cursor-pointer',
-                cat === 'All'
-                  ? 'bg-accent text-surface'
-                  : 'text-text-muted hover:text-text-primary hover:bg-surface border border-transparent',
-              ]}
-            >
-              {cat}
-            </button>
-          ))}
+        <div class="px-4 pt-3 pb-1">
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-text-muted select-none">
+            Popular Calculations
+          </span>
         </div>
-
-        <!-- Popular Searches (shown when input is empty) -->
-        <div
-          id="search-palette-popular"
-          role="listbox"
-          aria-label="Popular searches"
-          class="divide-y divide-border"
-        >
-          <div class="px-4 pt-3 pb-1">
-            <span class="text-[11px] font-semibold uppercase tracking-wide text-text-muted select-none">
-              Popular
-            </span>
-          </div>
-          {popularSearches.map((name) => (
-            <button
-              type="button"
-              data-popular-search={name}
-              class="popular-search-item w-full flex items-center gap-3 px-4 text-text-primary hover:bg-canvas transition-standard cursor-pointer focus-visible:outline-accent text-left"
-              style="height: 40px;"
+        {popularSearches.map((name) => (
+          <button
+            type="button"
+            data-popular-search={name}
+            class="popular-search-item w-full flex items-center gap-3 px-4 py-2.5 text-text-primary hover:bg-canvas transition-standard cursor-pointer focus-visible:outline-accent text-left"
+          >
+            <svg
+              class="w-4 h-4 text-text-muted shrink-0"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
             >
-              <svg
-                class="w-4 h-4 text-text-muted shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <span class="flex-1 text-sm font-medium">{name}</span>
-              <svg
-                class="w-4 h-4 text-text-muted shrink-0"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M6 12L10 8L6 4" />
-              </svg>
-            </button>
-          ))}
-        </div>
-
-        <!-- Results List -->
-        <div
-          id="search-palette-results"
-          role="listbox"
-          aria-label="Calculators search results"
-          class="hidden divide-y divide-border"
-        >
-          {tools.map((tool, idx) => (
-            <a
-              href={tool.path}
-              role="option"
-              data-search-item
-              data-tool-name={tool.name.toLowerCase()}
-              data-tool-category={tool.category}
-              data-tool-desc={tool.description.toLowerCase()}
-              data-tool-slug={tool.slug.toLowerCase()}
-              data-tool-region={tool.region}
-              class:list={[
-                'search-result-item flex items-center gap-3 px-4 text-text-primary hover:bg-canvas transition-standard group focus-visible:outline-accent cursor-pointer',
-                idx === 0 ? 'bg-canvas' : '',
-              ]}
-              style="height: 40px;"
-            >
-              <svg
-                class="w-4 h-4 text-text-muted shrink-0"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <div class="flex-1 min-w-0 flex items-center gap-2">
-                <span class="font-medium text-sm text-text-primary group-hover:text-accent transition-standard truncate">
-                  {tool.name}
-                </span>
-                <span class="text-[11px] font-medium px-1.5 py-0.5 rounded-chip bg-canvas border border-border text-text-muted shrink-0">
-                  {tool.category}
-                </span>
-                {tool.region !== 'Global' && (
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-chip bg-disabled-bg text-text-muted shrink-0">
-                    {tool.region}
-                  </span>
-                )}
-              </div>
-              <svg
-                class="w-4 h-4 text-text-muted group-hover:text-accent transition-standard shrink-0"
-                viewBox="0 0 16 16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M6 12L10 8L6 4" />
-              </svg>
-            </a>
-          ))}
-
-          <!-- Empty State Container -->
-          <div id="search-palette-empty" class="hidden p-8 text-center flex-col items-center justify-center">
-            <svg class="w-8 h-8 text-text-muted mb-2 stroke-current fill-none opacity-50" viewBox="0 0 24 24" stroke-width="1.5">
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <p class="text-sm font-semibold text-text-primary mb-1">No matching calculators</p>
-            <p class="text-xs text-text-muted max-w-xs">
-              Try searching for general terms like <button type="button" class="underline hover:text-accent" data-quick-fill="loan">loan</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="tax">tax</button>, <button type="button" class="underline hover:text-accent" data-quick-fill="investment">investment</button>, or <button type="button" class="underline hover:text-accent" data-quick-fill="SIP">SIP</button>.
-            </p>
-          </div>
-        </div>
+            <span class="flex-1 text-sm font-medium">{name}</span>
+            <svg
+              class="w-3.5 h-3.5 text-text-muted shrink-0"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 12L10 8L6 4" />
+            </svg>
+          </button>
+        ))}
+      </div>
 
-        <!-- Modal Footer with Keyboard Navigation hints -->
-        <div class="px-4 py-2.5 bg-canvas border-t border-border flex items-center justify-between text-[11px] text-text-muted select-none">
-          <div class="flex items-center gap-3">
-            <span class="hidden sm:inline-flex items-center gap-1">
-              <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↑</kbd>
-              <kbd class="px-1 py-0.5 rounded border border-border bg-surface font-mono">↓</kbd>
-              Navigate
-            </span>
-            <span class="hidden sm:inline-flex items-center gap-1">
-              <kbd class="px-1.5 py-0.5 rounded border border-border bg-surface font-mono">↵</kbd>
-              Select
-            </span>
-            <span class="sm:hidden">Tap any tool to open</span>
-          </div>
-          <div id="search-palette-count" class="font-medium text-text-primary">
-            {tools.length} calculators
-          </div>
+      <!-- Results List -->
+      <div
+        id="search-palette-results"
+        role="listbox"
+        aria-label="Calculators search results"
+        class="hidden divide-y divide-border"
+      >
+        {tools.map((tool) => (
+          <a
+            href={tool.path}
+            role="option"
+            data-search-item
+            data-tool-name={tool.name.toLowerCase()}
+            data-tool-category={tool.category}
+            data-tool-desc={tool.description.toLowerCase()}
+            data-tool-slug={tool.slug}
+            data-tool-region={tool.region}
+            class="search-result-item flex items-center justify-between px-4 py-3 text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent cursor-pointer group"
+          >
+            <div class="flex-1 min-w-0 pr-4">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-text-primary group-hover:text-accent transition-standard">
+                  {tool.name}
+                </span>
+                <span class="text-[11px] font-normal text-text-muted bg-canvas border border-border px-1.5 py-0.5 rounded-chip shrink-0">
+                  {tool.category}
+                </span>
+                {tool.region === 'IN' && (
+                  <span class="text-[11px] text-amber-700 dark:text-amber-400 font-medium">🇮🇳</span>
+                )}
+                {tool.region === 'US' && (
+                  <span class="text-[11px] text-sky-700 dark:text-sky-400 font-medium">🇺🇸</span>
+                )}
+              </div>
+              <p class="text-xs text-text-muted truncate mt-0.5">
+                {tool.description}
+              </p>
+            </div>
+            <div class="text-text-muted group-hover:text-accent shrink-0">
+              <svg class="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 12L10 8L6 4" />
+              </svg>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <!-- Empty State -->
+      <div
+        id="search-palette-empty"
+        class="hidden flex-col items-center justify-center p-8 text-center"
+      >
+        <div class="w-10 h-10 rounded-full bg-canvas flex items-center justify-center text-text-muted mb-2">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
         </div>
+        <p class="text-sm font-semibold text-text-primary">No calculators match your search</p>
+        <p class="text-xs text-text-muted mt-1 max-w-xs">
+          Try searching for a related term like "loan", "tax", "SIP", or browse categories above.
+        </p>
+        <div class="flex items-center gap-2 mt-4 flex-wrap justify-center">
+          <button
+            type="button"
+            data-quick-fill="SIP"
+            class="search-quick-fill text-xs bg-canvas hover:bg-surface border border-border px-2.5 py-1 rounded-chip text-text-muted hover:text-accent transition-standard cursor-pointer"
+          >
+            Try "SIP"
+          </button>
+          <button
+            type="button"
+            data-quick-fill="EMI"
+            class="search-quick-fill text-xs bg-canvas hover:bg-surface border border-border px-2.5 py-1 rounded-chip text-text-muted hover:text-accent transition-standard cursor-pointer"
+          >
+            Try "EMI"
+          </button>
+          <button
+            type="button"
+            data-quick-fill="GST"
+            class="search-quick-fill text-xs bg-canvas hover:bg-surface border border-border px-2.5 py-1 rounded-chip text-text-muted hover:text-accent transition-standard cursor-pointer"
+          >
+            Try "GST"
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spotlight Footer (Keyboard shortcuts & Results count) -->
+    <div class="px-4 py-2 bg-canvas/80 border-t border-border flex items-center justify-between text-[11px] text-text-muted select-none">
+      <div class="hidden sm:flex items-center gap-3">
+        <span class="flex items-center gap-1">
+          <kbd class="px-1 py-0.5 bg-surface border border-border rounded text-[10px]">↑</kbd>
+          <kbd class="px-1 py-0.5 bg-surface border border-border rounded text-[10px]">↓</kbd>
+          Navigate
+        </span>
+        <span class="flex items-center gap-1">
+          <kbd class="px-1.5 py-0.5 bg-surface border border-border rounded text-[10px]">↵</kbd>
+          Open
+        </span>
+        <span class="flex items-center gap-1">
+          <kbd class="px-1.5 py-0.5 bg-surface border border-border rounded text-[10px]">ESC</kbd>
+          Dismiss
+        </span>
+      </div>
+      <div id="search-palette-count" class="font-medium">
+        {tools.length} calculators
       </div>
     </div>
   </div>
@@ -266,37 +292,79 @@ const popularSearches = [
 <script>
   function initSearchPalette() {
     const backdrop = document.getElementById('search-palette-backdrop');
+    if (!backdrop) return;
+
     const input = document.getElementById('search-palette-input') as HTMLInputElement | null;
     const clearBtn = document.getElementById('search-palette-clear');
     const closeBtn = document.getElementById('search-palette-close-btn');
+    const popularContainer = document.getElementById('search-palette-popular');
+    const resultsContainer = document.getElementById('search-palette-results');
     const emptyState = document.getElementById('search-palette-empty');
     const countEl = document.getElementById('search-palette-count');
-    const resultsContainer = document.getElementById('search-palette-results');
-    const popularContainer = document.getElementById('search-palette-popular');
-    const items = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-search-item]'));
-    const categoryBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-filter-category]'));
-    const quickFills = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-quick-fill]'));
-    const popularBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-popular-search]'));
+    const categoryBtns = document.querySelectorAll<HTMLButtonElement>('.search-category-btn');
+    const popularBtns = document.querySelectorAll<HTMLButtonElement>('.popular-search-item');
+    const quickFills = document.querySelectorAll<HTMLButtonElement>('.search-quick-fill');
+    const recentWrapper = document.getElementById('search-palette-recent-wrapper');
+    const recentList = document.getElementById('search-palette-recent-list');
+    const clearRecentBtn = document.getElementById('clear-recent-tools-btn');
 
-    if (!backdrop || !input) return;
-    if (backdrop.dataset.paletteBound) return;
-    backdrop.dataset.paletteBound = 'true';
+    const items = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-search-item]'));
 
     let activeCategory = 'All';
     let selectedIndex = 0;
     let lastActiveElement: HTMLElement | null = null;
+
+    function renderRecentTools() {
+      if (!recentWrapper || !recentList) return;
+      try {
+        const raw = localStorage.getItem('cm_recent_tools');
+        const recents: Array<{ name: string; path: string; category?: string }> = raw ? JSON.parse(raw) : [];
+        if (!Array.isArray(recents) || recents.length === 0) {
+          recentWrapper.classList.add('hidden');
+          recentList.innerHTML = '';
+          return;
+        }
+
+        recentWrapper.classList.remove('hidden');
+        recentList.innerHTML = recents.slice(0, 4).map((tool) => `
+          <a
+            href="${tool.path}"
+            class="flex items-center justify-between px-4 py-2.5 text-text-primary hover:bg-canvas transition-standard cursor-pointer group"
+          >
+            <div class="flex items-center gap-2">
+              <svg class="w-3.5 h-3.5 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span class="text-sm font-medium group-hover:text-accent">${tool.name}</span>
+              ${tool.category ? `<span class="text-[10px] text-text-muted bg-canvas border border-border px-1 py-0.5 rounded">${tool.category}</span>` : ''}
+            </div>
+            <span class="text-xs text-accent font-medium">Open &rarr;</span>
+          </a>
+        `).join('');
+      } catch (e) {
+        recentWrapper.classList.add('hidden');
+      }
+    }
+
+    clearRecentBtn?.addEventListener('click', () => {
+      try {
+        localStorage.removeItem('cm_recent_tools');
+      } catch (e) {}
+      renderRecentTools();
+    });
 
     function openModal() {
       lastActiveElement = document.activeElement as HTMLElement | null;
       backdrop?.classList.remove('hidden');
       backdrop?.classList.add('flex');
       document.body.style.overflow = 'hidden';
-      input?.focus();
-      if (input) input.value = '';
-      clearBtn?.classList.add('hidden');
-      activeCategory = 'All';
-      updateCategoryButtons();
-      showPopular();
+      renderRecentTools();
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      filterResults();
     }
 
     function closeModal() {
@@ -312,6 +380,9 @@ const popularSearches = [
       if (popularContainer) {
         popularContainer.classList.remove('hidden');
       }
+      if (recentWrapper) {
+        renderRecentTools();
+      }
       if (resultsContainer) {
         resultsContainer.classList.add('hidden');
       }
@@ -323,6 +394,9 @@ const popularSearches = [
     function showResults() {
       if (popularContainer) {
         popularContainer.classList.add('hidden');
+      }
+      if (recentWrapper) {
+        recentWrapper.classList.add('hidden');
       }
       if (resultsContainer) {
         resultsContainer.classList.remove('hidden');
@@ -363,7 +437,6 @@ const popularSearches = [
         clearBtn.classList.toggle('hidden', q.length === 0);
       }
 
-      // Show popular when input is empty
       if (q.length === 0) {
         showPopular();
         return;
@@ -413,8 +486,7 @@ const popularSearches = [
       highlightSelected(visible);
     }
 
-    // Event listeners
-    input.addEventListener('input', filterResults);
+    input?.addEventListener('input', filterResults);
 
     clearBtn?.addEventListener('click', () => {
       if (input) {
@@ -426,7 +498,6 @@ const popularSearches = [
 
     closeBtn?.addEventListener('click', closeModal);
 
-    // Popular search buttons: fill input and trigger filter
     popularBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         const val = btn.getAttribute('data-popular-search') || '';
@@ -458,8 +529,7 @@ const popularSearches = [
       });
     });
 
-    // Keyboard navigation inside modal
-    input.addEventListener('keydown', (e) => {
+    input?.addEventListener('keydown', (e) => {
       const visible = getVisibleItems();
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -484,16 +554,13 @@ const popularSearches = [
       }
     });
 
-    // Click on the backdrop area (outside the results container and outside the search row) to close
     backdrop.addEventListener('click', (e) => {
       const container = document.getElementById('search-palette-container');
-      const searchRow = (e.target as HTMLElement)?.closest?.('[id="search-palette-backdrop"] > div');
-      if (container && !container.contains(e.target as Node) && !searchRow) {
+      if (container && !container.contains(e.target as Node)) {
         closeModal();
       }
     });
 
-    // Global keyboard shortcut: '/' or 'Cmd+K' / 'Ctrl+K'
     document.addEventListener('keydown', (e) => {
       const target = e.target as HTMLElement;
       const isInput =
@@ -509,7 +576,6 @@ const popularSearches = [
       }
     });
 
-    // Custom window events to open from anywhere
     window.addEventListener('cm:open-search', openModal);
     window.addEventListener('open-search-modal', openModal);
   }

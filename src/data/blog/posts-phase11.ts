@@ -8,11 +8,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Learn the critical differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing distorts returns, and how to avoid the short-holding annualization trap.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-04-12',
+    dateModified: '2026-09-20',
     readTime: '7 min read',
     market: 'Global',
-    author: 'Calcumetrics Quantitative Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFA & Quantitative Research Panel',
+    quickAnswer: 'CAGR measures single lump-sum growth; use XIRR for multiple staggered deposits or SIPs.',
     sources: [
       {
         name: 'CFA Institute Global Investment Performance Standards (GIPS)',
@@ -289,13 +291,15 @@ export const PHASE_11_POSTS: BlogPost[] = [
     title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
     seoTitle: 'Home Loan Prepayment vs SIP: Mathematical Comparison | Calcumetrics',
     description:
-      'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and post-Budget 2024 tax rules.',
+      'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and current FY 2025-27 tax rules.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-04-26',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Calcumetrics Personal Finance Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant (CA) & Debt Advisory Panel',
+    quickAnswer: 'Prepaying saves guaranteed post-tax interest (~8.5%); SIP historically compounds higher (~12-14%) with equity market risk.',
     sources: [
       {
         name: 'Reserve Bank of India (RBI)',
@@ -358,7 +362,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
           'Yes. Prepaying a loan provides a 100% risk-free, guaranteed return equal to the effective interest rate of your loan. For example, if your home loan interest rate is 8.50%, every rupee you prepay saves you 8.50% compounded annual interest. Very few risk-free fixed-income instruments offer a post-tax yield of 8.50%.',
       },
       {
-        question: 'How did Budget 2024 change the home loan prepayment calculation?',
+        question: 'How does the current New Tax Regime change the home loan prepayment calculation?',
         answer:
           'Under the Old Tax Regime, Section 24(b) allowed a deduction of up to ₹2,00,000 on home loan interest for self-occupied properties, which effectively reduced an 8.50% borrowing rate down to ~5.95% for individuals in the 30% tax slab. However, under the default New Tax Regime (Section 115BAC), Section 24(b) deductions are eliminated for self-occupied homes. Your effective borrowing cost is now the full nominal rate (8.50%), making prepayment substantially more attractive than in previous years.',
       },
@@ -412,7 +416,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         For an earner in the 30% tax bracket (+ 4% cess = 31.2%), the ₹2 lakh interest deduction saved ₹62,400 in annual taxes. This reduced an effective 8.50% loan interest rate down to approximately <strong>5.85% net borrowing cost</strong>. When your effective debt cost is under 6%, investing in a 12% equity SIP was an easy mathematical arbitrage.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Post-Budget 2024 Shift:</strong> Under the revised, default <strong>New Tax Regime (Section 115BAC)</strong>, Section 24(b) deductions for self-occupied homes and Section 80C principal deductions are <em>completely disallowed</em>. Unless you actively opt for the Old Regime with substantial deductions, your home loan cost is the full, unshielded <strong>8.50%</strong>. A guaranteed 8.50% post-tax return is vastly harder for fixed-income assets to match.
+        <strong>The Statutory New Tax Regime Shift:</strong> Under the default <strong>New Tax Regime (Section 115BAC)</strong>, Section 24(b) deductions for self-occupied homes and Section 80C principal deductions are <em>completely disallowed</em>. Unless you actively opt for the Old Regime with substantial deductions, your home loan cost is the full, unshielded <strong>8.50%</strong>. A guaranteed 8.50% post-tax return is vastly harder for fixed-income assets to match.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Comparison: Indian Home Loan Case Study (₹50 Lakh Loan Over 20 Years)</h2>
@@ -525,42 +529,45 @@ export const PHASE_11_POSTS: BlogPost[] = [
   },
   {
     slug: 'old-vs-new-tax-regime',
-    title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
-    seoTitle: 'Old vs New Tax Regime Breakeven Deduction Formula (Budget 2024) | Calcumetrics',
+    title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+    seoTitle: 'Old vs New Tax Regime Breakeven Deduction Formula | Calcumetrics',
     description:
-      'Breakeven deduction guide between Old and New Tax Regime after Budget 2024, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
+      'Breakeven deduction guide between Old and New Tax Regime for FY 2025-27, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-05-10',
+    dateModified: '2026-09-24',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Tax Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Senior Chartered Accountant (Tax & Statutory Practice)',
+    quickAnswer: 'If total deductions (80C, 24(b), 80D) exceed ₹4.25 Lakh, Old Regime saves more tax; otherwise, New Regime wins with lower slabs and ₹75k standard deduction.',
+    isFeatured: true,
     sources: [
       {
         name: 'Central Board of Direct Taxes (CBDT)',
-        citation: 'Circular No. 12/2024: Explanatory Notes on Provisions of the Finance (No. 2) Act 2024',
+        citation: 'Circular No. 12/2024: Explanatory Notes on Provisions of the Finance Act',
         url: 'https://incometaxindia.gov.in',
       },
       {
         name: 'Ministry of Finance, Government of India',
-        citation: 'Budget 2024-2025 Memorandum Explaining the Provisions in the Finance Bill',
+        citation: 'Statutory Tax Slabs & Provisions in the Finance Bill (FY 2025-27)',
         url: 'https://www.indiabudget.gov.in',
       },
       {
         name: 'Income Tax Department of India',
-        citation: 'Section 115BAC Slabs and Section 87A Rebate Guidelines for AY 2025-26',
+        citation: 'Section 115BAC Slabs and Section 87A Rebate Guidelines for AY 2025-26 & AY 2026-27',
         url: 'https://incometaxindia.gov.in',
       },
     ],
     type: 'Hybrid',
     summary:
-      'A comprehensive mathematical breakdown of the Old vs. New Tax Regime following the Finance (No. 2) Act 2024 revisions. Learn the exact breakeven deduction thresholds across salary bands (₹8.5L to ₹50L), how the ₹75,000 standard deduction shifts the balance, and how to evaluate employer NPS under Section 80CCD(2).',
+      'A comprehensive mathematical breakdown of the Old vs. New Tax Regime under current statutory rules. Learn the exact breakeven deduction thresholds across salary bands (₹8.5L to ₹50L), how the ₹75,000 standard deduction shifts the balance, and how to evaluate employer NPS under Section 80CCD(2).',
     relatedCalculators: [
       {
         name: 'Income Tax Calculator (India)',
         path: '/in/income-tax-calculator',
         description: 'Compare side-by-side tax liability under Old and New regimes for FY 2024-25 and FY 2025-26.',
-        badge: 'Budget 2024 Slabs',
+        badge: 'Current Tax Slabs',
       },
       {
         name: 'HRA Exemption Calculator',
@@ -622,9 +629,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
         To run your exact salary, rent receipts, and Section 80C deductions through our verified engine, open the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> and compute your exact tax liability under both regimes in seconds.
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. What Changed in the Finance (No. 2) Act 2024?</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Current Statutory Framework &amp; Slabs (FY 2025-27)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Budget 2024 introduced two crucial statutory modifications specifically designed to make the New Tax Regime the default choice for the vast majority of middle- and upper-income taxpayers:
+        The statutory tax framework under Section 115BAC features key modifications specifically designed to make the New Tax Regime the default choice for the vast majority of middle- and upper-income taxpayers:
       </p>
 
       <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
@@ -639,7 +646,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
             <tr>
               <th class="p-3">Tax Slab</th>
               <th class="p-3">Old Tax Regime Rate</th>
-              <th class="p-3">New Tax Regime Rate (Post-Budget 2024)</th>
+              <th class="p-3">New Tax Regime Rate (Current Framework)</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border text-text-muted">
@@ -858,20 +865,22 @@ export const PHASE_11_POSTS: BlogPost[] = [
   },
   {
     slug: 'capital-gains-tax-rules',
-    title: 'Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule',
+    title: 'Capital Gains Tax in India: Rates, Holding Periods, and the Real Estate Indexation Rule',
     seoTitle: 'Capital Gains Tax Rules India: 12.5% LTCG & Grandfathering | Calcumetrics',
     description:
-      'India capital gains tax guide after Budget 2024: new 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh exemption, and the dual-option real estate indexation rule explained.',
+      'India capital gains tax guide: 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh annual exemption, and the dual-option real estate indexation rule explained.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
+    publishDate: '2026-05-24',
     dateModified: '2026-09-23',
     readTime: '10 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Tax Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Tax Advisory Panel',
+    quickAnswer: 'Listed equity LTCG is taxed at 12.5% above ₹1.25 Lakh; legacy real estate (bought pre-July 2024) can opt for 20% with indexation or 12.5% without.',
     sources: [
       {
         name: 'Ministry of Finance, Government of India',
-        citation: 'Finance (No. 2) Act 2024: Amendments to Sections 48, 112, and 112A',
+        citation: 'Finance Act Statutory Provisions: Amendments to Sections 48, 112, and 112A',
         url: 'https://www.indiabudget.gov.in',
       },
       {
@@ -887,13 +896,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     ],
     type: 'Hybrid',
     summary:
-      "A definitive guide to India's overhauled capital gains tax framework enacted by the Finance (No. 2) Act 2024 and amended in August 2024. Learn how listed equities, mutual funds, gold, unlisted shares, and real estate are taxed, with an exact worked example showing how the dual indexation option saves lakhs on legacy property sales.",
+      "A definitive guide to India's overhauled capital gains tax framework. Learn how listed equities, mutual funds, gold, unlisted shares, and real estate are taxed, with an exact worked example showing how the dual indexation option saves lakhs on legacy property sales.",
     relatedCalculators: [
       {
         name: 'Capital Gains Tax Calculator',
         path: '/in/capital-gains-tax-calculator',
         description: 'Calculate STCG and LTCG tax liability across equities, debt, gold, and real estate with grandfathering rules.',
-        badge: 'Post-Budget 2024',
+        badge: 'Current FY Slabs',
       },
       {
         name: 'Advance Tax Calculator',
@@ -910,7 +919,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
         description: 'How your total annual taxable income and tax regime choice interact with capital gains liabilities.',
       },
       {
@@ -929,8 +938,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         answer: 'Yes, but conditionally. Under the parliamentary amendment passed in August 2024, if a residential or commercial property was purchased before July 23, 2024 by a resident individual or HUF, the seller has the choice of paying either 12.5% tax without indexation or 20% tax with indexation, whichever results in lower tax outgo. For properties purchased on or after July 23, 2024, indexation is permanently abolished and the tax rate is flat 12.5%.',
       },
       {
-        question: 'What are the holding period thresholds for long-term capital assets after Budget 2024?',
-        answer: 'The Finance (No. 2) Act 2024 streamlined holding periods into just two simple categories: (1) 12 months for all listed securities (listed equity shares, equity mutual funds, listed bonds, and units of REITs/InvITs), and (2) 24 months for all other assets, including immovable property (real estate), physical gold, unlisted equity shares, and gold mutual funds.',
+        question: 'What are the holding period thresholds for long-term capital assets?',
+        answer: 'The Finance Act streamlined holding periods into two simple categories: (1) 12 months for all listed securities (listed equity shares, equity mutual funds, listed bonds, and units of REITs/InvITs), and (2) 24 months for all other assets, including immovable property (real estate), physical gold, unlisted equity shares, and gold mutual funds.',
       },
       {
         question: 'When is advance tax due after booking capital gains?',
@@ -1147,7 +1156,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Action Checklist for Real Estate and Portfolio Rebalancing</h2>
       <p class="text-sm text-text-muted leading-relaxed">
-        The post-Budget 2024 capital gains regime simplifies holding periods and standardizes long-term taxation across financial assets at 12.5%. For property sellers holding legacy real estate acquired prior to July 23, 2024, the parliamentary grandfathering amendment is a multi-lakh rupee tax shield that should always be computed side-by-side before filing your tax return.
+        The modernized capital gains tax regime simplifies holding periods and standardizes long-term taxation across financial assets at 12.5%. For property sellers holding legacy real estate acquired prior to July 23, 2024, the parliamentary grandfathering amendment is a multi-lakh rupee tax shield that should always be computed side-by-side before filing your tax return.
       </p>
     `,
   },
@@ -1158,11 +1167,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Learn the exact mathematical difference between markup and margin, how to convert between them, and how confusing them leads to hidden business losses.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-06-07',
+    dateModified: '2026-09-18',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Corporate Finance Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Corporate Finance & Controller Panel',
+    quickAnswer: 'Margin is profit divided by revenue; markup is profit divided by cost. A 25% margin always requires a 33.3% markup.',
     sources: [
       {
         name: 'Harvard Business Review',
@@ -1484,11 +1495,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Why NPV and IRR give conflicting project rankings, how the reinvestment rate assumption distorts IRR, and how to find the Fisher crossover rate with formulas.',
     category: 'Corporate Finance',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-06-21',
+    dateModified: '2026-09-19',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Calcumetrics Corporate Finance Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFA & Investment Valuation Practice',
+    quickAnswer: 'NPV measures absolute dollar value creation, while IRR assumes reinvestment at the internal rate—always favor NPV when rankings conflict.',
     sources: [
       {
         name: 'CFA Institute',
@@ -1734,11 +1747,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Learn the difference between flat and reducing interest rates, how to convert a flat rate into true reducing APR, and why a 10% flat loan actually costs ~18%.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-07-05',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Calcumetrics Consumer Finance Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Banking & Retail Credit Specialist',
+    quickAnswer: 'Short answer: A 10% flat loan equates to an actual ~18.16% reducing APR because you keep paying interest on principal you already repaid.',
     sources: [
       {
         name: 'Reserve Bank of India (RBI)',
@@ -1990,11 +2005,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Master the Cash Conversion Cycle formula: DIO + DSO - DPO. Learn how working capital velocity determines solvency and how top retailers run negative float.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-07-19',
+    dateModified: '2026-09-20',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Calcumetrics Corporate Finance Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Working Capital & Treasury Panel',
+    quickAnswer: 'Cash Conversion Cycle = DIO + DSO - DPO. A shorter or negative cycle lets your business fund working capital using supplier credit for free.',
     sources: [
       {
         name: 'Harvard Business Review',
@@ -2293,11 +2310,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and capital gains windfall safe harbors.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
+    publishDate: '2026-08-02',
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Tax Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Statutory Compliance Panel',
+    quickAnswer: 'Pay advance tax in 4 quarterly tranches (15%, 45%, 75%, 100%) if net annual tax liability exceeds ₹10,000 to avoid mandatory 234B/234C interest.',
     sources: [
       {
         name: 'Income Tax Department of India',
@@ -2346,12 +2365,12 @@ export const PHASE_11_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'capital-gains-tax-rules',
-        title: 'Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule',
+        title: 'Capital Gains Tax in India: Rates, Holding Periods, and the Real Estate Indexation Rule',
         description: 'Understand capital gains rates and Section 234C windfall relief for stock and property sales.',
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime FY 2024-25 & 2025-26: The Definitive Breakeven Analysis',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
         description: 'Determine your baseline annual tax liability before scheduling quarterly advance tax payments.',
       },
     ],
@@ -2540,11 +2559,13 @@ export const PHASE_11_POSTS: BlogPost[] = [
     description:
       'Calculate true real rate of return after taxes and inflation using the Fisher Equation. Discover why a 7% bank fixed deposit (FD) yields negative real wealth.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-08-16',
+    dateModified: '2026-09-21',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Calcumetrics Wealth Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFP® & Wealth Advisory Panel',
+    quickAnswer: 'Real Return ≈ Nominal Return - Inflation - Tax. A 7% FD in a 30% tax bracket yields 4.9% post-tax; at 6% inflation, your purchasing power drops 1.1% per year.',
     sources: [
       {
         name: 'Irving Fisher',

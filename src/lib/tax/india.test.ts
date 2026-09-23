@@ -41,6 +41,14 @@ describe('calcGST', () => {
     expect(res.gstAmount).toBe(0);
     expect(res.baseAmount).toBe(res.totalAmount);
   });
+
+  it('GST 2.0: 40% demerit/luxury rate calculation', () => {
+    const res = calcGST(100000, 40, 'exclusive');
+    expect(res.gstAmount).toBe(40000);
+    expect(res.totalAmount).toBe(140000);
+    expect(res.cgst).toBe(20000);
+    expect(res.sgst).toBe(20000);
+  });
 });
 
 describe('calcHRA', () => {

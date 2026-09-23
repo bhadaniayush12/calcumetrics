@@ -28,7 +28,7 @@ const pct = ((value - min) / (max - min)) * 100;
       {label}
     </label>
   )}
-  <div class="relative h-5 flex items-center">
+  <div class="relative h-11 flex items-center">
     <input
       type="range"
       id={id}
@@ -42,7 +42,7 @@ const pct = ((value - min) / (max - min)) * 100;
       aria-valuemax={max}
       aria-valuenow={value}
       style={`--slider-pct: ${pct.toFixed(2)}%`}
-      class="slider-input w-full h-1 appearance-none bg-transparent cursor-pointer focus-visible:outline-none focus-visible:ring-0 rounded-full"
+      class="slider-input w-full h-2 appearance-none bg-transparent cursor-pointer focus-visible:outline-none focus-visible:ring-0 rounded-full py-3"
       data-slider
     />
   </div>

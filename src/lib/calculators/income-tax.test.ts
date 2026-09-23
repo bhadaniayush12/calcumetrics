@@ -5,24 +5,25 @@ import { serializeHash, restoreFromHash } from '../url-state';
 
 describe('5.10 Income Tax Calculator (India)', () => {
   describe('Mathematical Calculations & Budget 2024 Rules', () => {
-    it('applies Budget 2024 New Regime standard deduction of ₹75,000', () => {
-      const res = calcIncomeTax(775000);
+    it('applies New Regime standard deduction of ₹75,000 and Section 87A zero tax up to ₹12.75 Lakh gross', () => {
+      const res = calcIncomeTax(1275000);
       expect(res.newRegime.standardDeduction).toBe(75000);
-      expect(res.newRegime.taxableIncome).toBe(700000);
-      // Section 87A rebate gives 0 tax for taxable income <= 7,00,000
-      expect(res.newRegime.rebate87A).toBe(20000);
+      expect(res.newRegime.taxableIncome).toBe(1200000);
+      // Section 87A rebate gives 0 tax for taxable income <= 12,00,000
+      expect(res.newRegime.rebate87A).toBe(60000);
       expect(res.newRegime.totalTax).toBe(0);
     });
 
-    it('calculates Section 87A rebate cutoff for New Regime (tax applies above ₹7,00,000 taxable)', () => {
-      // Gross 8,00,000 - 75k std ded = 7,25,000 taxable
-      const res = calcIncomeTax(800000);
-      expect(res.newRegime.taxableIncome).toBe(725000);
-      expect(res.newRegime.rebate87A).toBe(0); // No 87A rebate above 7L
-      // Slabs: 3-7L (4L @ 5% = 20,000) + 7-7.25L (25k @ 10% = 2,500) = 22,500 base tax
-      expect(res.newRegime.baseTax).toBe(22500);
-      // Cess 4% = 900 -> Total Tax = 23,400
-      expect(res.newRegime.totalTax).toBe(23400);
+    it('calculates Section 87A marginal relief for New Regime when taxable income slightly exceeds ₹12,00,000', () => {
+      // Gross 13,00,000 - 75k std ded = 12,25,000 taxable (excess = 25,000)
+      const res = calcIncomeTax(1300000);
+      expect(res.newRegime.taxableIncome).toBe(1225000);
+      // Base tax before relief: 20k (4-8L) + 40k (8-12L) + 25k @ 15% (3,750) = 63,750
+      expect(res.newRegime.baseTax).toBe(63750);
+      // Marginal relief caps tax to excess income (₹25,000)
+      expect(res.newRegime.taxAfterRebate).toBe(25000);
+      // Cess 4% on 25,000 = 1,000 -> Total Tax = 26,000
+      expect(res.newRegime.totalTax).toBe(26000);
     });
 
     it('applies Old Tax Regime standard deduction of ₹50,000 and Section 87A rebate up to ₹5,00,000 taxable', () => {
@@ -34,23 +35,23 @@ describe('5.10 Income Tax Calculator (India)', () => {
       expect(res.oldRegime.totalTax).toBe(0);
     });
 
-    it('matches ₹12,00,000 salary fixture comparing New vs Old Regime', () => {
-      const res = calcIncomeTax(1200000, 150000, 25000, 50000);
+    it('matches ₹15,00,000 salary fixture comparing New vs Old Regime', () => {
+      const res = calcIncomeTax(1500000, 150000, 25000, 50000);
 
-      // New Regime: 12L - 75k = 11.25L taxable
-      // Slabs: 3-7L (20k) + 7-10L (30k) + 10-11.25L (1.25L @ 15% = 18,750) = 68,750
-      // Cess 4% = 2,750 -> Total = 71,500
-      expect(res.newRegime.taxableIncome).toBe(1125000);
-      expect(res.newRegime.totalTax).toBe(71500);
+      // New Regime: 15L - 75k = 14.25L taxable
+      // Slabs: 4-8L (20k) + 8-12L (40k) + 12-14.25L (2.25L @ 15% = 33,750) = 93,750
+      // Cess 4% = 3,750 -> Total = 97,500
+      expect(res.newRegime.taxableIncome).toBe(1425000);
+      expect(res.newRegime.totalTax).toBe(97500);
 
-      // Old Regime: 12L - (50k std ded + 150k 80C + 25k 80D + 50k other = 275k) = 9.25L taxable
-      // Slabs: 2.5-5L (12.5k) + 5-9.25L (4.25L @ 20% = 85k) = 97,500
-      // Cess 4% = 3,900 -> Total = 1,01,400
-      expect(res.oldRegime.taxableIncome).toBe(925000);
-      expect(res.oldRegime.totalTax).toBe(101400);
+      // Old Regime: 15L - (50k std ded + 150k 80C + 25k 80D + 50k other = 275k) = 12.25L taxable
+      // Slabs: 2.5-5L (12.5k) + 5-10L (100k) + 10-12.25L (2.25L @ 30% = 67.5k) = 1,80,000
+      // Cess 4% = 7,200 -> Total = 1,87,200
+      expect(res.oldRegime.taxableIncome).toBe(1225000);
+      expect(res.oldRegime.totalTax).toBe(187200);
 
       expect(res.recommendedRegime).toBe('New Regime');
-      expect(res.taxSavings).toBe(29900);
+      expect(res.taxSavings).toBe(89700);
     });
 
     it('caps Section 80C at ₹1,50,000 and 80D at ₹1,00,000 in Old Regime', () => {
@@ -69,18 +70,19 @@ describe('5.10 Income Tax Calculator (India)', () => {
       expect(resNeg.oldRegime.totalTax).toBe(0);
     });
 
-    it('correctly calculates high income bracket in New Regime (> ₹15,00,000 @ 30%)', () => {
-      const res = calcIncomeTax(2000000); // 20L
-      // Taxable = 20L - 75k = 19.25L
-      // 3-7L: 20k
-      // 7-10L: 30k
-      // 10-12L: 30k (2L @ 15%)
-      // 12-15L: 60k (3L @ 20%)
-      // >15L: 4.25L @ 30% = 1,27,500
-      // Base = 2,67,500 + 4% cess (10,700) = 2,78,200
-      expect(res.newRegime.taxableIncome).toBe(1925000);
-      expect(res.newRegime.baseTax).toBe(267500);
-      expect(res.newRegime.totalTax).toBe(278200);
+    it('correctly calculates high income bracket in New Regime (> ₹24,00,000 @ 30%)', () => {
+      const res = calcIncomeTax(3000000); // 30L
+      // Taxable = 30L - 75k = 29.25L
+      // 4-8L: 20k
+      // 8-12L: 40k
+      // 12-16L: 60k
+      // 16-20L: 80k
+      // 20-24L: 100k
+      // >24L: 5.25L @ 30% = 1,57,500
+      // Base = 4,57,500 + 4% cess (18,300) = 4,75,800
+      expect(res.newRegime.taxableIncome).toBe(2925000);
+      expect(res.newRegime.baseTax).toBe(457500);
+      expect(res.newRegime.totalTax).toBe(475800);
     });
   });
 

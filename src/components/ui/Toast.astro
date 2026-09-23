@@ -1,0 +1,96 @@
+---
+// src/components/ui/Toast.astro
+// macOS-Style Toast Notification
+---
+
+<div
+  id="mac-toast-container"
+  class="fixed top-20 right-4 sm:right-6 z-[120] pointer-events-none flex flex-col gap-2 max-w-sm w-full transition-all duration-200"
+  aria-live="polite"
+></div>
+
+<template id="mac-toast-template">
+  <div class="mac-toast-item pointer-events-auto flex items-start gap-3 p-3.5 bg-surface/95 dark:bg-surface/95 backdrop-blur-md border border-border rounded-card shadow-mac transform transition-all duration-300 translate-y-[-10px] opacity-0">
+    <div class="toast-icon-wrapper w-7 h-7 rounded-full bg-accent/15 text-accent flex items-center justify-center shrink-0 mt-0.5 text-sm font-bold">
+      ✓
+    </div>
+    <div class="flex-1 min-w-0 pr-1">
+      <div class="toast-title text-[13px] font-semibold text-text-primary truncate">Calcumetrics</div>
+      <div class="toast-message text-xs text-text-muted mt-0.5 break-words">Notification message</div>
+    </div>
+    <button
+      type="button"
+      class="toast-close-btn text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer shrink-0"
+      aria-label="Dismiss notification"
+    >
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+</template>
+
+<script>
+  interface ToastOptions {
+    title?: string;
+    message: string;
+    icon?: string;
+    duration?: number;
+  }
+
+  declare global {
+    interface Window {
+      __cmShowToast?: (options: ToastOptions | string) => void;
+    }
+  }
+
+  function showToast(options: ToastOptions | string) {
+    const container = document.getElementById('mac-toast-container');
+    const template = document.getElementById('mac-toast-template') as HTMLTemplateElement | null;
+    if (!container || !template) return;
+
+    const opts: ToastOptions = typeof options === 'string' ? { message: options } : options;
+    const clone = template.content.cloneNode(true) as DocumentFragment;
+    const toastEl = clone.querySelector('.mac-toast-item') as HTMLElement;
+    const titleEl = clone.querySelector('.toast-title') as HTMLElement;
+    const messageEl = clone.querySelector('.toast-message') as HTMLElement;
+    const iconEl = clone.querySelector('.toast-icon-wrapper') as HTMLElement;
+    const closeBtn = clone.querySelector('.toast-close-btn') as HTMLElement;
+
+    if (titleEl) titleEl.textContent = opts.title || 'Calcumetrics';
+    if (messageEl) messageEl.textContent = opts.message;
+    if (iconEl && opts.icon) iconEl.textContent = opts.icon;
+
+    function removeToast() {
+      toastEl.classList.remove('translate-y-0', 'opacity-100');
+      toastEl.classList.add('translate-y-[-10px]', 'opacity-0');
+      setTimeout(() => {
+        toastEl.remove();
+      }, 300);
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', removeToast);
+    }
+
+    container.appendChild(toastEl);
+
+    // Animate in
+    requestAnimationFrame(() => {
+      toastEl.classList.remove('translate-y-[-10px]', 'opacity-0');
+      toastEl.classList.add('translate-y-0', 'opacity-100');
+    });
+
+    const duration = opts.duration || 3200;
+    setTimeout(removeToast, duration);
+  }
+
+  window.__cmShowToast = showToast;
+  window.addEventListener('cm:toast', (e: Event) => {
+    const customEvent = e as CustomEvent<ToastOptions>;
+    if (customEvent.detail) {
+      showToast(customEvent.detail);
+    }
+  });
+</script>

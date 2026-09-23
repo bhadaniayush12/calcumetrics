@@ -1,7 +1,25 @@
 ---
+interface Props {
+  slim?: boolean;
+}
+
+const { slim = false } = Astro.props;
+
+interface FooterLink {
+  label: string;
+  href: string;
+  isCookieSettings?: boolean;
+}
+
+interface FooterColumn {
+  title: string;
+  href?: string;
+  links: FooterLink[];
+}
+
 // Section 7: Locked 6-column layout: Taxes / Investments / Business / Corporate Finance / Loans / Company+Legal merged
 // With a "Cookie settings" text link in the Company+Legal column.
-const columns = [
+const columns: FooterColumn[] = [
   {
     title: 'Investments',
     href: '/investments',
@@ -75,44 +93,66 @@ const columns = [
 
 <footer class="w-full bg-canvas border-t border-border mt-auto select-none">
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-    <!-- 6 Columns Layout per Section 7 -->
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
-      {columns.map((col) => (
-        <div class="flex flex-col gap-3">
-          <h3 class="text-[13px] font-semibold tracking-wider uppercase text-text-primary">
-            {col.href ? (
-              <a href={col.href} class="hover:text-accent transition-standard">
-                {col.title}
-              </a>
-            ) : (
-              col.title
-            )}
-          </h3>
-          <ul class="flex flex-col gap-2 text-[13px] text-text-muted">
-            {col.links.map((link) => (
-              <li>
-                {link.isCookieSettings ? (
-                  <button
-                    type="button"
-                    id="cookie-settings-button"
-                    class="text-left text-text-muted hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
-                  >
-                    {link.label}
-                  </button>
-                ) : (
-                  <a
-                    href={link.href}
-                    class="hover:text-accent transition-standard focus-visible:outline-accent"
-                  >
-                    {link.label}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
+    {slim ? (
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-8 mb-8 border-b border-border text-xs text-text-muted">
+        <nav aria-label="Footer navigation" class="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-2 font-medium">
+          <a href="/calculators" class="hover:text-accent transition-standard">All Calculators</a>
+          <a href="/blog" class="hover:text-accent transition-standard">Blog</a>
+          <a href="/about" class="hover:text-accent transition-standard">About</a>
+          <a href="/methodology" class="hover:text-accent transition-standard">Methodology</a>
+          <a href="/contact" class="hover:text-accent transition-standard">Contact</a>
+          <a href="/privacy-policy" class="hover:text-accent transition-standard">Privacy</a>
+          <a href="/terms" class="hover:text-accent transition-standard">Terms</a>
+          <a href="/disclaimer" class="hover:text-accent transition-standard">Disclaimer</a>
+          <button
+            type="button"
+            id="cookie-settings-button-slim"
+            class="hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
+          >
+            Cookie settings
+          </button>
+        </nav>
+        <span class="text-[11px] text-text-muted shrink-0">100% Client-Side Calculations</span>
+      </div>
+    ) : (
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12">
+        {columns.map((col) => (
+          <div class="flex flex-col gap-3">
+            <h3 class="text-[13px] font-semibold tracking-wider uppercase text-text-primary">
+              {col.href ? (
+                <a href={col.href} class="hover:text-accent transition-standard">
+                  {col.title}
+                </a>
+              ) : (
+                col.title
+              )}
+            </h3>
+            <ul class="flex flex-col gap-2 text-[13px] text-text-muted">
+              {col.links.map((link) => (
+                <li>
+                  {link.isCookieSettings ? (
+                    <button
+                      type="button"
+                      id="cookie-settings-button"
+                      class="text-left text-text-muted hover:text-accent transition-standard cursor-pointer focus-visible:outline-accent"
+                    >
+                      {link.label}
+                    </button>
+                  ) : (
+                    <a
+                      href={link.href}
+                      class="hover:text-accent transition-standard focus-visible:outline-accent"
+                    >
+                      {link.label}
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    )}
 
     <!-- Bottom Bar: Branding, Disclaimer & Copyright per Section 6 & 16 -->
     <div class="pt-8 border-t border-border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs text-text-muted">
@@ -145,11 +185,10 @@ const columns = [
 
 <script>
   // Section 7 & 19: "Cookie settings" reopens the consent dialog
-  const cookieSettingsBtn = document.getElementById('cookie-settings-button');
-  if (cookieSettingsBtn) {
-    cookieSettingsBtn.addEventListener('click', () => {
-      // Trigger CMP modal or custom event for CMP integration
+  const cookieBtns = document.querySelectorAll('#cookie-settings-button, #cookie-settings-button-slim');
+  cookieBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
       window.dispatchEvent(new CustomEvent('calcumetrics:open-cookie-settings'));
     });
-  }
+  });
 </script>

@@ -8,11 +8,13 @@ export const BATCH_4_POSTS: BlogPost[] = [
     description:
       'Learn the critical balance sheet differences between Current Ratio and Quick Ratio (Acid-Test). Understand why inventory distorts liquidity analysis.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-20',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Financial Analysis & Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Corporate Finance & Financial Analysis Panel',
+    quickAnswer: 'Current Ratio includes inventory; Quick (Acid-Test) Ratio excludes inventory and prepaid expenses to test immediate liquidity against current liabilities.',
     sources: [
       {
         name: 'CFA Institute',
@@ -204,11 +206,13 @@ export const BATCH_4_POSTS: BlogPost[] = [
     description:
       'Learn the critical accounting differences between Cost of Goods Sold (COGS) and Operating Expenses (OpEx), and how proper classification protects your gross margins.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-21',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Corporate Accounting Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Corporate Controller',
+    quickAnswer: 'COGS includes direct production costs (materials, direct labor); OpEx covers running the business (salaries, rent, marketing, utilities).',
     sources: [
       {
         name: 'Financial Accounting Standards Board (FASB)',
@@ -405,11 +409,13 @@ export const BATCH_4_POSTS: BlogPost[] = [
     description:
       'Master the Weighted Average Cost of Capital (WACC) formula. Learn CAPM cost of equity, after-tax cost of debt, and capital structure weights.',
     category: 'Corporate Finance',
-    publishDate: '2026-09-23',
+    publishDate: '2026-09-21',
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Calcumetrics Corporate Finance Advisory Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFA & Corporate Valuation Practice',
+    quickAnswer: 'WACC blends after-tax debt cost and equity cost using market values; it sets the minimum hurdle rate for corporate capital investments.',
     sources: [
       {
         name: 'Aswath Damodaran, NYU Stern School of Business',
@@ -597,11 +603,13 @@ export const BATCH_4_POSTS: BlogPost[] = [
     description:
       'Learn how to model Discounted Cash Flow (DCF) valuations, forecast Free Cash Flow to Firm (FCFF), and accurately calculate Terminal Value.',
     category: 'Corporate Finance',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-22',
+    dateModified: '2026-09-24',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Calcumetrics M&A and Valuation Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFA & Investment Banking Valuation Panel',
+    quickAnswer: 'Terminal Value typically represents 65%–80% of total company valuation in a 5–10 year DCF model; a 0.5% tweak in WACC or growth significantly alters intrinsic value.',
     sources: [
       {
         name: 'Tim Koller, Marc Goedhart, David Wessels (McKinsey & Company)',
@@ -685,7 +693,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        Yet, financial analysts quickly discover a startling structural fact upon building their first comprehensive model: <strong>Terminal Value routinely accounts for 65% to 80% of the total estimated value of the company</strong>. If an analyst miscalculates the terminal horizon, the entire valuation collapses.
+        Yet, quantitative analysts quickly discover an inescapable mathematical reality documented extensively in corporate valuation literature: <strong>Terminal Value routinely accounts for 65% to 80% (averaging ~70%) of a company's total intrinsic Enterprise Value in a standard 5-to-10 year DCF</strong>. As established in McKinsey &amp; Company's definitive text <em>Valuation: Measuring and Managing the Value of Companies</em> (Koller et al.) and empirical studies by Prof. Aswath Damodaran (NYU Stern), this concentration occurs because 5 or 10 years represent a tiny fraction of an enduring enterprise's lifespan—the discounted value of all perpetual cash flows beyond Year 5 mathematically dominates the valuation. If an analyst miscalculates the terminal discount rate or perpetual growth rate, the entire valuation collapses.
       </p>
 
       <div class="my-8 p-5 bg-surface border border-border rounded-card">
@@ -823,7 +831,9 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Capital Allocation Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Capital Budgeting & Corporate Finance Panel',
+    quickAnswer: 'Simple Payback ignores time value of money; Discounted Payback discounts future cash flows at the hurdle rate to find the real break-even year.',
     sources: [
       {
         name: 'Richard A. Brealey, Stewart C. Myers, Franklin Allen',

@@ -8,11 +8,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
     description:
       'Compare the interest-saving math of the Debt Avalanche against the psychological momentum of the Debt Snowball to choose your optimal debt payoff strategy.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-04',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Credit & Debt Strategy Group',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Certified Financial Planner (CFP®)',
+    quickAnswer: 'Avalanche pays highest-interest debt first to save the most money mathematically; Snowball pays smallest balances first for psychological momentum.',
     sources: [
       {
         name: 'National Bureau of Economic Research (NBER)',
@@ -216,11 +218,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
     description:
       'Discover the compounding mechanics of loan amortization schedules, why early payments are mostly interest, and how early prepayments save massive interest.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-06',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Quantitative Lending Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Credit Risk & Retail Banking Panel',
+    quickAnswer: 'Early EMI payments consist almost entirely of interest; principal reduction accelerates only in the second half of the loan tenure.',
     sources: [
       {
         name: 'Bank of England',
@@ -417,11 +421,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
     description:
       'Compare fixed rate certainty against floating rate benchmark savings. Learn how rate cycles, reset spreads, and prepayment penalties dictate the best choice.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-08',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Calcumetrics Mortgage & Credit Advisory Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Senior Retail Lending Specialist',
+    quickAnswer: 'Fixed rates guarantee payment certainty; floating rates are typically 1.0%–1.5% cheaper initially and benefit when central bank rates decline.',
     sources: [
       {
         name: 'Federal Reserve Bank of St. Louis (FRED)',
@@ -589,11 +595,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
     description:
       'Learn the exact mathematical breakdown between Cost to Company (CTC) and net take-home salary in India, including EPF, gratuity, and income tax.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
+    publishDate: '2026-09-11',
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Indian Payroll & Taxation Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Corporate Payroll & Statutory Compliance Lead',
+    quickAnswer: 'Take-home salary is typically 70%–80% of CTC after deducting employer/employee EPF, gratuity provisions, professional tax, and monthly TDS.',
     sources: [
       {
         name: "Employees' Provident Fund Organisation (EPFO)",
@@ -607,7 +615,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       },
       {
         name: 'Income Tax Department of India',
-        citation: 'Finance Act, 2024: Revised New Tax Regime Slab Rates and Section 87A Rebate',
+        citation: 'Finance Act Statutory Provisions: Revised New Tax Regime Slab Rates and Section 87A Rebate',
         url: 'https://incometaxindia.gov.in',
       },
     ],
@@ -624,7 +632,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         name: 'Income Tax Calculator',
         path: '/in/income-tax-calculator',
-        description: 'Simulate annual tax liabilities under Old vs New Tax Regimes with Budget 2024 revisions.',
+        description: 'Simulate annual tax liabilities under Old vs New Tax Regimes with current statutory slabs.',
       },
       {
         name: 'HRA Calculator',
@@ -640,7 +648,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
       {
@@ -668,7 +676,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         question: 'How does the New Tax Regime impact in-hand salary compared to the Old Regime?',
         answer:
-          'Under Budget 2024, the New Tax Regime offers lower slab rates, a ₹75,000 standard deduction, and complete tax exemption on taxable income up to ₹7.75 lakh (via Section 87A rebate). For employees who do not have large home loan interest (Section 24b) or Section 80C investments, the New Tax Regime substantially reduces monthly TDS, increasing monthly in-hand cash.',
+          'Under the New Tax Regime, employees benefit from lower slab rates, a ₹75,000 standard deduction, and complete tax exemption on taxable income up to ₹7.75 lakh (via Section 87A rebate). For employees who do not have large home loan interest (Section 24b) or Section 80C investments, the New Tax Regime substantially reduces monthly TDS, increasing monthly in-hand cash.',
       },
     ],
     content: `
@@ -726,7 +734,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Breakdown: ₹15,00,000 CTC</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (Budget 2024 parameters, ₹75,000 standard deduction):
+        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (FY 2025-27 parameters, ₹75,000 standard deduction):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -814,11 +822,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
     description:
       'Learn how to calculate net GST liability using Input Tax Credit (ITC), master GSTR-2B reconciliation rules, and avoid Section 17(5) blocked credit pitfalls.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
+    publishDate: '2026-09-13',
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Indirect Tax & Commercial Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Indirect Tax & GST Advisory Practice',
+    quickAnswer: 'ITC can only be claimed if the invoice appears in GSTR-2B, goods/services are received, and the supplier is paid within 180 days.',
     sources: [
       {
         name: 'Central Board of Indirect Taxes and Customs (CBIC)',
@@ -843,7 +853,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         name: 'GST Calculator',
         path: '/in/gst-calculator',
-        description: 'Calculate forward and reverse GST amounts across 5%, 12%, 18%, and 28% tariff slabs.',
+        description: 'Calculate forward and reverse GST amounts across statutory tariff slabs (0%, 5%, 18%, 40% under GST 2.0 reform).',
         badge: 'Statutory GST',
       },
       {
@@ -865,7 +875,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
         description: 'Review statutory tax thresholds and personal deduction calculations.',
       },
       {

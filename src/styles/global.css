@@ -35,13 +35,13 @@
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Colors (Section 2 - Locked Tokens) */
+  /* Colors (Section 2 - High-Contrast Tokens) */
   --color-canvas: #F7F7F4;
   --color-surface: #FFFFFF;
   --color-text-primary: #171A18;
-  --color-text-muted: #66706B;
+  --color-text-muted: #3D4842;
   --color-ink: #171A18;
-  --color-muted: #66706B;
+  --color-muted: #3D4842;
 
   --color-accent: #176B5B;
   --color-accent-hover: #135A4D;
@@ -50,7 +50,7 @@
   --color-border: #D8DDD9;
 
   --color-disabled-bg: #EEF0EE;
-  --color-disabled-text: #8A928D;
+  --color-disabled-text: #66726C;
 
   --color-error: #B42318;
   --color-error-text: #B42318;
@@ -62,7 +62,7 @@
   --color-dark-bg: #171A18;
   --color-dark-border: #2B302D;
   --color-dark-text: #F7F7F4;
-  --color-dark-muted: #A8B0AB;
+  --color-dark-muted: #BDC7C2;
   --color-dark-accent: #5FCDB6;
 
   /* Radii: Section 2: controls 8px, cards 12px, chips/tags 6px, checkboxes 4px. Nothing else. */
@@ -81,14 +81,14 @@ html[data-theme="dark"] {
   --color-canvas: #0F1211;
   --color-surface: #171A18;
   --color-text-primary: #F7F7F4;
-  --color-text-muted: #A8B0AB;
+  --color-text-muted: #BDC7C2;
   --color-ink: #F7F7F4;
-  --color-muted: #A8B0AB;
+  --color-muted: #BDC7C2;
 
   --color-border: #2B302D;
 
   --color-disabled-bg: #1F2421;
-  --color-disabled-text: #66706B;
+  --color-disabled-text: #808A85;
 
   --color-accent: #5FCDB6;
   --color-accent-hover: #76D7C2;
@@ -104,7 +104,7 @@ html[data-theme="dark"] {
   --color-dark-bg: #141715;
   --color-dark-border: #2B302D;
   --color-dark-text: #F7F7F4;
-  --color-dark-muted: #A8B0AB;
+  --color-dark-muted: #BDC7C2;
   --color-dark-accent: #5FCDB6;
 
   color-scheme: dark;
@@ -139,49 +139,91 @@ html[data-theme="dark"] .bg-accent.text-surface {
     line-height: 1.5;
   }
 
-  /* Section 4: Focus = outline only: 2px solid #176B5B, offset 2px, on :focus-visible */
+  /* Accessible Focus Rings */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-accent) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.22) !important;
   }
 
-  /* Focus on dark surfaces: #5FCDB6 */
+  /* Focus on dark surfaces */
   .dark-surface :focus-visible,
-  [data-surface="dark"] :focus-visible {
-    outline: 2px solid var(--color-dark-accent);
-    outline-offset: 2px;
+  [data-surface="dark"] :focus-visible,
+  html.dark :focus-visible,
+  html[data-theme="dark"] :focus-visible {
+    outline: 2px solid var(--color-dark-accent) !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 3px rgba(95, 205, 182, 0.28) !important;
   }
 
-  /* Section 2: font-variant-numeric: tabular-nums on every number */
+  /* Section 2: Universal Tabular Numbers for zero-jitter alignment */
   .tabular-nums,
-  [data-numeric] {
+  [data-numeric],
+  .cm-result-value,
+  [data-cm-result],
+  #calc-desktop-hero,
+  #calc-mobile-hero,
+  [id*="-result-"],
+  [id*="-hero"],
+  [id*="-amt"],
+  [id*="-total"],
+  [id*="-tax"],
+  .font-mono {
     font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
   }
 }
 
-/* Custom utility for 120ms transitions per Section 3 */
+/* Custom utility for 120ms transitions */
 @utility transition-standard {
   transition-property: color, background-color, border-color, opacity;
   transition-duration: 120ms;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Section 3: Allowed motion - skeleton opacity pulse with motion-reduce */
-@keyframes skeleton-pulse {
-  0%, 100% {
-    opacity: 1;
+/* Skeleton shimmer with zero cumulative layout shift */
+@keyframes mac-shimmer {
+  0% {
+    background-position: -200% 0;
   }
-  50% {
-    opacity: 0.5;
+  100% {
+    background-position: 200% 0;
   }
 }
 
-@utility animate-skeleton {
-  animation: skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--color-canvas) 25%, var(--color-surface) 50%, var(--color-canvas) 75%);
+  background-size: 200% 100%;
+  animation: mac-shimmer 1.8s infinite;
 }
 
+@utility shadow-mac {
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+@utility shadow-mac-subtle {
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+/* macOS Glass Effect Fallback */
+@media (prefers-reduced-transparency: reduce) {
+  .mac-blur-surface {
+    backdrop-filter: none !important;
+    background-color: var(--color-surface) !important;
+  }
+}
+
+/* Respect prefers-reduced-motion: Instant updates, zero animations */
 @media (prefers-reduced-motion: reduce) {
-  .animate-skeleton {
-    animation: none;
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .skeleton-shimmer {
+    animation: none !important;
+    background: var(--color-canvas) !important;
   }
 }
+

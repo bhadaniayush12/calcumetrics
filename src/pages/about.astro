@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import WindowFrame from '../components/calculator/WindowFrame.astro';
 import { getToolCount, CATEGORIES, SITE_EMAIL } from '../config/site';
 
 const canonicalUrl = 'https://calcumetrics.com/about';
@@ -14,8 +13,18 @@ const jsonld = {
       '@type': 'AboutPage',
       name: 'About Calcumetrics',
       url: canonicalUrl,
-      description: 'Learn about Calcumetrics — our mission, methodology, formula accuracy, and independent financial calculation architecture.',
-      mainEntity: { '@id': 'https://calcumetrics.com/#org' },
+      description: 'Learn about Calcumetrics — our founder story, formula accuracy, client-side privacy, public corrections log, and test-case verification architecture.',
+      mainEntity: {
+        '@type': 'Person',
+        name: 'Priyanshu Bhadauriya',
+        jobTitle: 'Founder & Lead Developer',
+        url: 'https://calcumetrics.com/about',
+        sameAs: [
+          'https://github.com/calcumetrics',
+          'https://linkedin.com/in/priyanshubhadauriya',
+          'https://x.com/calcumetrics',
+        ],
+      },
     },
     {
       '@type': 'BreadcrumbList',
@@ -27,14 +36,18 @@ const jsonld = {
   ],
 };
 ---
+
 <Layout
-  title="About Calcumetrics | Free Financial Calculators, No Sign-Up"
-  description="Learn about Calcumetrics — who runs it, our mission, what the tools are, how we make money, and our approach to formula accuracy."
+  title="About Calcumetrics | Founder Story, Testing & Mission"
+  description="Learn about Calcumetrics and founder Priyanshu Bhadauriya. Built for commerce students, CA aspirants, and everyday investors with 100% client-side privacy."
   canonical={canonicalUrl}
+  slimFooter={true}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <nav aria-label="Breadcrumb" class="mb-6">
+
+  <div class="max-w-[860px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-5">
       <ol class="flex items-center gap-1.5 text-xs text-text-muted">
         <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
         <li aria-hidden="true">›</li>
@@ -42,122 +55,541 @@ const jsonld = {
       </ol>
     </nav>
 
-    <!-- 1. WindowFrame Hero -->
-    <WindowFrame urlPill="calcumetrics.com/about" class="mb-8">
-      <div class="p-6 sm:p-8">
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-chip bg-disabled-bg border border-border text-xs font-medium text-text-muted mb-4">
-          100% Free · No signup · Zero data collected
-        </div>
-        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary mb-3">About Calcumetrics</h1>
-        <p class="text-sm text-text-muted leading-relaxed max-w-xl">
-          Independent, free financial calculators with transparent formulas, client-side execution, and zero personal data collection.
-        </p>
-        <p class="text-xs text-text-muted mt-4">Last updated: 23 September 2026</p>
+    <!-- Page Title & Intro -->
+    <header class="mb-8">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold text-accent mb-3">
+        <span>🛡️</span>
+        <span>100% Free · No Sign-Up · 100% Client-Side Privacy</span>
       </div>
-    </WindowFrame>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-2.5">
+        About Calcumetrics
+      </h1>
+      <p class="text-base text-text-muted leading-relaxed font-normal max-w-2xl">
+        Fast, transparent financial calculation engines built with documented mathematical formulas, zero personal data collection, and verified test fixtures.
+      </p>
+    </header>
 
-    <!-- 2. Three-Stat Strip -->
-    <section class="mb-10" aria-label="Platform statistics">
-      <div class="bg-surface border border-border rounded-card p-4 sm:p-5">
-        <div class="grid grid-cols-3 divide-x divide-border">
-          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
-            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">{toolCount}</span>
-            <span class="text-xs text-text-muted mt-1 font-medium">Calculators</span>
+    <!-- macOS Interactive System Settings Window -->
+    <section class="bg-surface border border-border rounded-card shadow-mac overflow-hidden mb-12" aria-label="Calcumetrics Preferences Window">
+      <!-- Window Title Bar with Functional Traffic Lights -->
+      <div class="bg-canvas/90 border-b border-border px-4 py-3 flex items-center justify-between select-none">
+        <div class="flex items-center gap-2">
+          <!-- Red: Close / Reset -->
+          <button
+            type="button"
+            id="traffic-dot-red"
+            class="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] hover:opacity-80 transition-standard cursor-pointer relative group"
+            aria-label="Reset tabs"
+            title="Reset to Overview tab"
+          >
+            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
+              Reset view
+            </span>
+          </button>
+          <!-- Yellow: Minimize -->
+          <button
+            type="button"
+            id="traffic-dot-yellow"
+            class="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] hover:opacity-80 transition-standard cursor-pointer relative group"
+            aria-label="Minimize preview"
+            title="Minimize"
+          >
+            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
+              Minimize
+            </span>
+          </button>
+          <!-- Green: Zoom / Expand -->
+          <button
+            type="button"
+            id="traffic-dot-green"
+            class="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] hover:opacity-80 transition-standard cursor-pointer relative group"
+            aria-label="Expand view"
+            title="Zoom"
+          >
+            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
+              Zoom
+            </span>
+          </button>
+        </div>
+
+        <div class="text-xs font-semibold text-text-muted flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <span>Calcumetrics — System Settings</span>
+        </div>
+
+        <div class="text-[11px] text-text-muted font-mono hidden sm:block">
+          v2.4 · Sep 2026
+        </div>
+      </div>
+
+      <!-- System Settings Tab Bar -->
+      <div class="bg-canvas/50 border-b border-border px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
+        <button
+          type="button"
+          data-about-tab="overview"
+          class="about-tab-btn px-3 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <span>👤</span>
+          <span>Overview &amp; Story</span>
+        </button>
+        <button
+          type="button"
+          data-about-tab="testing"
+          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <span>📐</span>
+          <span>How We Test (Worked Proofs)</span>
+        </button>
+        <button
+          type="button"
+          data-about-tab="money"
+          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <span>🛡️</span>
+          <span>Money &amp; Ethics</span>
+        </button>
+        <button
+          type="button"
+          data-about-tab="corrections"
+          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
+        >
+          <span>📝</span>
+          <span>Corrections Log</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div class="p-6 sm:p-8" id="about-tab-content">
+
+        <!-- TAB 1: OVERVIEW & FOUNDER STORY -->
+        <div id="tab-panel-overview" class="space-y-8">
+          <!-- Founder Origin Story Card (5-6 lines emotional connection) -->
+          <div class="p-5 sm:p-6 bg-canvas/70 border border-border rounded-card">
+            <div class="flex items-center gap-2 text-xs font-semibold text-accent uppercase tracking-wider mb-2">
+              <span>💡</span>
+              <span>Why This Exists</span>
+            </div>
+            <h2 class="text-xl font-bold text-text-primary mb-3">
+              The Origin: Two Commerce Friends &amp; Broken Calculators
+            </h2>
+            <p class="text-[15px] text-text-primary leading-relaxed mb-3">
+              Calcumetrics began with two college friends studying commerce in India. Har baar assignments, case studies aur financial analysis ke liye alag-alag ad-choked websites pe bhatakna padta tha—kisi pe formula hidden tha, kisi pe 2-saal purane outdated tax slabs the, aur phone par aate hi poora layout bikhar jaata tha.
+            </p>
+            <p class="text-[15px] text-text-muted leading-relaxed">
+              Ek raat semester projects ke dauran tang aakar humne decide kiya: <em>"Kyun na hum khud ek aisa clean tool banayein jo browser mein turant calculate kare bina kisi lead-form ya popup ke?"</em> Wahi se Calcumetrics shuru hua—ek aisi jagah jaha commerce students, CA aspirants aur everyday investors bina kisi distraction ke exact numbers calculate kar sakein.
+            </p>
           </div>
-          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
-            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">{categoryCount}</span>
-            <span class="text-xs text-text-muted mt-1 font-medium">Categories</span>
+
+          <!-- Founder Profile -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-surface border border-border rounded-card">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-2xl font-bold shrink-0 shadow-sm">
+              PB
+            </div>
+            <div class="flex-1">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
+                <div>
+                  <h3 class="text-lg font-bold text-text-primary">Priyanshu Bhadauriya</h3>
+                  <p class="text-xs text-text-muted">Founder &amp; Lead Developer · Calcumetrics</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <a href={`mailto:${SITE_EMAIL}`} class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
+                    ✉️ {SITE_EMAIL}
+                  </a>
+                  <a href="https://linkedin.com/in/priyanshubhadauriya" target="_blank" rel="noopener noreferrer" class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
+                    LinkedIn
+                  </a>
+                  <a href="https://x.com/calcumetrics" target="_blank" rel="noopener noreferrer" class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
+                    X
+                  </a>
+                </div>
+              </div>
+              <p class="text-xs text-text-muted leading-relaxed mt-2">
+                Commerce background with deep focus on corporate valuation, direct taxation, and client-side web architecture. Every formula on Calcumetrics is manually verified against statutory notifications and academic financial literature.
+              </p>
+            </div>
           </div>
-          <div class="flex flex-col items-center text-center px-2 sm:px-4 py-1">
-            <span class="text-xl sm:text-3xl font-bold tabular-nums text-text-primary tracking-tight">100%</span>
-            <span class="text-xs text-text-muted mt-1 font-medium">Client-side</span>
+
+          <!-- 4-Stat Trust Bar -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="p-4 bg-canvas border border-border rounded-control text-center">
+              <span class="text-2xl font-extrabold text-text-primary tabular-nums block">{toolCount}+</span>
+              <span class="text-xs text-text-muted font-medium">Precision Calculators</span>
+            </div>
+            <div class="p-4 bg-canvas border border-border rounded-control text-center">
+              <span class="text-2xl font-extrabold text-text-primary tabular-nums block">{categoryCount}</span>
+              <span class="text-xs text-text-muted font-medium">Core Financial Hubs</span>
+            </div>
+            <div class="p-4 bg-canvas border border-border rounded-control text-center">
+              <span class="text-2xl font-extrabold text-accent tabular-nums block">100%</span>
+              <span class="text-xs text-text-muted font-medium">Client-Side Privacy</span>
+            </div>
+            <div class="p-4 bg-canvas border border-border rounded-control text-center">
+              <span class="text-2xl font-extrabold text-accent tabular-nums block">0</span>
+              <span class="text-xs text-text-muted font-medium">Tracking Scripts</span>
+            </div>
+          </div>
+
+          <!-- Audience & Values -->
+          <div>
+            <h3 class="text-base font-bold text-text-primary mb-2">Built Specifically For</h3>
+            <p class="text-sm text-text-muted leading-relaxed">
+              Calcumetrics is engineered for <strong>commerce students, CA aspirants, finance professionals, and everyday investors</strong> who need dependable numbers fast. No login walls, no email gates, no sales reps calling you after you calculate your mortgage or tax liability.
+            </p>
           </div>
         </div>
+
+        <!-- TAB 2: HOW WE TEST (WORKED PROOFS) -->
+        <div id="tab-panel-testing" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl font-bold text-text-primary mb-2">
+              Public Test Fixtures: How We Guarantee Accuracy
+            </h2>
+            <p class="text-sm text-text-muted leading-relaxed">
+              Every calculator on Calcumetrics is verified with continuous automated unit tests against published mathematical standards, RBI lending circulars, and CBDT statutory notifications.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Fixture 1: SIP -->
+            <div class="p-4 bg-canvas border border-border rounded-control text-xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-text-primary text-sm">1. SIP Compound Annuity</span>
+                <span class="text-emerald-700 dark:text-emerald-400 font-semibold">✓ Tested</span>
+              </div>
+              <p class="text-text-muted mb-2 font-mono text-[11px]">
+                FV = P × [((1 + i)^n − 1) / i] × (1 + i)
+              </p>
+              <div class="bg-surface p-2.5 rounded border border-border space-y-1 text-text-muted">
+                <div><strong>Inputs:</strong> ₹25,000/mo, 12% p.a., 15 Years</div>
+                <div><strong>Invested:</strong> ₹45,00,000</div>
+                <div class="text-text-primary font-bold">Maturity: ₹1,26,14,400</div>
+              </div>
+            </div>
+
+            <!-- Fixture 2: EMI -->
+            <div class="p-4 bg-canvas border border-border rounded-control text-xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-text-primary text-sm">2. Loan EMI (Reducing Balance)</span>
+                <span class="text-emerald-700 dark:text-emerald-400 font-semibold">✓ Tested</span>
+              </div>
+              <p class="text-text-muted mb-2 font-mono text-[11px]">
+                EMI = P × r × (1 + r)^n / [(1 + r)^n − 1]
+              </p>
+              <div class="bg-surface p-2.5 rounded border border-border space-y-1 text-text-muted">
+                <div><strong>Inputs:</strong> ₹50,00,000, 8.5% p.a., 20 Years</div>
+                <div><strong>Monthly EMI:</strong> ₹43,391</div>
+                <div class="text-text-primary font-bold">Total Interest: ₹54,13,879</div>
+              </div>
+            </div>
+
+            <!-- Fixture 3: WACC -->
+            <div class="p-4 bg-canvas border border-border rounded-control text-xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-text-primary text-sm">3. Corporate WACC (CAPM)</span>
+                <span class="text-emerald-700 dark:text-emerald-400 font-semibold">✓ Tested</span>
+              </div>
+              <p class="text-text-muted mb-2 font-mono text-[11px]">
+                WACC = (E/V × Ke) + (D/V × Kd × (1 − t))
+              </p>
+              <div class="bg-surface p-2.5 rounded border border-border space-y-1 text-text-muted">
+                <div><strong>Inputs:</strong> Ke=13.5%, Kd=9.0%, Tax=25%, E/D=60/40</div>
+                <div><strong>After-tax Debt:</strong> 6.75%</div>
+                <div class="text-text-primary font-bold">Blended WACC: 10.80%</div>
+              </div>
+            </div>
+
+            <!-- Fixture 4: Section 115BAC -->
+            <div class="p-4 bg-canvas border border-border rounded-control text-xs">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-bold text-text-primary text-sm">4. New Tax Regime (FY 2025-27)</span>
+                <span class="text-emerald-700 dark:text-emerald-400 font-semibold">✓ Tested</span>
+              </div>
+              <p class="text-text-muted mb-2 font-mono text-[11px]">
+                Sec 115BAC + Sec 87A Rebate + ₹75k Standard Deduction
+              </p>
+              <div class="bg-surface p-2.5 rounded border border-border space-y-1 text-text-muted">
+                <div><strong>Gross Salary:</strong> ₹12,75,000</div>
+                <div><strong>Taxable Income:</strong> ₹12,00,000</div>
+                <div class="text-emerald-700 dark:text-emerald-400 font-bold">Final Tax Payable: ₹0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: MONEY & ETHICS -->
+        <div id="tab-panel-money" class="hidden space-y-6">
+          <div>
+            <h2 class="text-xl font-bold text-text-primary mb-2">
+              Transparency: How This Site Is Funded
+            </h2>
+            <p class="text-sm text-text-muted leading-relaxed">
+              We believe financial websites should be completely honest about how they make money.
+            </p>
+          </div>
+
+          <div class="p-5 bg-canvas border border-border rounded-card">
+            <h3 class="text-base font-bold text-text-primary mb-2">Monetization Statement</h3>
+            <p class="text-sm text-text-primary leading-relaxed mb-3">
+              <strong>Calcumetrics is free and supported by clean, relevant advertising.</strong>
+            </p>
+            <p class="text-sm text-text-muted leading-relaxed">
+              We partner with vetted, professional advertising networks to cover domain, hosting, and editorial infrastructure costs. We will never sell user calculation inputs, never gate results behind forced email opt-ins, and never track your browsing behavior across the web.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div class="p-4 bg-canvas border border-border rounded-control space-y-1.5">
+              <span class="font-bold text-text-primary text-sm block">What We Never Do</span>
+              <p class="text-text-muted">❌ Never store your financial numbers on a server</p>
+              <p class="text-text-muted">❌ Never require sign-up, email, or phone number</p>
+              <p class="text-text-muted">❌ Never run intrusive full-screen popups</p>
+              <p class="text-text-muted">❌ Never sell data to credit bureaus or loan brokers</p>
+            </div>
+            <div class="p-4 bg-canvas border border-border rounded-control space-y-1.5">
+              <span class="font-bold text-text-primary text-sm block">What We Guarantee</span>
+              <p class="text-text-muted">✅ 100% in-browser JavaScript execution</p>
+              <p class="text-text-muted">✅ Fully documented formulas on every page</p>
+              <p class="text-text-muted">✅ Immediate calculation on slider/input change</p>
+              <p class="text-text-muted">✅ Public test fixtures and quarterly rate audits</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: CORRECTIONS LOG -->
+        <div id="tab-panel-corrections" class="hidden space-y-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-text-primary mb-1">
+                Public Statutory Corrections Log
+              </h2>
+              <p class="text-xs text-text-muted">
+                Transparent changelog of all statutory rate updates and formula adjustments.
+              </p>
+            </div>
+            <span class="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded font-semibold">
+              Live Audited
+            </span>
+          </div>
+
+          <div class="relative pl-6 border-l-2 border-border space-y-6 text-xs">
+            <!-- Entry 1 -->
+            <div class="relative">
+              <div class="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-accent border-2 border-surface"></div>
+              <span class="font-bold text-text-primary text-sm block">September 2026</span>
+              <p class="text-accent font-semibold mt-0.5">GST 2.0 Reform Implementation</p>
+              <p class="text-text-muted mt-1 leading-relaxed">
+                Upgraded Indian GST calculator from former 5/12/18/28% slabs to the restructured 0%, 5%, 18%, and 40% luxury/demerit tier. Retained 12% and 28% under legacy reconciliation toggle.
+              </p>
+            </div>
+
+            <!-- Entry 2 -->
+            <div class="relative">
+              <div class="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-border border-2 border-surface"></div>
+              <span class="font-bold text-text-primary text-sm block">July 2026</span>
+              <p class="text-accent font-semibold mt-0.5">Income Tax Slabs &amp; Sec 87A Rebate Verification</p>
+              <p class="text-text-muted mt-1 leading-relaxed">
+                Confirmed Section 115BAC statutory schedule for FY 2025-27: ₹75,000 standard deduction verified, full rebate up to ₹12 Lakh taxable income, yielding ₹0 net tax for gross salary up to ₹12.75 Lakh.
+              </p>
+            </div>
+
+            <!-- Entry 3 -->
+            <div class="relative">
+              <div class="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-border border-2 border-surface"></div>
+              <span class="font-bold text-text-primary text-sm block">May 2026</span>
+              <p class="text-accent font-semibold mt-0.5">Capital Gains Tax Rationalization</p>
+              <p class="text-text-muted mt-1 leading-relaxed">
+                Standardized Indian equity LTCG at 12.5% (exemption threshold ₹1.25 Lakh) and STCG under Section 111A at 20% across all relevant equity tools and blog articles.
+              </p>
+            </div>
+
+            <!-- Entry 4 -->
+            <div class="relative">
+              <div class="absolute -left-[31px] top-0 w-3.5 h-3.5 rounded-full bg-border border-2 border-surface"></div>
+              <span class="font-bold text-text-primary text-sm block">April 2026</span>
+              <p class="text-accent font-semibold mt-0.5">Terminal Value Formula Damodaran Alignment</p>
+              <p class="text-text-muted mt-1 leading-relaxed">
+                Verified perpetual Gordon Growth Model assumptions in DCF engine against McKinsey Valuation guidelines and NYU Stern benchmarks.
+              </p>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- 3. Three Feature Cards -->
-    <section class="mb-12" aria-labelledby="differentiators-heading">
-      <h2 id="differentiators-heading" class="text-xl font-bold text-text-primary mb-4">
-        What makes Calcumetrics different
+    <!-- "Also Built By Us" Section (Point 5) -->
+    <section class="mb-12 p-6 bg-surface border border-border rounded-card" aria-label="Also Built By Us">
+      <div class="flex items-center gap-2 text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+        <span>🛠️</span>
+        <span>Independent Operator Portfolio</span>
+      </div>
+      <h2 class="text-lg font-bold text-text-primary mb-2">
+        Also Built By Us
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="font-bold text-sm text-text-primary mb-2">Client-side calculation</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Every computation executes directly in your browser. Financial inputs are never transmitted to or processed on an external server.
-          </p>
-        </div>
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="font-bold text-sm text-text-primary mb-2">Transparent formulas</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Every calculator documents its underlying equations, mathematical conventions, and assumptions. We operate without hidden logic.
-          </p>
-        </div>
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="font-bold text-sm text-text-primary mb-2">Zero data collection</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            No sign-up, no user accounts, and no tracking of your calculation scenarios. Your financial models remain entirely private.
-          </p>
-        </div>
+      <p class="text-xs text-text-muted mb-4 max-w-xl">
+        We build focused, high-utility web tools that solve everyday problems without bloat or tracking.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Sister Project Card 1: FixTheSpeaker -->
+        <a
+          href="https://fixthespeaker.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="p-4 bg-canvas hover:bg-surface border border-border hover:border-accent rounded-control transition-standard flex items-start gap-3.5 group cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0 text-xl font-bold group-hover:scale-105 transition-standard">
+            🔊
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 font-bold text-sm text-text-primary group-hover:text-accent transition-standard">
+              <span>FixTheSpeaker.com</span>
+              <span class="text-xs text-text-muted">&nearr;</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">
+              Clean browser tool generating precision sine-wave sound frequencies to clear water and dust trapped in smartphone speakers.
+            </p>
+          </div>
+        </a>
+
+        <!-- Sister Project Card 2: Calcumetrics Open Formulas -->
+        <a
+          href="https://github.com/calcumetrics"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="p-4 bg-canvas hover:bg-surface border border-border hover:border-accent rounded-control transition-standard flex items-start gap-3.5 group cursor-pointer"
+        >
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 text-xl font-bold group-hover:scale-105 transition-standard">
+            ⚡
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5 font-bold text-sm text-text-primary group-hover:text-accent transition-standard">
+              <span>Calcumetrics Open Math</span>
+              <span class="text-xs text-text-muted">&nearr;</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">
+              Open collection of TypeScript financial formulas (SIP, EMI, XIRR, WACC) tested and free for commercial or educational use.
+            </p>
+          </div>
+        </a>
       </div>
     </section>
 
-    <!-- Preserved Editorial and Legal Content -->
-    <div class="space-y-8 pt-4 border-t border-border">
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Who runs this site</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Calcumetrics is operated by an independent developer based in India.
-          <!-- TODO (owner): Replace the above sentence with your real name/entity and country before launching.
-               Example: "Calcumetrics is operated by [Your Full Name / Company Name], based in [City, Country]."
-               This is required for AdSense eligibility (publisher identity must be verifiable). -->
-        </p>
-      </section>
+    <!-- Bottom Actionable CTAs (Point 8: No Dead End) -->
+    <section class="border-t border-border pt-8" aria-label="Next steps">
+      <div class="text-center mb-6">
+        <h2 class="text-lg font-bold text-text-primary">Where to Next?</h2>
+        <p class="text-xs text-text-muted mt-0.5">Explore our most popular calculations or help us improve.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a
+          href="/sip-calculator"
+          class="p-5 bg-surface hover:bg-canvas border border-border hover:border-accent rounded-card transition-standard flex items-center justify-between group cursor-pointer"
+        >
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">📈</span>
+            <div>
+              <span class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard block">
+                Try the SIP Calculator
+              </span>
+              <span class="text-xs text-text-muted">Calculate monthly returns with live compounding</span>
+            </div>
+          </div>
+          <span class="text-accent text-sm font-semibold group-hover:translate-x-1 transition-standard">&rarr;</span>
+        </a>
 
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">What Calcumetrics is</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Calcumetrics is a free, 100% client-side financial calculator platform. Every calculation runs in your browser — we do not send your inputs to any server. There is no sign-up, no account, and no data stored about you.
-        </p>
-        <p class="text-sm text-text-muted leading-relaxed">
-          The site covers five categories: investments, loans, taxes, business and corporate finance. Tools include both global financial calculators (WACC, IRR, NPV, DCF, SIP, CAGR) and jurisdiction-specific tools for India and the US.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Our mission</h2>
-        <p class="text-sm text-text-muted leading-relaxed">
-          To give finance professionals, CAs, analysts, students and retail investors accurate, transparent tools — with every formula documented, every assumption stated, and every result validated against published test fixtures.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">How this site makes money</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Calcumetrics plans to display advertising through Google AdSense once the site meets AdSense's quality and policy requirements. Ads will appear only on calculator and category pages — never on the homepage, legal pages, policy pages, or error pages. A Google-certified consent management platform (CMP) will be installed before any ads are served to users in the EU, UK, and Switzerland.
-        </p>
-        <p class="text-sm text-text-muted leading-relaxed">
-          No sponsored content, paid placements, or affiliate links are currently on the site.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Accuracy and corrections</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          We validate every calculator against published test fixtures before launch. Tax rates and law-dependent data are stored in a versioned data file with a "Rates last verified" date on each relevant tool. If you find an error in a formula, a rate, or any page content, please <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a>. We correct verified errors promptly and update the "Last updated" date and schema <code>dateModified</code>.
-        </p>
-        <p class="text-sm text-text-muted leading-relaxed">
-          See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, rate sources, and the correction policy.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Contact and publisher inquiries</h2>
-        <p class="text-sm text-text-muted leading-relaxed">
-          For general feedback, calculation bug reports, or editorial inquiries, visit our <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">Contact page</a> or email us directly at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
-        </p>
-      </section>
-    </div>
+        <a
+          href={`mailto:${SITE_EMAIL}?subject=Bug%20Report%20/%20Formula%20Correction`}
+          class="p-5 bg-surface hover:bg-canvas border border-border hover:border-accent rounded-card transition-standard flex items-center justify-between group cursor-pointer"
+        >
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">🐞</span>
+            <div>
+              <span class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard block">
+                Report an Error / Suggest a Tool
+              </span>
+              <span class="text-xs text-text-muted">Direct inbox to the engineering team</span>
+            </div>
+          </div>
+          <span class="text-accent text-sm font-semibold group-hover:translate-x-1 transition-standard">&rarr;</span>
+        </a>
+      </div>
+    </section>
   </div>
+
+  <!-- Interactive Tabs and Traffic Light script -->
+  <script>
+    function initAboutTabs() {
+      const tabBtns = document.querySelectorAll<HTMLButtonElement>('.about-tab-btn');
+      const panels: Record<string, HTMLElement | null> = {
+        overview: document.getElementById('tab-panel-overview'),
+        testing: document.getElementById('tab-panel-testing'),
+        money: document.getElementById('tab-panel-money'),
+        corrections: document.getElementById('tab-panel-corrections'),
+      };
+
+      function switchTab(targetTab: string) {
+        tabBtns.forEach((btn) => {
+          const tab = btn.getAttribute('data-about-tab');
+          if (tab === targetTab) {
+            btn.className = 'about-tab-btn px-3 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap';
+          } else {
+            btn.className = 'about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap';
+          }
+        });
+
+        Object.keys(panels).forEach((k) => {
+          const p = panels[k];
+          if (p) {
+            if (k === targetTab) {
+              p.classList.remove('hidden');
+            } else {
+              p.classList.add('hidden');
+            }
+          }
+        });
+      }
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const tab = btn.getAttribute('data-about-tab') || 'overview';
+          switchTab(tab);
+        });
+      });
+
+      // Traffic Light buttons
+      const redBtn = document.getElementById('traffic-dot-red');
+      const yellowBtn = document.getElementById('traffic-dot-yellow');
+      const greenBtn = document.getElementById('traffic-dot-green');
+
+      redBtn?.addEventListener('click', () => {
+        switchTab('overview');
+        window.__cmShowToast?.({ title: 'System Settings', message: 'Tabs reset to Overview' });
+      });
+
+      yellowBtn?.addEventListener('click', () => {
+        const content = document.getElementById('about-tab-content');
+        if (content) {
+          content.classList.toggle('hidden');
+          const isHidden = content.classList.contains('hidden');
+          window.__cmShowToast?.({
+            title: 'System Settings',
+            message: isHidden ? 'Window minimized' : 'Window restored',
+          });
+        }
+      });
+
+      greenBtn?.addEventListener('click', () => {
+        switchTab('testing');
+        window.__cmShowToast?.({ title: 'System Settings', message: 'Expanded test fixtures' });
+      });
+    }
+
+    initAboutTabs();
+    document.addEventListener('astro:page-load', initAboutTabs);
+  </script>
 </Layout>

@@ -251,9 +251,9 @@ export const TOOLS: Tool[] = [
     path: '/in/income-tax-calculator',
     category: 'Taxes',
     region: 'IN',
-    description: 'Compare New Tax Regime (Budget 2024) vs Old Tax Regime, Section 87A rebate, and maximize tax savings.',
+    description: 'Compare New Tax Regime (FY 2025-26 & 2026-27) vs Old Regime, Section 87A zero tax up to ₹12.75L, and marginal relief.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
   {
     name: 'GST Calculator',
@@ -261,9 +261,9 @@ export const TOOLS: Tool[] = [
     path: '/in/gst-calculator',
     category: 'Taxes',
     region: 'IN',
-    description: 'Calculate GST amounts for any base price using India\'s current tax slabs (5%, 12%, 18%, 28%).',
+    description: 'Calculate GST 2.0 amounts (0%, 5%, 18%, 40%) with CGST, SGST & IGST split, plus legacy 12% & 28% slab support.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
   {
     name: 'HRA Calculator',

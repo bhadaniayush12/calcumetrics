@@ -8,11 +8,13 @@ export const BATCH_1_POSTS: BlogPost[] = [
     description:
       'Understand the statutory 5th-of-the-month PPF deposit rule, how monthly interest is computed on the lowest balance, and the compounding loss of late deposits.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-08-20',
+    dateModified: '2026-09-21',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Personal Finance Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Fixed-Income Specialist',
+    quickAnswer: 'Deposit before the 5th of the month; PPF interest is calculated monthly on the lowest balance between the 5th and the end of the month.',
     sources: [
       {
         name: 'Ministry of Finance, Government of India',
@@ -202,11 +204,13 @@ export const BATCH_1_POSTS: BlogPost[] = [
     description:
       'Compare upfront tax deductions against tax-free retirement withdrawals. Learn how marginal vs effective tax rates and employer match rules drive the decision.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-08-23',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Retirement & Wealth Editorial Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by CFP® & US Retirement Tax Panel',
+    quickAnswer: 'Choose Traditional 401(k) if your current tax bracket is higher than your expected retirement bracket; choose Roth if you are currently in a lower tax bracket.',
     sources: [
       {
         name: 'Internal Revenue Service (IRS)',
@@ -401,11 +405,13 @@ export const BATCH_1_POSTS: BlogPost[] = [
     description:
       'How APR differs from APY, how compounding frequency widens the gap between nominal and effective rates, and how lenders quote interest to borrowers and savers.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-08-27',
+    dateModified: '2026-09-21',
     readTime: '7 min read',
     market: 'Global',
-    author: 'Calcumetrics Quantitative Research Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Banking & Quantitative Finance Panel',
+    quickAnswer: 'APR ignores compounding; APY includes it. For borrowers, look at APY to see the true cost; for savers, APY shows actual earned yield.',
     sources: [
       {
         name: 'Federal Reserve Board',
@@ -606,11 +612,13 @@ export const BATCH_1_POSTS: BlogPost[] = [
     description:
       'Compare guaranteed bank Recurring Deposits with market-linked Systematic Investment Plans. Discover the optimal strategy for short-term vs long-term financial goals.',
     category: 'Investments',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-08-30',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Calcumetrics Wealth Planning Group',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Wealth Advisory Panel',
+    quickAnswer: 'RD offers guaranteed capital safety with fixed returns taxed at slab rate; SIP equity mutual funds carry market risk but beat inflation over 5+ years.',
     sources: [
       {
         name: 'Reserve Bank of India (RBI)',
@@ -802,11 +810,13 @@ export const BATCH_1_POSTS: BlogPost[] = [
     description:
       'Master the debt-to-income ratio calculations lenders use to approve mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and actionable steps to lower your ratio.',
     category: 'Loans',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-02',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Credit & Lending Advisory Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Mortgage Underwriting & Credit Risk Analyst',
+    quickAnswer: 'Lenders generally cap front-end DTI at 28% (housing) and back-end DTI at 36%–43% (all debts) to qualify for prime mortgage rates.',
     sources: [
       {
         name: 'Consumer Financial Protection Bureau (CFPB)',

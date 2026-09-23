@@ -1,26 +1,138 @@
 ---
 /**
- * Full calculator directory — /calculators
- * Section 26.4: Search, chips, grouped grid, counts computed.
- * All tool links in static HTML (no unmounting, JS only toggles hidden class).
- * Result count: aria-live="polite"
+ * Full Calculator Directory — /calculators
+ * macOS Finder-Style Master Redesign
+ * 
+ * Features:
+ * - Finder-style layout: Left categories/recents sidebar + Right main workspace
+ * - View Switcher: Grid View (𐄹) vs List View (☰) with persistence
+ * - Quick Look preview: Press Space on any tool or click preview eye icon
+ * - Recently Used tools from localStorage
+ * - Clean visual hierarchy with zero noisy "GLOBAL" badges
+ * - Rare regional signals only: 🇮🇳 India, 🇺🇸 United States
+ * - "Most Used" top strip for instant 1-click access to flagship calculators
+ * - Curiosity preview metrics displayed on cards (e.g. ₹25k/mo → ₹1.26 Cr)
+ * - Smart synonym search (mortgage -> home loan, PF -> PPF, in-hand -> income tax)
+ * - SEO-optimized H1, authoritative intro, and 100% crawlable semantic links
  */
+
 import Layout from '../layouts/Layout.astro';
 import { getPublishedTools, getToolsByCategory, CATEGORIES, getToolCount } from '../config/site';
-import type { Category } from '../config/site';
 
 const allTools = getPublishedTools();
 const byCategory = getToolsByCategory();
 const totalCount = getToolCount();
+
+// Popular tools marked for special highlighting
+const POPULAR_SLUGS = new Set([
+  'sip-calculator',
+  'emi-calculator',
+  'income-tax-calculator',
+  'gst-calculator',
+  'fd-calculator',
+  'cagr-calculator',
+  'ppf-calculator',
+  '401k-calculator',
+  'home-loan-calculator',
+  'break-even-calculator',
+]);
+
+// Freshness badges for statutory/recent tools
+const FRESHNESS_TAGS: Record<string, string> = {
+  'income-tax-calculator': 'FY 2025-27 Slabs',
+  'gst-calculator': 'GST 2.0 Ready',
+  'ppf-calculator': '7.1% Current Rate',
+};
+
+// Curiosity preview metrics displayed on cards
+const TOOL_PREVIEWS: Record<string, string> = {
+  'sip-calculator': '₹25k/mo @ 12% in 15y → ₹1.26 Cr',
+  'emi-calculator': '₹50L @ 8.5% for 20y → ₹43k/mo',
+  'income-tax-calculator': '₹12.75L salary → ₹0 tax New Regime',
+  'gst-calculator': '₹10k base @ 18% GST → ₹1,800 tax',
+  'fd-calculator': '₹5L @ 7.2% for 5y → ₹7.14L',
+  'cagr-calculator': '₹1L → ₹3L over 7y = 16.99% CAGR',
+  'ppf-calculator': '₹1.5L/yr for 15y → ₹40.68L tax-free',
+  '401k-calculator': '6% deferral + 3% match projection',
+  'home-loan-calculator': 'Year-by-year amortisation & interest',
+  'car-loan-calculator': 'Monthly installment & total interest',
+  'loan-prepayment-calculator': '₹2L extra → cut 3.5 years tenure',
+  'lump-sum-calculator': '₹10L @ 11% for 10y → ₹28.39L',
+  'compound-interest-calculator': 'A = P(1 + r/n)^(nt) compound yield',
+  'simple-interest-calculator': 'Straight interest vs compound growth',
+  'rd-calculator': '₹10k/mo for 5y @ 6.5% → ₹7.09L',
+  'xirr-calculator': 'IRR for irregular SIP dates & cash flows',
+  'hra-calculator': 'Calculate Sec 10(13A) tax exemption',
+  'upi-mdr-calculator': 'RuPay CC & PPI interchange costs',
+  'break-even-calculator': 'Fixed costs ÷ unit contribution margin',
+  'profit-margin-calculator': 'Gross, operating & net profit margins',
+  'markup-vs-margin-calculator': '33.3% markup = 25% gross margin',
+  'roi-calculator': 'Net return ÷ cost as annualised rate',
+  'eoq-calculator': 'Batch size minimizing ordering costs',
+  'depreciation-calculator': 'SLM & WDV asset depreciation table',
+  'working-capital-calculator': 'Current & Quick ratio solvency',
+  'cogs-calculator': 'Beginning inventory + purchases − ending',
+  'inventory-turnover-calculator': 'Days Sales of Inventory (DSI/DIO)',
+  'liquidity-ratios-calculator': 'Current, acid-test & cash ratio suite',
+  'wacc-calculator': 'Cost of equity & after-tax debt',
+  'npv-calculator': 'Discounted cash flows vs initial cost',
+  'irr-calculator': 'Hurdle rate where NPV equals zero',
+  'payback-period-calculator': 'Years to recoup initial project capital',
+  'dcf-calculator': 'Intrinsic equity & share valuation',
+};
+
+// Category descriptions & metadata
+const CATEGORY_META: Record<string, { desc: string; iconColor: string; bgTint: string }> = {
+  Investments: {
+    desc: 'Grow wealth with mutual fund SIPs, compound growth, and return on capital.',
+    iconColor: 'text-emerald-500',
+    bgTint: 'bg-emerald-500/10 border-emerald-500/20',
+  },
+  Loans: {
+    desc: 'Calculate monthly EMIs, total borrowing costs, and prepayment savings.',
+    iconColor: 'text-sky-500',
+    bgTint: 'bg-sky-500/10 border-sky-500/20',
+  },
+  Taxes: {
+    desc: 'Compute Indian income taxes (FY 2025-27), GST 2.0 slabs, and HRA exemptions.',
+    iconColor: 'text-amber-500',
+    bgTint: 'bg-amber-500/10 border-amber-500/20',
+  },
+  Business: {
+    desc: 'Optimize pricing, break-even sales units, inventory velocity, and UPI fees.',
+    iconColor: 'text-violet-500',
+    bgTint: 'bg-violet-500/10 border-violet-500/20',
+  },
+  'Corporate Finance': {
+    desc: 'Discounted cash flow valuation, capital budgeting, NPV, IRR, and WACC.',
+    iconColor: 'text-indigo-500',
+    bgTint: 'bg-indigo-500/10 border-indigo-500/20',
+  },
+};
+
+// "Most Used" Strip tools
+const MOST_USED_SLUGS = [
+  'sip-calculator',
+  'emi-calculator',
+  'income-tax-calculator',
+  'gst-calculator',
+  'fd-calculator',
+  'cagr-calculator',
+];
+const mostUsedTools = MOST_USED_SLUGS.map((slug) => allTools.find((t) => t.slug === slug)).filter(Boolean);
+
+const pageTitle = `All Financial Calculators: Investments, Loans, Taxes & Business | Calcumetrics`;
+const pageDesc = `Browse all ${totalCount} free financial calculators. SIP, EMI, Income Tax (FY 2025-27), GST 2.0, FD, CAGR, and business metrics. 100% private, client-side, and ad-free.`;
+const canonicalUrl = 'https://calcumetrics.com/calculators';
 
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'CollectionPage',
-      name: 'Financial Calculator Directory',
-      url: 'https://calcumetrics.com/calculators',
-      description: `Browse all ${totalCount} free financial calculators on Calcumetrics — investments, loans, taxes, business, and corporate finance.`,
+      name: 'All Financial Calculators',
+      url: canonicalUrl,
+      description: pageDesc,
     },
     {
       '@type': 'ItemList',
@@ -35,24 +147,22 @@ const jsonld = {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
-        { '@type': 'ListItem', position: 2, name: 'All Calculators', item: 'https://calcumetrics.com/calculators' },
+        { '@type': 'ListItem', position: 2, name: 'All Calculators', item: canonicalUrl },
       ],
     },
   ],
 };
 ---
 
-<Layout
-  title={`Financial Calculators: ${totalCount} Free Tools | Calcumetrics`}
-  description={`Browse all ${totalCount} free online financial calculators. Investments, loans, taxes, business and corporate finance — 100% client-side, no sign-up.`}
-  canonical="https://calcumetrics.com/calculators"
->
+<Layout title={pageTitle} description={pageDesc} canonical={canonicalUrl}>
   <Fragment slot="head">
     <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
   </Fragment>
 
-  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <nav aria-label="Breadcrumb" class="mb-6">
+  <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    
+    <!-- Breadcrumb -->
+    <nav aria-label="Breadcrumb" class="mb-5">
       <ol class="flex items-center gap-1.5 text-xs text-text-muted">
         <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
         <li aria-hidden="true">›</li>
@@ -60,174 +170,788 @@ const jsonld = {
       </ol>
     </nav>
 
-    <!-- Page header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">
-        Financial Calculator Directory
-      </h1>
-      <p class="text-sm text-text-muted max-w-xl">
-        {totalCount} free calculators — investments, loans, taxes, business and corporate finance. No sign-up. Runs entirely in your browser.
-      </p>
-    </div>
-
-    <!-- Search + filter controls -->
-    <div class="mb-6 space-y-4">
-      <!-- Search -->
-      <div class="relative max-w-md">
-        <label for="calc-search" class="sr-only">Search calculators</label>
-        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
-          <svg class="w-4 h-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
+    <!-- Header & SEO Context -->
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent/10 text-accent border border-accent/20">
+          ⚡ 100% Client-Side &amp; Private
         </span>
-        <input
-          type="search"
-          id="calc-search"
-          placeholder="Search calculators…"
-          autocomplete="off"
-          class="w-full h-11 pl-9 pr-4 bg-surface border border-border rounded-control text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-accent transition-standard"
-          aria-label="Search calculators"
-          aria-controls="calc-grid"
-        />
+        <span class="text-xs text-text-muted">·</span>
+        <span class="text-xs text-text-muted font-medium">{totalCount} Free Interactive Tools</span>
       </div>
+      <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-3">
+        All Financial Calculators: Investments, Loans, Taxes &amp; Business
+      </h1>
+      <p class="text-sm text-neutral-600 dark:text-neutral-300 max-w-3xl leading-relaxed mb-4">
+        Explore Calcumetrics’ full suite of precision financial calculators. Whether you are projecting wealth accumulation through mutual fund SIPs, calculating loan repayment schedules, applying India's GST 2.0 rationalized slabs (0%, 5%, 18%, 40%), or comparing the New and Old Income Tax regimes for FY 2025-27, every calculation runs instantly and entirely inside your browser. No sign-ups, no spam, and complete data privacy.
+      </p>
+    </header>
 
-      <!-- Category filter chips -->
-      <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by category">
-        <button
-          type="button"
-          id="filter-all"
-          aria-pressed="true"
-          data-filter="all"
-          class="chip-filter h-8 px-3 rounded-chip text-sm font-medium border border-accent bg-accent text-white transition-standard focus-visible:outline-accent cursor-pointer"
-        >
-          All ({totalCount})
-        </button>
-        {CATEGORIES.map((cat) => {
-          const catTools = byCategory.get(cat.name) ?? [];
-          return (
+    <!-- ── MOST USED STRIP (Top 6 Flags) ──────────────────────────────────────── -->
+    <section aria-labelledby="most-used-heading" class="mb-8 p-4 sm:p-5 rounded-card bg-surface border border-border/80 shadow-mac-subtle">
+      <div class="flex items-center justify-between mb-3.5">
+        <h2 id="most-used-heading" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-primary flex items-center gap-2">
+          <span class="text-amber-500">★</span> Most Used Calculators
+        </h2>
+        <span class="text-[11px] text-text-muted">Quick 1-click access</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        {mostUsedTools.map((tool) => tool && (
+          <a
+            href={tool.path}
+            class="group p-3 rounded-control border border-border/70 bg-canvas/40 hover:bg-canvas hover:border-accent hover:-translate-y-0.5 transition-all duration-150 flex flex-col justify-between"
+          >
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[10px] font-bold text-accent uppercase tracking-wider">{tool.category}</span>
+                {tool.region === 'IN' && <span class="text-[10px]" title="India statutory rules">🇮🇳</span>}
+                {tool.region === 'US' && <span class="text-[10px]" title="US statutory rules">🇺🇸</span>}
+              </div>
+              <h3 class="font-bold text-xs sm:text-sm text-text-primary group-hover:text-accent transition-colors line-clamp-1">
+                {tool.name}
+              </h3>
+            </div>
+            <div class="mt-2 pt-2 border-t border-border/40 text-[10px] font-mono text-text-muted group-hover:text-text-primary transition-colors truncate">
+              {TOOL_PREVIEWS[tool.slug] || 'Explore tool →'}
+            </div>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── FINDER-STYLE MAIN SPLIT (Sidebar + Workspace) ──────────────────────── -->
+    <div class="lg:grid lg:grid-cols-12 lg:gap-8 items-start">
+      
+      <!-- Finder Left Sidebar (Desktop Only) -->
+      <aside class="hidden lg:block lg:col-span-3 sticky top-24 space-y-4 select-none" aria-label="Finder Sidebar">
+        <!-- Recently Used Section -->
+        <div id="finder-recents-box" class="hidden p-3.5 bg-surface border border-border rounded-card">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-text-muted flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+              </svg>
+              Recently Used
+            </span>
+          </div>
+          <div id="finder-recents-items" class="space-y-1"></div>
+        </div>
+
+        <!-- Categories Navigation -->
+        <div class="p-3.5 bg-surface border border-border rounded-card">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-text-muted px-2 block mb-2">
+            Categories
+          </span>
+          <nav class="space-y-1" id="finder-cat-nav">
             <button
               type="button"
-              aria-pressed="false"
-              data-filter={cat.name}
-              class="chip-filter h-8 px-3 rounded-chip text-sm font-medium border border-border text-text-primary hover:border-accent hover:text-accent transition-standard focus-visible:outline-accent cursor-pointer"
+              data-filter="all"
+              class="finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer"
             >
-              {cat.name} ({catTools.length})
+              <span class="flex items-center gap-2"><span>📂</span> All Tools</span>
+              <span class="text-[11px] font-mono opacity-80">{totalCount}</span>
             </button>
-          );
-        })}
-      </div>
-
-      <!-- Result count -->
-      <p class="text-xs text-text-muted" id="calc-count" aria-live="polite">
-        Showing {totalCount} calculators
-      </p>
-    </div>
-
-    <!-- Grouped grid — all links in static HTML -->
-    <div id="calc-grid" class="space-y-10">
-      {CATEGORIES.map((cat) => {
-        const catTools = byCategory.get(cat.name) ?? [];
-        return (
-          <section data-category={cat.name} aria-labelledby={`cat-${cat.name.toLowerCase().replace(/\s+/g, '-')}`}>
-            <h2
-              id={`cat-${cat.name.toLowerCase().replace(/\s+/g, '-')}`}
-              class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2"
-            >
-              <a href={cat.href} class="hover:text-accent transition-standard focus-visible:outline-accent">
-                {cat.name}
-              </a>
-              <span class="text-sm font-normal text-text-muted">({catTools.length})</span>
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {catTools.map((tool) => (
-                <a
-                  href={tool.path}
-                  data-tool-name={tool.name.toLowerCase()}
-                  data-tool-category={tool.category}
-                  class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
+            {CATEGORIES.map((cat) => {
+              const catTools = byCategory.get(cat.name) ?? [];
+              return (
+                <button
+                  type="button"
+                  data-filter={cat.name}
+                  class="finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-medium text-text-primary hover:bg-canvas transition-standard cursor-pointer"
                 >
-                  <div class="flex items-start justify-between mb-2">
-                    <span class="text-xs font-semibold text-accent uppercase tracking-wider">{tool.region}</span>
-                  </div>
-                  <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">
-                    {tool.name}
-                  </h3>
-                  <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
-                </a>
-              ))}
+                  <span class="flex items-center gap-2">
+                    <span>
+                      {cat.name === 'Investments' && '📈'}
+                      {cat.name === 'Loans' && '🏦'}
+                      {cat.name === 'Taxes' && '🧾'}
+                      {cat.name === 'Business' && '💼'}
+                      {cat.name === 'Corporate Finance' && '⚖️'}
+                    </span>
+                    {cat.name}
+                  </span>
+                  <span class="text-[11px] text-text-muted font-mono">{catTools.length}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <!-- Quick Look Shortcut Hint -->
+        <div class="p-3 bg-canvas border border-border rounded-card text-xs text-text-muted">
+          <div class="flex items-center gap-2 font-semibold text-text-primary mb-1">
+            <span>👁️</span>
+            <span>Finder Quick Look</span>
+          </div>
+          <p class="leading-relaxed text-[11px]">
+            Hover over any calculator card and press <kbd class="px-1.5 py-0.5 bg-surface border border-border rounded font-mono text-[10px]">Space</kbd> to inspect formulas without leaving the page.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Finder Right Workspace (Content + Toolbar) -->
+      <main class="lg:col-span-9 space-y-6">
+        
+        <!-- Finder Toolbar: Search + View Switcher (Grid vs List) + Region Filter -->
+        <div class="sticky top-[64px] z-30 bg-surface/95 backdrop-blur-md p-3 sm:p-4 rounded-card border border-border/80 shadow-mac-subtle transition-all">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            
+            <!-- Search Input -->
+            <div class="relative flex-1">
+              <label for="calc-search" class="sr-only">Search calculators</label>
+              <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
+                <svg class="w-4 h-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </span>
+              <input
+                type="search"
+                id="calc-search"
+                placeholder="Search by name, category, or synonym (e.g. SIP, mortgage, PF, GST, salary)..."
+                autocomplete="off"
+                class="w-full h-10 pl-9 pr-9 bg-canvas border border-border rounded-control text-xs sm:text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-accent transition-standard"
+                aria-label="Search calculators"
+              />
+              <button
+                type="button"
+                id="calc-search-clear"
+                class="absolute inset-y-0 right-2.5 hidden items-center text-text-muted hover:text-text-primary transition-colors text-xs font-bold px-1"
+                aria-label="Clear search input"
+              >
+                ✕
+              </button>
             </div>
-          </section>
-        );
-      })}
+
+            <!-- View Switcher & Region Pills Cluster -->
+            <div class="flex items-center gap-2 self-end sm:self-auto flex-wrap">
+              <!-- View Switcher: Grid (𐄹) vs List (☰) -->
+              <div class="flex items-center bg-canvas p-1 rounded-control border border-border text-xs" role="group" aria-label="View Mode">
+                <button
+                  type="button"
+                  id="view-mode-grid"
+                  aria-label="Grid View"
+                  title="Grid View"
+                  class="view-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-surface shadow-sm text-accent transition-standard cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                  <span class="hidden sm:inline">Grid</span>
+                </button>
+                <button
+                  type="button"
+                  id="view-mode-list"
+                  aria-label="List View"
+                  title="List View"
+                  class="view-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                  <span class="hidden sm:inline">List</span>
+                </button>
+              </div>
+
+              <!-- Region Filter Pills -->
+              <div class="flex items-center bg-canvas p-1 rounded-control border border-border text-xs" role="group" aria-label="Filter by region">
+                <button
+                  type="button"
+                  data-region-filter="all"
+                  class="region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer"
+                  aria-pressed="true"
+                >
+                  All
+                </button>
+                <button
+                  type="button"
+                  data-region-filter="IN"
+                  class="region-filter-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer"
+                  aria-pressed="false"
+                >
+                  🇮🇳 IN
+                </button>
+                <button
+                  type="button"
+                  data-region-filter="US"
+                  class="region-filter-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer"
+                  aria-pressed="false"
+                >
+                  🇺🇸 US
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Counter Strip -->
+          <div class="flex items-center justify-between text-xs text-text-muted pt-2.5 mt-2.5 border-t border-border/50">
+            <div id="calc-count" class="font-medium flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true"></span>
+              <span id="calc-count-text">Showing {totalCount} calculators</span>
+            </div>
+            <div class="text-[11px] text-text-muted">
+              Press <kbd class="px-1 py-0.5 bg-canvas border border-border rounded font-mono text-[10px]">Space</kbd> on card to Quick Look
+            </div>
+          </div>
+        </div>
+
+        <!-- ── EMPTY SEARCH STATE ────────────────────────────────────────────────── -->
+        <div id="calc-empty" class="hidden text-center py-12 px-4 bg-surface border border-dashed border-border rounded-card">
+          <div class="w-12 h-12 rounded-full bg-accent/10 text-accent flex items-center justify-center mx-auto mb-3 text-xl">
+            🔍
+          </div>
+          <h3 class="text-base font-bold text-text-primary mb-1">Kuch nahi mila (No tools found)</h3>
+          <p class="text-xs text-text-muted max-w-md mx-auto mb-4 leading-relaxed">
+            We couldn't find a calculator matching your query. Try searching for synonyms or click one of our popular tools:
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-2 max-w-lg mx-auto mb-4">
+            {[
+              { label: 'SIP Calculator', path: '/sip-calculator' },
+              { label: 'EMI Calculator', path: '/emi-calculator' },
+              { label: 'GST Calculator', path: '/in/gst-calculator' },
+              { label: 'Income Tax', path: '/in/income-tax-calculator' },
+              { label: 'FD Calculator', path: '/fd-calculator' },
+              { label: 'CAGR Calculator', path: '/cagr-calculator' },
+            ].map((item) => (
+              <a
+                href={item.path}
+                class="px-2.5 py-1 rounded-control text-xs font-medium bg-canvas border border-border hover:border-accent hover:text-accent transition-standard"
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+          <button
+            type="button"
+            id="calc-empty-reset"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-control text-xs font-semibold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer"
+          >
+            Clear Search &amp; Show All Tools
+          </button>
+        </div>
+
+        <!-- ── GROUPED CALCULATOR DIRECTORY ────────────────────────────────────── -->
+        <div id="calc-grid-container" class="space-y-10" data-view="grid">
+          {CATEGORIES.map((cat) => {
+            const catTools = byCategory.get(cat.name) ?? [];
+            const meta = CATEGORY_META[cat.name] || {
+              desc: 'Financial calculation tools.',
+              iconColor: 'text-accent',
+              bgTint: 'bg-accent/10 border-accent/20',
+            };
+
+            return (
+              <section data-category={cat.name} class="category-block">
+                <!-- Section Header -->
+                <div class="flex items-center justify-between pb-2 mb-3.5 border-b border-border/80">
+                  <div class="flex items-center gap-2">
+                    <h2 class="text-base sm:text-lg font-bold text-text-primary flex items-center gap-2">
+                      <span>
+                        {cat.name === 'Investments' && '📈'}
+                        {cat.name === 'Loans' && '🏦'}
+                        {cat.name === 'Taxes' && '🧾'}
+                        {cat.name === 'Business' && '💼'}
+                        {cat.name === 'Corporate Finance' && '⚖️'}
+                      </span>
+                      {cat.name}
+                    </h2>
+                    <span class="text-xs font-semibold px-2 py-0.5 rounded-chip bg-canvas border border-border text-text-muted">
+                      {catTools.length}
+                    </span>
+                  </div>
+                  <p class="text-xs text-text-muted hidden md:block">
+                    {meta.desc}
+                  </p>
+                </div>
+
+                <!-- Cards Grid/List Container -->
+                <div class="calc-cards-wrapper grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  {catTools.map((tool) => {
+                    const isPopular = POPULAR_SLUGS.has(tool.slug);
+                    const freshness = FRESHNESS_TAGS[tool.slug];
+                    const preview = TOOL_PREVIEWS[tool.slug];
+
+                    return (
+                      <div
+                        data-tool-card
+                        data-tool-name={tool.name.toLowerCase()}
+                        data-tool-slug={tool.slug}
+                        data-tool-category={tool.category}
+                        data-tool-region={tool.region}
+                        data-tool-desc={tool.description}
+                        data-tool-preview={preview || ''}
+                        data-tool-path={tool.path}
+                        tabindex="0"
+                        class="tool-card group relative flex flex-col justify-between bg-surface border border-border/80 rounded-card p-4 hover:border-accent hover:-translate-y-0.5 hover:shadow-mac-subtle transition-all duration-150 focus-visible:outline-accent select-none"
+                      >
+                        <div>
+                          <!-- Top Badges & Quick Look Icon -->
+                          <div class="flex items-center justify-between gap-2 mb-2">
+                            <div class="flex items-center gap-1 flex-wrap">
+                              {tool.region === 'IN' && (
+                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                  🇮🇳 India
+                                </span>
+                              )}
+                              {tool.region === 'US' && (
+                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">
+                                  🇺🇸 US
+                                </span>
+                              )}
+                              {isPopular && (
+                                <span class="inline-flex items-center text-[10px] font-bold uppercase tracking-wider text-accent bg-accent/10 border border-accent/25 px-1.5 py-0.5 rounded">
+                                  ★ Popular
+                                </span>
+                              )}
+                              {freshness && (
+                                <span class="inline-flex items-center text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                                  {freshness}
+                                </span>
+                              )}
+                            </div>
+
+                            <!-- Quick Look Preview Eye Button -->
+                            <button
+                              type="button"
+                              class="quick-look-trigger p-1 rounded-control text-text-muted hover:text-accent hover:bg-canvas transition-standard cursor-pointer"
+                              title="Quick Look (Space)"
+                              aria-label={`Quick look ${tool.name}`}
+                            >
+                              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                              </svg>
+                            </button>
+                          </div>
+
+                          <!-- Tool Name -->
+                          <a href={tool.path} class="font-bold text-sm sm:text-base text-text-primary group-hover:text-accent transition-colors block mb-1 leading-snug">
+                            {tool.name}
+                          </a>
+
+                          <!-- Description (clamped to 2 lines) -->
+                          <p class="text-xs text-neutral-700 dark:text-neutral-300 line-clamp-2 mb-2 leading-relaxed">
+                            {tool.description}
+                          </p>
+                        </div>
+
+                        <!-- Curiosity Preview / Direct Link -->
+                        <div class="mt-auto pt-2 border-t border-border/50 flex items-center justify-between text-[11px]">
+                          {preview ? (
+                            <span class="font-mono text-accent truncate mr-2 font-medium" title={preview}>
+                              {preview}
+                            </span>
+                          ) : (
+                            <span class="text-text-muted">Instant calculation</span>
+                          )}
+                          <a href={tool.path} class="text-text-muted group-hover:text-accent group-hover:translate-x-1 transition-all font-bold shrink-0">
+                            &rarr;
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+
+        <!-- ── BOTTOM AUTHORITATIVE SEO CONTENT ─────────────────────────────────── -->
+        <footer class="mt-12 pt-6 border-t border-border/70 text-xs text-text-muted space-y-3">
+          <div class="bg-surface p-5 rounded-card border border-border/70">
+            <h3 class="text-sm font-bold text-text-primary mb-2">Why Calcumetrics Calculators Are Different</h3>
+            <p class="leading-relaxed text-neutral-700 dark:text-neutral-300 mb-2">
+              Financial decisions shouldn't rely on black-box tools or outdated statutory rates. Calcumetrics calculators are mathematically auditable, adhere strictly to Indian Reserve Bank (RBI), Central Board of Direct Taxes (CBDT), and CBIC GST 2.0 circulars, and execute entirely on the client side using pure JavaScript. Whether you are computing compound interest compounding quarterly, calculating exact Section 87A marginal relief on salary income, or extracting net base amounts from a GST-inclusive invoice, your inputs stay confidential in your browser.
+            </p>
+            <div class="flex flex-wrap gap-4 text-[11px] pt-1 text-text-muted">
+              <span>✓ Verified statutory rates (September 2026)</span>
+              <span>✓ Zero server telemetry or analytics cookies on calculations</span>
+              <span>✓ Formatted with Indian numbering system (Lakhs &amp; Crores)</span>
+              <span>✓ URL hash sharing for instant team collaboration</span>
+            </div>
+          </div>
+        </footer>
+
+      </main>
     </div>
+
+    <!-- ── QUICK LOOK PREVIEW MODAL ───────────────────────────────────────────── -->
+    <div
+      id="quick-look-modal"
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110] hidden items-center justify-center p-4 select-none"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Quick Look Calculator Preview"
+    >
+      <div class="bg-surface border border-border rounded-card shadow-mac max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-150 relative">
+        <!-- Close Button -->
+        <button
+          type="button"
+          id="ql-close-btn"
+          class="absolute top-4 right-4 text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer"
+          aria-label="Close preview"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
+        <!-- Modal Header -->
+        <div class="flex items-center gap-2 mb-3">
+          <span id="ql-cat" class="text-[11px] font-bold uppercase tracking-wider text-accent bg-accent/10 px-2 py-0.5 rounded">
+            Category
+          </span>
+          <span id="ql-badge" class="text-[11px] text-text-muted"></span>
+        </div>
+
+        <h3 id="ql-title" class="text-xl font-bold text-text-primary mb-2">
+          Calculator Name
+        </h3>
+
+        <p id="ql-desc" class="text-xs text-text-muted leading-relaxed mb-4">
+          Calculator description will appear here.
+        </p>
+
+        <!-- Preview Box -->
+        <div class="bg-canvas border border-border rounded-control p-3.5 mb-5 space-y-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Formula Preview</span>
+          <div id="ql-preview" class="font-mono text-sm font-semibold text-accent break-words">
+            Formula preview line
+          </div>
+          <p class="text-[11px] text-text-muted">
+            100% client-side precision model. Slider &amp; preset inputs supported.
+          </p>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            id="ql-dismiss-btn"
+            class="px-3.5 py-2 rounded-control text-xs font-medium text-text-muted hover:bg-canvas transition-standard cursor-pointer"
+          >
+            Close (ESC)
+          </button>
+          <a
+            id="ql-open-btn"
+            href="#"
+            class="px-4 py-2 rounded-control text-xs font-bold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer flex items-center gap-1.5"
+          >
+            <span>Open Calculator</span>
+            <span>&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </Layout>
 
 <script>
   function initDirectory() {
     const searchInput = document.getElementById('calc-search') as HTMLInputElement | null;
-    const grid = document.getElementById('calc-grid');
-    if (!grid || grid.dataset.bound) return;
-    grid.dataset.bound = 'true';
+    const searchClear = document.getElementById('calc-search-clear');
+    const container = document.getElementById('calc-grid-container');
+    if (!container || container.dataset.bound) return;
+    container.dataset.bound = 'true';
 
-    const countEl = document.getElementById('calc-count');
-    const filterBtns = document.querySelectorAll<HTMLButtonElement>('.chip-filter');
-    const toolCards = document.querySelectorAll<HTMLAnchorElement>('#calc-grid [data-tool-name]');
-    const sections = document.querySelectorAll<HTMLElement>('#calc-grid [data-category]');
+    const countText = document.getElementById('calc-count-text');
+    const emptyState = document.getElementById('calc-empty');
+    const emptyReset = document.getElementById('calc-empty-reset');
+    const sidebarBtns = document.querySelectorAll<HTMLButtonElement>('.finder-sidebar-btn');
+    const regionBtns = document.querySelectorAll<HTMLButtonElement>('.region-filter-btn');
+    const toolCards = document.querySelectorAll<HTMLElement>('.tool-card');
+    const sections = document.querySelectorAll<HTMLElement>('.category-block');
+    const viewGridBtn = document.getElementById('view-mode-grid');
+    const viewListBtn = document.getElementById('view-mode-list');
 
-    let activeFilter = 'all';
+    let activeCategory = 'all';
+    let activeRegion = 'all';
     let searchQuery = '';
+    let currentView = 'grid';
+
+    // ── 1. View Mode (Grid vs List) ─────────────────────────────────────────
+    try {
+      currentView = localStorage.getItem('cm_tools_view') || 'grid';
+    } catch (e) {}
+
+    function applyViewMode(mode: string) {
+      currentView = mode;
+      try {
+        localStorage.setItem('cm_tools_view', mode);
+      } catch (e) {}
+
+      if (viewGridBtn && viewListBtn) {
+        if (mode === 'grid') {
+          viewGridBtn.className = 'view-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-surface shadow-sm text-accent transition-standard cursor-pointer flex items-center gap-1.5';
+          viewListBtn.className = 'view-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer flex items-center gap-1.5';
+        } else {
+          viewListBtn.className = 'view-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-surface shadow-sm text-accent transition-standard cursor-pointer flex items-center gap-1.5';
+          viewGridBtn.className = 'view-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer flex items-center gap-1.5';
+        }
+      }
+
+      const wrappers = document.querySelectorAll('.calc-cards-wrapper');
+      wrappers.forEach((w) => {
+        if (mode === 'list') {
+          w.className = 'calc-cards-wrapper grid grid-cols-1 gap-2';
+        } else {
+          w.className = 'calc-cards-wrapper grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5';
+        }
+      });
+    }
+
+    applyViewMode(currentView);
+
+    viewGridBtn?.addEventListener('click', () => applyViewMode('grid'));
+    viewListBtn?.addEventListener('click', () => applyViewMode('list'));
+
+    // ── 2. Smart Synonyms Dictionary ────────────────────────────────────────
+    const SYNONYMS: Record<string, string[]> = {
+      mortgage: ['emi-calculator', 'home-loan-calculator'],
+      home: ['home-loan-calculator', 'emi-calculator'],
+      housing: ['home-loan-calculator'],
+      car: ['car-loan-calculator'],
+      auto: ['car-loan-calculator'],
+      tax: ['income-tax-calculator', 'gst-calculator', 'hra-calculator'],
+      salary: ['income-tax-calculator', 'hra-calculator'],
+      'in-hand': ['income-tax-calculator'],
+      inhand: ['income-tax-calculator'],
+      ctc: ['income-tax-calculator'],
+      pf: ['ppf-calculator'],
+      ppf: ['ppf-calculator'],
+      epf: ['ppf-calculator'],
+      fd: ['fd-calculator', 'rd-calculator'],
+      fixed: ['fd-calculator'],
+      recurring: ['rd-calculator'],
+      rd: ['rd-calculator'],
+      sip: ['sip-calculator', 'lump-sum-calculator', 'cagr-calculator'],
+      mutual: ['sip-calculator', 'lump-sum-calculator', 'cagr-calculator', 'xirr-calculator'],
+      mf: ['sip-calculator', 'cagr-calculator'],
+      cagr: ['cagr-calculator', 'xirr-calculator', 'roi-calculator'],
+      gst: ['gst-calculator'],
+      vat: ['gst-calculator'],
+      hra: ['hra-calculator'],
+      rent: ['hra-calculator'],
+      pension: ['401k-calculator', 'ppf-calculator'],
+      retirement: ['401k-calculator', 'ppf-calculator'],
+      business: ['upi-mdr-calculator', 'break-even-calculator', 'profit-margin-calculator'],
+      upi: ['upi-mdr-calculator'],
+      mdr: ['upi-mdr-calculator'],
+      breakeven: ['break-even-calculator'],
+      'break-even': ['break-even-calculator'],
+      margin: ['profit-margin-calculator', 'markup-vs-margin-calculator'],
+      markup: ['markup-vs-margin-calculator'],
+      dcf: ['dcf-calculator', 'npv-calculator', 'wacc-calculator'],
+      valuation: ['dcf-calculator', 'wacc-calculator', 'npv-calculator'],
+      wacc: ['wacc-calculator'],
+      npv: ['npv-calculator'],
+      irr: ['irr-calculator', 'xirr-calculator'],
+    };
 
     function updateUI() {
       let visible = 0;
+      const synonymSlugs = new Set<string>();
+      if (searchQuery) {
+        Object.entries(SYNONYMS).forEach(([keyword, slugs]) => {
+          if (searchQuery.includes(keyword) || keyword.includes(searchQuery)) {
+            slugs.forEach((s) => synonymSlugs.add(s));
+          }
+        });
+      }
+
       toolCards.forEach((card) => {
         const name = card.dataset.toolName ?? '';
+        const slug = card.dataset.toolSlug ?? '';
         const cat = card.dataset.toolCategory ?? '';
-        const matchesFilter = activeFilter === 'all' || cat === activeFilter;
-        const matchesSearch = name.includes(searchQuery) || cat.toLowerCase().includes(searchQuery);
-        const show = matchesFilter && matchesSearch;
+        const region = card.dataset.toolRegion ?? 'Global';
+
+        const matchesCategory = activeCategory === 'all' || cat === activeCategory;
+        let matchesRegion = true;
+        if (activeRegion === 'IN') {
+          matchesRegion = region === 'IN';
+        } else if (activeRegion === 'US') {
+          matchesRegion = region === 'US';
+        }
+
+        let matchesSearch = true;
+        if (searchQuery) {
+          const directMatch = name.includes(searchQuery) || cat.toLowerCase().includes(searchQuery) || slug.includes(searchQuery);
+          const synonymMatch = synonymSlugs.has(slug);
+          matchesSearch = directMatch || synonymMatch;
+        }
+
+        const show = matchesCategory && matchesRegion && matchesSearch;
         card.classList.toggle('hidden', !show);
         if (show) visible++;
       });
 
-      // Hide section headers when all their tools are hidden
       sections.forEach((section) => {
-        const catCards = section.querySelectorAll<HTMLAnchorElement>('[data-tool-name]');
+        const catCards = section.querySelectorAll<HTMLElement>('.tool-card');
         const anyVisible = Array.from(catCards).some((c) => !c.classList.contains('hidden'));
         section.classList.toggle('hidden', !anyVisible);
       });
 
-      if (countEl) {
-        countEl.textContent = `Showing ${visible} calculator${visible !== 1 ? 's' : ''}`;
+      if (countText) {
+        countText.textContent = `Showing ${visible} calculator${visible !== 1 ? 's' : ''}`;
+      }
+
+      if (emptyState) {
+        emptyState.classList.toggle('hidden', visible > 0);
+      }
+
+      if (searchClear) {
+        searchClear.classList.toggle('hidden', !searchQuery);
+        searchClear.classList.toggle('flex', !!searchQuery);
       }
     }
 
-    filterBtns.forEach((btn) => {
+    // ── 3. Sidebar Category Handlers ────────────────────────────────────────
+    sidebarBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        activeFilter = btn.dataset.filter ?? 'all';
-        // Update aria-pressed
-        filterBtns.forEach((b) => {
-          const isActive = b.dataset.filter === activeFilter;
-          b.setAttribute('aria-pressed', String(isActive));
+        activeCategory = btn.dataset.filter ?? 'all';
+        sidebarBtns.forEach((b) => {
+          const isActive = b.dataset.filter === activeCategory;
           if (isActive) {
-            b.classList.remove('border-border', 'text-text-primary', 'hover:border-accent', 'hover:text-accent');
-            b.classList.add('border-accent', 'bg-accent', 'text-white');
+            b.className = 'finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer';
           } else {
-            b.classList.remove('border-accent', 'bg-accent', 'text-white');
-            b.classList.add('border-border', 'text-text-primary', 'hover:border-accent', 'hover:text-accent');
+            b.className = 'finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-medium text-text-primary hover:bg-canvas transition-standard cursor-pointer';
           }
         });
         updateUI();
       });
     });
 
+    // ── 4. Region Filter Handlers ───────────────────────────────────────────
+    regionBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        activeRegion = btn.dataset.regionFilter ?? 'all';
+        regionBtns.forEach((b) => {
+          const isActive = b.dataset.regionFilter === activeRegion;
+          b.setAttribute('aria-pressed', String(isActive));
+          if (isActive) {
+            b.className = 'region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer';
+          } else {
+            b.className = 'region-filter-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer';
+          }
+        });
+        updateUI();
+      });
+    });
+
+    // ── 5. Search Handlers ──────────────────────────────────────────────────
     let searchTimer: ReturnType<typeof setTimeout>;
     searchInput?.addEventListener('input', () => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
         searchQuery = searchInput.value.toLowerCase().trim();
         updateUI();
-      }, 150);
+      }, 80);
+    });
+
+    searchClear?.addEventListener('click', () => {
+      if (searchInput) {
+        searchInput.value = '';
+        searchQuery = '';
+        searchInput.focus();
+        updateUI();
+      }
+    });
+
+    emptyReset?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      searchQuery = '';
+      activeCategory = 'all';
+      activeRegion = 'all';
+      updateUI();
+    });
+
+    // ── 6. Recently Used Sidebar Rendering ──────────────────────────────────
+    const recentsBox = document.getElementById('finder-recents-box');
+    const recentsItems = document.getElementById('finder-recents-items');
+
+    try {
+      const raw = localStorage.getItem('cm_recent_tools');
+      const recents: Array<{ name: string; path: string; category?: string }> = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(recents) && recents.length > 0 && recentsBox && recentsItems) {
+        recentsBox.classList.remove('hidden');
+        recentsItems.innerHTML = recents.slice(0, 4).map((tool) => `
+          <a
+            href="${tool.path}"
+            class="flex items-center justify-between px-2.5 py-1 rounded-control text-xs text-text-primary hover:bg-canvas transition-standard group"
+          >
+            <span class="truncate font-medium group-hover:text-accent">${tool.name}</span>
+            <span class="text-accent text-xs">&rarr;</span>
+          </a>
+        `).join('');
+      }
+    } catch (e) {}
+
+    // ── 7. Quick Look Modal (Spacebar / Eye Button) ──────────────────────────
+    const qlModal = document.getElementById('quick-look-modal');
+    const qlClose = document.getElementById('ql-close-btn');
+    const qlDismiss = document.getElementById('ql-dismiss-btn');
+    const qlTitle = document.getElementById('ql-title');
+    const qlCat = document.getElementById('ql-cat');
+    const qlBadge = document.getElementById('ql-badge');
+    const qlDesc = document.getElementById('ql-desc');
+    const qlPreview = document.getElementById('ql-preview');
+    const qlOpenBtn = document.getElementById('ql-open-btn') as HTMLAnchorElement | null;
+
+    let activeHoveredCard: HTMLElement | null = null;
+
+    function openQuickLook(card: HTMLElement) {
+      if (!qlModal) return;
+      const name = card.dataset.toolName || '';
+      const cat = card.dataset.toolCategory || '';
+      const desc = card.dataset.toolDesc || '';
+      const preview = card.dataset.toolPreview || '';
+      const path = card.dataset.toolPath || '#';
+      const region = card.dataset.toolRegion || '';
+
+      if (qlTitle) qlTitle.textContent = card.querySelector('a')?.textContent?.trim() || name;
+      if (qlCat) qlCat.textContent = cat;
+      if (qlBadge) qlBadge.textContent = region === 'IN' ? '🇮🇳 India Rules' : region === 'US' ? '🇺🇸 US Rules' : 'Global Scope';
+      if (qlDesc) qlDesc.textContent = desc;
+      if (qlPreview) qlPreview.textContent = preview || 'Live browser model';
+      if (qlOpenBtn) qlOpenBtn.href = path;
+
+      qlModal.classList.remove('hidden');
+      qlModal.classList.add('flex');
+    }
+
+    function closeQuickLook() {
+      qlModal?.classList.add('hidden');
+      qlModal?.classList.remove('flex');
+    }
+
+    qlClose?.addEventListener('click', closeQuickLook);
+    qlDismiss?.addEventListener('click', closeQuickLook);
+
+    qlModal?.addEventListener('click', (e) => {
+      if (e.target === qlModal) closeQuickLook();
+    });
+
+    toolCards.forEach((card) => {
+      card.addEventListener('mouseenter', () => { activeHoveredCard = card; });
+      card.addEventListener('mouseleave', () => { if (activeHoveredCard === card) activeHoveredCard = null; });
+      card.addEventListener('focus', () => { activeHoveredCard = card; });
+
+      const qlTrigger = card.querySelector('.quick-look-trigger');
+      qlTrigger?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        openQuickLook(card);
+      });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && activeHoveredCard && !searchInput?.matches(':focus')) {
+        e.preventDefault();
+        if (qlModal && !qlModal.classList.contains('hidden')) {
+          closeQuickLook();
+        } else {
+          openQuickLook(activeHoveredCard);
+        }
+      } else if (e.key === 'Escape' && qlModal && !qlModal.classList.contains('hidden')) {
+        closeQuickLook();
+      }
     });
   }
 

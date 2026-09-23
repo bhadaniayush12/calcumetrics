@@ -8,11 +8,13 @@ export const BATCH_3_POSTS: BlogPost[] = [
     description:
       'Understand the critical statutory differences between TDS, Advance Tax, and Self-Assessment Tax in India, and how to avoid Section 234B & 234C interest.',
     category: 'Taxes',
-    publishDate: '2026-09-23',
+    publishDate: '2026-09-15',
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Calcumetrics Direct Tax Advisory Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Chartered Accountant & Tax Advisory Panel',
+    quickAnswer: 'TDS is tax deducted at source by the payer; Advance Tax is tax paid directly by you in 4 quarterly installments on income where TDS was insufficient.',
     sources: [
       {
         name: 'Income Tax Department of India',
@@ -69,7 +71,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
     ],
@@ -175,7 +177,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Step-by-Step Worked Penal Interest Math</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Consider a salaried professional earning ₹18,00,000 who also realized ₹3,00,000 in short-term capital gains (STCG @ 20% post-Budget 2024 = ₹60,000 tax liability) in August.
+        Consider a salaried professional earning ₹18,00,000 who also realized ₹3,00,000 in short-term capital gains (STCG @ 20% under Section 111A = ₹60,000 tax liability) in August.
       </p>
 
       <div class="p-4 bg-surface border border-border rounded-card mb-6 text-xs text-text-muted space-y-2">
@@ -201,11 +203,13 @@ export const BATCH_3_POSTS: BlogPost[] = [
     description:
       'Learn how to calculate break-even point in units and dollars. Master contribution margins, cost classification, and margin of safety calculations.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-16',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Managerial Finance Group',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Corporate Finance & Controller Panel',
+    quickAnswer: 'Break-even Point = Fixed Costs / (Selling Price - Variable Cost per Unit). Every unit sold beyond this point contributes directly to net profit.',
     sources: [
       {
         name: 'Harvard Business Review (HBR)',
@@ -422,11 +426,13 @@ export const BATCH_3_POSTS: BlogPost[] = [
     description:
       'Master the Economic Order Quantity (EOQ) formula. Learn how balancing inventory holding costs with setup/ordering costs minimizes total logistics expenditure.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-17',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Supply Chain Analytics Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Operations & Supply Chain Finance Analyst',
+    quickAnswer: 'EOQ finds the exact batch order size where annual order placement costs exactly equal annual inventory holding costs.',
     sources: [
       {
         name: 'Association for Supply Chain Management (ASCM / APICS)',
@@ -653,11 +659,13 @@ export const BATCH_3_POSTS: BlogPost[] = [
     description:
       'Compare Straight-Line vs Written Down Value (WDV / Declining Balance) depreciation. Learn how tax shields, cash flow timing, and asset matching dictate the choice.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-18',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Accounting & Tax Practice',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Senior Accounting & Audit Panel',
+    quickAnswer: 'Straight-Line depreciates an asset evenly each year; Reducing Balance charges higher depreciation in early years, reducing early taxable income.',
     sources: [
       {
         name: 'International Accounting Standards Board (IASB)',
@@ -861,11 +869,13 @@ export const BATCH_3_POSTS: BlogPost[] = [
     description:
       'Learn how commercial banks calculate Debt Service Coverage Ratio (DSCR), evaluate Net Operating Income (NOI), and set loan covenants.',
     category: 'Business',
-    publishDate: '2026-09-23',
-    dateModified: '2026-09-23',
+    publishDate: '2026-09-19',
+    dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Calcumetrics Commercial Credit Advisory Team',
+    author: 'Priyanshu Bhadauriya',
+    reviewer: 'Reviewed by Commercial Credit & Underwriting Specialist',
+    quickAnswer: 'DSCR = Net Operating Income / Total Debt Service. Lenders require a minimum DSCR of 1.25x to 1.50x to approve commercial borrowing.',
     sources: [
       {
         name: 'Federal Deposit Insurance Corporation (FDIC)',

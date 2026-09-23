@@ -46,37 +46,52 @@ export function calcIncomeTax(
     return { newRegime: empty, oldRegime: empty, recommendedRegime: 'Equal', taxSavings: 0 };
   }
 
-  // ── 1. New Tax Regime (Budget 2024) ───────────────────────────────────────
+  // ── 1. New Tax Regime (Current FY 2025-26 & FY 2026-27) ─────────────────
+  // Slabs: 0-4L Nil, 4-8L 5%, 8-12L 10%, 12-16L 15%, 16-20L 20%, 20-24L 25%, >24L 30%
+  // Standard deduction: ₹75,000. Section 87A rebate: zero tax up to ₹12 Lakh taxable.
   const newStdDed = 75000;
   const newTaxable = Math.max(0, grossIncome - newStdDed);
   let newBaseTax = 0;
 
-  if (newTaxable > 1500000) {
-    newBaseTax += (newTaxable - 1500000) * 0.30;
-    newBaseTax += 300000 * 0.20; // 12L-15L
-    newBaseTax += 200000 * 0.15; // 10L-12L
-    newBaseTax += 300000 * 0.10; // 7L-10L
-    newBaseTax += 400000 * 0.05; // 3L-7L
+  if (newTaxable > 2400000) {
+    newBaseTax += (newTaxable - 2400000) * 0.30;
+    newBaseTax += 400000 * 0.25; // 20L-24L (1,00,000)
+    newBaseTax += 400000 * 0.20; // 16L-20L (80,000)
+    newBaseTax += 400000 * 0.15; // 12L-16L (60,000)
+    newBaseTax += 400000 * 0.10; // 8L-12L  (40,000)
+    newBaseTax += 400000 * 0.05; // 4L-8L   (20,000)
+  } else if (newTaxable > 2000000) {
+    newBaseTax += (newTaxable - 2000000) * 0.25;
+    newBaseTax += 400000 * 0.20;
+    newBaseTax += 400000 * 0.15;
+    newBaseTax += 400000 * 0.10;
+    newBaseTax += 400000 * 0.05;
+  } else if (newTaxable > 1600000) {
+    newBaseTax += (newTaxable - 1600000) * 0.20;
+    newBaseTax += 400000 * 0.15;
+    newBaseTax += 400000 * 0.10;
+    newBaseTax += 400000 * 0.05;
   } else if (newTaxable > 1200000) {
-    newBaseTax += (newTaxable - 1200000) * 0.20;
-    newBaseTax += 200000 * 0.15;
-    newBaseTax += 300000 * 0.10;
+    newBaseTax += (newTaxable - 1200000) * 0.15;
+    newBaseTax += 400000 * 0.10;
     newBaseTax += 400000 * 0.05;
-  } else if (newTaxable > 1000000) {
-    newBaseTax += (newTaxable - 1000000) * 0.15;
-    newBaseTax += 300000 * 0.10;
+  } else if (newTaxable > 800000) {
+    newBaseTax += (newTaxable - 800000) * 0.10;
     newBaseTax += 400000 * 0.05;
-  } else if (newTaxable > 700000) {
-    newBaseTax += (newTaxable - 700000) * 0.10;
-    newBaseTax += 400000 * 0.05;
-  } else if (newTaxable > 300000) {
-    newBaseTax += (newTaxable - 300000) * 0.05;
+  } else if (newTaxable > 400000) {
+    newBaseTax += (newTaxable - 400000) * 0.05;
   }
 
-  // Section 87A rebate for New Regime (up to 7,00,000 taxable income)
+  // Section 87A rebate for New Regime (zero tax up to ₹12,00,000 taxable income, with marginal relief)
   let newRebate = 0;
-  if (newTaxable <= 700000) {
+  if (newTaxable <= 1200000) {
     newRebate = newBaseTax;
+  } else {
+    // Marginal relief under Section 87A: tax payable cannot exceed taxable income minus ₹12,00,000
+    const excessIncome = newTaxable - 1200000;
+    if (newBaseTax > excessIncome) {
+      newRebate = newBaseTax - excessIncome;
+    }
   }
   const newTaxAfterRebate = Math.max(0, newBaseTax - newRebate);
   const newCess = newTaxAfterRebate * 0.04;

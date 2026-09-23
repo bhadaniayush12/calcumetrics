@@ -1,25 +1,26 @@
 ---
 /**
- * Homepage — / (Section 26.4)
- * Pre-rendered SIP preview inside WindowFrame linking to /sip-calculator.
- * Most Popular Tools, Browse by Category, Why Calcumetrics, closing CTA.
- * No ads at launch (Section 21). No email capture (Section 26.4).
- *
- * Competitor improvements applied:
- * - Trust stats bar (total tools, categories, client-side, formula-verified)
- * - Popular tool badges ("Most Popular" chip label)
- * - Category cards enriched with descriptions
- * - "Why Calcumetrics" rewritten to differentiate from India-only competitors
- * - Competitive differentiator callout strip
+ * Homepage — /
+ * India-first financial calculators with instant live calculations.
+ * Pre-rendered live interactive SIP preview inside WindowFrame.
+ * Quick-pick row, Most Popular Tools, Browse by Category, unified Why Calcumetrics.
  */
 import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
 import { calcSIP } from '../lib/calculators/sip';
-import { formatIndian } from '../lib/formatters';
-import { getPublishedTools, getToolCount, CATEGORIES, SITE_NAME } from '../config/site';
+import { formatIndian, formatIndianCompact, formatIndianWords } from '../lib/formatters';
+import { getPublishedTools, getToolCount, CATEGORIES } from '../config/site';
 
-const result = calcSIP(25000, 12, 15);
-const fmt = (n: number) => '₹' + formatIndian(n);
+const initialMonthly = 25000;
+const initialRate = 12;
+const initialYears = 15;
+const result = calcSIP(initialMonthly, initialRate, initialYears);
+
+const heroCompact = formatIndianCompact(result.maturity, '₹');
+const heroExact = '₹' + formatIndian(result.maturity);
+const heroInvested = formatIndianCompact(result.invested, '₹');
+const heroGain = formatIndianCompact(result.gain, '₹');
+const initialGainWords = formatIndianWords(result.gain, '₹');
 
 const allTools = getPublishedTools();
 const totalCount = getToolCount();
@@ -38,11 +39,11 @@ const popularTools = popularSlugs
   .map((s) => allTools.find((t) => t.slug === s))
   .filter(Boolean);
 
-// Category descriptions for richer cards (vs. competitor's bare lists)
+// Category descriptions for richer cards
 const categoryDescriptions: Record<string, string> = {
   Investments: 'SIP, compound interest, CAGR, XIRR, FD, PPF, 401(k) and more.',
   Loans: 'EMI, home loan, car loan and prepayment impact calculators.',
-  Taxes: 'GST and HRA for India. More jurisdictions coming.',
+  Taxes: 'GST, HRA, and Old vs New income tax regime for India.',
   Business: 'Break-even, profit margins, markup vs margin, ROI.',
   'Corporate Finance': 'WACC, NPV, IRR, payback period, DCF — global formulas.',
 };
@@ -71,15 +72,15 @@ const jsonld = {
       name: 'Calcumetrics',
       description: `${totalCount} free financial calculators for investments, loans, taxes, business and corporate finance.`,
       publisher: { '@id': 'https://calcumetrics.com/#org' },
-      inLanguage: 'en',
+      inLanguage: 'en-IN',
     },
   ],
 };
 ---
 
 <Layout
-  title="Free Online Financial Calculators | Calcumetrics"
-  description={`${totalCount} free financial calculators for investments, loans, taxes, business and corporate finance. No sign-up, 100% client-side. Runs in your browser.`}
+  title="Free SIP, EMI, GST & Tax Calculators | Calcumetrics"
+  description={`Instant financial calculators for India: SIP, EMI, FD, GST, and Income Tax. Formula shown, live results, zero sign-up required. 100% client-side.`}
   canonical="https://calcumetrics.com/"
 >
   <Fragment slot="head">
@@ -87,78 +88,166 @@ const jsonld = {
   </Fragment>
 
   <!-- Hero Section -->
-  <section class="bg-canvas border-b border-border py-16 sm:py-20" aria-labelledby="hero-heading">
+  <section class="bg-canvas border-b border-border py-10 sm:py-14" aria-labelledby="hero-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="lg:grid lg:grid-cols-12 lg:gap-12 lg:items-center">
+      <div class="lg:grid lg:grid-cols-12 lg:gap-10 lg:items-center">
 
-        <!-- Left: Copy -->
-        <div class="lg:col-span-5 mb-10 lg:mb-0">
-          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-chip border border-border bg-disabled-bg text-xs font-medium text-text-muted mb-4">
-            {totalCount} calculators · 100% free
+        <!-- Left: Copy & Quick Picks -->
+        <div class="lg:col-span-5 mb-8 lg:mb-0">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-chip border border-accent/20 bg-accent/5 text-xs font-semibold text-accent mb-3">
+            100% Free · No Sign-Up · Built for India
           </div>
-          <h1 id="hero-heading" class="text-4xl sm:text-5xl font-bold tracking-[-0.02em] text-text-primary mb-5 leading-tight">
-            Precision Financial<br />Calculators
+          <h1 id="hero-heading" class="text-3xl sm:text-4xl lg:text-[40px] font-bold tracking-tight text-text-primary mb-3 leading-tight">
+            Free SIP, EMI, GST & Tax Calculators for India
           </h1>
-          <p class="text-base text-text-muted leading-relaxed mb-8 max-w-md">
-            Investments, loans, taxes, business and corporate finance. Every formula shown and tested. No sign-up. Runs entirely in your browser.
+          <p class="text-sm sm:text-base text-text-muted leading-relaxed mb-6 max-w-md">
+            Instant results. Transparent formulas. Your financial data stays entirely on your device with 100% private calculations.
           </p>
-          <div class="flex flex-wrap gap-3">
-            <a href="/calculators" class="inline-flex items-center h-12 px-6 rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent">
-              Browse all calculators
+          <div class="flex flex-wrap gap-3 mb-6">
+            <a href="/calculators" class="inline-flex items-center h-11 px-5 rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent shadow-sm">
+              Browse all calculators &rarr;
             </a>
-            <a href="/methodology" class="inline-flex items-center h-12 px-6 rounded-control border border-border text-sm font-medium text-text-primary hover:text-accent hover:border-accent transition-standard focus-visible:outline-accent">
-              How it works
+            <a href="/methodology" class="inline-flex items-center h-11 px-5 rounded-control border border-border text-sm font-medium text-text-primary hover:text-accent hover:border-accent transition-standard focus-visible:outline-accent">
+              How formulas work
             </a>
+          </div>
+
+          <!-- Quick pick row -->
+          <div class="pt-4 border-t border-border">
+            <p class="text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-2">Quick Pick Tools</p>
+            <div class="flex flex-wrap gap-1.5">
+              {[
+                { name: 'SIP', href: '/sip-calculator' },
+                { name: 'EMI', href: '/emi-calculator' },
+                { name: 'FD', href: '/fd-calculator' },
+                { name: 'GST', href: '/in/gst-calculator' },
+                { name: 'Income Tax', href: '/in/income-tax-calculator' },
+                { name: 'HRA', href: '/in/hra-calculator' },
+                { name: 'PPF', href: '/in/ppf-calculator' },
+              ].map((t) => (
+                <a
+                  href={t.href}
+                  class="inline-flex items-center px-2.5 py-1 rounded-control bg-surface hover:bg-canvas border border-border hover:border-accent text-xs font-medium text-text-primary hover:text-accent transition-standard"
+                >
+                  {t.name}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 
-        <!-- Right: SIP preview in WindowFrame -->
+        <!-- Right: Live Interactive SIP preview in WindowFrame -->
         <div class="lg:col-span-7">
           <WindowFrame urlPill="calcumetrics.com/sip-calculator" class="w-full">
-            <div class="p-6">
-              <div class="flex flex-col sm:flex-row gap-4">
-                <!-- Input side preview -->
-                <div class="flex-1 space-y-3">
-                  <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">SIP Calculator</p>
-                  <div class="space-y-2">
-                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
-                      <span class="text-text-muted mr-2">₹</span>
-                      <span class="tabular-nums">25,000</span>
-                      <span class="text-text-muted text-xs ml-auto">/month</span>
-                    </div>
-                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
-                      <span class="tabular-nums">12.0</span>
-                      <span class="text-text-muted text-xs ml-auto">% p.a.</span>
-                    </div>
-                    <div class="h-11 flex items-center px-3 border border-border rounded-control bg-canvas text-sm text-text-primary">
-                      <span class="tabular-nums">15</span>
-                      <span class="text-text-muted text-xs ml-auto">years</span>
-                    </div>
+            <div class="p-5 sm:p-6" id="hero-sip-widget">
+              <div class="flex flex-col sm:flex-row gap-5">
+                <!-- Input side preview with live sliders -->
+                <div class="flex-1 space-y-4">
+                  <div class="flex items-center justify-between">
+                    <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">SIP Live Preview</p>
+                    <span class="text-[11px] text-accent font-medium bg-accent/10 px-2 py-0.5 rounded">Live Interactive</span>
                   </div>
-                  <a href="/sip-calculator" class="block w-full h-10 flex items-center justify-center rounded-control bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-standard focus-visible:outline-accent">
-                    Calculate →
+
+                  <!-- Monthly Investment -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-medium text-text-primary">
+                      <span>Monthly Investment</span>
+                      <span class="tabular-nums font-semibold" id="hero-val-monthly">₹25,000</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="hero-slider-monthly"
+                      min="500"
+                      max="100000"
+                      step="500"
+                      value="25000"
+                      aria-label="Monthly investment slider"
+                      class="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  <!-- Expected Return Rate -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-medium text-text-primary">
+                      <span>Expected Return</span>
+                      <span class="tabular-nums font-semibold" id="hero-val-rate">12.0%</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="hero-slider-rate"
+                      min="1"
+                      max="30"
+                      step="0.5"
+                      value="12"
+                      aria-label="Expected return rate slider"
+                      class="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  <!-- Time Period -->
+                  <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-medium text-text-primary">
+                      <span>Time Period</span>
+                      <span class="tabular-nums font-semibold" id="hero-val-years">15 yrs</span>
+                    </div>
+                    <input
+                      type="range"
+                      id="hero-slider-years"
+                      min="1"
+                      max="40"
+                      step="1"
+                      value="15"
+                      aria-label="Time period slider"
+                      class="w-full h-1.5 bg-border rounded-lg appearance-none cursor-pointer accent-accent"
+                    />
+                  </div>
+
+                  <a
+                    id="hero-full-calculator-btn"
+                    href="/sip-calculator#p=25000&r=12&y=15"
+                    class="flex items-center justify-center gap-1.5 w-full h-10 rounded-control bg-accent text-white text-xs font-semibold hover:bg-accent-hover transition-standard focus-visible:outline-accent"
+                  >
+                    Open full SIP calculator & year schedule &rarr;
                   </a>
                 </div>
 
-                <!-- Output side preview -->
-                <div class="flex-1 bg-dark-bg rounded-card p-4">
-                  <p class="text-xs text-dark-muted mb-1 uppercase tracking-wider font-medium">Estimated Maturity</p>
-                  <p class="text-3xl font-bold tabular-nums text-dark-text mb-4" aria-live="polite">{fmt(result.maturity)}</p>
-                  <div class="space-y-2 text-xs border-t border-dark-border pt-3">
-                    <div class="flex justify-between">
-                      <span class="text-dark-muted">Invested</span>
-                      <span class="tabular-nums text-dark-text">{fmt(result.invested)}</span>
+                <!-- Output side preview with big compact format + compounding insight -->
+                <div class="flex-1 bg-dark-bg rounded-card p-4 flex flex-col justify-between">
+                  <div>
+                    <p class="text-[11px] text-dark-muted mb-1 uppercase tracking-wider font-medium">Estimated Maturity</p>
+                    <div class="flex items-baseline gap-2 mb-1 flex-wrap">
+                      <p class="text-3xl sm:text-4xl font-extrabold tabular-nums text-dark-text" id="hero-maturity-compact">
+                        {heroCompact}
+                      </p>
+                      <span class="text-xs text-dark-muted tabular-nums" id="hero-maturity-exact">
+                        ({heroExact})
+                      </span>
                     </div>
-                    <div class="flex justify-between">
-                      <span class="text-dark-muted">Gain</span>
-                      <span class="tabular-nums text-dark-accent font-semibold">+{fmt(result.gain)}</span>
+
+                    <div class="space-y-2 text-xs border-t border-dark-border pt-3 mt-3">
+                      <div class="flex justify-between">
+                        <span class="text-dark-muted">Total Invested</span>
+                        <span class="tabular-nums text-dark-text font-medium" id="hero-res-invested">{heroInvested}</span>
+                      </div>
+                      <div class="flex justify-between">
+                        <span class="text-dark-muted">Total Gain</span>
+                        <span class="tabular-nums text-dark-accent font-bold" id="hero-res-gain">+{heroGain}</span>
+                      </div>
+                    </div>
+
+                    <!-- Composition bar preview -->
+                    <div class="mt-3 h-2 w-full flex overflow-hidden rounded-sm bg-dark-border">
+                      <div id="hero-bar-invested" class="h-full bg-dark-muted transition-all duration-150" style={`width: ${(result.principalFraction * 100).toFixed(1)}%`}></div>
+                      <div id="hero-bar-gain" class="h-full bg-dark-accent transition-all duration-150" style={`width: ${(result.gainFraction * 100).toFixed(1)}%`}></div>
                     </div>
                   </div>
-                  <div class="mt-3 h-2 w-full flex overflow-hidden rounded-sm">
-                    <div class="h-full bg-dark-muted" style={`width: ${(result.principalFraction * 100).toFixed(1)}%`}></div>
-                    <div class="h-full bg-dark-accent" style={`width: ${(result.gainFraction * 100).toFixed(1)}%`}></div>
+
+                  <!-- Compounding Insight line -->
+                  <div class="mt-4 p-2.5 rounded bg-dark-border/50 border border-dark-border text-[11px] text-dark-text leading-snug">
+                    <span id="hero-compounding-insight">
+                      ₹25,000/month se 15 saal mein {initialGainWords} ka gain, sirf compounding se.
+                    </span>
                   </div>
-                  <p class="text-[10px] text-dark-muted mt-3 leading-relaxed">For information only. Not financial advice. Returns are estimates.</p>
                 </div>
               </div>
             </div>
@@ -168,15 +257,15 @@ const jsonld = {
     </div>
   </section>
 
-  <!-- Trust Stats Bar -->
-  <section class="bg-surface border-b border-border py-5" aria-label="Platform highlights">
+  <!-- Trust Stats Bar (Fixed 4th item) -->
+  <section class="bg-surface border-b border-border py-4" aria-label="Platform highlights">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-0 sm:divide-x sm:divide-border">
         {[
-          { stat: String(totalCount), label: 'Free calculators' },
-          { stat: '5',               label: 'Finance categories' },
-          { stat: '100%',            label: 'Client-side — no data sent' },
-          { stat: 'Every',           label: 'Formula shown & tested' },
+          { stat: String(totalCount) + '+', label: 'Free calculators' },
+          { stat: '5',                      label: 'Finance categories' },
+          { stat: '100%',                   label: 'Client-side privacy' },
+          { stat: '0',                      label: 'Sign-ups required' },
         ].map((item) => (
           <div class="flex flex-col items-center text-center px-4 py-1">
             <span class="text-xl font-bold tabular-nums text-text-primary tracking-tight">{item.stat}</span>
@@ -188,20 +277,27 @@ const jsonld = {
   </section>
 
   <!-- Most Popular Tools -->
-  <section class="py-14 bg-canvas border-b border-border" aria-labelledby="popular-heading">
+  <section class="py-12 bg-canvas border-b border-border" aria-labelledby="popular-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 id="popular-heading" class="text-2xl font-bold text-text-primary mb-2">Most popular calculators</h2>
-      <p class="text-sm text-text-muted mb-8">Start with these tools used most frequently by finance professionals, CAs, analysts and retail investors.</p>
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
+        <div>
+          <h2 id="popular-heading" class="text-2xl font-bold text-text-primary mb-1">Most popular calculators</h2>
+          <p class="text-sm text-text-muted">Start with top tools for personal wealth, home loans, taxation, and business planning.</p>
+        </div>
+        <a href="/calculators" class="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-accent hover:text-accent-hover transition-standard">
+          View all {totalCount} tools &rarr;
+        </a>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {popularTools.map((tool) => tool && (
           <a
             href={tool.path}
-            class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
+            class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
           >
             <div class="flex items-start justify-between mb-2">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider">{tool.category}</span>
               {popularConfig[tool.slug] === 'Most Popular' && (
-                <span class="inline-flex items-center px-1.5 py-0.5 rounded-chip bg-disabled-bg border border-border text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                <span class="inline-flex items-center px-1.5 py-0.5 rounded-chip bg-accent/10 border border-accent/20 text-[10px] font-semibold text-accent uppercase tracking-wider">
                   Popular
                 </span>
               )}
@@ -211,26 +307,26 @@ const jsonld = {
           </a>
         ))}
       </div>
-      <div class="mt-6 text-center">
+      <div class="mt-6 text-center sm:hidden">
         <a href="/calculators" class="inline-flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover transition-standard focus-visible:outline-accent">
-          View all {totalCount} calculators →
+          View all {totalCount} calculators &rarr;
         </a>
       </div>
     </div>
   </section>
 
   <!-- Browse by Category -->
-  <section class="py-14 bg-surface border-b border-border" aria-labelledby="categories-heading">
+  <section class="py-12 bg-surface border-b border-border" aria-labelledby="categories-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <h2 id="categories-heading" class="text-2xl font-bold text-text-primary mb-2">Browse by category</h2>
-      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories — global tools included.</p>
+      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories — covering Indian statutory rules and global finance.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {CATEGORIES.map((cat) => {
           const catTools = allTools.filter((t) => t.category === cat.name);
           return (
             <a
               href={cat.href}
-              class="group block bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard focus-visible:outline-accent"
+              class="group block bg-canvas border border-border rounded-card p-5 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
             >
               <div class="flex items-center justify-between mb-2">
                 <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{cat.name}</h3>
@@ -242,7 +338,7 @@ const jsonld = {
                   <li class="text-xs text-text-muted truncate">· {tool.name}</li>
                 ))}
                 {catTools.length > 3 && (
-                  <li class="text-xs text-accent">+ {catTools.length - 3} more →</li>
+                  <li class="text-xs text-accent font-medium">+ {catTools.length - 3} more &rarr;</li>
                 )}
               </ul>
             </a>
@@ -255,37 +351,44 @@ const jsonld = {
         >
           <span class="text-2xl font-bold text-accent mb-1">{totalCount}</span>
           <span class="text-sm font-medium text-text-primary group-hover:text-accent transition-standard">View all calculators</span>
-          <span class="text-xs text-text-muted mt-1">Search, filter, browse →</span>
+          <span class="text-xs text-text-muted mt-1">Search, filter, browse &rarr;</span>
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Why Calcumetrics — competitive differentiators vs. India-only sites (Section 26.5) -->
+  <!-- Why Calcumetrics (Unified Single High-Trust Section) -->
   <section class="py-14 bg-canvas border-b border-border" aria-labelledby="why-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 id="why-heading" class="text-2xl font-bold text-text-primary mb-2">Why Calcumetrics</h2>
-      <p class="text-sm text-text-muted mb-10">Built for finance professionals, CAs, analysts, students and retail investors who need transparent, global tools.</p>
+      <div class="max-w-2xl mx-auto text-center mb-10">
+        <h2 id="why-heading" class="text-2xl sm:text-3xl font-bold text-text-primary mb-2">Why Calcumetrics</h2>
+        <p class="text-sm text-text-muted">Built for Indian investors, taxpayers, business owners, and finance professionals who need transparent, reliable tools.</p>
+      </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           {
-            title: 'Global scope',
-            body: "WACC, IRR, NPV, DCF, CAGR, 401(k) and more. Not limited to one country's tax rules.",
+            icon: `<svg class="w-5 h-5 text-accent stroke-current fill-none mb-3" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+            title: 'India-First & Global Scope',
+            body: 'Specialized calculators for Indian GST, HRA, PPF, and Old vs New Tax Regimes, alongside international tools like WACC, DCF, and 401(k).',
           },
           {
-            title: 'Every formula shown',
-            body: 'The formula, variable legend, and a worked example appear on every calculator page. No black boxes.',
+            icon: `<svg class="w-5 h-5 text-accent stroke-current fill-none mb-3" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+            title: 'Every Formula Transparent',
+            body: 'The exact formula, variable legend, and worked step-by-step example appear directly on every calculator. Zero black-box calculations.',
           },
           {
-            title: 'No login required',
-            body: 'All calculations run in your browser. We do not store or transmit your financial inputs to any server.',
+            icon: `<svg class="w-5 h-5 text-accent stroke-current fill-none mb-3" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+            title: '100% Client-Side Privacy',
+            body: 'All calculations run directly in your web browser. No accounts, no logins, and zero financial data ever sent to any remote server.',
           },
           {
-            title: 'Test-driven accuracy',
-            body: 'Each calculator is validated against published test fixtures before launch. Results are estimates, not guarantees.',
+            icon: `<svg class="w-5 h-5 text-accent stroke-current fill-none mb-3" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            title: 'Test-Driven Accuracy',
+            body: 'Every calculation engine is validated with published financial fixtures and current statutory tax amendments before launch.',
           },
         ].map((item) => (
-          <div class="bg-surface border border-border rounded-card p-5">
+          <div class="bg-surface border border-border rounded-card p-5 hover:border-accent transition-standard">
+            <Fragment set:html={item.icon} />
             <h3 class="font-bold text-sm text-text-primary mb-2">{item.title}</h3>
             <p class="text-xs text-text-muted leading-relaxed">{item.body}</p>
           </div>
@@ -294,45 +397,14 @@ const jsonld = {
     </div>
   </section>
 
-  <!-- Differentiator strip vs. India-only competitors -->
-  <section class="py-10 bg-surface border-b border-border" aria-label="Platform comparison">
-    <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-        {[
-          {
-            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-            label: 'Global financial tools',
-            sub: 'WACC · IRR · NPV · DCF · CAGR · 401(k)',
-          },
-          {
-            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-            label: 'Your data stays with you',
-            sub: 'No server. No account. No tracking of inputs.',
-          },
-          {
-            icon: `<svg class="w-5 h-5 stroke-current fill-none mx-auto mb-2 text-accent" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`,
-            label: 'Transparent methodology',
-            sub: 'Formula · assumptions · worked example on every page.',
-          },
-        ].map((item) => (
-          <div class="flex flex-col items-center px-4 py-5 bg-canvas border border-border rounded-card">
-            <Fragment set:html={item.icon} />
-            <span class="text-sm font-bold text-text-primary mb-1">{item.label}</span>
-            <span class="text-xs text-text-muted">{item.sub}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Closing CTA (dark background) -->
+  <!-- Closing CTA (Clean copy, no ads claim) -->
   <section class="py-16 bg-dark-bg" aria-labelledby="cta-heading">
     <div class="max-w-[800px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
       <h2 id="cta-heading" class="text-3xl font-bold tracking-tight text-dark-text mb-4">
         Every formula. Shown and tested.
       </h2>
       <p class="text-sm text-dark-muted mb-8 leading-relaxed">
-        {totalCount} free financial calculators for investments, loans, taxes, business and corporate finance. No sign-up. No ads on this page.
+        {totalCount} free financial calculators for investments, loans, taxes, business and corporate finance. Transparent, reliable, and private.
       </p>
       <div class="flex flex-wrap justify-center gap-3">
         <a href="/calculators" class="inline-flex items-center h-12 px-6 rounded-control bg-dark-accent text-dark-bg text-sm font-semibold hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2">
@@ -345,3 +417,110 @@ const jsonld = {
     </div>
   </section>
 </Layout>
+
+<script>
+  import { calcSIP } from '../lib/calculators/sip';
+  import { formatIndian, formatIndianCompact, formatIndianWords, formatCompactCurrency } from '../lib/formatters';
+  import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
+
+  function initHeroSIP() {
+    const sliderMonthly = document.getElementById('hero-slider-monthly') as HTMLInputElement | null;
+    const sliderRate = document.getElementById('hero-slider-rate') as HTMLInputElement | null;
+    const sliderYears = document.getElementById('hero-slider-years') as HTMLInputElement | null;
+
+    const valMonthly = document.getElementById('hero-val-monthly');
+    const valRate = document.getElementById('hero-val-rate');
+    const valYears = document.getElementById('hero-val-years');
+
+    const maturityCompact = document.getElementById('hero-maturity-compact');
+    const maturityExact = document.getElementById('hero-maturity-exact');
+    const resInvested = document.getElementById('hero-res-invested');
+    const resGain = document.getElementById('hero-res-gain');
+    const barInvested = document.getElementById('hero-bar-invested');
+    const barGain = document.getElementById('hero-bar-gain');
+    const insightText = document.getElementById('hero-compounding-insight');
+    const fullLink = document.getElementById('hero-full-calculator-btn') as HTMLAnchorElement | null;
+
+    if (!sliderMonthly || !sliderRate || !sliderYears) return;
+
+    let activeCurrency: CurrencyCode = getStoredCurrency();
+
+    function updateHero() {
+      const monthly = parseFloat(sliderMonthly.value);
+      const rate = parseFloat(sliderRate.value);
+      const years = parseFloat(sliderYears.value);
+
+      const symbol = CURRENCY_CONFIG[activeCurrency]?.symbol || '₹';
+
+      // Update input labels
+      if (valMonthly) {
+        valMonthly.textContent = activeCurrency === 'INR'
+          ? `₹${formatIndian(monthly)}`
+          : `${symbol}${new Intl.NumberFormat('en-US').format(monthly)}`;
+      }
+      if (valRate) valRate.textContent = `${rate.toFixed(1)}%`;
+      if (valYears) valYears.textContent = `${years} yrs`;
+
+      // Run calculation
+      const r = calcSIP(monthly, rate, years);
+
+      // Compact format
+      const compactMaturity = activeCurrency === 'INR'
+        ? formatIndianCompact(r.maturity, '₹')
+        : formatCompactCurrency(r.maturity, activeCurrency);
+
+      const exactMaturity = activeCurrency === 'INR'
+        ? `(₹${formatIndian(r.maturity)})`
+        : `(${symbol}${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(r.maturity)})`;
+
+      const compactInvested = activeCurrency === 'INR'
+        ? formatIndianCompact(r.invested, '₹')
+        : formatCompactCurrency(r.invested, activeCurrency);
+
+      const compactGain = activeCurrency === 'INR'
+        ? formatIndianCompact(r.gain, '₹')
+        : formatCompactCurrency(r.gain, activeCurrency);
+
+      if (maturityCompact) maturityCompact.textContent = compactMaturity;
+      if (maturityExact) maturityExact.textContent = exactMaturity;
+      if (resInvested) resInvested.textContent = compactInvested;
+      if (resGain) resGain.textContent = `+${compactGain}`;
+
+      // Update composition bar
+      if (barInvested) barInvested.style.width = `${(r.principalFraction * 100).toFixed(1)}%`;
+      if (barGain) barGain.style.width = `${(r.gainFraction * 100).toFixed(1)}%`;
+
+      // Emotional Compounding Insight line
+      if (insightText) {
+        if (activeCurrency === 'INR') {
+          const gainWords = formatIndianWords(r.gain, '₹');
+          insightText.textContent = `₹${formatIndian(monthly)}/month se ${years} saal mein ${gainWords} ka gain, sirf compounding se.`;
+        } else {
+          insightText.textContent = `${symbol}${new Intl.NumberFormat('en-US').format(monthly)}/month over ${years} years yields ${compactGain} in pure compounding gain.`;
+        }
+      }
+
+      // Update link to transfer state to full SIP calculator
+      if (fullLink) {
+        fullLink.href = `/sip-calculator#p=${monthly}&r=${rate}&y=${years}`;
+      }
+    }
+
+    sliderMonthly.addEventListener('input', updateHero);
+    sliderRate.addEventListener('input', updateHero);
+    sliderYears.addEventListener('input', updateHero);
+
+    // Listen to navbar currency switch event to prevent mismatch
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.code) {
+        activeCurrency = e.detail.code;
+        updateHero();
+      }
+    });
+
+    updateHero();
+  }
+
+  initHeroSIP();
+  document.addEventListener('astro:page-load', initHeroSIP);
+</script>

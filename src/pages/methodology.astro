@@ -9,10 +9,11 @@ const jsonld = {
   '@graph': [
     {
       '@type': 'WebPage',
-      name: 'Methodology: Formulas & Conventions',
+      name: 'Methodology: Financial Engineering, Formulas & Statutory Conventions',
       url: canonicalUrl,
-      description: 'Formulas, conventions, data sources, and our correction policy for all Calcumetrics calculators.',
+      description: 'Transparent mathematical formulas, statutory conventions, worked test fixture proofs, and regulatory data sources governing Calcumetrics calculators.',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
+      dateModified: '2026-09-24',
     },
     {
       '@type': 'BreadcrumbList',
@@ -24,13 +25,18 @@ const jsonld = {
   ],
 };
 ---
+
 <Layout
-  title="Methodology: Our Formulas & Conventions | Calcumetrics"
-  description="Formulas, conventions, data sources, and our correction policy for all Calcumetrics calculators."
+  title="Methodology: Formulas, Proofs & Statutory Conventions | Calcumetrics"
+  description="Transparent mathematical formulas, statutory conventions, worked test fixture proofs, and regulatory data sources governing Calcumetrics calculators."
   canonical={canonicalUrl}
 >
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+  </Fragment>
+
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Breadcrumb -->
     <nav aria-label="Breadcrumb" class="mb-6">
       <ol class="flex items-center gap-1.5 text-xs text-text-muted">
         <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
@@ -38,262 +44,808 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Methodology</li>
       </ol>
     </nav>
-    <!-- 1. Title + Introduction -->
-    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
-    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-3">Methodology</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-8">
-      Calcumetrics uses standard mathematical formulas from widely accepted financial textbooks and official regulatory sources. This page documents our conventions, assumptions, data sources, and client-side execution architecture.
-    </p>
 
-    <!-- 2. Dark WindowFrame Methodology Demo -->
-    <section class="mb-10" aria-label="Methodology demonstration sandbox">
-      <WindowFrame variant="dark" urlPill="calcumetrics.com/methodology">
-        <div class="p-5 sm:p-6 text-dark-text">
-          <div class="flex items-center justify-between border-b border-dark-border pb-3 mb-5">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold text-dark-accent uppercase tracking-wider">Interactive Sandbox</span>
-              <span class="text-xs text-dark-muted hidden sm:inline">· Client-Side Flow</span>
-            </div>
-            <span class="text-[11px] font-mono text-dark-muted">Calculation runs locally · 0 network requests</span>
+    <!-- Header Section -->
+    <div class="max-w-3xl mb-10">
+      <div class="flex items-center gap-2 mb-2 flex-wrap">
+        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent/10 text-accent">
+          Mathematical Transparency
+        </span>
+        <span class="text-xs text-text-muted">Last updated: 24 September 2026</span>
+        <span class="text-xs text-text-muted">·</span>
+        <a href="/about#corrections-log" class="text-xs text-accent hover:underline font-medium">
+          View Corrections Log →
+        </a>
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-4">
+        Methodology: Plain-Language Principles, Formulas &amp; Statutory Conventions
+      </h1>
+      <p class="text-base text-text-muted leading-relaxed">
+        Financial tools should never be black boxes. Whether you are a commerce student cross-checking an examination problem, a Chartered Accountant auditing a loan schedule, or an everyday investor planning a retirement corpus, you have a right to inspect the exact math, conventions, and regulatory baselines behind your results.
+      </p>
+    </div>
+
+    <!-- Layout: Main Content + Sticky "On this page" Sidebar -->
+    <div class="lg:grid lg:grid-cols-12 lg:gap-10 items-start">
+      
+      <!-- Main Content (8 cols) -->
+      <main class="lg:col-span-8 space-y-12 min-w-0">
+
+        <!-- 1. Interactive Live Sandbox -->
+        <section id="sandbox" class="scroll-mt-24" aria-labelledby="sandbox-heading">
+          <div class="flex items-center justify-between mb-3">
+            <h2 id="sandbox-heading" class="text-xl font-bold text-text-primary">
+              Live Calculation Engine Simulator
+            </h2>
+            <span class="text-xs font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+              100% In-Browser Memory
+            </span>
           </div>
+          <p class="text-xs text-text-muted mb-4 leading-relaxed">
+            Drag the sliders below. Notice how the calculation executes continuously in your local browser memory with zero network delay and zero server roundtrips.
+          </p>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
-            <!-- Col 1: INPUT -->
-            <div class="space-y-3">
-              <div class="text-xs font-semibold uppercase tracking-wider text-dark-muted flex items-center gap-1.5">
-                <span>1. Input</span>
-              </div>
-              <div>
-                <label for="demo-principal" class="text-xs text-dark-muted mb-1 flex justify-between">
-                  <span>Principal (P)</span>
-                  <span id="demo-principal-val" class="font-mono text-dark-text tabular-nums">$5,000</span>
-                </label>
-                <input
-                  type="range"
-                  id="demo-principal"
-                  min="1000"
-                  max="20000"
-                  step="500"
-                  value="5000"
-                  class="w-full h-1.5 bg-dark-border rounded-control appearance-none cursor-pointer accent-dark-accent"
-                  aria-label="Demo Principal Amount"
-                />
+          <WindowFrame variant="dark" urlPill="calcumetrics.com/methodology#sandbox">
+            <div class="p-5 sm:p-6 text-dark-text">
+              <div class="flex items-center justify-between border-b border-dark-border pb-3 mb-5">
+                <div class="flex items-center gap-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span class="text-xs font-bold text-dark-accent uppercase tracking-wider">Live Math Sandbox</span>
+                </div>
+                <span class="text-[11px] font-mono text-dark-muted hidden sm:inline">Execution: 0 Server Calls</span>
               </div>
 
-              <div>
-                <label for="demo-rate" class="text-xs text-dark-muted mb-1 flex justify-between">
-                  <span>Annual Rate (r)</span>
-                  <span id="demo-rate-val" class="font-mono text-dark-text tabular-nums">7.0%</span>
-                </label>
-                <input
-                  type="range"
-                  id="demo-rate"
-                  min="1"
-                  max="15"
-                  step="0.5"
-                  value="7"
-                  class="w-full h-1.5 bg-dark-border rounded-control appearance-none cursor-pointer accent-dark-accent"
-                  aria-label="Demo Annual Interest Rate"
-                />
-              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+                <!-- Col 1: INPUT -->
+                <div class="space-y-3.5">
+                  <div class="text-xs font-bold uppercase tracking-wider text-dark-muted flex items-center gap-1.5">
+                    <span>1. Input (Local State)</span>
+                  </div>
+                  <div>
+                    <label for="demo-principal" class="text-xs text-dark-muted mb-1 flex justify-between">
+                      <span>Principal (P)</span>
+                      <span id="demo-principal-val" class="font-mono text-dark-text font-bold tabular-nums">₹5,00,000</span>
+                    </label>
+                    <input
+                      type="range"
+                      id="demo-principal"
+                      min="50000"
+                      max="2500000"
+                      step="25000"
+                      value="500000"
+                      class="w-full h-2 bg-dark-border rounded-control appearance-none cursor-pointer accent-dark-accent py-2"
+                      aria-label="Demo Principal Amount"
+                    />
+                  </div>
 
-              <div class="text-[11px] text-dark-muted flex justify-between pt-1">
-                <span>Term (t)</span>
-                <span class="font-mono text-dark-text">5 years (fixed)</span>
-              </div>
-            </div>
+                  <div>
+                    <label for="demo-rate" class="text-xs text-dark-muted mb-1 flex justify-between">
+                      <span>Annual Rate (r)</span>
+                      <span id="demo-rate-val" class="font-mono text-dark-text font-bold tabular-nums">7.5%</span>
+                    </label>
+                    <input
+                      type="range"
+                      id="demo-rate"
+                      min="1"
+                      max="15"
+                      step="0.25"
+                      value="7.5"
+                      class="w-full h-2 bg-dark-border rounded-control appearance-none cursor-pointer accent-dark-accent py-2"
+                      aria-label="Demo Annual Interest Rate"
+                    />
+                  </div>
 
-            <!-- Col 2: ENGINE -->
-            <div>
-              <div class="text-xs font-semibold uppercase tracking-wider text-dark-muted mb-3 flex items-center gap-1.5">
-                <span>2. Engine</span>
-              </div>
-              <div class="bg-surface/5 border border-dark-border rounded-control p-3 font-mono text-xs space-y-2">
-                <div class="text-dark-muted text-[11px]">Formula:</div>
-                <div class="text-dark-accent font-medium">A = P × (1 + r)^t</div>
-                <div class="text-dark-muted text-[11px] pt-1 border-t border-dark-border">Execution:</div>
-                <div id="demo-engine-calc" class="text-dark-text text-[11px] break-all tabular-nums">5000 × (1 + 0.07)^5</div>
-                <div class="text-[10px] text-dark-muted">IEEE 754 64-bit float</div>
-              </div>
-            </div>
+                  <div class="text-[11px] text-dark-muted flex justify-between pt-1 border-t border-dark-border/40">
+                    <span>Tenure (t)</span>
+                    <span class="font-mono text-dark-text font-medium">5 years (annual compounding)</span>
+                  </div>
+                </div>
 
-            <!-- Col 3: OUTPUT -->
-            <div>
-              <div class="text-xs font-semibold uppercase tracking-wider text-dark-muted mb-3 flex items-center gap-1.5">
-                <span>3. Output</span>
-              </div>
-              <div class="bg-surface/5 border border-dark-border rounded-control p-3 flex flex-col justify-between min-h-[140px]">
+                <!-- Col 2: ENGINE -->
                 <div>
-                  <div class="text-[11px] text-dark-muted">Future Value (A)</div>
-                  <div id="demo-output-result" class="text-xl font-bold tabular-nums text-dark-accent mt-0.5 tracking-tight">$7,012.76</div>
-                  <div id="demo-output-gain" class="text-[11px] text-dark-muted tabular-nums mt-0.5">+ $2,012.76 gain</div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-dark-muted mb-3.5 flex items-center gap-1.5">
+                    <span>2. Mathematical Engine</span>
+                  </div>
+                  <div class="bg-surface/5 border border-dark-border rounded-control p-3.5 font-mono text-xs space-y-2">
+                    <div class="text-dark-muted text-[11px] font-sans font-medium">Standard Equation:</div>
+                    <div class="text-dark-accent font-semibold">A = P × (1 + r)ᵗ</div>
+                    <div class="text-dark-muted text-[11px] pt-1.5 border-t border-dark-border font-sans font-medium">Live In-Memory Step:</div>
+                    <div id="demo-engine-calc" class="text-dark-text text-[11px] break-all tabular-nums font-mono leading-relaxed">
+                      500000 × (1 + 0.075)⁵
+                    </div>
+                    <div class="text-[10px] text-dark-muted pt-1 border-t border-dark-border font-sans">
+                      Floating Point: IEEE 754 64-bit precision
+                    </div>
+                  </div>
                 </div>
-                <div class="pt-2 border-t border-dark-border flex items-center justify-between text-[10px] text-dark-muted">
-                  <span>Display rounding:</span>
-                  <span class="text-dark-text font-mono">2 decimals</span>
+
+                <!-- Col 3: OUTPUT -->
+                <div>
+                  <div class="text-xs font-bold uppercase tracking-wider text-dark-muted mb-3.5 flex items-center gap-1.5">
+                    <span>3. Reactive Output</span>
+                  </div>
+                  <div class="bg-surface/5 border border-dark-border rounded-control p-3.5 flex flex-col justify-between min-h-[145px]">
+                    <div>
+                      <div class="text-[11px] text-dark-muted uppercase font-semibold">Maturity Corpus (A)</div>
+                      <div id="demo-output-result" class="text-2xl font-extrabold tabular-nums text-dark-accent mt-1 tracking-tight">
+                        ₹7,17,815
+                      </div>
+                      <div id="demo-output-gain" class="text-xs text-dark-text font-medium tabular-nums mt-1">
+                        + ₹2,17,815 wealth gain
+                      </div>
+                    </div>
+                    <div class="pt-2 border-t border-dark-border flex items-center justify-between text-[10px] text-dark-muted">
+                      <span>Display format:</span>
+                      <span class="text-dark-text font-mono font-medium">Indian Lakhs/Crores</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+          </WindowFrame>
+        </section>
+
+        <!-- 2. Core Engineering Principles -->
+        <section id="principles" class="scroll-mt-24" aria-labelledby="principles-heading">
+          <h2 id="principles-heading" class="text-xl font-bold text-text-primary mb-3">
+            Core Engineering &amp; Architectural Standards
+          </h2>
+          <p class="text-sm text-text-muted mb-5 leading-relaxed">
+            Our technical choices are intentionally conservative. In financial calculation, predictability and accuracy supersede flashy dependencies.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- 1. No Server Calls -->
+            <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-text-primary">No Server Calls</h3>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 font-semibold">100% Client-Side</span>
+              </div>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Calculations execute entirely in your local browser JavaScript engine. We never transmit your income, loan balances, or investment amounts to a backend server or third-party API.
+              </p>
+            </div>
+
+            <!-- 2. Continuous Statutory Audits -->
+            <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-text-primary">Continuous Statutory Audits</h3>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 font-semibold">Event-Driven</span>
+              </div>
+              <p class="text-xs text-text-muted leading-relaxed">
+                We do not rely on passive annual audits. When statutory changes occur mid-year (such as the September 2025 GST 2.0 rate rationalization or Finance Act amendments), models and test suites are updated and deployed immediately.
+              </p>
+            </div>
+
+            <!-- 3. IEEE 754 Float & Rounding Drift -->
+            <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-text-primary">Strict Precision Boundaries</h3>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-canvas text-text-muted border border-border font-semibold">IEEE 754 64-bit</span>
+              </div>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Computers store binary decimals with small approximations. Calcumetrics preserves full unrounded floating-point precision throughout all multi-step iterations (e.g. 240-month amortization schedules), rounding strictly at the final display step.
+              </p>
+            </div>
+
+            <!-- 4. Immutable Mathematical Formulas -->
+            <div class="bg-surface border border-border rounded-card p-5 space-y-2">
+              <div class="flex items-center justify-between">
+                <h3 class="text-sm font-bold text-text-primary">Immutable Proofs</h3>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-canvas text-text-muted border border-border font-semibold">Automated CI/CD</span>
+              </div>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Formulas never silently change. Every calculator engine is anchored by rigorous unit test fixtures verified in automated CI/CD pipelines before any code is published.
+              </p>
+            </div>
           </div>
-        </div>
-      </WindowFrame>
-    </section>
+        </section>
 
-    <!-- 3. Input → Engine → Output Pipeline -->
-    <section class="mb-10" aria-labelledby="pipeline-heading">
-      <h2 id="pipeline-heading" class="text-xl font-bold text-text-primary mb-4">
-        The calculation pipeline
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="bg-surface border border-border rounded-card p-5">
-          <div class="inline-flex items-center justify-center w-6 h-6 rounded-chip bg-disabled-bg text-text-muted text-xs font-bold mb-3">
-            1
+        <!-- 3. Master Formulas & Plain-Language Explanations -->
+        <section id="formulas" class="scroll-mt-24 space-y-6" aria-labelledby="formulas-heading">
+          <div>
+            <h2 id="formulas-heading" class="text-xl font-bold text-text-primary mb-2">
+              Master Formulas &amp; Statutory Specifications
+            </h2>
+            <p class="text-sm text-text-muted leading-relaxed">
+              Below are the exact mathematical models and statutory conventions implemented across Calcumetrics. Every formula is rendered with native browser MathML and links directly to its live calculator.
+            </p>
           </div>
-          <h3 class="text-sm font-bold text-text-primary mb-1">Input</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            User provides values directly in form fields or sliders. All data stays local to the client session.
-          </p>
-        </div>
 
-        <div class="bg-surface border border-border rounded-card p-5">
-          <div class="inline-flex items-center justify-center w-6 h-6 rounded-chip bg-disabled-bg text-text-muted text-xs font-bold mb-3">
-            2
+          <!-- Formula: SIP -->
+          <article id="sip" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Investments · Compounding</span>
+                <h3 class="text-base sm:text-lg font-bold text-text-primary">
+                  1. Systematic Investment Plan (SIP) — Annuity-Due Model
+                </h3>
+              </div>
+              <a href="/sip-calculator" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
+                Try SIP Calculator →
+              </a>
+            </div>
+
+            <!-- Plain explanation -->
+            <p class="text-xs sm:text-sm text-text-muted leading-relaxed">
+              <strong>Plain-Language Explanation:</strong> In an equity SIP, bank auto-debits debit your installment on a scheduled day at the <em>beginning</em> of each monthly cycle. Because each month's installment earns compounding growth from day one of that month, the calculation requires an <strong>annuity-due</strong> formula rather than a standard end-of-month annuity.
+            </p>
+
+            <!-- Native MathML Equation -->
+            <div class="p-4 bg-canvas border border-border rounded-control overflow-x-auto text-center" aria-label="SIP Annuity-Due Equation">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-base sm:text-lg text-accent font-semibold py-1">
+                <mi>M</mi>
+                <mo>=</mo>
+                <mi>P</mi>
+                <mo>×</mo>
+                <mfrac>
+                  <mrow>
+                    <msup>
+                      <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>i</mi><mo>)</mo></mrow>
+                      <mi>n</mi>
+                    </msup>
+                    <mo>−</mo>
+                    <mn>1</mn>
+                  </mrow>
+                  <mi>i</mi>
+                </mfrac>
+                <mo>×</mo>
+                <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>i</mi><mo>)</mo></mrow>
+              </math>
+              <span class="sr-only">M = P * [((1 + i)^n - 1) / i] * (1 + i)</span>
+            </div>
+
+            <!-- Details toggle -->
+            <details class="text-xs text-text-muted border-t border-border pt-3 cursor-pointer group">
+              <summary class="font-semibold text-text-primary hover:text-accent select-none list-none flex items-center justify-between">
+                <span>View Mathematical Variables &amp; Assumptions</span>
+                <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pl-2">
+                <div><strong class="text-text-primary font-mono">M</strong> = Estimated Future Value (Total Maturity Corpus)</div>
+                <div><strong class="text-text-primary font-mono">P</strong> = Monthly investment amount</div>
+                <div><strong class="text-text-primary font-mono">i</strong> = Monthly compounding rate = Annual Rate ÷ 12 ÷ 100</div>
+                <div><strong class="text-text-primary font-mono">n</strong> = Total number of monthly installments (Years × 12)</div>
+              </div>
+            </details>
+          </article>
+
+          <!-- Formula: EMI -->
+          <article id="emi" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Loans · Amortization</span>
+                <h3 class="text-base sm:text-lg font-bold text-text-primary">
+                  2. Equated Monthly Installment (EMI) — Reducing Balance
+                </h3>
+              </div>
+              <a href="/emi-calculator" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
+                Try EMI Calculator →
+              </a>
+            </div>
+
+            <p class="text-xs sm:text-sm text-text-muted leading-relaxed">
+              <strong>Plain-Language Explanation:</strong> In a genuine reducing-balance loan (standard for Indian home, car, and personal loans under RBI guidelines), your interest for month <em>t</em> is calculated solely on the remaining unpaid loan principal, not on the original sanction amount. As principal decreases with each installment, the interest portion of your EMI shrinks while the principal reduction portion grows.
+            </p>
+
+            <div class="p-4 bg-canvas border border-border rounded-control overflow-x-auto text-center" aria-label="EMI Equation">
+              <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-base sm:text-lg text-accent font-semibold py-1">
+                <mi>E</mi>
+                <mo>=</mo>
+                <mfrac>
+                  <mrow>
+                    <mi>P</mi>
+                    <mo>×</mo>
+                    <mi>r</mi>
+                    <mo>×</mo>
+                    <msup>
+                      <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>)</mo></mrow>
+                      <mi>n</mi>
+                    </msup>
+                  </mrow>
+                  <mrow>
+                    <msup>
+                      <mrow><mo>(</mo><mn>1</mn><mo>+</mo><mi>r</mi><mo>)</mo></mrow>
+                      <mi>n</mi>
+                    </msup>
+                    <mo>−</mo>
+                    <mn>1</mn>
+                  </mrow>
+                </mfrac>
+              </math>
+              <span class="sr-only">E = [P * r * (1 + r)^n] / [((1 + r)^n) - 1]</span>
+            </div>
+
+            <details class="text-xs text-text-muted border-t border-border pt-3 cursor-pointer group">
+              <summary class="font-semibold text-text-primary hover:text-accent select-none list-none flex items-center justify-between">
+                <span>View Mathematical Variables &amp; RBI Compliance</span>
+                <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 pl-2">
+                <div><strong class="text-text-primary font-mono">E</strong> = Equated Monthly Installment</div>
+                <div><strong class="text-text-primary font-mono">P</strong> = Loan principal sanction amount</div>
+                <div><strong class="text-text-primary font-mono">r</strong> = Monthly rate = Annual Rate ÷ 12 ÷ 100</div>
+                <div><strong class="text-text-primary font-mono">n</strong> = Total tenure in months (Years × 12)</div>
+              </div>
+            </details>
+          </article>
+
+          <!-- Formula: GST 2.0 -->
+          <article id="gst" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Taxation · Indirect Tax</span>
+                <h3 class="text-base sm:text-lg font-bold text-text-primary">
+                  3. Goods &amp; Services Tax (GST 2.0 Reform)
+                </h3>
+              </div>
+              <a href="/in/gst-calculator" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
+                Try GST Calculator →
+              </a>
+            </div>
+
+            <p class="text-xs sm:text-sm text-text-muted leading-relaxed">
+              <strong>Plain-Language Explanation:</strong> Following the landmark GST Council rate rationalization effective September 2025, India transitioned to a modern 4-slab architecture (0% Nil, 5% Merit, 18% Standard, 40% Luxury/Demerit), phasing out the former 12% and 28% slabs. Calcumetrics calculates forward exclusive tax and reverse inclusive tax extraction with exact split into equal CGST and SGST halves (or IGST for interstate).
+            </p>
+
+            <div class="p-4 bg-canvas border border-border rounded-control overflow-x-auto text-center" aria-label="GST Equations">
+              <div class="space-y-3">
+                <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-sm sm:text-base text-accent font-semibold">
+                  <mtext>Exclusive (Add GST):&#160;</mtext>
+                  <mtext>Tax</mtext>
+                  <mo>=</mo>
+                  <mfrac>
+                    <mrow><mtext>Net Price</mtext><mo>×</mo><mi>R</mi></mrow>
+                    <mn>100</mn>
+                  </mfrac>
+                </math>
+                <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-sm sm:text-base text-accent font-semibold">
+                  <mtext>Inclusive (Extract GST):&#160;</mtext>
+                  <mtext>Tax</mtext>
+                  <mo>=</mo>
+                  <mtext>Gross Price</mtext>
+                  <mo>−</mo>
+                  <mrow><mo>[</mo><mfrac><mrow><mtext>Gross Price</mtext><mo>×</mo><mn>100</mn></mrow><mrow><mn>100</mn><mo>+</mo><mi>R</mi></mrow></mfrac><mo>]</mo></mrow>
+                </math>
+              </div>
+            </div>
+
+            <details class="text-xs text-text-muted border-t border-border pt-3 cursor-pointer group">
+              <summary class="font-semibold text-text-primary hover:text-accent select-none list-none flex items-center justify-between">
+                <span>View GST Slabs &amp; Split Structure</span>
+                <span class="text-accent group-open:rotate-180 transition-transform">▼</span>
+              </summary>
+              <div class="mt-3 space-y-1.5 pl-2">
+                <p>• <strong>Primary Slabs:</strong> 0% (Exempt essentials), 5% (Merit goods/food), 18% (Standard commercial services/goods), 40% (Demerit luxury / vehicles >350cc).</p>
+                <p>• <strong>Intrastate Billing:</strong> CGST = Tax ÷ 2, SGST/UTGST = Tax ÷ 2.</p>
+                <p>• <strong>Interstate Billing:</strong> IGST = 100% of Tax amount.</p>
+              </div>
+            </details>
+          </article>
+
+          <!-- Formula: Income Tax 115BAC -->
+          <article id="income-tax" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Taxation · Direct Tax</span>
+                <h3 class="text-base sm:text-lg font-bold text-text-primary">
+                  4. Indian Income Tax — Section 115BAC New Tax Regime
+                </h3>
+              </div>
+              <a href="/in/income-tax-calculator" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
+                Try Income Tax Calculator →
+              </a>
+            </div>
+
+            <p class="text-xs sm:text-sm text-text-muted leading-relaxed">
+              <strong>Plain-Language Explanation:</strong> Under the statutory New Tax Regime (FY 2025-26 &amp; FY 2026-27), salaried taxpayers receive a ₹75,000 standard deduction. Full rebate under Section 87A is provided up to ₹12 Lakh taxable income. Together, salaried individuals earning up to <strong>₹12.75 Lakh pay ₹0 tax</strong>. If income slightly exceeds ₹12 Lakh, Section 87A marginal relief legally caps your tax liability so you never pay more tax than the excess income earned.
+            </p>
+
+            <div class="p-4 bg-canvas border border-border rounded-control text-xs font-mono space-y-1.5 leading-relaxed overflow-x-auto">
+              <div class="text-accent font-bold">Taxable Income = Gross Salary − ₹75,000 Standard Deduction</div>
+              <div>₹0 – ₹4,00,000: Nil (0%)</div>
+              <div>₹4,00,001 – ₹8,00,000: 5% of amount over ₹4L</div>
+              <div>₹8,00,001 – ₹12,00,000: ₹20,000 + 10% of amount over ₹8L</div>
+              <div>₹12,00,001 – ₹16,00,000: ₹60,000 + 15% of amount over ₹12L</div>
+              <div>₹16,00,001 – ₹20,00,000: ₹1,20,000 + 20% of amount over ₹16L</div>
+              <div>₹20,00,001 – ₹24,00,000: ₹2,00,000 + 25% of amount over ₹20L</div>
+              <div>Above ₹24,00,000: ₹3,00,000 + 30% of amount over ₹24L</div>
+              <div class="text-text-muted pt-1 border-t border-border">Health &amp; Education Cess: 4% on net tax liability after rebate.</div>
+            </div>
+          </article>
+
+          <!-- Formula: CAGR & WACC -->
+          <article id="cagr" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+            <div class="flex items-start justify-between gap-3 flex-wrap">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Corporate Finance &amp; Valuation</span>
+                <h3 class="text-base sm:text-lg font-bold text-text-primary">
+                  5. CAGR &amp; Weighted Average Cost of Capital (WACC)
+                </h3>
+              </div>
+              <div class="flex gap-2 text-xs font-semibold text-accent">
+                <a href="/cagr-calculator" class="hover:underline">CAGR →</a>
+                <span>·</span>
+                <a href="/wacc-calculator" class="hover:underline">WACC →</a>
+              </div>
+            </div>
+
+            <p class="text-xs sm:text-sm text-text-muted leading-relaxed">
+              <strong>CAGR:</strong> The annualized geometric growth rate dampening multi-year market volatility into a smoothed constant annual percentage rate.<br />
+              <strong>WACC:</strong> A company's blended cost of capital across equity and tax-shielded corporate debt, used as the benchmark discount rate for DCF and NPV valuations.
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-center">
+              <div class="p-3 bg-canvas border border-border rounded-control overflow-x-auto">
+                <div class="text-[11px] font-semibold text-text-muted mb-1">CAGR Formula</div>
+                <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-sm text-accent font-semibold py-1">
+                  <mtext>CAGR</mtext>
+                  <mo>=</mo>
+                  <msup>
+                    <mrow><mo>(</mo><mfrac><mi>FV</mi><mi>PV</mi></mfrac><mo>)</mo></mrow>
+                    <mfrac><mn>1</mn><mi>n</mi></mfrac>
+                  </msup>
+                  <mo>−</mo>
+                  <mn>1</mn>
+                </math>
+              </div>
+
+              <div class="p-3 bg-canvas border border-border rounded-control overflow-x-auto">
+                <div class="text-[11px] font-semibold text-text-muted mb-1">WACC Formula</div>
+                <math xmlns="http://www.w3.org/1998/Math/MathML" display="block" class="text-sm text-accent font-semibold py-1">
+                  <mtext>WACC</mtext>
+                  <mo>=</mo>
+                  <mrow><mo>(</mo><mfrac><mi>E</mi><mi>V</mi></mfrac><mo>)</mo></mrow><msub><mi>R</mi><mi>e</mi></msub>
+                  <mo>+</mo>
+                  <mrow><mo>(</mo><mfrac><mi>D</mi><mi>V</mi></mfrac><mo>)</mo></mrow><msub><mi>R</mi><mi>d</mi></msub><mrow><mo>(</mo><mn>1</mn><mo>−</mo><msub><mi>T</mi><mi>c</mi></msub><mo>)</mo></mrow>
+                </math>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- 4. Worked Test Cases Table -->
+        <section id="worked-proofs" class="scroll-mt-24" aria-labelledby="proofs-heading">
+          <h2 id="proofs-heading" class="text-xl font-bold text-text-primary mb-2">
+            Published Test Fixtures &amp; Worked Proofs
+          </h2>
+          <p class="text-sm text-text-muted mb-4 leading-relaxed">
+            Every engine change must validate against these canonical reference fixtures before deployment. You can test each scenario yourself in the live calculator.
+          </p>
+
+          <div class="bg-surface border border-border rounded-card overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-canvas border-b border-border text-text-primary font-bold">
+                    <th class="p-3">Calculator</th>
+                    <th class="p-3">Fixture Input</th>
+                    <th class="p-3">Verified Expected Output</th>
+                    <th class="p-3">Statutory Benchmark</th>
+                    <th class="p-3 text-right">Verification</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border text-text-muted">
+                  <tr class="hover:bg-canvas/50 transition-standard">
+                    <td class="p-3 font-semibold text-text-primary">SIP Annuity-Due</td>
+                    <td class="p-3 font-mono">₹25,000/mo, 12% p.a., 15 yrs</td>
+                    <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹1,26,14,400</td>
+                    <td class="p-3">Invested: ₹45.00L · Gain: ₹81.14L</td>
+                    <td class="p-3 text-right">
+                      <a href="/sip-calculator#p=25000&r=12&y=15" class="text-accent font-semibold hover:underline">
+                        Test Fixture →
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-canvas/50 transition-standard">
+                    <td class="p-3 font-semibold text-text-primary">Reducing-Balance EMI</td>
+                    <td class="p-3 font-mono">₹50,00,000, 8.5% p.a., 20 yrs</td>
+                    <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹43,391/month</td>
+                    <td class="p-3">Total Interest: ₹54,13,879</td>
+                    <td class="p-3 text-right">
+                      <a href="/emi-calculator#p=5000000&r=8.5&y=20" class="text-accent font-semibold hover:underline">
+                        Test Fixture →
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-canvas/50 transition-standard">
+                    <td class="p-3 font-semibold text-text-primary">Income Tax 115BAC</td>
+                    <td class="p-3 font-mono">₹12,75,000 Salaried Gross</td>
+                    <td class="p-3 font-mono font-bold text-emerald-700 dark:text-emerald-400">₹0 Total Tax</td>
+                    <td class="p-3">Standard ded. ₹75k + Sec 87A rebate</td>
+                    <td class="p-3 text-right">
+                      <a href="/in/income-tax-calculator" class="text-accent font-semibold hover:underline">
+                        Test Fixture →
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-canvas/50 transition-standard">
+                    <td class="p-3 font-semibold text-text-primary">GST 2.0 (Demerit)</td>
+                    <td class="p-3 font-mono">₹50,000 base, 40% slab</td>
+                    <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹20,000 GST (₹70k Invoice)</td>
+                    <td class="p-3">CGST: ₹10,000 + SGST: ₹10,000</td>
+                    <td class="p-3 text-right">
+                      <a href="/in/gst-calculator" class="text-accent font-semibold hover:underline">
+                        Test Fixture →
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr class="hover:bg-canvas/50 transition-standard">
+                    <td class="p-3 font-semibold text-text-primary">Fixed Deposit (FD)</td>
+                    <td class="p-3 font-mono">₹1,00,000, 7.0%, 5 yrs (Quarterly)</td>
+                    <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹1,41,478</td>
+                    <td class="p-3">Annualized Yield: 7.186% APY</td>
+                    <td class="p-3 text-right">
+                      <a href="/fd-calculator" class="text-accent font-semibold hover:underline">
+                        Test Fixture →
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          <h3 class="text-sm font-bold text-text-primary mb-1">Engine</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Formula and calculation logic process the inputs in the browser using standard floating-point arithmetic.
-          </p>
-        </div>
+        </section>
 
-        <div class="bg-surface border border-border rounded-card p-5">
-          <div class="inline-flex items-center justify-center w-6 h-6 rounded-chip bg-disabled-bg text-text-muted text-xs font-bold mb-3">
-            3
+        <!-- 5. Why Results Differ from Banks & Platforms -->
+        <section id="discrepancies" class="scroll-mt-24 space-y-4" aria-labelledby="discrepancies-heading">
+          <h2 id="discrepancies-heading" class="text-xl font-bold text-text-primary">
+            Why does my result differ from my bank, Groww, or Zerodha?
+          </h2>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Users frequently ask why different online financial calculators show minor variances on the same inputs. These differences almost always trace to 4 standard methodological causes:
+          </p>
+
+          <div class="space-y-3">
+            <div class="p-4 bg-surface border border-border rounded-card space-y-1.5">
+              <h3 class="text-sm font-bold text-text-primary">1. Compounding Cadence (Quarterly vs Monthly vs Daily)</h3>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Indian commercial banks compound Fixed Deposits on a quarterly schedule (every 90 days), whereas many generic online calculators compound annually or monthly. A 7.0% deposit compounded quarterly yields <strong>7.186% APY</strong>, whereas monthly compounding yields <strong>7.229% APY</strong>. Calcumetrics strictly labels the compounding cadence on every tool.
+              </p>
+            </div>
+
+            <div class="p-4 bg-surface border border-border rounded-card space-y-1.5">
+              <h3 class="text-sm font-bold text-text-primary">2. Annuity-Due (1st of Month) vs Annuity-Immediate (30th of Month)</h3>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Some platforms assume your SIP installment is invested at the <em>end</em> of the month. Because Calcumetrics mirrors actual mutual fund auto-debit behavior (beginning of the month), your capital earns that initial month's compounding, resulting in a slightly higher, more realistic corpus.
+              </p>
+            </div>
+
+            <div class="p-4 bg-surface border border-border rounded-card space-y-1.5">
+              <h3 class="text-sm font-bold text-text-primary">3. Intermediate Rounding Drift in Loan Amortization</h3>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Many banking legacy core systems round each individual month's interest and principal payment to the nearest whole integer. Over a 240-month (20-year) mortgage, these minor cumulative roundings can cause a ₹50 to ₹300 difference in total interest paid. Calcumetrics maintains exact float precision throughout the schedule.
+              </p>
+            </div>
+
+            <div class="p-4 bg-surface border border-border rounded-card space-y-1.5">
+              <h3 class="text-sm font-bold text-text-primary">4. Gross Mathematical Projections vs Net In-Hand Portfolio Value</h3>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Calculators project pure mathematical compounding. Real-world broker statements deduct mutual fund Total Expense Ratios (TER: 0.1% to 1.5%), AMC exit loads (if redeemed within 1 year), and statutory Capital Gains Tax (e.g. 12.5% LTCG on equity gains exceeding ₹1.25 Lakh).
+              </p>
+            </div>
           </div>
-          <h3 class="text-sm font-bold text-text-primary mb-1">Output</h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            The resulting value is rounded to standard currency decimals and presented for immediate interpretation.
+        </section>
+
+        <!-- 6. Honest Limitations & What We Do Not Include -->
+        <section id="limitations" class="scroll-mt-24 space-y-3" aria-labelledby="limitations-heading">
+          <h2 id="limitations-heading" class="text-xl font-bold text-text-primary">
+            Scope &amp; Explicit Limitations
+          </h2>
+          <p class="text-sm text-text-muted leading-relaxed">
+            Transparent software communicates what it does <em>not</em> do as clearly as what it does. Calcumetrics calculators operate under these deliberate boundaries:
+          </p>
+
+          <div class="bg-surface border border-border rounded-card p-5 space-y-2.5 text-xs text-text-muted">
+            <p>• <strong>No Unsolicited Tax or Financial Advice:</strong> Calculations represent mathematical projections based on provided inputs. They do not substitute for customized advice from a qualified Chartered Accountant, SEBI-registered Investment Advisor, or CFP.</p>
+            <p>• <strong>Market Volatility:</strong> Constant CAGR is an analytical modeling heuristic. Real market equities experience sequence-of-returns risk and drawdowns.</p>
+            <p>• <strong>Inflation Adjustment:</strong> Standard calculators display nominal future figures. To evaluate real purchasing power after purchasing-power erosion, use our specialized <a href="/inflation-calculator" class="text-accent underline font-medium">Inflation Calculator</a>.</p>
+            <p>• <strong>Tax Law Changes:</strong> Historical calculation models apply the rules enacted for their respective assessment years. Future Finance Acts may alter tax slabs, surcharge, or exemptions.</p>
+          </div>
+        </section>
+
+        <!-- 7. Official Regulatory Sources -->
+        <section id="sources" class="scroll-mt-24 space-y-4" aria-labelledby="sources-heading">
+          <h2 id="sources-heading" class="text-xl font-bold text-text-primary">
+            Official Regulatory Sources &amp; Legal Provenance
+          </h2>
+          <p class="text-sm text-text-muted leading-relaxed">
+            All statutory rates and mathematical equations are verified against primary regulatory documentation:
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <a
+              href="https://www.incometax.gov.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 bg-surface border border-border rounded-card hover:border-accent hover:shadow-mac-subtle transition-standard group block"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-text-primary group-hover:text-accent">Income Tax Department</span>
+                <span class="text-text-muted text-xs">↗</span>
+              </div>
+              <p class="text-[11px] text-text-muted leading-relaxed">
+                Direct Taxes, Section 115BAC, Standard Deductions, and Section 87A rebate notifications under the Finance Act.
+              </p>
+            </a>
+
+            <a
+              href="https://www.cbic.gov.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 bg-surface border border-border rounded-card hover:border-accent hover:shadow-mac-subtle transition-standard group block"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-text-primary group-hover:text-accent">CBIC &amp; GST Council</span>
+                <span class="text-text-muted text-xs">↗</span>
+              </div>
+              <p class="text-[11px] text-text-muted leading-relaxed">
+                GST 2.0 rate rationalization schedules, HSN rate determinations, and reverse-charge extraction guidelines.
+              </p>
+            </a>
+
+            <a
+              href="https://www.rbi.org.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 bg-surface border border-border rounded-card hover:border-accent hover:shadow-mac-subtle transition-standard group block"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-text-primary group-hover:text-accent">Reserve Bank of India (RBI)</span>
+                <span class="text-text-muted text-xs">↗</span>
+              </div>
+              <p class="text-[11px] text-text-muted leading-relaxed">
+                Master Directions on Interest Rates, reducing balance amortization standards, and bank compounding directives.
+              </p>
+            </a>
+
+            <a
+              href="https://www.indiapost.gov.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="p-4 bg-surface border border-border rounded-card hover:border-accent hover:shadow-mac-subtle transition-standard group block"
+            >
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-text-primary group-hover:text-accent">Department of Posts / Ministry of Finance</span>
+                <span class="text-text-muted text-xs">↗</span>
+              </div>
+              <p class="text-[11px] text-text-muted leading-relaxed">
+                National Savings Schemes, PPF 5th-day rule compounding rules, and quarterly interest rate notifications.
+              </p>
+            </a>
+          </div>
+        </section>
+
+        <!-- 8. Feedback Widget & Reporting CTAs -->
+        <section id="feedback" class="scroll-mt-24 pt-6 border-t border-border space-y-6">
+          <!-- "Was this helpful?" widget -->
+          <div class="p-5 bg-canvas border border-border rounded-card flex items-center justify-between gap-4 flex-wrap">
+            <div>
+              <h3 class="text-sm font-bold text-text-primary">Was this methodology clear and helpful?</h3>
+              <p class="text-xs text-text-muted">Your feedback helps commerce students and developers worldwide.</p>
+            </div>
+            <div class="flex items-center gap-2" id="methodology-feedback-container">
+              <button
+                type="button"
+                id="feedback-yes-btn"
+                class="min-h-[44px] px-4 py-2 rounded-control bg-surface border border-border hover:border-accent text-xs font-semibold text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <span>👍 Yes, very clear</span>
+              </button>
+              <button
+                type="button"
+                id="feedback-no-btn"
+                class="min-h-[44px] px-4 py-2 rounded-control bg-surface border border-border hover:border-accent text-xs font-semibold text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <span>👎 Needs improvement</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Actionable Exit CTAs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-5 bg-surface border border-border rounded-card space-y-2">
+              <h4 class="text-sm font-bold text-text-primary">Found a calculation discrepancy?</h4>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Report the formula, inputs, and observed vs expected results. We investigate and patch discrepancies within 48 hours.
+              </p>
+              <a
+                href="/contact"
+                class="inline-flex items-center min-h-[44px] px-4 py-2 rounded-control bg-accent text-white text-xs font-semibold hover:opacity-90 transition-standard cursor-pointer mt-2"
+              >
+                Report a Discrepancy →
+              </a>
+            </div>
+
+            <div class="p-5 bg-surface border border-border rounded-card space-y-2">
+              <h4 class="text-sm font-bold text-text-primary">Ready to calculate?</h4>
+              <p class="text-xs text-text-muted leading-relaxed">
+                Explore our directory of 50+ financial, loan, tax, and investment tools verified against these principles.
+              </p>
+              <a
+                href="/calculators"
+                class="inline-flex items-center min-h-[44px] px-4 py-2 rounded-control bg-canvas border border-border hover:border-accent text-text-primary hover:text-accent text-xs font-semibold transition-standard cursor-pointer mt-2"
+              >
+                Browse All 50+ Calculators →
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Sticky "On this page" Sidebar (4 cols) -->
+      <aside class="hidden lg:block lg:col-span-4 sticky top-24 space-y-6">
+        <div class="bg-surface border border-border rounded-card p-5 space-y-3.5 shadow-mac-subtle">
+          <div class="flex items-center justify-between border-b border-border pb-2.5">
+            <span class="text-xs font-bold uppercase tracking-wider text-text-primary">On This Page</span>
+            <span class="text-[10px] text-text-muted font-mono">Navigator</span>
+          </div>
+
+          <nav class="space-y-1 text-xs" aria-label="Methodology Table of Contents">
+            <a href="#sandbox" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              1. Live Math Sandbox
+            </a>
+            <a href="#principles" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              2. Core Engineering Standards
+            </a>
+            <a href="#formulas" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              3. Master Formulas &amp; MathML
+            </a>
+            <a href="#sip" class="block py-1 pl-5 pr-2 text-[11px] text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              ↳ SIP (Annuity-Due)
+            </a>
+            <a href="#emi" class="block py-1 pl-5 pr-2 text-[11px] text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              ↳ EMI (Reducing Balance)
+            </a>
+            <a href="#gst" class="block py-1 pl-5 pr-2 text-[11px] text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              ↳ GST 2.0 Slabs
+            </a>
+            <a href="#income-tax" class="block py-1 pl-5 pr-2 text-[11px] text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              ↳ Income Tax (115BAC)
+            </a>
+            <a href="#worked-proofs" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              4. Worked Reference Fixtures
+            </a>
+            <a href="#discrepancies" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              5. Why Results Differ
+            </a>
+            <a href="#limitations" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              6. Scope &amp; Limitations
+            </a>
+            <a href="#sources" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              7. Official Regulatory Sources
+            </a>
+            <a href="#feedback" class="block py-1 px-2 rounded text-text-muted hover:text-accent hover:bg-canvas transition-standard toc-link">
+              8. Feedback &amp; Error Reporting
+            </a>
+          </nav>
+        </div>
+
+        <!-- Trust badge card -->
+        <div class="p-4 bg-canvas border border-border rounded-card text-xs text-text-muted space-y-2">
+          <div class="font-bold text-text-primary flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-accent"></span>
+            Independent Operator Guarantee
+          </div>
+          <p class="leading-relaxed text-[11px]">
+            Calcumetrics has no financial stake in whether you borrow, save, or invest. We do not sell leads or collect user phone numbers.
           </p>
         </div>
-      </div>
-    </section>
+      </aside>
 
-    <!-- 4. Engineering Standards Grid -->
-    <section class="mb-12" aria-labelledby="standards-heading">
-      <h2 id="standards-heading" class="text-xl font-bold text-text-primary mb-4">
-        Engineering standards
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center justify-between">
-            <span>IEEE 754</span>
-            <span class="text-[10px] font-mono font-normal text-text-muted px-2 py-0.5 rounded-chip bg-disabled-bg border border-border">64-bit float</span>
-          </h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Internal calculations preserve normal floating-point precision and values are rounded for display.
-          </p>
-        </div>
-
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center justify-between">
-            <span>Zero Scripts</span>
-            <span class="text-[10px] font-mono font-normal text-text-muted px-2 py-0.5 rounded-chip bg-disabled-bg border border-border">100% local</span>
-          </h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            No remote calculation service is required; calculations execute in the browser.
-          </p>
-        </div>
-
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center justify-between">
-            <span>Immutable Formulas</span>
-            <span class="text-[10px] font-mono font-normal text-text-muted px-2 py-0.5 rounded-chip bg-disabled-bg border border-border">Documented</span>
-          </h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Calculator formulas are explicitly documented and should not change silently.
-          </p>
-        </div>
-
-        <div class="bg-surface border border-border rounded-card p-5">
-          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center justify-between">
-            <span>Annual Statutory Review</span>
-            <span class="text-[10px] font-mono font-normal text-text-muted px-2 py-0.5 rounded-chip bg-disabled-bg border border-border">Versioned</span>
-          </h3>
-          <p class="text-xs text-text-muted leading-relaxed">
-            Tax/regulatory data is reviewed and carries a visible verification date.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5-10. Preserved Methodology Documentation Content -->
-    <div class="space-y-8 pt-4 border-t border-border">
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Formulas and conventions</h2>
-        <div class="bg-surface border border-border rounded-card p-5 space-y-3 text-sm text-text-muted break-words">
-          <p><strong class="text-text-primary">SIP (annuity-due):</strong> M = P × [((1 + i)^n − 1) / i] × (1 + i). Contribution at start of month. i = r/12/100.</p>
-          <p><strong class="text-text-primary">EMI:</strong> E = P × r × (1+r)^n / ((1+r)^n − 1). Internal computation uses unrounded EMI. r = annual rate / 12 / 100.</p>
-          <p><strong class="text-text-primary">Compound interest:</strong> A = P × (1 + r/n)^(n×t). Nominal rate, specified compounding frequency.</p>
-          <p><strong class="text-text-primary">CAGR:</strong> CAGR = (FV/PV)^(1/n) − 1.</p>
-          <p><strong class="text-text-primary">WACC:</strong> WACC = (E/V) × Re + (D/V) × Rd × (1 − Tc).</p>
-          <p><strong class="text-text-primary">IRR/XIRR:</strong> Newton-Raphson numerical iteration. Requires at least one sign change in cash flows.</p>
-          <p><strong class="text-text-primary">NPV:</strong> NPV = Σ CF_t / (1+r)^t from t=0 to n.</p>
-        </div>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Interest rate conventions</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          All calculators use nominal annual rates unless labelled otherwise. We do not use effective annual rate (EAR) unless explicitly stated. This matches the convention of Indian mutual fund platforms, banks, and most retail financial products.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Jurisdiction-locked calculators</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Calculators bound to regional tax statutes or legal frameworks (such as Indian Income Tax under Section 115BAC, HRA exemptions, Capital Gains Tax, GST, TDS, and the US 401(k) calculator) are strictly jurisdiction-locked. They always execute using their designated statutory currency (₹ INR for India-specific tools, $ USD for US 401(k)) and apply local statutory rules directly. They cannot be converted to other jurisdictions or currencies because tax codes and retirement regulations cannot be translated simply via exchange rates.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Display currency formatting vs. foreign exchange</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          For universal financial calculators (e.g. CAGR, NPV, IRR, EMI, Loan Amortization, DCF), Calcumetrics allows users to select their preferred display currency symbol ($, €, £, ₹). This control affects <em>display formatting and symbol presentation only</em>. It does <strong>not</strong> perform real-time currency conversion or modify numerical input/output amounts. Calcumetrics is not a foreign exchange service.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Tax and regulatory data</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Tax rates (GST slabs, PPF rates) are stored in a data file with a <strong>verifiedOn</strong> date and a link to the official source. We re-verify rates on a schedule. The <strong>verifiedOn</strong> date is displayed on each tax tool. Rates change; always verify against official government sources before making decisions.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Rounding</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          All internal computations use full floating-point precision. Values are rounded only when displayed to the user. This prevents accumulated rounding errors in multi-step calculations such as loan amortization.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Limitations</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Calculators assume constant rates for the entire period. Actual market returns, interest rates, and tax laws change. All results are estimates for information and planning purposes only. They are not financial, tax, or legal advice.
-        </p>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-text-primary mb-3">Correction policy</h2>
-        <p class="text-sm text-text-muted leading-relaxed">
-          If you find a calculation error, <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">contact us</a> with the input values and the discrepancy. We verify reported errors against published test fixtures and correct them promptly. The visible &ldquo;Last updated&rdquo; date changes only when logic, rates, or copy actually change.
-        </p>
-      </section>
     </div>
   </div>
 </Layout>
 
 <script>
-  function initMethodologyDemo() {
+  import { animateValue } from '../lib/animate-number';
+
+  function initMethodologySandbox() {
     const pInput = document.getElementById('demo-principal') as HTMLInputElement | null;
     const rInput = document.getElementById('demo-rate') as HTMLInputElement | null;
     const pVal = document.getElementById('demo-principal-val');
@@ -302,33 +854,91 @@ const jsonld = {
     const outputResult = document.getElementById('demo-output-result');
     const outputGain = document.getElementById('demo-output-gain');
 
-    if (!pInput || !rInput || !pVal || !rVal || !engineCalc || !outputResult || !outputGain) return;
+    if (!pInput || !rInput) return;
+
+    function formatIndianRupee(num: number): string {
+      return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(num));
+    }
 
     function updateValues() {
-      if (!pInput || !rInput || !pVal || !rVal || !engineCalc || !outputResult || !outputGain) return;
-      const P = parseFloat(pInput.value) || 5000;
-      const rPercent = parseFloat(rInput.value) || 7;
+      if (!pInput || !rInput) return;
+      const P = parseFloat(pInput.value) || 500000;
+      const rPercent = parseFloat(rInput.value) || 7.5;
       const t = 5;
       const r = rPercent / 100;
 
-      pVal.textContent = `$${P.toLocaleString()}`;
-      rVal.textContent = `${rPercent.toFixed(1)}%`;
-      engineCalc.textContent = `${P} × (1 + ${(r).toFixed(3)})^${t}`;
+      if (pVal) pVal.textContent = formatIndianRupee(P);
+      if (rVal) rVal.textContent = `${rPercent.toFixed(2)}%`;
+      if (engineCalc) {
+        engineCalc.textContent = `${P.toLocaleString('en-IN')} × (1 + ${(r).toFixed(3)})^${t}`;
+      }
 
       const A = P * Math.pow(1 + r, t);
       const gain = A - P;
 
-      outputResult.textContent = `$${A.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      outputGain.textContent = `+ $${gain.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} gain`;
+      const formattedCorpus = formatIndianRupee(A);
+      const formattedGain = `+ ${formatIndianRupee(gain)} wealth gain`;
+
+      if (outputResult) animateValue(outputResult, formattedCorpus, { duration: 150 });
+      if (outputGain) animateValue(outputGain, formattedGain, { duration: 150 });
     }
 
     pInput.addEventListener('input', updateValues);
     rInput.addEventListener('input', updateValues);
+
+    // Initial run
+    updateValues();
+
+    // Feedback widget handlers
+    const yesBtn = document.getElementById('feedback-yes-btn');
+    const noBtn = document.getElementById('feedback-no-btn');
+    const feedbackBox = document.getElementById('methodology-feedback-container');
+
+    const handleFeedback = (response: string) => {
+      if (!feedbackBox) return;
+      feedbackBox.innerHTML = `
+        <div class="px-3 py-2 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 rounded-control text-xs font-semibold flex items-center gap-1.5">
+          <span>✓ Thank you for your feedback!</span>
+        </div>
+      `;
+      if ((window as any).__cmShowToast) {
+        (window as any).__cmShowToast('Feedback recorded. Thank you!');
+      }
+    };
+
+    yesBtn?.addEventListener('click', () => handleFeedback('yes'));
+    noBtn?.addEventListener('click', () => handleFeedback('no'));
+
+    // IntersectionObserver for Table of Contents active highlight
+    const tocLinks = document.querySelectorAll<HTMLAnchorElement>('.toc-link');
+    const observedSections = document.querySelectorAll('section[id], article[id]');
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute('id');
+            if (id) {
+              tocLinks.forEach((link) => {
+                const href = link.getAttribute('href');
+                if (href === `#${id}`) {
+                  link.classList.add('text-accent', 'font-bold', 'bg-canvas');
+                  link.classList.remove('text-text-muted');
+                } else {
+                  link.classList.remove('text-accent', 'font-bold', 'bg-canvas');
+                  link.classList.add('text-text-muted');
+                }
+              });
+            }
+          }
+        });
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    );
+
+    observedSections.forEach((sec) => observer.observe(sec));
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMethodologyDemo);
-  } else {
-    initMethodologyDemo();
-  }
+  initMethodologySandbox();
+  document.addEventListener('astro:page-load', initMethodologySandbox);
 </script>

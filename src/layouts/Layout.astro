@@ -1,6 +1,8 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Toast from '../components/ui/Toast.astro';
+import MobileDock from '../components/ui/MobileDock.astro';
 import '../styles/global.css';
 
 interface Props {
@@ -13,6 +15,7 @@ interface Props {
   /** OG image path or full URL. Defaults to '/og/default.png' */
   ogImage?: string;
   ogImageAlt?: string;
+  slimFooter?: boolean;
 }
 
 const {
@@ -23,6 +26,7 @@ const {
   ogType = 'website',
   ogImage,
   ogImageAlt,
+  slimFooter = false,
 } = Astro.props;
 
 const domain = 'https://calcumetrics.com';
@@ -108,9 +112,11 @@ const resolvedOgAlt = ogImageAlt || title;
   </head>
   <body class="font-sans min-h-screen flex flex-col bg-canvas text-text-primary antialiased">
     <Header currentPath={currentPath} />
-    <main class="flex-1 w-full">
+    <main class="flex-1 w-full pb-16 lg:pb-0">
       <slot />
     </main>
-    <Footer />
+    <Footer slim={slimFooter} />
+    <MobileDock currentPath={currentPath} />
+    <Toast />
   </body>
 </html>

@@ -26,7 +26,7 @@
  * Standard GST slabs per CGST Act, 2017 and subsequent CBIC notifications.
  * Rates last verified: September 2026 (source: cbic.gov.in).
  */
-export type GSTRate = 0 | 5 | 12 | 18 | 28;
+export type GSTRate = 0 | 5 | 12 | 18 | 28 | 40;
 
 export interface GSTResult {
   baseAmount: number;

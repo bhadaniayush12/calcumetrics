@@ -1,9 +1,9 @@
 {
   "gst": {
-    "slabs": [0, 5, 12, 18, 28],
-    "verifiedOn": "2026-09-20",
+    "slabs": [0, 5, 18, 40, 12, 28],
+    "verifiedOn": "2026-09-24",
     "source": "https://www.cbic.gov.in/htdocs-cbec/gst/gst-rates.pdf",
-    "note": "India adopted 5%/18% as primary slabs in Sept 2025 GST Council revision. 12% and 28% slabs remain; verify current applicability before advising clients."
+    "note": "GST 2.0 reform rationalized slabs into 0% (exempt), 5% (merit/essentials), 18% (standard), and 40% (luxury/sin). 12% and 28% remain supported as legacy slabs for past invoices."
   },
   "ppf": {
     "rate": 7.1,

@@ -35,6 +35,9 @@ export interface BlogPost {
   dateModified: string; // ISO 8601 (YYYY-MM-DD)
   readTime: string; // e.g. '7 min read'
   author: string;
+  reviewer?: string;
+  quickAnswer?: string;
+  isFeatured?: boolean;
   type: 'Evergreen' | 'Trending' | 'Hybrid';
   summary: string;
   sources?: BlogSource[];

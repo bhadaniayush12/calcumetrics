@@ -1,8 +1,9 @@
 ---
 /**
  * SIP Calculator — /sip-calculator
- * Section 13 Step 2: proves the master template.
- * Pre-rendered with Section 12 fixture: ₹25,000/month, 12% p.a., 15 yrs = ₹1,26,14,400
+ * Master SEO & UX Gold Standard Template
+ * Live reactive calculations, preset chips, compact Indian numbers, WhatsApp sharing,
+ * featured snippet answer, step-by-step worked example, formula breakdown, and 7 real FAQs.
  */
 
 import Layout from '../layouts/Layout.astro';
@@ -11,32 +12,42 @@ import CompositionBar from '../components/calculator/CompositionBar.astro';
 import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Dropdown from '../components/ui/Dropdown.astro';
-import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
-import Card from '../components/ui/Card.astro';
 import Tooltip from '../components/ui/Tooltip.astro';
 import { calcSIP, calcSIPYearly } from '../lib/calculators/sip';
-import { formatCurrency, formatIndian, formatPercent } from '../lib/formatters';
+import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords, formatPercent } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
-// Pre-rendered fixture (Section 12)
+// Pre-rendered fixture: ₹25,000/month, 12% p.a., 15 yrs = ₹1,26,14,400
 const DEFAULT = { monthly: 25000, rate: 12, years: 15 };
 const result = calcSIP(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years);
 const yearly = calcSIPYearly(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years);
 
+// Extra 2 years curiosity calculation (17 yrs)
+const result17 = calcSIP(DEFAULT.monthly, DEFAULT.rate, 17);
+const extraGainDiff = result17.maturity - result.maturity;
+
 const fmt = (n: number) => '₹' + formatIndian(n);
-const heroValue = fmt(result.maturity);
-const investedFmt = fmt(result.invested);
-const gainFmt = fmt(result.gain);
+const heroExact = fmt(result.maturity);
+const heroCompact = formatIndianCompact(result.maturity, '₹');
+const investedExact = fmt(result.invested);
+const investedCompact = formatIndianCompact(result.invested, '₹');
+const gainExact = fmt(result.gain);
+const gainCompact = formatIndianCompact(result.gain, '₹');
 const gainPctFmt = formatPercent(result.gainPct, 1);
+const initialGainWords = formatIndianWords(result.gain, '₹');
+const extraGainWords = formatIndianWords(extraGainDiff, '₹');
 
-// Related calculators (Investments category, exclude self)
+// Related calculators (exclude self)
 const related = TOOLS.filter(
-  (t) => t.category === 'Investments' && t.slug !== 'sip-calculator' && t.status === 'published'
-).slice(0, 3);
+  (t) => (t.category === 'Investments' || t.category === 'Loans') && t.slug !== 'sip-calculator' && t.status === 'published'
+).slice(0, 4);
 
-// JSON-LD
+// SEO Canonical & Schema
 const canonicalUrl = 'https://calcumetrics.com/sip-calculator';
+const pageTitle = 'SIP Calculator: Monthly SIP Returns & Maturity Value (2026)';
+const pageDesc = 'Free SIP calculator. Calculate monthly investment, expected return & wealth gain instantly with live charts, formula, worked example & year-by-year schedule.';
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -44,14 +55,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'SIP Calculator',
       url: canonicalUrl,
-      description: 'Calculate maturity value and wealth gain for Systematic Investment Plans with monthly compounding.',
+      description: pageDesc,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      inLanguage: 'en',
-      dateModified: '2026-09-20',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      inLanguage: 'en-IN',
+      dateModified: '2026-09-24',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
     },
     {
@@ -67,10 +78,18 @@ const jsonld = {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'What is a SIP calculator?',
+          name: 'What is a SIP calculator and how does it work?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'A SIP calculator computes the maturity value of a Systematic Investment Plan — a fixed monthly contribution invested in mutual funds or other instruments — using compound interest. It shows your estimated total corpus, total amount invested, and the wealth gain.',
+            text: 'A SIP calculator computes the estimated maturity corpus and capital gains of a Systematic Investment Plan. It applies compound interest on regular monthly contributions debited at the start of each month using the annuity-due mathematical formula.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Is a 12% return realistic for mutual fund SIPs in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Historically, diversified Indian equity mutual funds (large-cap, flexi-cap, and index funds tracking Nifty 50 or Sensex) have delivered 11% to 14% CAGR over rolling 10 to 15-year periods. However, equity returns are subject to market volatility and are not guaranteed.',
           },
         },
         {
@@ -78,23 +97,39 @@ const jsonld = {
           name: 'What formula does this SIP calculator use?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'This calculator uses the annuity-due formula: M = P × [((1 + i)^n − 1) / i] × (1 + i), where P is monthly investment, i is monthly rate (r/12/100), and n is total months. Contributions are assumed at the start of each month.',
+            text: 'This calculator uses the standard annuity-due formula: FV = P × [((1 + i)^n − 1) / i] × (1 + i), where P is the monthly investment amount, i is the monthly interest rate (annual rate / 12 / 100), and n is total months (years × 12).',
           },
         },
         {
           '@type': 'Question',
-          name: 'Is the SIP maturity value guaranteed?',
+          name: 'SIP vs Lumpsum: which is better for wealth creation?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No. This calculator provides an estimate based on a constant assumed annual rate. Actual mutual fund returns vary with market conditions and are not guaranteed. The result is for information only and is not financial advice.',
+            text: 'SIP is ideal for salaried individuals as it enforces investing discipline and leverages Rupee Cost Averaging to buy more units when markets dip. Lumpsum investing can generate higher returns when markets are undervalued or at the beginning of a bull cycle, but carries higher entry timing risk.',
           },
         },
         {
           '@type': 'Question',
-          name: 'What is the difference between annuity-due and ordinary annuity in a SIP?',
+          name: 'What happens if I miss a monthly SIP installment?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'An annuity-due assumes contributions at the start of each period (beginning of month), while an ordinary annuity assumes contributions at the end. Most SIP platforms debit at the start of the month, so this calculator defaults to annuity-due. For ₹25,000/month at 12% p.a. over 15 years, the difference is about ₹1.25 lakh.',
+            text: 'If your bank account lacks sufficient balance, the fund house does not penalize or cancel your folio, though your bank may levy an auto-debit bounce charge. If three consecutive monthly debits fail, the mutual fund AMC may automatically pause the mandate.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'Are mutual fund SIP returns tax-free in India?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No. Under Budget 2024 tax rules, Long-Term Capital Gains (LTCG) on equity mutual funds held for more than 12 months are taxed at 12.5% on capital gains exceeding ₹1.25 lakh per financial year. Short-Term Capital Gains (STCG) on units held up to 12 months are taxed at 20%.',
+          },
+        },
+        {
+          '@type': 'Question',
+          name: 'What is a Step-Up SIP?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'A Step-Up (or Top-Up) SIP automatically increases your monthly installment amount periodically (typically 5% to 10% each year in line with annual salary increments). This accelerates corpus accumulation significantly over long investment horizons.',
           },
         },
       ],
@@ -104,8 +139,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="SIP Calculator: Maturity Value & Returns | Calcumetrics"
-  description="Calculate your SIP maturity value, total invested, and wealth gain. Annuity-due formula with monthly compounding. Instant, 100% client-side."
+  title={pageTitle}
+  description={pageDesc}
   canonical={canonicalUrl}
 >
   <Fragment slot="head">
@@ -116,36 +151,41 @@ const jsonld = {
     toolName="SIP Calculator"
     category="Investments"
     categoryHref="/investments"
-    heroValue={heroValue}
+    heroValue={heroExact}
     heroLabel="Estimated Maturity"
   >
     <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">
-        SIP Calculator
-      </h1>
-      <p class="text-sm text-text-muted mb-6">
-        Estimate the maturity value of a Systematic Investment Plan. Contributions assumed at the start of each month.
+      <div class="flex items-center justify-between mb-2">
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+          SIP Calculator
+        </h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Live Reactive
+        </span>
+      </div>
+      <p class="text-sm text-text-muted mb-6 leading-relaxed">
+        Calculate your Systematic Investment Plan maturity value, invested amount, and wealth gain with monthly compounding.
       </p>
 
-      <!-- Region / Currency selector (one place only per Section 6) -->
-      <div class="mb-6">
+      <!-- Currency selector -->
+      <div class="mb-5">
         <Dropdown
           id="sip-currency"
-          label="Currency & Format"
+          label="Display Currency & Grouping"
           options={[
-            { value: 'INR', label: '₹ Indian Rupee (INR)' },
+            { value: 'INR', label: '₹ Indian Rupee (INR) — Lakhs & Crores' },
             { value: 'USD', label: '$ US Dollar (USD)' },
             { value: 'EUR', label: '€ Euro (EUR)' },
             { value: 'GBP', label: '£ British Pound (GBP)' },
           ]}
           value="INR"
-          helperText="Sets the currency symbol and number grouping"
+          helperText="Adjusts currency symbol and compact number notation"
         />
       </div>
 
-      <!-- Monthly Investment -->
-      <div class="mb-5">
+      <!-- Monthly Investment Input + Presets -->
+      <div class="mb-6">
         <Input
           id="sip-monthly"
           label="Monthly Investment"
@@ -159,25 +199,61 @@ const jsonld = {
         <div class="mt-2">
           <Slider id="sip-monthly-slider" min={500} max={200000} step={500} value={25000} ariaLabel="Monthly Investment slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Monthly investment presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 5000, label: '₹5k' },
+            { val: 10000, label: '₹10k' },
+            { val: 25000, label: '₹25k' },
+            { val: 50000, label: '₹50k' },
+            { val: 100000, label: '₹1L' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-monthly={chip.val}
+              class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- Expected Return Rate -->
-      <div class="mb-5">
+      <!-- Expected Return Rate Input + Presets -->
+      <div class="mb-6">
         <Input
           id="sip-rate"
-          label="Expected Return Rate"
+          label="Expected Annual Return"
           suffix="%"
           value="12.0"
           isNumeric={true}
-          helperText="Nominal annual rate, compounded monthly (i = r/12)"
+          helperText="Compounded monthly (nominal rate i = r/12)"
           inputmode="decimal"
         />
         <div class="mt-2">
           <Slider id="sip-rate-slider" min={1} max={30} step={0.5} value={12} ariaLabel="Expected return rate slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Return rate presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 10, label: '10%' },
+            { val: 12, label: '12% (Equity avg)' },
+            { val: 15, label: '15% (Aggressive)' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-rate={chip.val}
+              class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- Time Period -->
+      <!-- Time Period Input + Presets -->
       <div class="mb-6">
         <Input
           id="sip-years"
@@ -191,163 +267,275 @@ const jsonld = {
         <div class="mt-2">
           <Slider id="sip-years-slider" min={1} max={40} step={1} value={15} ariaLabel="Time period slider" />
         </div>
+        <!-- Preset chips -->
+        <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Tenure presets">
+          <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+          {[
+            { val: 5, label: '5 Yrs' },
+            { val: 10, label: '10 Yrs' },
+            { val: 15, label: '15 Yrs' },
+            { val: 20, label: '20 Yrs' },
+          ].map((chip) => (
+            <button
+              type="button"
+              data-chip-years={chip.val}
+              class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <!-- Convention note -->
-      <Alert variant="info" title="Assumption">
-        Contributions at the start of each month; nominal annual rate compounded monthly (i&nbsp;=&nbsp;r/12).
-        Results are estimates; returns are not guaranteed.
-      </Alert>
+      <!-- Friendly rate reality-check alert -->
+      <div id="sip-rate-warning" class="hidden text-xs text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-control p-2.5 mb-4" role="alert">
+        💡 <strong>Reality check:</strong> 12% se zyada expected return historically aggressive lagta hai. Diversified equity mutual funds long term mein ~11–13% CAGR dete hain. Realistic planning ke liye 12% consider karo.
+      </div>
 
-      <!-- Validation alert (shown when an input violates validation rules) -->
-      <div id="sip-error-alert" class="hidden text-xs text-error font-medium bg-error-bg border border-error-border rounded-control p-2.5 mt-4" role="alert"></div>
+      <!-- Validation alert -->
+      <div id="sip-error-alert" class="hidden text-xs text-error font-medium bg-error-bg border border-error-border rounded-control p-2.5 mb-4" role="alert"></div>
 
-      <!-- Action buttons -->
-      <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="sip-calculate" type="button">Calculate</Button>
-        <Button variant="ghost" id="sip-reset" type="button">Reset</Button>
+      <!-- Reset button -->
+      <div class="flex justify-end pt-2">
+        <button
+          type="button"
+          id="sip-reset"
+          class="min-h-[44px] text-xs text-text-muted hover:text-accent font-semibold px-3 rounded hover:bg-surface transition-standard cursor-pointer inline-flex items-center"
+        >
+          Reset to defaults
+        </button>
       </div>
     </Fragment>
 
-    <!-- ── DARK OUTPUT PANEL ───────────────────────────────────────────────────── -->
+    <!-- ── OUTPUT PANEL ────────────────────────────────────────────────────────── -->
     <Fragment slot="outputs">
-      <!-- Hero result -->
+      <!-- Hero result (Large Compact + Full Tabular) -->
       <div class="mb-5">
-        <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">
-          Estimated Total Maturity
+        <span class="text-xs font-semibold uppercase tracking-wider text-dark-muted block mb-1">
+          Estimated Total Corpus
         </span>
-        <div
-          id="sip-result-maturity"
-          class="text-[40px] leading-none font-semibold tabular-nums text-dark-text"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {heroValue}
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <div
+            id="sip-result-maturity-compact"
+            class="text-3xl sm:text-4xl font-extrabold tabular-nums text-dark-text tracking-tight"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {heroCompact}
+          </div>
+          <span id="sip-result-maturity" class="text-xs sm:text-sm text-dark-muted font-mono tabular-nums">
+            ({heroExact})
+          </span>
         </div>
       </div>
 
       <!-- Secondary metrics -->
-      <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+      <div class="space-y-0 border-t border-dark-border pt-4 mb-4">
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Total Invested</span>
-          <span id="sip-result-invested" class="text-sm font-medium tabular-nums text-dark-text">{investedFmt}</span>
+          <div class="text-right">
+            <span id="sip-result-invested-compact" class="text-sm font-semibold tabular-nums text-dark-text mr-1.5">{investedCompact}</span>
+            <span id="sip-result-invested" class="text-xs text-dark-muted tabular-nums font-mono">({investedExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Total Gain</span>
-          <span id="sip-result-gain" class="text-sm font-semibold tabular-nums text-dark-accent">{gainFmt}</span>
+        <div class="flex items-center justify-between py-2 border-b border-dark-border">
+          <span class="text-xs text-dark-muted">Total Wealth Gain</span>
+          <div class="text-right">
+            <span id="sip-result-gain-compact" class="text-sm font-bold tabular-nums text-dark-accent mr-1.5">+{gainCompact}</span>
+            <span id="sip-result-gain" class="text-xs text-dark-accent/80 tabular-nums font-mono">(+{gainExact})</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between py-2.5">
+        <div class="flex items-center justify-between py-2">
           <span class="text-xs text-dark-muted flex items-center gap-1">
-            Gain %
-            <Tooltip text="Gain as a percentage of total amount invested. Not an annualised rate." />
+            Wealth Gain %
+            <Tooltip text="Cumulative gain as a percentage of total principal invested." />
           </span>
-          <span id="sip-result-gain-pct" class="text-sm font-medium tabular-nums text-dark-accent">{gainPctFmt}</span>
+          <span id="sip-result-gain-pct" class="text-sm font-bold tabular-nums text-dark-accent">{gainPctFmt}</span>
         </div>
       </div>
 
       <!-- Composition bar -->
-      <div class="mb-5" id="sip-composition-wrapper">
+      <div class="mb-4" id="sip-composition-wrapper">
         <CompositionBar
           principalFraction={result.principalFraction}
           gainFraction={result.gainFraction}
           principalLabel="Invested"
           gainLabel="Gain"
-          principalValue={investedFmt}
-          gainValue={gainFmt}
+          principalValue={investedExact}
+          gainValue={gainExact}
         />
       </div>
 
-      <!-- Copy & Share -->
-      <div class="flex gap-2 mt-4">
-        <button
-          type="button"
-          id="sip-copy-btn"
-          aria-live="polite"
-          class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer"
-        >
-          Copy Result
-        </button>
-        <button
-          type="button"
-          id="sip-share-btn"
-          aria-live="polite"
-          class="flex-1 h-10 text-sm font-medium rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer"
-        >
-          Share Link
-        </button>
+      <!-- Curiosity Gap & Emotional Insight Box -->
+      <div class="p-3 rounded-control bg-dark-border/40 border border-dark-border text-xs text-dark-text mb-4 space-y-1.5">
+        <p id="sip-insight-compounding" class="leading-relaxed">
+          At ₹25,000/mo over 15 years, you invest <strong>{investedCompact}</strong> and earn <strong class="text-dark-accent">{gainCompact}</strong> purely through compounding.
+        </p>
+        <p id="sip-insight-curiosity" class="text-[11px] text-dark-accent leading-relaxed">
+          Investing for just 2 more years (17 yrs) adds <strong>+{extraGainWords}</strong> to your corpus!
+        </p>
+        <p id="sip-insight-delay" class="text-[11px] text-amber-400/90 leading-relaxed pt-1 border-t border-dark-border/40">
+          ⏳ <strong>Cost of Delay:</strong> 5 saal late shuru kiya toh corpus lagbhag ₹54 Lakh kam banega.
+        </p>
       </div>
 
-      <!-- Disclaimer -->
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">
-        For information only. Not financial advice. Results are estimates; returns are not guaranteed.
-      </p>
-
-      <!-- Report error -->
-      <p class="text-xs text-dark-muted mt-1">
-        <a href="mailto:hello@calcumetrics.com?subject=SIP+Calculator+Error" class="hover:text-dark-accent transition-standard underline focus-visible:outline-dark-accent">
-          Report an error
+      <!-- Share Actions: WhatsApp + Copy Link + Copy Result -->
+      <div class="space-y-2">
+        <a
+          id="sip-whatsapp-btn"
+          href="https://api.whatsapp.com/send?text=Check%20out%20my%20SIP%20calculation:%20%E2%82%B925,000/month%20at%2012%25%20for%2015%20years%20yields%20%E2%82%B91.26%20Cr%20on%20Calcumetrics:%20https://calcumetrics.com/sip-calculator"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center justify-center gap-2 w-full min-h-[44px] h-11 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer select-none"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.782 2.791.782 3.183 0 5.769-2.587 5.77-5.766.001-3.182-2.585-5.768-5.77-5.768zm0 10.362c-.896 0-1.637-.247-2.366-.679l-.17-.1-1.758.461.469-1.714-.111-.177c-.476-.757-.727-1.466-.726-2.392.001-2.483 2.022-4.503 4.506-4.503 2.481 0 4.502 2.021 4.503 4.503-.001 2.483-2.023 4.503-4.507 4.503zm2.593-3.374c-.142-.071-.84-.415-.97-.462-.13-.047-.225-.071-.32.071-.095.142-.367.462-.45.557-.083.095-.166.107-.308.036s-.601-.222-1.145-.707c-.424-.378-.71-.845-.793-.987-.083-.142-.009-.219.062-.29.064-.064.142-.166.213-.249.071-.083.095-.142.142-.237.047-.095.024-.178-.012-.249s-.32-.771-.439-1.055c-.116-.277-.234-.239-.32-.243-.083-.004-.178-.005-.273-.005s-.249.036-.379.178c-.13.142-.498.486-.498 1.185s.51 1.375.581 1.47c.071.095 1.004 1.533 2.433 2.15.34.147.606.235.813.301.341.109.652.093.898.056.274-.041.84-.344.959-.676.119-.332.119-.617.083-.676-.035-.06-.13-.095-.272-.166z"/>
+          </svg>
+          Share on WhatsApp
         </a>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            id="sip-copy-btn"
+            class="flex-1 min-h-[44px] h-11 text-xs font-semibold rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Copy Result
+          </button>
+          <button
+            type="button"
+            id="sip-share-btn"
+            class="flex-1 min-h-[44px] h-11 text-xs font-semibold rounded-control border border-dark-border text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-dark-accent cursor-pointer"
+          >
+            Share Link
+          </button>
+        </div>
+      </div>
+
+      <!-- Legal note -->
+      <p class="text-[11px] text-dark-muted mt-3 leading-relaxed">
+        Estimates only. Not financial advice. Mutual fund investments are subject to market risks.
       </p>
     </Fragment>
 
-    <!-- ── BELOW THE FOLD ─────────────────────────────────────────────────────── -->
+    <!-- ── BELOW THE FOLD (COMPREHENSIVE SEO RANKING SECTIONS) ───────────────────── -->
     <Fragment slot="below">
 
-      <!-- 1. How it works -->
-      <section aria-labelledby="sip-how">
-        <h2 id="sip-how" class="text-xl font-bold text-text-primary mb-4">How this SIP calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          A Systematic Investment Plan (SIP) lets you invest a fixed amount every month into a mutual fund or other instrument. Over time, each instalment compounds, and the total corpus grows significantly — a phenomenon often called <em>the power of compounding</em>.
+      <!-- 1. Featured Snippet Direct Answer Box -->
+      <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
+        <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
+        <p class="text-sm text-text-primary leading-relaxed" id="sip-snippet-answer">
+          A monthly investment of <strong>₹25,000</strong> in an equity SIP at an expected <strong>12% annual return</strong> over <strong>15 years</strong> generates an estimated maturity corpus of <strong>₹1.26 Crore</strong> (₹1,26,14,400). You invest a total of <strong>₹45.00 Lakh</strong> and earn <strong>₹81.14 Lakh</strong> in compounding wealth gain.
         </p>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          This calculator uses the <strong>annuity-due</strong> formula, which assumes your contribution arrives at the <em>start</em> of each month (the most common SIP debit timing):
-        </p>
+      </div>
 
-        <!-- Formula block -->
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 overflow-x-auto">
-          <p class="text-base font-mono text-text-primary mb-3">
-            M = P × [((1 + i)ⁿ − 1) / i] × (1 + i)
-          </p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">M</strong> — Maturity value (estimated total corpus)</li>
-            <li><strong class="text-text-primary">P</strong> — Monthly investment amount</li>
-            <li><strong class="text-text-primary">i</strong> — Monthly interest rate = r / 12 / 100</li>
-            <li><strong class="text-text-primary">n</strong> — Total months = years × 12</li>
-            <li><strong class="text-text-primary">r</strong> — Annual nominal rate (e.g. 12 for 12%)</li>
-          </ul>
+      <!-- 2. How it works & Formula -->
+      <section aria-labelledby="sip-how" class="mb-10">
+        <div class="flex items-center justify-between gap-3 flex-wrap mb-3">
+          <h2 id="sip-how" class="text-xl sm:text-2xl font-bold text-text-primary">How this SIP calculator works</h2>
+          <a
+            href="/methodology#sip"
+            class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1"
+          >
+            How is this calculated? Full Methodology &amp; Proof →
+          </a>
         </div>
-
-        <p class="text-sm text-text-muted leading-relaxed">
-          All internal computations use full floating-point precision. Values are rounded only when displayed. This matches the convention used by most Indian mutual fund platforms and is consistent with the AMFI SIP calculator.
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          A Systematic Investment Plan (SIP) enables disciplined rupee-cost averaging by investing a fixed sum on a scheduled day every month into mutual fund units. Each installment earns compound interest over its remaining tenure. Because units are bought each month across market highs and lows, your average acquisition cost stabilizes over long horizons.
         </p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calcumetrics computes SIP maturity using the standard <strong>annuity-due formula</strong> with monthly compounding. Annuity-due assumes installments are credited at the beginning of each month (matching the banking auto-debit schedule of Indian mutual fund AMCs):
+        </p>
+
+        <!-- Formula block with variable legend -->
+        <div class="bg-surface border border-border rounded-card p-5 mb-5 overflow-x-auto">
+          <div class="text-base sm:text-lg font-mono text-accent font-bold mb-3 tracking-wide">
+            FV = P × [((1 + i)ⁿ − 1) / i] × (1 + i)
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-text-muted border-t border-border pt-3">
+            <div><strong class="text-text-primary">FV</strong> = Future Value (estimated maturity corpus)</div>
+            <div><strong class="text-text-primary">P</strong> = Monthly investment installment</div>
+            <div><strong class="text-text-primary">i</strong> = Monthly interest rate = Annual Rate / 12 / 100</div>
+            <div><strong class="text-text-primary">n</strong> = Total installments = Tenure in Years × 12</div>
+          </div>
+        </div>
       </section>
 
-      <!-- 2. Worked example table -->
-      <section aria-labelledby="sip-example">
-        <h2 id="sip-example" class="text-xl font-bold text-text-primary mb-4">Worked example</h2>
+      <!-- 3. Worked numerical example -->
+      <section aria-labelledby="sip-example" class="mb-10">
+        <h2 id="sip-example" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Worked mathematical example</h2>
         <p class="text-sm text-text-muted mb-4">
-          ₹25,000 per month at 12% p.a. (nominal, compounded monthly), annuity-due:
+          Here is how the formula calculates a ₹25,000 monthly SIP at 12% p.a. over 15 years step-by-step:
         </p>
-        <details>
-          <summary class="cursor-pointer text-sm font-medium text-accent hover:text-accent-hover transition-standard mb-3 focus-visible:outline-accent rounded">
-            Year-by-year breakdown — show / hide
+        <div class="space-y-3 bg-surface border border-border rounded-card p-5 text-xs text-text-muted">
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 1:</span>
+            <span>Monthly rate: <code>i = 12 / (12 × 100) = 0.01</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 2:</span>
+            <span>Total monthly installments: <code>n = 15 × 12 = 180 months</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 3:</span>
+            <span>Compound factor: <code>(1 + 0.01)¹⁸⁰ − 1 = 5.995802 − 1 = 4.995802</code></span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-bold text-accent">Step 4:</span>
+            <span>Annuity-due multiplication: <code>25,000 × (4.995802 / 0.01) × 1.01 = ₹1,26,14,400</code></span>
+          </div>
+          <div class="pt-2 border-t border-border flex justify-between font-medium text-text-primary text-sm">
+            <span>Total Invested: ₹45,00,000</span>
+            <span class="text-accent font-bold">Wealth Gain: ₹81,14,400</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. How to use step by step -->
+      <section aria-labelledby="sip-steps" class="mb-10">
+        <h2 id="sip-steps" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How to use this SIP calculator</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { step: '1', title: 'Enter Monthly Amount', desc: 'Choose the amount you can comfortably invest every month via bank auto-debit.' },
+            { step: '2', title: 'Set Expected Return', desc: 'Use 11% to 13% for diversified equity funds; 7% to 9% for debt or conservative hybrid funds.' },
+            { step: '3', title: 'Select Horizon', desc: 'Compounding works best over 10+ years. Slide tenure to test 5, 10, 15, or 20-year goals.' },
+            { step: '4', title: 'Review & Share', desc: 'View live corpus breakdown, copy the scenario link, or share directly on WhatsApp.' },
+          ].map((item) => (
+            <div class="p-4 bg-surface border border-border rounded-card">
+              <span class="w-6 h-6 rounded-full bg-accent/10 text-accent font-bold text-xs flex items-center justify-center mb-2">{item.step}</span>
+              <h3 class="font-bold text-sm text-text-primary mb-1">{item.title}</h3>
+              <p class="text-xs text-text-muted leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- 5. Year-by-year schedule table (collapsible) -->
+      <section aria-labelledby="sip-schedule" class="mb-10">
+        <h2 id="sip-schedule" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Year-by-year compounding schedule</h2>
+        <p class="text-sm text-text-muted mb-3">
+          Observe how interest accumulation outpaces the cumulative invested capital as time progresses:
+        </p>
+        <details class="bg-surface border border-border rounded-card overflow-hidden group">
+          <summary class="px-5 py-3 cursor-pointer text-sm font-semibold text-accent hover:text-accent-hover flex items-center justify-between focus-visible:outline-accent">
+            <span>View Year-by-Year Growth Table (1 to 15 Years)</span>
+            <span class="text-xs text-text-muted group-open:rotate-180 transition-standard">&darr;</span>
           </summary>
-          <div class="overflow-x-auto mt-3">
-            <table class="w-full text-sm border-collapse">
+          <div class="overflow-x-auto px-4 pb-4">
+            <table class="w-full text-xs sm:text-sm border-collapse">
               <thead>
-                <tr class="border-b border-border">
-                  <th class="text-left py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Year</th>
-                  <th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Invested</th>
-                  <th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Maturity</th>
-                  <th class="text-right py-2 px-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Gain</th>
+                <tr class="border-b border-border text-text-muted">
+                  <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Year</th>
+                  <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Invested Amount</th>
+                  <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Estimated Corpus</th>
+                  <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Compounded Gain</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="sip-yearly-body">
                 {yearly.map((row) => (
-                  <tr class="border-b border-border hover:bg-canvas transition-standard">
-                    <td class="py-2 px-3 text-text-primary">{row.year}</td>
+                  <tr class="border-b border-border/50 hover:bg-canvas transition-standard">
+                    <td class="py-2 px-3 font-medium text-text-primary">Year {row.year}</td>
                     <td class="py-2 px-3 text-right tabular-nums text-text-muted">{fmt(row.invested)}</td>
-                    <td class="py-2 px-3 text-right tabular-nums text-text-primary font-medium">{fmt(row.maturity)}</td>
+                    <td class="py-2 px-3 text-right tabular-nums text-text-primary font-semibold">{fmt(row.maturity)}</td>
                     <td class="py-2 px-3 text-right tabular-nums text-accent font-medium">+{fmt(row.gain)}</td>
                   </tr>
                 ))}
@@ -357,116 +545,125 @@ const jsonld = {
         </details>
       </section>
 
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Comparing fixed monthly bank deposits vs. mutual fund equity SIPs?</strong>
-        Read our detailed comparison on <a href="/blog/rd-vs-sip" class="text-accent font-medium hover:underline">RD vs. SIP: Guaranteed Returns vs. Market-Linked Wealth Creation</a> to understand how risk premiums, volatility drag, and post-tax yields diverge over 5 to 15-year horizons.
-      </div>
-
-      <!-- 3. FAQ -->
-      <section aria-labelledby="sip-faq">
-        <h2 id="sip-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
-        <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-              What is a SIP calculator?
-            </summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              A SIP calculator computes the estimated maturity value of a Systematic Investment Plan — a fixed monthly contribution invested in mutual funds or other instruments — using compound interest. It shows your total corpus, total amount invested, and the wealth gain.
-            </div>
-          </details>
-
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-              Is the maturity value guaranteed?
-            </summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. This calculator assumes a constant annual rate for the entire period. Actual mutual fund returns vary with market conditions and are not guaranteed. The result is an estimate for planning purposes only; it is not financial advice.
-            </div>
-          </details>
-
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-              Why does this use annuity-due (start of month) and not ordinary annuity?
-            </summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Most SIP platforms debit your bank account at the beginning of each month, so your money starts earning returns from day one of that month. Annuity-due reflects this behaviour. If your platform debits at month-end, the result would be slightly lower (for ₹25,000/12%/15yr, the difference is approximately ₹1.25 lakh).
-            </div>
-          </details>
-
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-              What rate should I enter?
-            </summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Enter the nominal annual rate (not CAGR or effective annual rate). Equity mutual funds in India have historically delivered 10%–15% p.a. over long periods, but past performance is not indicative of future results. 12% p.a. is a commonly used planning assumption; your actual return will differ.
-            </div>
-          </details>
-
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-              Does this account for inflation?
-            </summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No — this calculator shows nominal (not inflation-adjusted) values. To estimate real purchasing power, subtract an assumed inflation rate. For example, if your return is 12% and inflation is 6%, a rough real return is approximately 5.7% (= 12/1.06 − 1 as compound real return). Use our Compound Interest calculator to model this.
-            </div>
-          </details>
+      <!-- 6. Common Mistakes & Important Limitations -->
+      <section aria-labelledby="sip-limitations" class="mb-10">
+        <h2 id="sip-limitations" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Key limitations & common misconceptions</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-text-muted">
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">Returns Are Not Linear</h3>
+            <p class="leading-relaxed">A 12% expected return does not mean 1% every month. Markets fluctuate with negative years followed by sharp recoveries.</p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">Inflation Impact</h3>
+            <p class="leading-relaxed">This calculator outputs nominal values. A ₹1.26 Cr corpus 15 years from now has a real purchasing power of ~₹52.6 Lakh at 6% inflation.</p>
+          </div>
+          <div class="p-4 bg-surface border border-border rounded-card">
+            <h3 class="font-bold text-text-primary text-sm mb-1.5">Budget 2024 Tax Rules</h3>
+            <p class="leading-relaxed">Equity fund LTCG held > 12 months is taxed at 12.5% on gains exceeding ₹1.25 Lakh per financial year.</p>
+          </div>
         </div>
       </section>
 
-      <!-- Ad slot reserved (Section 9) — rendered only when ADS_ENABLED -->
-      <!-- min-height reserved to prevent CLS -->
-      <div
-        class="w-full bg-canvas border border-border rounded-card overflow-hidden"
-        style="min-height: 90px;"
-        aria-hidden="true"
-        data-ad-slot="sip-below-fold"
-      >
-        <p class="text-xs text-text-muted text-center py-1 tracking-wider uppercase font-medium" style="font-size:10px;">Advertisement</p>
-      </div>
-
-      <!-- 4. Related calculators -->
-      <section aria-labelledby="sip-related">
-        <h2 id="sip-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {related.map((tool) => (
-            <a
-              href={tool.path}
-              class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"
-            >
-              <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
-              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
-              <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
-            </a>
+      <!-- 7. Real FAQs (PAA) -->
+      <section aria-labelledby="sip-faq" class="mb-10">
+        <h2 id="sip-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+        <div class="space-y-3">
+          {[
+            {
+              q: 'What is a SIP calculator and how does it work?',
+              a: 'A SIP calculator computes the estimated maturity corpus and capital gains of a Systematic Investment Plan. It applies compound interest on regular monthly contributions debited at the start of each month using the annuity-due mathematical formula.',
+            },
+            {
+              q: 'Is a 12% return realistic for mutual fund SIPs in India?',
+              a: 'Historically, diversified Indian equity mutual funds (large-cap, flexi-cap, and index funds tracking Nifty 50 or Sensex) have delivered 11% to 14% CAGR over rolling 10 to 15-year periods. However, equity returns are subject to market volatility and are not guaranteed.',
+            },
+            {
+              q: 'What formula does this SIP calculator use?',
+              a: 'This calculator uses the standard annuity-due formula: FV = P × [((1 + i)^n − 1) / i] × (1 + i), where P is the monthly investment amount, i is the monthly interest rate (annual rate / 12 / 100), and n is total months (years × 12).',
+            },
+            {
+              q: 'SIP vs Lumpsum: which is better for wealth creation?',
+              a: 'SIP is ideal for salaried individuals as it enforces investing discipline and leverages Rupee Cost Averaging to buy more units when markets dip. Lumpsum investing can generate higher returns when markets are undervalued, but carries higher entry timing risk.',
+            },
+            {
+              q: 'What happens if I miss a monthly SIP installment?',
+              a: 'If your bank account lacks sufficient balance, the fund house does not penalize or cancel your folio, though your bank may levy an auto-debit bounce charge. If three consecutive monthly debits fail, the mutual fund AMC may automatically pause the mandate.',
+            },
+            {
+              q: 'Are mutual fund SIP returns tax-free in India?',
+              a: 'No. Under Budget 2024 tax rules, Long-Term Capital Gains (LTCG) on equity mutual funds held for more than 12 months are taxed at 12.5% on capital gains exceeding ₹1.25 lakh per financial year. Short-Term Capital Gains (STCG) on units held up to 12 months are taxed at 20%.',
+            },
+            {
+              q: 'What is a Step-Up SIP?',
+              a: 'A Step-Up (or Top-Up) SIP automatically increases your monthly installment amount periodically (typically 5% to 10% each year in line with annual salary increments). This accelerates corpus accumulation significantly over long investment horizons.',
+            },
+          ].map((item) => (
+            <details class="border border-border rounded-card overflow-hidden bg-surface">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
+                {item.q}
+              </summary>
+              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
+                {item.a}
+              </div>
+            </details>
           ))}
         </div>
       </section>
+
+      <!-- 8. Related calculators & Blog -->
+      <section aria-labelledby="sip-related" class="mb-10">
+        <h2 id="sip-related" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Related calculators</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {related.map((tool) => (
+            <a
+              href={tool.path}
+              class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
+            >
+              <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
+              <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
+              <p class="text-xs text-text-muted mt-1 leading-relaxed line-clamp-2">{tool.description}</p>
+            </a>
+          ))}
+        </div>
+        <div class="mt-4 p-4 bg-surface border border-accent/30 rounded-card text-xs text-text-muted">
+          <strong class="text-text-primary text-sm block mb-1">Comparing fixed deposits vs mutual fund SIPs?</strong>
+          Read our in-depth analysis on <a href="/blog/rd-vs-sip" class="text-accent font-semibold hover:underline">RD vs. SIP: Guaranteed Returns vs. Market-Linked Wealth Creation &rarr;</a>
+        </div>
+      </section>
+
+      <!-- 9. Authoritative Footer Review & Methodology -->
+      <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
+        <div>
+          <span>Last updated: <strong>September 2026</strong></span>
+          <span class="mx-2">·</span>
+          <span>Reviewed against statutory Indian financial modeling conventions</span>
+        </div>
+        <div>
+          <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
+        </div>
+      </div>
+
     </Fragment>
   </CalculatorLayout>
 </Layout>
 
 <script>
-  /**
-   * SIP Calculator client-side logic.
-   * Integrates Phase 4 Architecture:
-   * - Pure calculation engine (src/lib/calculators/sip.ts)
-   * - Canonical single-source-of-truth result store (src/lib/result-bus.ts)
-   * - Centralized validation engine (src/lib/validate.ts)
-   * - URL hash state serialization and restoration (src/lib/url-state.ts)
-   */
-  import { calcSIP } from '../lib/calculators/sip';
+  import { calcSIP, calcSIPYearly } from '../lib/calculators/sip';
   import { setResult } from '../lib/result-bus';
-  import { validate, type ValidationRules } from '../lib/validate';
+  import { validate } from '../lib/validate';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
+  import { formatIndian, formatIndianCompact, formatIndianWords, formatCompactCurrency } from '../lib/formatters';
+  import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
 
-  // Declarative validation schema for SIP inputs
   const sipSchema = {
     monthly: { required: true, min: 500, max: 2000000, integerOnly: true, label: 'Monthly Investment' },
     rate: { required: true, min: 1, max: 30, decimal: true, label: 'Expected Return Rate' },
     years: { required: true, min: 1, max: 40, integerOnly: true, label: 'Time Period' },
   } as const;
 
-  let currentCurrencySymbol = '₹';
-  let currentNumberLocale = 'en-IN';
+  let currentCurrencyCode: CurrencyCode = getStoredCurrency();
+  let currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
+  let currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
 
   function fmtNumber(n: number): string {
     return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
@@ -474,6 +671,12 @@ const jsonld = {
 
   function fmtCurrency(n: number): string {
     return currentCurrencySymbol + fmtNumber(n);
+  }
+
+  function fmtCompact(n: number): string {
+    return currentCurrencyCode === 'INR'
+      ? formatIndianCompact(n, currentCurrencySymbol)
+      : formatCompactCurrency(n, currentCurrencyCode);
   }
 
   function fmtLiveIndian(raw: string): string {
@@ -492,10 +695,23 @@ const jsonld = {
 
     const copyBtn = document.getElementById('sip-copy-btn');
     const shareBtn = document.getElementById('sip-share-btn');
-    const calculateBtn = document.getElementById('sip-calculate');
+    const whatsappBtn = document.getElementById('sip-whatsapp-btn') as HTMLAnchorElement | null;
     const resetBtn = document.getElementById('sip-reset');
     const currencyDropdown = document.getElementById('sip-currency') as HTMLSelectElement | null;
     const errorAlert = document.getElementById('sip-error-alert');
+
+    const resMaturityCompact = document.getElementById('sip-result-maturity-compact');
+    const resMaturity = document.getElementById('sip-result-maturity');
+    const resInvestedCompact = document.getElementById('sip-result-invested-compact');
+    const resInvested = document.getElementById('sip-result-invested');
+    const resGainCompact = document.getElementById('sip-result-gain-compact');
+    const resGain = document.getElementById('sip-result-gain');
+    const resGainPct = document.getElementById('sip-result-gain-pct');
+
+    const insightCompounding = document.getElementById('sip-insight-compounding');
+    const insightCuriosity = document.getElementById('sip-insight-curiosity');
+    const snippetAnswer = document.getElementById('sip-snippet-answer');
+    const yearlyBody = document.getElementById('sip-yearly-body');
 
     if (!monthlyInput || !rateInput || !yearsInput) return;
 
@@ -509,7 +725,6 @@ const jsonld = {
       const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
       if (bar) bar.style.width = `${(pFraction * 100).toFixed(2)}%`;
       if (gainBar) gainBar.style.width = `${(gFraction * 100).toFixed(2)}%`;
-      // Update legend values
       const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
       if (legendEls[0]) legendEls[0].textContent = fmtCurrency(invested);
       if (legendEls[1]) legendEls[1].textContent = fmtCurrency(gain);
@@ -527,8 +742,24 @@ const jsonld = {
       }
     }
 
+    function updateYearlyTable(monthly: number, rate: number, years: number) {
+      if (!yearlyBody) return;
+      const schedule = calcSIPYearly(monthly, rate, years);
+      yearlyBody.innerHTML = schedule
+        .map(
+          (row) => `
+        <tr class="border-b border-border/50 hover:bg-canvas transition-standard">
+          <td class="py-2 px-3 font-medium text-text-primary">Year ${row.year}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-text-muted">${fmtCurrency(row.invested)}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-text-primary font-semibold">${fmtCurrency(row.maturity)}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-accent font-medium">+${fmtCurrency(row.gain)}</td>
+        </tr>`
+        )
+        .join('');
+    }
+
     function recalc() {
-      // 1. Validation via Phase 4.3 Centralized Validation Engine
+      if (!monthlyInput || !rateInput || !yearsInput) return;
       const vMonthly = validate(monthlyInput.value, sipSchema.monthly);
       const vRate = validate(rateInput.value, sipSchema.rate);
       const vYears = validate(yearsInput.value, sipSchema.years);
@@ -554,30 +785,91 @@ const jsonld = {
       }
       yearsInput.removeAttribute('aria-invalid');
 
-      showValidationFeedback(); // Clear error
+      showValidationFeedback();
 
       const monthly = vMonthly.value!;
       const rate = vRate.value!;
       const years = vYears.value!;
 
-      // 2. Pure Calculation
+      // Run calculation
       const r = calcSIP(monthly, rate, years);
 
-      // 3. Phase 4.2 Canonical Result State Architecture
-      // A single source-of-truth call drives desktop output IDs, mobile hero, and layout-managed presentation
+      // Extra 2 years curiosity calculation
+      const rExtra = calcSIP(monthly, rate, years + 2);
+      const extraDiff = rExtra.maturity - r.maturity;
+
+      const compMaturity = fmtCompact(r.maturity);
+      const compInvested = fmtCompact(r.invested);
+      const compGain = fmtCompact(r.gain);
+      const compExtra = fmtCompact(extraDiff);
+
+      // Update Output Panel with smooth count-up animation
+      const anim = (window as any).__cmAnimateNumber || ((el: any, t: string) => { if (el) el.textContent = t; });
+      if (resMaturityCompact) anim(resMaturityCompact, compMaturity);
+      if (resMaturity) anim(resMaturity, `(${fmtCurrency(r.maturity)})`);
+      if (resInvestedCompact) anim(resInvestedCompact, compInvested);
+      if (resInvested) anim(resInvested, `(${fmtCurrency(r.invested)})`);
+      if (resGainCompact) anim(resGainCompact, `+${compGain}`);
+      if (resGain) anim(resGain, `(+${fmtCurrency(r.gain)})`);
+      if (resGainPct) anim(resGainPct, r.gainPct.toFixed(1) + '%');
+
+      // Update Composition Bar
+      updateCompositionBar(r.principalFraction, r.gainFraction, r.invested, r.gain);
+
+      // Update Insights
+      if (insightCompounding) {
+        insightCompounding.innerHTML = `At ${fmtCurrency(monthly)}/mo over ${years} years, you invest <strong>${compInvested}</strong> and earn <strong class="text-dark-accent">${compGain}</strong> purely through compounding.`;
+      }
+      if (insightCuriosity) {
+        insightCuriosity.innerHTML = `Investing for just 2 more years (${years + 2} yrs) adds <strong>+${compExtra}</strong> to your corpus!`;
+      }
+      const insightDelay = document.getElementById('sip-insight-delay');
+      if (insightDelay) {
+        if (years > 5) {
+          const delayed = calcSIP(monthly, rate, years - 5);
+          const loss = r.maturity - delayed.maturity;
+          insightDelay.innerHTML = `⏳ <strong>Cost of Delay:</strong> 5 saal late shuru kiya toh compounding loss se corpus <strong>~${fmtCompact(loss)} kam</strong> banega.`;
+          insightDelay.classList.remove('hidden');
+        } else {
+          insightDelay.classList.add('hidden');
+        }
+      }
+
+      // Friendly rate reality check
+      const rateWarning = document.getElementById('sip-rate-warning');
+      if (rateWarning) {
+        rateWarning.classList.toggle('hidden', rate <= 15);
+      }
+
+      // Update Featured Snippet Answer Box
+      if (snippetAnswer) {
+        snippetAnswer.innerHTML = `A monthly investment of <strong>${fmtCurrency(monthly)}</strong> in an equity SIP at an expected <strong>${rate.toFixed(1)}% annual return</strong> over <strong>${years} years</strong> generates an estimated maturity corpus of <strong>${compMaturity}</strong> (${fmtCurrency(r.maturity)}). You invest a total of <strong>${compInvested}</strong> and earn <strong>${compGain}</strong> in compounding wealth gain.`;
+      }
+
+      // Update Year-by-Year schedule
+      updateYearlyTable(monthly, rate, years);
+
+      // Update WhatsApp Share Link
+      if (whatsappBtn) {
+        const shareMsg = encodeURIComponent(
+          `Check out my SIP calculation:\nMonthly: ${fmtCurrency(monthly)}\nRate: ${rate}% p.a.\nTenure: ${years} years\nEstimated Corpus: ${compMaturity} (${fmtCurrency(r.maturity)})\nWealth Gain: +${compGain}\nCalculate on Calcumetrics: ${location.href.split('#')[0]}#p=${monthly}&r=${rate}&y=${years}`
+        );
+        whatsappBtn.href = `https://api.whatsapp.com/send?text=${shareMsg}`;
+      }
+
+      // Canonical Result Bus for mobile sticky bar
       const canonicalResult = {
-        heroValue: fmtCurrency(r.maturity),
-        heroLabel: 'Estimated Total Maturity',
+        heroValue: compMaturity,
+        heroLabel: 'Estimated Maturity',
         rows: [
-          { label: 'Total Invested', value: fmtCurrency(r.invested) },
-          { label: 'Total Gain', value: fmtCurrency(r.gain), variant: 'accent' as const },
+          { label: 'Total Invested', value: compInvested },
+          { label: 'Total Gain', value: compGain, variant: 'accent' as const },
           { label: 'Gain %', value: r.gainPct.toFixed(1) + '%' },
         ],
         fields: {
           'sip-result-maturity': fmtCurrency(r.maturity),
           'sip-result-invested': fmtCurrency(r.invested),
           'sip-result-gain': fmtCurrency(r.gain),
-          'sip-result-gain-pct': r.gainPct.toFixed(1) + '%',
         },
         meta: {
           principalFraction: r.principalFraction,
@@ -594,35 +886,20 @@ const jsonld = {
       }
       window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
-      // Desktop DOM elements
-      const resMaturity = document.getElementById('sip-result-maturity');
-      const resInvested = document.getElementById('sip-result-invested');
-      const resGain = document.getElementById('sip-result-gain');
-      const resGainPct = document.getElementById('sip-result-gain-pct');
-      if (resMaturity) resMaturity.textContent = fmtCurrency(r.maturity);
-      if (resInvested) resInvested.textContent = fmtCurrency(r.invested);
-      if (resGain) resGain.textContent = fmtCurrency(r.gain);
-      if (resGainPct) resGainPct.textContent = r.gainPct.toFixed(1) + '%';
-
-      // 4. Update Composition Bar
-      updateCompositionBar(r.principalFraction, r.gainFraction, r.invested, r.gain);
-
-      // 5. Phase 4.4 URL State Architecture
+      // URL Hash persistence
       const hash = serializeHash({ p: monthly, r: rate, y: years });
       updateHash(hash, true);
     }
 
     function debounceRecalc() {
       clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(recalc, 80);
+      debounceTimer = setTimeout(recalc, 60);
     }
 
-    // ── Slider ↔ Input sync ──────────────────────────────────────────────────
+    // ── Sliders & Inputs sync ────────────────────────────────────────────────
     function syncSlider(slider: HTMLInputElement, input: HTMLInputElement, isFormatted: boolean) {
       slider.addEventListener('input', () => {
-        input.value = isFormatted
-          ? fmtLiveIndian(slider.value)
-          : slider.value;
+        input.value = isFormatted ? fmtLiveIndian(slider.value) : slider.value;
         const min = parseFloat(slider.min), max = parseFloat(slider.max), val = parseFloat(slider.value);
         const pct = ((val - min) / (max - min)) * 100;
         slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
@@ -642,7 +919,6 @@ const jsonld = {
         debounceRecalc();
       });
 
-      // On blur, format the input nicely if valid
       input.addEventListener('blur', () => {
         if (isFormatted) {
           const v = validate(input.value, { integerOnly: true });
@@ -671,20 +947,49 @@ const jsonld = {
       yearsSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
     }
 
-    // ── Calculate button ─────────────────────────────────────────────────────
-    calculateBtn?.addEventListener('click', () => {
-      recalc();
-      if (window.innerWidth < 1024) {
-        document.getElementById('calc-mobile-bar')?.scrollIntoView({ behavior: 'smooth' });
-        const resEl = document.getElementById('sip-result-maturity');
-        resEl?.setAttribute('tabindex', '-1');
-        resEl?.focus();
-      }
+    // ── Preset Chips ─────────────────────────────────────────────────────────
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-monthly]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-monthly');
+        if (val) {
+          monthlyInput.value = fmtLiveIndian(val);
+          if (monthlySlider) {
+            monthlySlider.value = val;
+            const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max);
+            monthlySlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
     });
 
-    [monthlyInput, rateInput, yearsInput].forEach((el) => {
-      el.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') recalc();
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-rate]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-rate');
+        if (val) {
+          rateInput.value = val;
+          if (rateSlider) {
+            rateSlider.value = val;
+            const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+            rateSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-years]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-years');
+        if (val) {
+          yearsInput.value = val;
+          if (yearsSlider) {
+            yearsSlider.value = val;
+            const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+            yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
       });
     });
 
@@ -710,7 +1015,7 @@ const jsonld = {
       monthlyInput.focus();
     });
 
-    // ── Restore from URL Hash (Phase 4.4 Architecture) ─────────────────────────
+    // ── Restore from URL Hash ────────────────────────────────────────────────
     const restored = restoreFromHash(location.hash, {
       p: sipSchema.monthly,
       r: sipSchema.rate,
@@ -742,7 +1047,6 @@ const jsonld = {
       }
     }
 
-    // Initial calculation or restore
     recalc();
 
     // ── Copy & Share ─────────────────────────────────────────────────────────
@@ -762,7 +1066,7 @@ const jsonld = {
       if (!vM.valid || !vR.valid || !vY.valid) return;
 
       const r = calcSIP(vM.value!, vR.value!, vY.value!);
-      const text = `SIP Calculator: ${currentCurrencySymbol}${fmtNumber(vM.value!)}/month at ${vR.value!}% p.a. for ${vY.value!} years gives ${fmtCurrency(r.maturity)} (estimate). ${location.href.split('#')[0]}${serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })}`;
+      const text = `SIP Calculator: ${fmtCurrency(vM.value!)}/month at ${vR.value!}% p.a. for ${vY.value!} years gives ${fmtCompact(r.maturity)} (${fmtCurrency(r.maturity)}). ${location.href.split('#')[0]}${serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -776,6 +1080,7 @@ const jsonld = {
         document.body.removeChild(ta);
       }
       flashBtn(copyBtn, 'Copied!');
+      window.__cmShowToast?.({ title: 'SIP Calculator', message: 'Result summary copied to clipboard ✓' });
     });
 
     shareBtn?.addEventListener('click', async () => {
@@ -798,16 +1103,15 @@ const jsonld = {
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-      flashBtn(shareBtn, 'Copied!');
+      flashBtn(shareBtn, 'Copied Link!');
+      window.__cmShowToast?.({ title: 'SIP Calculator', message: 'Shareable link copied to clipboard ✓' });
     });
 
     // ── Currency synchronization ─────────────────────────────────────────────
-    function setSIPCurrency(code: string, symbol: string) {
+    function setSIPCurrency(code: CurrencyCode, symbol: string) {
+      currentCurrencyCode = code;
       currentCurrencySymbol = symbol;
-      if (code === 'USD') currentNumberLocale = 'en-US';
-      else if (code === 'EUR') currentNumberLocale = 'de-DE';
-      else if (code === 'GBP') currentNumberLocale = 'en-GB';
-      else currentNumberLocale = 'en-IN';
+      currentNumberLocale = CURRENCY_CONFIG[code]?.locale || 'en-IN';
 
       if (currencyDropdown && currencyDropdown.value !== code) {
         currencyDropdown.value = code;
@@ -816,13 +1120,15 @@ const jsonld = {
     }
 
     currencyDropdown?.addEventListener('change', () => {
-      const code = currencyDropdown.value;
-      const symbolMap: Record<string, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
-      const sym = symbolMap[code] || '₹';
+      const code = (currencyDropdown.value as CurrencyCode) || 'INR';
+      const config = CURRENCY_CONFIG[code];
+      const sym = config?.symbol || '₹';
       setSIPCurrency(code, sym);
-      window.dispatchEvent(new CustomEvent('cm:currency-change', {
-        detail: { code, symbol: sym, label: `${sym} ${code}` }
-      }));
+      window.dispatchEvent(
+        new CustomEvent('cm:currency-change', {
+          detail: { code, symbol: sym, label: `${sym} ${code}` },
+        })
+      );
     });
 
     window.addEventListener('cm:currency-change', (e: any) => {
@@ -830,16 +1136,6 @@ const jsonld = {
         setSIPCurrency(e.detail.code, e.detail.symbol);
       }
     });
-
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        if (saved.includes('USD')) setSIPCurrency('USD', '$');
-        else if (saved.includes('EUR')) setSIPCurrency('EUR', '€');
-        else if (saved.includes('GBP')) setSIPCurrency('GBP', '£');
-        else setSIPCurrency('INR', '₹');
-      }
-    } catch (e) {}
   }
 
   initSIPCalc();

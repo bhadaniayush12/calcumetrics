@@ -48,7 +48,7 @@ const {
   ...rest
 } = Astro.props;
 
-const resolvedInputMode = inputmode || (isNumeric || localeFormat !== 'none' ? 'decimal' : undefined);
+const resolvedInputMode = inputmode || (isNumeric || localeFormat !== 'none' || type === 'number' ? 'decimal' : undefined);
 
 const isError = Boolean(errorMessage);
 const helperId = helperText ? `${id}-helper` : undefined;

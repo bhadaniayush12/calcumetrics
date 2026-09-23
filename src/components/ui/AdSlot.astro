@@ -21,8 +21,8 @@
 import { ADS_ENABLED } from '../../config/site';
 
 interface Props {
-  /** 'leaderboard' = 728×90 (desktop); 'rectangle' = 336×280 (below-fold) */
-  format?: 'leaderboard' | 'rectangle';
+  /** 'leaderboard' = 728×90 (desktop) / 320×50-100 (mobile); 'rectangle' = 300×250; 'mobile-banner' = 320×50 */
+  format?: 'leaderboard' | 'rectangle' | 'mobile-banner';
   /** AdSense data-ad-slot ID — required to show a live ad */
   adSlotId?: string;
   /** Extra wrapper classes if needed for spacing */
@@ -35,45 +35,52 @@ const {
   class: extraClass = '',
 } = Astro.props;
 
-// Reserved heights per §9: desktop leaderboard min 90px; rectangle 250px
-const reservedHeight = format === 'rectangle' ? '250px' : '90px';
+// Strictly reserved dimensions to prevent any Cumulative Layout Shift (CLS = 0)
+const minHeight = format === 'rectangle' ? '250px' : format === 'mobile-banner' ? '50px' : '90px';
+const maxWidth = format === 'rectangle' ? '336px' : '728px';
 const shouldShowAd = ADS_ENABLED && !!adSlotId;
 ---
 
 <div
-  class={`ad-slot-wrapper relative w-full overflow-hidden ${extraClass}`}
-  style={`min-height: ${reservedHeight};`}
+  class={`ad-slot-wrapper relative w-full mx-auto my-6 overflow-hidden ${extraClass}`}
+  style={`min-height: ${minHeight}; max-width: ${maxWidth}; contain: layout size;`}
   data-ad-format={format}
 >
-  {/* "Advertisement" label — per §9 & §03_AD_PLACEMENT: "ADVERTISEMENT" or "Sponsored Links" only */}
-  <p class="text-[10px] font-medium text-text-muted uppercase tracking-wider text-center mb-1 select-none" aria-hidden="true">
-    Advertisement
-  </p>
+  {/* Standard Google AdSense "Advertisement" compliance label */}
+  <div class="flex items-center justify-center gap-1.5 mb-1.5 select-none" aria-hidden="true">
+    <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
+    <p class="text-[10px] font-semibold text-text-muted uppercase tracking-wider text-center">
+      Advertisement
+    </p>
+    <span class="w-1.5 h-1.5 rounded-full bg-border"></span>
+  </div>
 
-  {/* Reserved container — 1px border, #F7F7F4 bg per §9 */}
+  {/* Strict zero-shift container with skeleton shimmer fallback */}
   <div
-    class="w-full bg-canvas border border-border rounded-card flex items-center justify-center"
-    style={`min-height: calc(${reservedHeight} - 16px);`}
+    class="w-full bg-canvas border border-border/70 rounded-card flex items-center justify-center relative overflow-hidden transition-standard"
+    style={`height: calc(${minHeight} - 20px); min-height: calc(${minHeight} - 20px);`}
   >
     {shouldShowAd ? (
-      /**
-       * Live ad — rendered only when ADS_ENABLED=true and adSlotId is provided.
-       * data-ad-client must be replaced with your publisher ID (ca-pub-XXXXXXXXXXXXXXXX).
-       * Load AdSense script async, after consent, in Layout.astro head.
-       */
-      <ins
-        class="adsbygoogle"
-        style="display:block; width:100%;"
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-        data-ad-slot={adSlotId}
-        data-ad-format={format === 'leaderboard' ? 'horizontal' : 'rectangle'}
-        data-full-width-responsive="true"
-      ></ins>
+      <>
+        {/* Skeleton shimmer layer while ad asset finishes painting */}
+        <div class="absolute inset-0 skeleton-shimmer opacity-40 pointer-events-none" aria-hidden="true"></div>
+        <ins
+          class="adsbygoogle relative z-10"
+          style="display:block; width:100%; height:100%;"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+          data-ad-slot={adSlotId}
+          data-ad-format={format === 'leaderboard' ? 'horizontal' : 'rectangle'}
+          data-full-width-responsive="true"
+        ></ins>
+      </>
     ) : (
-      /* Placeholder shown when ads not yet enabled — invisible to users in production (no ads) */
-      <span class="text-[10px] text-text-muted select-none" aria-hidden="true">
-        {ADS_ENABLED ? 'Ad slot — no ID provided' : ''}
-      </span>
+      /* Clean macOS-style placeholder with skeleton lines ensuring 0 CLS */
+      <div class="w-full h-full flex flex-col items-center justify-center p-3 opacity-60">
+        <div class="w-24 h-2 rounded bg-border/60 skeleton-shimmer mb-2" aria-hidden="true"></div>
+        <span class="text-[11px] text-text-muted select-none font-medium" aria-hidden="true">
+          {ADS_ENABLED ? 'Reserved Ad Placement (CLS = 0)' : 'Calcumetrics · Clean Sponsored Space'}
+        </span>
+      </div>
     )}
   </div>
 </div>

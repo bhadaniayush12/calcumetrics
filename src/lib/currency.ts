@@ -110,6 +110,27 @@ export function getCurrencyConfig(code: unknown): CurrencyConfig {
 }
 
 /**
+ * Auto-detects the appropriate initial currency based on client locale / timezone.
+ * Returns 'INR' by default or if timezone/locale indicates India.
+ */
+export function detectUserCurrency(): CurrencyCode {
+  if (typeof window === 'undefined') return DEFAULT_CURRENCY;
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (tz.includes('Calcutta') || tz.includes('Kolkata') || tz === 'Asia/Kolkata') {
+      return 'INR';
+    }
+    const langs = navigator.languages || [navigator.language];
+    for (const lang of langs) {
+      if (lang && (lang.toLowerCase().includes('en-in') || lang.toLowerCase().includes('hi'))) {
+        return 'INR';
+      }
+    }
+  } catch {}
+  return DEFAULT_CURRENCY;
+}
+
+/**
  * Client-side safe getter for stored currency.
  * Returns DEFAULT_CURRENCY during SSR or when localStorage is inaccessible/empty.
  */
@@ -119,6 +140,9 @@ export function getStoredCurrency(): CurrencyCode {
   }
   try {
     const raw = localStorage.getItem(CURRENCY_STORAGE_KEY);
+    if (!raw) {
+      return detectUserCurrency();
+    }
     return normalizeCurrency(raw);
   } catch {
     return DEFAULT_CURRENCY;

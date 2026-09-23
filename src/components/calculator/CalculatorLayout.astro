@@ -51,29 +51,132 @@ const {
 } = Astro.props;
 ---
 
-<!-- Breadcrumb: Home › Category › Tool -->
-<nav aria-label="Breadcrumb" class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-  <ol class="flex items-center gap-1.5 text-xs text-text-muted flex-wrap" itemscope itemtype="https://schema.org/BreadcrumbList">
-    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-      <a href="/" class="hover:text-accent transition-standard focus-visible:outline-accent" itemprop="item">
-        <span itemprop="name">Home</span>
-      </a>
-      <meta itemprop="position" content="1" />
-    </li>
-    <li aria-hidden="true"><span class="text-border">›</span></li>
-    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-      <a href={categoryHref} class="hover:text-accent transition-standard focus-visible:outline-accent" itemprop="item">
-        <span itemprop="name">{category}</span>
-      </a>
-      <meta itemprop="position" content="2" />
-    </li>
-    <li aria-hidden="true"><span class="text-border">›</span></li>
-    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="text-text-primary font-medium" aria-current="page">
-      <span itemprop="name">{toolName}</span>
-      <meta itemprop="position" content="3" />
-    </li>
-  </ol>
-</nav>
+<!-- Breadcrumb & Inspector Bar: Home › Category › Tool | [Get Info ⌘I] -->
+<div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2 flex items-center justify-between gap-3 flex-wrap">
+  <nav aria-label="Breadcrumb">
+    <ol class="flex items-center gap-1.5 text-xs text-text-muted flex-wrap" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="/" class="hover:text-accent transition-standard focus-visible:outline-accent" itemprop="item">
+          <span itemprop="name">Home</span>
+        </a>
+        <meta itemprop="position" content="1" />
+      </li>
+      <li aria-hidden="true"><span class="text-border">›</span></li>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href={categoryHref} class="hover:text-accent transition-standard focus-visible:outline-accent" itemprop="item">
+          <span itemprop="name">{category}</span>
+        </a>
+        <meta itemprop="position" content="2" />
+      </li>
+      <li aria-hidden="true"><span class="text-border">›</span></li>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem" class="text-text-primary font-medium" aria-current="page">
+        <span itemprop="name">{toolName}</span>
+        <meta itemprop="position" content="3" />
+      </li>
+    </ol>
+  </nav>
+
+  <!-- macOS Get Info Inspector Button -->
+  <button
+    type="button"
+    id="get-info-btn"
+    aria-label="Get Info (⌘I)"
+    title="Get Info (⌘I)"
+    class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard cursor-pointer shadow-mac-subtle select-none"
+  >
+    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+    <span class="font-medium">Get Info</span>
+    <kbd class="text-[10px] text-text-muted font-mono bg-canvas border border-border px-1 py-0.2 rounded hidden sm:inline">⌘I</kbd>
+  </button>
+</div>
+
+<!-- macOS Get Info Inspector Modal (⌘I) -->
+<div
+  id="calc-get-info-modal"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden items-center justify-center p-4 select-none"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Calculator Information Inspector"
+>
+  <div class="bg-surface border border-border rounded-card shadow-mac max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-150 relative">
+    <!-- Header -->
+    <div class="flex items-center justify-between border-b border-border pb-3 mb-4">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-sm font-bold">
+          ℹ️
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-text-primary">{toolName}</h3>
+          <p class="text-[11px] text-text-muted">Inspector · Mathematical Specifications</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        id="get-info-close"
+        class="text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer"
+        aria-label="Close inspector"
+      >
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Inspector Specifications -->
+    <div class="space-y-3.5 text-xs">
+      <div class="p-3 bg-canvas border border-border rounded-control space-y-1">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Mathematical Model</span>
+        <p class="text-text-primary font-medium leading-relaxed">
+          Standardized statutory &amp; financial equations verified with automated unit test fixtures.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-[11px]">
+        <div class="p-2.5 bg-canvas border border-border rounded-control">
+          <span class="text-text-muted block text-[10px] uppercase font-bold">Category</span>
+          <span class="text-text-primary font-semibold">{category}</span>
+        </div>
+        <div class="p-2.5 bg-canvas border border-border rounded-control">
+          <span class="text-text-muted block text-[10px] uppercase font-bold">Rates Verified</span>
+          <span class="text-emerald-700 dark:text-emerald-400 font-semibold">Sep 2026 (Quarterly)</span>
+        </div>
+        <div class="p-2.5 bg-canvas border border-border rounded-control">
+          <span class="text-text-muted block text-[10px] uppercase font-bold">Execution</span>
+          <span class="text-text-primary font-semibold">100% Client-Side</span>
+        </div>
+        <div class="p-2.5 bg-canvas border border-border rounded-control">
+          <span class="text-text-muted block text-[10px] uppercase font-bold">Privacy</span>
+          <span class="text-accent font-semibold">0 Server Storage</span>
+        </div>
+      </div>
+
+      <div class="text-[11px] text-text-muted leading-relaxed">
+        Inputs are reactive and recalculated continuously in your browser memory without network latency or data transmission.
+      </div>
+
+      <div class="pt-2 border-t border-border flex items-center justify-between">
+        <a href="/methodology" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
+          <span>How is this calculated? Read Methodology &amp; Proofs</span>
+          <span>→</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="mt-4 pt-3 border-t border-border flex justify-end">
+      <button
+        type="button"
+        id="get-info-dismiss"
+        class="px-3.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer"
+      >
+        Done (ESC)
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->
 <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8" data-calc-type={calcType}>
@@ -154,15 +257,15 @@ const {
 <!-- Mobile: Fixed bottom bar (hidden on desktop) -->
 <div
   id="calc-mobile-bar"
-  class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-bg border-t border-dark-border flex items-center justify-between px-4 gap-3"
-  style="padding-bottom: env(safe-area-inset-bottom);"
+  class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-bg border-t border-dark-border flex items-center justify-between px-4 py-2 gap-3"
+  style="padding-bottom: max(env(safe-area-inset-bottom), 8px);"
   aria-label="Calculator result"
 >
-  <div class="py-3 min-w-0 flex-1">
-    <p id="calc-mobile-hero-label" class="text-xs text-dark-muted leading-none mb-0.5">{heroLabel}</p>
+  <div class="py-1 min-w-0 flex-1">
+    <p id="calc-mobile-hero-label" class="text-[11px] text-dark-muted font-medium leading-none mb-1 truncate">{heroLabel}</p>
     <p
       id="calc-mobile-hero"
-      class="text-xl font-bold text-dark-text tabular-nums truncate"
+      class="text-xl sm:text-2xl font-bold text-dark-text tabular-nums truncate tracking-tight"
       aria-live="polite"
     >
       {heroValue}
@@ -174,9 +277,12 @@ const {
     aria-haspopup="dialog"
     aria-controls="calc-bottom-sheet"
     aria-expanded="false"
-    class="flex-shrink-0 h-11 px-4 rounded-control border border-dark-border text-sm font-medium text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer"
+    class="flex-shrink-0 min-h-[44px] h-11 px-4 rounded-control border border-dark-border text-sm font-semibold text-dark-text hover:bg-dark-border transition-standard focus-visible:outline-2 focus-visible:outline-dark-accent focus-visible:outline-offset-2 cursor-pointer inline-flex items-center justify-center gap-1.5"
   >
-    Details
+    <span>Details</span>
+    <svg class="w-3.5 h-3.5 stroke-current fill-none" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15" />
+    </svg>
   </button>
 </div>
 
@@ -207,6 +313,7 @@ const {
     getCurrencyConfig,
     normalizeCurrency,
   } from '../../lib/currency';
+  import { animateValue } from '../../lib/animate-number';
 
   /**
    * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.
@@ -345,17 +452,20 @@ const {
       }
     });
 
-    // Helper to render/update DOM from canonical result state
+    // Helper to render/update DOM from canonical result state with smooth count-up animation
     const applyCanonicalResult = (result: CalcResult) => {
+      // Expose animateValue globally for page scripts
+      (window as any).__cmAnimateNumber = animateValue;
+
       // 1. Mobile presentation
       const mobileHero = document.getElementById('calc-mobile-hero');
-      if (mobileHero) mobileHero.textContent = result.heroValue;
+      if (mobileHero) animateValue(mobileHero, result.heroValue);
       const mobileLabel = document.getElementById('calc-mobile-hero-label');
       if (mobileLabel && result.heroLabel) mobileLabel.textContent = result.heroLabel;
 
       // 2. Desktop presentation (where layout owns generic presentation)
       const desktopHero = document.getElementById('calc-desktop-hero');
-      if (desktopHero) desktopHero.textContent = result.heroValue;
+      if (desktopHero) animateValue(desktopHero, result.heroValue);
       const desktopLabel = document.getElementById('calc-desktop-hero-label');
       if (desktopLabel && result.heroLabel) desktopLabel.textContent = result.heroLabel;
 
@@ -451,6 +561,56 @@ const {
         applyCanonicalResult(existing);
       }
     }
+
+    // ── Get Info Inspector Panel (⌘I) ──────────────────────────────────
+    const getInfoBtn = document.getElementById('get-info-btn');
+    const getInfoModal = document.getElementById('calc-get-info-modal');
+    const getInfoClose = document.getElementById('get-info-close');
+    const getInfoDismiss = document.getElementById('get-info-dismiss');
+
+    function toggleGetInfo(force?: boolean) {
+      if (!getInfoModal) return;
+      const isOpen = !getInfoModal.classList.contains('hidden');
+      const shouldOpen = typeof force === 'boolean' ? force : !isOpen;
+
+      if (shouldOpen) {
+        getInfoModal.classList.remove('hidden');
+        getInfoModal.classList.add('flex');
+      } else {
+        getInfoModal.classList.add('hidden');
+        getInfoModal.classList.remove('flex');
+      }
+    }
+
+    getInfoBtn?.addEventListener('click', () => toggleGetInfo(true));
+    getInfoClose?.addEventListener('click', () => toggleGetInfo(false));
+    getInfoDismiss?.addEventListener('click', () => toggleGetInfo(false));
+
+    getInfoModal?.addEventListener('click', (e) => {
+      if (e.target === getInfoModal) toggleGetInfo(false);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
+        e.preventDefault();
+        toggleGetInfo();
+      } else if (e.key === 'Escape' && getInfoModal && !getInfoModal.classList.contains('hidden')) {
+        toggleGetInfo(false);
+      }
+    });
+
+    // ── Auto-track Recently Used Tools ────────────────────────────────
+    try {
+      const pageTitle = document.title.split(':')[0].split('|')[0].trim();
+      const currentPath = window.location.pathname;
+      if (currentPath && currentPath !== '/' && !currentPath.startsWith('/blog') && !currentPath.startsWith('/about')) {
+        const raw = localStorage.getItem('cm_recent_tools');
+        let recents: Array<{ name: string; path: string }> = raw ? JSON.parse(raw) : [];
+        recents = recents.filter((t) => t.path !== currentPath);
+        recents.unshift({ name: pageTitle, path: currentPath });
+        localStorage.setItem('cm_recent_tools', JSON.stringify(recents.slice(0, 6)));
+      }
+    } catch (e) {}
   }
 
   // Sync currency prefix from localStorage or jurisdiction lock on current page DOM
