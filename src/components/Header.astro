@@ -1,5 +1,5 @@
 ---
-import { getPublishedTools, getToolCount, SHOW_BLOG_NAV, SHOW_LANGUAGE } from '../config/site';
+import { getPublishedTools, getToolCount, SHOW_BLOG_NAV } from '../config/site';
 import SearchModal from './ui/SearchModal.astro';
 
 interface Props {
@@ -50,7 +50,7 @@ const totalToolsCount = getToolCount();
           currentPath === '/' ? 'text-accent font-semibold' : 'hover:text-accent',
         ]}
       >
-        <span data-i18n="nav-home">Home</span>
+        <span>Home</span>
       </a>
 
       <!-- Tools with dropdown chevron -->
@@ -63,7 +63,7 @@ const totalToolsCount = getToolCount();
           aria-controls="tools-menu-dropdown"
           class="group px-2.5 py-1.5 rounded-control flex items-center gap-1.5 text-text-primary hover:text-accent transition-standard focus-visible:outline-accent cursor-pointer"
         >
-          <span data-i18n="nav-tools">Tools</span>
+          <span>Tools</span>
           <!-- 1.5px stroke chevron -->
           <svg
             class="w-3.5 h-3.5 text-text-muted group-hover:text-accent transition-standard"
@@ -101,7 +101,7 @@ const totalToolsCount = getToolCount();
             role="menuitem"
             class="flex items-center justify-between px-3 py-2 text-[13px] rounded font-semibold text-accent hover:bg-canvas transition-standard focus-visible:outline-accent"
           >
-            <span data-i18n="nav-view-all">View All {totalToolsCount} Calculators</span>
+            <span>View All {totalToolsCount} Calculators</span>
             <span>&rarr;</span>
           </a>
         </div>
@@ -116,7 +116,7 @@ const totalToolsCount = getToolCount();
             currentPath.startsWith('/blog') ? 'text-accent font-semibold' : 'hover:text-accent',
           ]}
         >
-          <span data-i18n="nav-blog">Blog</span>
+          <span>Blog</span>
         </a>
       )}
 
@@ -128,7 +128,7 @@ const totalToolsCount = getToolCount();
           currentPath.startsWith('/about') ? 'text-accent font-semibold' : 'hover:text-accent',
         ]}
       >
-        <span data-i18n="nav-about">About</span>
+        <span>About</span>
       </a>
     </nav>
 
@@ -193,45 +193,8 @@ const totalToolsCount = getToolCount();
         </div>
       </div>
 
-      {SHOW_LANGUAGE && (
-        <>
-          <div class="relative" data-lang-dropdown>
-            <button
-              type="button"
-              id="header-lang-btn"
-              aria-label="Select Language"
-              aria-expanded="false"
-              aria-haspopup="true"
-              class="group flex items-center gap-1 text-text-primary hover:text-accent px-2 py-1.5 rounded-control transition-standard focus-visible:outline-accent font-medium text-[13px] cursor-pointer"
-            >
-              <span id="current-lang-label">EN</span>
-              <svg class="w-3 h-3 text-text-muted group-hover:text-accent transition-standard" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 4.5L6 7.5L9 4.5" />
-              </svg>
-            </button>
-
-            <div
-              id="header-lang-menu"
-              class="hidden absolute right-0 top-full mt-1 w-36 bg-surface border border-border rounded-control p-1 z-50 flex-col text-xs"
-            >
-              <button type="button" data-lang-val="EN" class="w-full text-left px-2.5 py-1.5 rounded bg-canvas text-accent font-semibold flex items-center justify-between cursor-pointer">
-                <span>EN (English)</span>
-                <span data-lang-check="EN" class="text-accent font-bold">✓</span>
-              </button>
-              <button type="button" data-lang-val="HI" class="w-full text-left px-2.5 py-1.5 rounded hover:bg-canvas hover:text-accent transition-standard text-text-primary flex items-center justify-between cursor-pointer">
-                <span>HI (हिन्दी)</span>
-                <span data-lang-check="HI" class="text-accent font-bold hidden">✓</span>
-              </button>
-            </div>
-          </div>
-          <div class="h-3.5 w-[1px] bg-border" aria-hidden="true"></div>
-        </>
-      )}
-
-      <!-- Divider line subtle (when no language selector) -->
-      {!SHOW_LANGUAGE && (
-        <div class="h-3.5 w-[1px] bg-border" aria-hidden="true"></div>
-      )}
+      <!-- Divider line subtle -->
+      <div class="h-3.5 w-[1px] bg-border" aria-hidden="true"></div>
 
       <!-- Dark Mode Toggle -->
       <button
@@ -347,7 +310,7 @@ const totalToolsCount = getToolCount();
   >
     <div class="max-w-[1440px] mx-auto w-full">
       <a href="/" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        <span data-i18n="nav-home">Home</span>
+        <span>Home</span>
       </a>
 
       <!-- Tools accordion section in mobile -->
@@ -358,7 +321,7 @@ const totalToolsCount = getToolCount();
           aria-expanded="false"
           class="w-full h-12 flex items-center justify-between px-6 text-[15px] font-medium text-text-primary hover:text-accent hover:bg-canvas transition-standard cursor-pointer"
         >
-          <span data-i18n="nav-tools">Tools</span>
+          <span>Tools</span>
           <svg id="mobile-tools-chevron" class="w-4 h-4 text-text-muted transition-standard" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M4 6L8 10L12 6" />
           </svg>
@@ -372,25 +335,25 @@ const totalToolsCount = getToolCount();
             </a>
           ))}
           <a href="/calculators" class="h-11 flex items-center px-8 text-sm font-semibold text-accent hover:underline">
-            <span data-i18n="nav-view-all">View All {totalToolsCount} Calculators &rarr;</span>
+            <span>View All {totalToolsCount} Calculators &rarr;</span>
           </a>
         </div>
       </div>
 
       {SHOW_BLOG_NAV && (
         <a href="/blog" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-          <span data-i18n="nav-blog">Blog</span>
+          <span>Blog</span>
         </a>
       )}
 
       <a href="/about" class="h-12 flex items-center px-6 text-[15px] font-medium border-b border-border text-text-primary hover:text-accent hover:bg-canvas transition-standard">
-        <span data-i18n="nav-about">About</span>
+        <span>About</span>
       </a>
 
-      <!-- Mobile utility row: Currency & Language -->
-      <div class="p-4 flex items-center justify-between text-xs text-text-muted bg-canvas">
+      <!-- Mobile utility row: Currency -->
+      <div class="p-4 flex items-center text-xs text-text-muted bg-canvas">
         <div class="flex items-center gap-2">
-          <span class="font-medium text-text-primary" data-i18n="nav-currency">Currency:</span>
+          <span class="font-medium text-text-primary">Currency:</span>
           <select id="mobile-currency-select" aria-label="Select display currency" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
             <option value="₹ INR" selected>₹ INR</option>
             <option value="$ USD">$ USD</option>
@@ -398,16 +361,6 @@ const totalToolsCount = getToolCount();
             <option value="£ GBP">£ GBP</option>
           </select>
         </div>
-
-        {SHOW_LANGUAGE && (
-          <div class="flex items-center gap-2">
-            <span class="font-medium text-text-primary" data-i18n="nav-lang">Lang:</span>
-            <select id="mobile-lang-select" class="h-8 rounded border border-border bg-surface px-2 text-xs text-text-primary focus:outline-accent">
-              <option value="EN" selected>EN</option>
-              <option value="HI">HI</option>
-            </select>
-          </div>
-        )}
       </div>
     </div>
   </div>
@@ -576,129 +529,7 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // ── 4. Language Selector with Persistence & Feedback ────────────────────
-    const langBtn = document.getElementById('header-lang-btn');
-    const langMenu = document.getElementById('header-lang-menu');
-    const langLabel = document.getElementById('current-lang-label');
-    const mobileLangSelect = document.getElementById('mobile-lang-select') as HTMLSelectElement | null;
-
-    const I18N_TEXTS: Record<string, Record<string, string>> = {
-      EN: {
-        'nav-home': 'Home',
-        'nav-tools': 'Tools',
-        'nav-blog': 'Blog',
-        'nav-about': 'About',
-        'nav-currency': 'Currency:',
-        'nav-lang': 'Lang:',
-      },
-      HI: {
-        'nav-home': 'होम',
-        'nav-tools': 'कैलकुलेटर',
-        'nav-blog': 'ब्लॉग',
-        'nav-about': 'परिचय',
-        'nav-currency': 'मुद्रा:',
-        'nav-lang': 'भाषा:',
-      },
-    };
-
-    function showToast(message: string) {
-      let toast = document.getElementById('cm-global-toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'cm-global-toast';
-        toast.className = 'fixed bottom-5 right-5 z-[150] bg-surface border border-border text-text-primary px-4 py-2.5 rounded-control text-xs font-medium transition-standard pointer-events-none opacity-0 translate-y-2';
-        document.body.appendChild(toast);
-      }
-      toast.textContent = message;
-      toast.classList.remove('opacity-0', 'translate-y-2');
-      toast.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(() => {
-        toast?.classList.remove('opacity-100', 'translate-y-0');
-        toast?.classList.add('opacity-0', 'translate-y-2');
-      }, 2200);
-    }
-
-    function applyLanguage(lang: string, broadcast = true) {
-      if (lang !== 'HI' && lang !== 'EN') lang = 'EN';
-      if (langLabel) langLabel.textContent = lang;
-      if (mobileLangSelect) mobileLangSelect.value = lang;
-
-      langMenu?.querySelectorAll<HTMLElement>('[data-lang-check]').forEach((el) => {
-        const checkLang = el.getAttribute('data-lang-check');
-        el.classList.toggle('hidden', checkLang !== lang);
-      });
-
-      langMenu?.querySelectorAll<HTMLElement>('[data-lang-val]').forEach((btn) => {
-        const btnLang = btn.getAttribute('data-lang-val');
-        if (btnLang === lang) {
-          btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
-          btn.classList.remove('text-text-primary');
-        } else {
-          btn.classList.remove('bg-canvas', 'text-accent', 'font-semibold');
-          btn.classList.add('text-text-primary');
-        }
-      });
-
-      try {
-        localStorage.setItem('cm_lang', lang);
-      } catch (e) {}
-
-      // Update translated UI text
-      const texts = I18N_TEXTS[lang];
-      if (texts) {
-        Object.entries(texts).forEach(([key, val]) => {
-          document.querySelectorAll(`[data-i18n="${key}"]`).forEach((el) => {
-            el.textContent = val;
-          });
-        });
-      }
-
-      if (broadcast) {
-        window.dispatchEvent(new CustomEvent('cm:lang-change', { detail: { lang } }));
-        showToast(lang === 'HI' ? 'भाषा: हिन्दी सेट की गई' : 'Language set to English');
-      }
-    }
-
-    // Restore saved language
-    try {
-      const savedLang = localStorage.getItem('cm_lang');
-      if (savedLang === 'HI' || savedLang === 'EN') {
-        applyLanguage(savedLang, false);
-      }
-    } catch (e) {}
-
-    if (langBtn && langMenu) {
-      langBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        langMenu.classList.toggle('hidden');
-        langMenu.classList.toggle('flex');
-        langBtn.setAttribute('aria-expanded', langMenu.classList.contains('flex') ? 'true' : 'false');
-      });
-
-      langMenu.querySelectorAll('[data-lang-val]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const lang = btn.getAttribute('data-lang-val') || 'EN';
-          applyLanguage(lang, true);
-          langMenu.classList.add('hidden');
-          langMenu.classList.remove('flex');
-          langBtn.setAttribute('aria-expanded', 'false');
-        });
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!langMenu.contains(e.target as Node) && !langBtn.contains(e.target as Node)) {
-          langMenu.classList.add('hidden');
-          langMenu.classList.remove('flex');
-          langBtn.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
-    mobileLangSelect?.addEventListener('change', () => {
-      applyLanguage(mobileLangSelect.value, true);
-    });
-
-    // ── 5. Dark Mode Toggle (Desktop & Mobile Sync) ──────────────────────────
+    // ── 4. Dark Mode Toggle (Desktop & Mobile Sync) ──────────────────────────
     const themeBtn = document.getElementById('theme-toggle-button');
     const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
     const iconMoon = document.getElementById('theme-icon-moon');
@@ -737,7 +568,7 @@ const totalToolsCount = getToolCount();
       mobileThemeBtn.addEventListener('click', toggleTheme);
     }
 
-    // ── 6. Mobile Navigation ────────────────────────────────────────────────
+    // ── 5. Mobile Navigation ────────────────────────────────────────────────
     const mobileMenuBtn = document.getElementById('mobile-menu-button');
     const mobileNavPanel = document.getElementById('mobile-nav-panel');
     const iconBars = document.getElementById('menu-icon-bars');
@@ -788,7 +619,7 @@ const totalToolsCount = getToolCount();
       });
     }
 
-    // ── 7. Mobile Tools Accordion ───────────────────────────────────────────
+    // ── 6. Mobile Tools Accordion ───────────────────────────────────────────
     const mobileToolsToggle = document.getElementById('mobile-tools-toggle');
     const mobileToolsSubpanel = document.getElementById('mobile-tools-subpanel');
     const mobileToolsChevron = document.getElementById('mobile-tools-chevron');
