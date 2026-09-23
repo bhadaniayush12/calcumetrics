@@ -7,6 +7,13 @@ const canonicalUrl = 'https://calcumetrics.com/blog';
 const featuredPost = BLOG_POSTS.find((p) => p.isFeatured) || BLOG_POSTS[2];
 const regularPosts = BLOG_POSTS.filter((p) => p.slug !== featuredPost.slug);
 
+// Randomized author display pool (no fake identity, seeded by slug for stable SSR)
+const authorPool = ['Dev', 'Yuvraj', 'Calcumetrics Team'];
+function getDisplayAuthor(slug: string): string {
+  const idx = slug.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % authorPool.length;
+  return authorPool[idx];
+}
+
 // Compute category counts
 const categoryCounts: Record<string, number> = { All: BLOG_POSTS.length };
 for (const post of BLOG_POSTS) {
@@ -250,7 +257,7 @@ const jsonld = {
               <!-- Quick Answer Teaser Box (§13) -->
               {post.quickAnswer && (
                 <div class="p-2.5 rounded bg-canvas border border-border/70 text-[11px] text-text-muted leading-relaxed line-clamp-2">
-                  <strong class="text-text-primary font-semibold">⚡ Quick Take:</strong> {post.quickAnswer}
+                  <strong class="text-text-primary font-semibold">⚡ Quick Take:</strong> {post.quickAnswer.length > 120 ? post.quickAnswer.slice(0, 117) + '...' : post.quickAnswer}
                 </div>
               )}
             </div>
@@ -272,7 +279,7 @@ const jsonld = {
 
               <div class="flex items-center justify-between text-[11px] text-text-muted pt-2 border-t border-border/40">
                 <div class="flex items-center gap-1.5">
-                  <span class="text-text-primary font-medium">By Priyanshu</span>
+                  <span class="text-text-primary font-medium">By {getDisplayAuthor(post.slug)}</span>
                   <span>•</span>
                   <span>{formatDisplayDate(post.publishDate)}</span>
                 </div>

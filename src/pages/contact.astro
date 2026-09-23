@@ -31,12 +31,16 @@ const jsonld = {
 };
 ---
 <Layout
-  title="Contact Us | Calcumetrics"
-  description="Contact us to report a calculation error, ask a question, or provide feedback. We respond within 2–3 business days."
+  title="Contact Calcumetrics | Report an Error or Share Feedback"
+  description="Report a calculation error, suggest a new calculator, or share general feedback. We respond to all messages within 2–3 business days."
   canonical={canonicalUrl}
+  slimFooter={true}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+    <!-- Breadcrumb -->
     <nav aria-label="Breadcrumb" class="mb-6">
       <ol class="flex items-center gap-1.5 text-xs text-text-muted">
         <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
@@ -44,32 +48,115 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Contact</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
-    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Contact</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-6">
-      This inbox is monitored. We respond to all messages, typically within 2–3 business days.
-    </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Email</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent font-medium">{SITE_EMAIL}</a>
-    </p>
+    <!-- Page Header -->
+    <header class="mb-10">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-chip border border-accent/20 bg-accent/5 text-xs font-semibold text-accent mb-3">
+        📬 Get in Touch
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-3">Contact Us</h1>
+      <p class="text-base text-text-muted leading-relaxed max-w-xl">
+        This inbox is monitored. We respond to every message — typically within 2–3 business days.
+      </p>
+    </header>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Reporting a calculation error</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-2">Please include:</p>
-    <ul class="list-disc list-inside space-y-1 text-sm text-text-muted mb-4 pl-2">
-      <li>The calculator name and URL</li>
-      <li>The exact inputs you used</li>
-      <li>The result you got from Calcumetrics</li>
-      <li>The result you expected, with your source or working</li>
-    </ul>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      This helps us reproduce and verify the issue quickly. Verified errors are corrected and the "Last updated" date on the page is changed.
-    </p>
+    <!-- Contact Card -->
+    <div class="bg-surface border border-border rounded-card p-6 sm:p-8 mb-8">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center text-lg shrink-0">✉️</div>
+        <div>
+          <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">Email us at</p>
+          <a
+            href={`mailto:${SITE_EMAIL}`}
+            class="text-lg font-bold text-accent hover:underline focus-visible:outline-accent"
+            id="contact-email-link"
+          >
+            {SITE_EMAIL}
+          </a>
+        </div>
+      </div>
+      <p class="text-sm text-text-muted leading-relaxed">
+        One inbox. Two people read every email. No bots, no auto-replies.
+      </p>
+    </div>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Other enquiries</h2>
-    <p class="text-sm text-text-muted leading-relaxed">
-      For general feedback, suggestions for new calculators, or anything else, use the same email address. We do not offer one-to-one financial, tax, or legal advice.
-    </p>
+    <!-- What to Write About -->
+    <div class="space-y-4 mb-10">
+      <h2 class="text-xl font-bold text-text-primary">What can we help with?</h2>
+
+      <!-- Category 1: Error Report -->
+      <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-error-section">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-xl">🐞</span>
+          <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">Report a Calculation Error</h3>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Found a wrong answer? We take accuracy seriously. When reporting, please include:
+        </p>
+        <ul class="space-y-1.5 text-sm text-text-muted pl-1">
+          <li class="flex items-start gap-2"><span class="text-accent font-bold shrink-0">·</span> The calculator name and URL</li>
+          <li class="flex items-start gap-2"><span class="text-accent font-bold shrink-0">·</span> The exact inputs you used</li>
+          <li class="flex items-start gap-2"><span class="text-accent font-bold shrink-0">·</span> The result you got from Calcumetrics</li>
+          <li class="flex items-start gap-2"><span class="text-accent font-bold shrink-0">·</span> The result you expected, with your source or working</li>
+        </ul>
+        <div class="mt-4 pt-3 border-t border-border">
+          <a
+            href={`mailto:${SITE_EMAIL}?subject=Calculation%20Error%20Report&body=Calculator%3A%0AURL%3A%0AInputs%20Used%3A%0AResult%20Received%3A%0AExpected%20Result%20(with%20source)%3A`}
+            class="inline-flex items-center gap-2 text-xs font-semibold text-accent hover:underline focus-visible:outline-accent"
+            id="contact-report-error-btn"
+          >
+            Send error report &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Category 2: Suggest a Calculator -->
+      <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-suggest-section">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-xl">💡</span>
+          <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">Suggest a New Calculator</h3>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-3">
+          Missing a tool you need? Tell us the calculator name, what it computes, and the formula or standard it should follow. We prioritize based on user demand.
+        </p>
+        <a
+          href={`mailto:${SITE_EMAIL}?subject=Calculator%20Suggestion&body=Calculator%20name%3A%0AWhat%20it%20computes%3A%0AFormula%20or%20standard%3A`}
+          class="inline-flex items-center gap-2 text-xs font-semibold text-accent hover:underline focus-visible:outline-accent"
+          id="contact-suggest-btn"
+        >
+          Send suggestion &rarr;
+        </a>
+      </div>
+
+      <!-- Category 3: General Feedback -->
+      <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-feedback-section">
+        <div class="flex items-center gap-2.5 mb-3">
+          <span class="text-xl">💬</span>
+          <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">General Feedback</h3>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          Anything else — UI issues, content improvements, a kind word, or a tough question. Use the same email address.
+        </p>
+      </div>
+    </div>
+
+    <!-- Response Time -->
+    <div class="flex items-start gap-3 p-4 bg-accent/5 border border-accent/20 rounded-card mb-8">
+      <span class="text-accent text-lg shrink-0">⏱️</span>
+      <div>
+        <p class="text-sm font-semibold text-text-primary mb-0.5">Response time</p>
+        <p class="text-xs text-text-muted leading-relaxed">
+          We aim to respond within 2–3 business days. Verified calculation errors are corrected promptly and logged in the <a href="/about#corrections" class="text-accent hover:underline">public corrections log</a>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Legal Note -->
+    <div class="border-t border-border pt-6">
+      <p class="text-xs text-text-muted leading-relaxed">
+        <strong class="text-text-primary">Legal note:</strong> Calcumetrics does not offer one-to-one financial, tax, investment, or legal advice. All calculators are provided for informational and educational purposes only. Results are mathematical estimates and should not be relied upon as professional advice. Consult a qualified professional for your specific situation.
+      </p>
+    </div>
+
   </div>
 </Layout>

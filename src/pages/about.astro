@@ -13,17 +13,13 @@ const jsonld = {
       '@type': 'AboutPage',
       name: 'About Calcumetrics',
       url: canonicalUrl,
-      description: 'Learn about Calcumetrics — our founder story, formula accuracy, client-side privacy, public corrections log, and test-case verification architecture.',
+      description: 'Learn about Calcumetrics — our story, formula accuracy, client-side privacy, public corrections log, and test-case verification architecture.',
       mainEntity: {
-        '@type': 'Person',
-        name: 'Priyanshu Bhadauriya',
-        jobTitle: 'Founder & Lead Developer',
-        url: 'https://calcumetrics.com/about',
-        sameAs: [
-          'https://github.com/calcumetrics',
-          'https://linkedin.com/in/priyanshubhadauriya',
-          'https://x.com/calcumetrics',
-        ],
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        email: 'hello@calcumetrics.com',
       },
     },
     {
@@ -38,8 +34,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="About Calcumetrics | Founder Story, Testing & Mission"
-  description="Learn about Calcumetrics and founder Priyanshu Bhadauriya. Built for commerce students, CA aspirants, and everyday investors with 100% client-side privacy."
+  title="About Calcumetrics | Our Story, Testing & Mission"
+  description="Learn about Calcumetrics — built by two commerce graduates who needed reliable financial calculators without the noise. 100% client-side privacy."
   canonical={canonicalUrl}
   slimFooter={true}
 >
@@ -177,39 +173,42 @@ const jsonld = {
               The Origin: Two Commerce Friends &amp; Broken Calculators
             </h2>
             <p class="text-[15px] text-text-primary leading-relaxed mb-3">
-              Calcumetrics began with two college friends studying commerce in India. Har baar assignments, case studies aur financial analysis ke liye alag-alag ad-choked websites pe bhatakna padta tha—kisi pe formula hidden tha, kisi pe 2-saal purane outdated tax slabs the, aur phone par aate hi poora layout bikhar jaata tha.
+              Calcumetrics started with two college friends — Dev and Yuvraj — who spent their commerce years jumping between ad-cluttered websites every time they needed a reliable formula. Each site had something wrong: hidden logic, outdated tax slabs, or a layout that broke on mobile the moment it mattered most.
             </p>
             <p class="text-[15px] text-text-muted leading-relaxed">
-              Ek raat semester projects ke dauran tang aakar humne decide kiya: <em>"Kyun na hum khud ek aisa clean tool banayein jo browser mein turant calculate kare bina kisi lead-form ya popup ke?"</em> Wahi se Calcumetrics shuru hua—ek aisi jagah jaha commerce students, CA aspirants aur everyday investors bina kisi distraction ke exact numbers calculate kar sakein.
+              One night, deep in semester projects, we hit a wall. <em>"Why doesn't a clean, honest calculator site exist?"</em> So we built one. Calcumetrics is that tool — a place where commerce students, CA aspirants, and everyday investors can get exact numbers instantly, without a lead form, a popup, or a paywall.
             </p>
           </div>
 
-          <!-- Founder Profile -->
-          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 p-5 bg-surface border border-border rounded-card">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-2xl font-bold shrink-0 shadow-sm">
-              PB
-            </div>
-            <div class="flex-1">
-              <div class="flex flex-wrap items-center justify-between gap-2 mb-1">
-                <div>
-                  <h3 class="text-lg font-bold text-text-primary">Priyanshu Bhadauriya</h3>
-                  <p class="text-xs text-text-muted">Founder &amp; Lead Developer · Calcumetrics</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <a href={`mailto:${SITE_EMAIL}`} class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
-                    ✉️ {SITE_EMAIL}
-                  </a>
-                  <a href="https://linkedin.com/in/priyanshubhadauriya" target="_blank" rel="noopener noreferrer" class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
-                    LinkedIn
-                  </a>
-                  <a href="https://x.com/calcumetrics" target="_blank" rel="noopener noreferrer" class="text-xs px-2.5 py-1 rounded bg-canvas border border-border text-text-muted hover:text-accent transition-standard">
-                    X
-                  </a>
-                </div>
+          <!-- Co-Founders Profile -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Dev -->
+            <div class="flex items-start gap-4 p-5 bg-surface border border-border rounded-card">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-xl font-bold shrink-0 shadow-sm">
+                D
               </div>
-              <p class="text-xs text-text-muted leading-relaxed mt-2">
-                Commerce background with deep focus on corporate valuation, direct taxation, and client-side web architecture. Every formula on Calcumetrics is manually verified against statutory notifications and academic financial literature.
-              </p>
+              <div class="flex-1">
+                <h3 class="text-base font-bold text-text-primary">Dev</h3>
+                <p class="text-xs text-text-muted mb-2">Co-founder &middot; Calcumetrics</p>
+                <p class="text-xs text-text-muted leading-relaxed">Commerce background. Focuses on formula architecture, statutory accuracy, and making financial math accessible to everyone.</p>
+                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1 text-xs mt-2 text-accent hover:underline">
+                  ✉️ {SITE_EMAIL}
+                </a>
+              </div>
+            </div>
+            <!-- Yuvraj -->
+            <div class="flex items-start gap-4 p-5 bg-surface border border-border rounded-card">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-xl font-bold shrink-0 shadow-sm">
+                Y
+              </div>
+              <div class="flex-1">
+                <h3 class="text-base font-bold text-text-primary">Yuvraj</h3>
+                <p class="text-xs text-text-muted mb-2">Co-founder &middot; Calcumetrics</p>
+                <p class="text-xs text-text-muted leading-relaxed">Commerce background. Leads UX, content strategy, and ensures every calculator solves a real user problem without friction.</p>
+                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1 text-xs mt-2 text-accent hover:underline">
+                  ✉️ {SITE_EMAIL}
+                </a>
+              </div>
             </div>
           </div>
 
@@ -434,7 +433,7 @@ const jsonld = {
         We build focused, high-utility web tools that solve everyday problems without bloat or tracking.
       </p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
         <!-- Sister Project Card 1: FixTheSpeaker -->
         <a
           href="https://fixthespeaker.com"
@@ -452,27 +451,6 @@ const jsonld = {
             </div>
             <p class="text-xs text-text-muted mt-1 leading-relaxed">
               Clean browser tool generating precision sine-wave sound frequencies to clear water and dust trapped in smartphone speakers.
-            </p>
-          </div>
-        </a>
-
-        <!-- Sister Project Card 2: Calcumetrics Open Formulas -->
-        <a
-          href="https://github.com/calcumetrics"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="p-4 bg-canvas hover:bg-surface border border-border hover:border-accent rounded-control transition-standard flex items-start gap-3.5 group cursor-pointer"
-        >
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 text-xl font-bold group-hover:scale-105 transition-standard">
-            ⚡
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1.5 font-bold text-sm text-text-primary group-hover:text-accent transition-standard">
-              <span>Calcumetrics Open Math</span>
-              <span class="text-xs text-text-muted">&nearr;</span>
-            </div>
-            <p class="text-xs text-text-muted mt-1 leading-relaxed">
-              Open collection of TypeScript financial formulas (SIP, EMI, XIRR, WACC) tested and free for commercial or educational use.
             </p>
           </div>
         </a>
