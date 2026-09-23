@@ -271,6 +271,7 @@ html[data-theme="dark"] .bg-accent.text-surface {
 input[type="number"],
 input[inputmode="decimal"],
 input[inputmode="numeric"] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 input[type="number"]::-webkit-outer-spin-button,

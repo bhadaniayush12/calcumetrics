@@ -41,16 +41,26 @@
 
   declare global {
     interface Window {
-      __cmShowToast?: (options: ToastOptions | string) => void;
+      __cmShowToast?: (options: ToastOptions | string, titleOrType?: string) => void;
     }
   }
 
-  function showToast(options: ToastOptions | string) {
+  function showToast(options: ToastOptions | string, titleOrType?: string) {
     const container = document.getElementById('mac-toast-container');
     const template = document.getElementById('mac-toast-template') as HTMLTemplateElement | null;
     if (!container || !template) return;
 
-    const opts: ToastOptions = typeof options === 'string' ? { message: options } : options;
+    let opts: ToastOptions;
+    if (typeof options === 'string') {
+      const isType = titleOrType && ['success', 'info', 'error', 'warning'].includes(titleOrType.toLowerCase());
+      opts = {
+        message: options,
+        title: isType ? undefined : titleOrType,
+        icon: isType && titleOrType.toLowerCase() === 'info' ? 'ℹ' : isType && titleOrType.toLowerCase() === 'error' ? '✕' : undefined,
+      };
+    } else {
+      opts = options;
+    }
     const clone = template.content.cloneNode(true) as DocumentFragment;
     const toastEl = clone.querySelector('.mac-toast-item') as HTMLElement;
     const titleEl = clone.querySelector('.toast-title') as HTMLElement;
