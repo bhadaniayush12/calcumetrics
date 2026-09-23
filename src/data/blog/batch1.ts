@@ -12,7 +12,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     dateModified: '2026-09-21',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Chartered Accountant & Fixed-Income Specialist',
     quickAnswer: 'Deposit before the 5th of the month; PPF interest is calculated monthly on the lowest balance between the 5th and the end of the month.',
     sources: [
@@ -208,7 +208,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by CFP® & US Retirement Tax Panel',
     quickAnswer: 'Choose Traditional 401(k) if your current tax bracket is higher than your expected retirement bracket; choose Roth if you are currently in a lower tax bracket.',
     sources: [
@@ -409,7 +409,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     dateModified: '2026-09-21',
     readTime: '7 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Banking & Quantitative Finance Panel',
     quickAnswer: 'APR ignores compounding; APY includes it. For borrowers, look at APY to see the true cost; for savers, APY shows actual earned yield.',
     sources: [
@@ -616,7 +616,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Chartered Accountant & Wealth Advisory Panel',
     quickAnswer: 'RD offers guaranteed capital safety with fixed returns taxed at slab rate; SIP equity mutual funds carry market risk but beat inflation over 5+ years.',
     sources: [
@@ -814,7 +814,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Mortgage Underwriting & Credit Risk Analyst',
     quickAnswer: 'Lenders generally cap front-end DTI at 28% (housing) and back-end DTI at 36%–43% (all debts) to qualify for prime mortgage rates.',
     sources: [
