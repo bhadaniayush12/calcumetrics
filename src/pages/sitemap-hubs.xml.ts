@@ -14,7 +14,7 @@ export const GET: APIRoute = async () => {
     .map(
       (cat) => `  <url>
     <loc>https://calcumetrics.com${cat.href}</loc>
-    <lastmod>2026-09-20</lastmod>
+    <lastmod>2026-09-23</lastmod>
   </url>`
     )
     .join('\n');

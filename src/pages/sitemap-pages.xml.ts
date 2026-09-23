@@ -2,27 +2,33 @@ import type { APIRoute } from 'astro';
 import { BLOG_POSTS } from '../data/blog/posts';
 
 export const GET: APIRoute = async () => {
+  // Static pages with their last meaningful update date
   const staticPages = [
-    '/',
-    '/calculators',
-    '/blog',
-    '/about',
-    '/contact',
-    '/methodology',
-    '/privacy-policy',
-    '/terms',
-    '/disclaimer',
-    '/cookie-policy',
+    { path: '/',               lastmod: '2026-09-23' },
+    { path: '/calculators',   lastmod: '2026-09-23' },
+    { path: '/blog',          lastmod: '2026-09-23' },
+    { path: '/about',         lastmod: '2026-09-23' },
+    { path: '/contact',       lastmod: '2026-09-23' },
+    { path: '/methodology',   lastmod: '2026-09-23' },
+    { path: '/privacy-policy',lastmod: '2026-09-23' },
+    { path: '/terms',         lastmod: '2026-09-23' },
+    { path: '/disclaimer',    lastmod: '2026-09-23' },
+    { path: '/cookie-policy', lastmod: '2026-09-23' },
   ];
 
-  const blogPages = BLOG_POSTS.map((post) => `/blog/${post.slug}`);
-  const pages = [...staticPages, ...blogPages];
+  // Blog posts use their individual dateModified for accurate freshness signals
+  const blogEntries = BLOG_POSTS.map((post) => ({
+    path: `/blog/${post.slug}`,
+    lastmod: post.dateModified,
+  }));
 
-  const urls = pages
+  const allEntries = [...staticPages, ...blogEntries];
+
+  const urls = allEntries
     .map(
-      (path) => `  <url>
-    <loc>https://calcumetrics.com${path === '/' ? '/' : path}</loc>
-    <lastmod>2026-09-23</lastmod>
+      ({ path, lastmod }) => `  <url>
+    <loc>https://calcumetrics.com${path}</loc>
+    <lastmod>${lastmod}</lastmod>
   </url>`
     )
     .join('\n');
