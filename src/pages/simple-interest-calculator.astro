@@ -345,6 +345,8 @@ const jsonld = {
     }
 
     function recalc() {
+      if (!pInput || !rInput || !yInput) return;
+
       // Phase 4.3 Centralized Validation Engine
       const valP = validate(pInput.value, siSchema.p);
       if (!valP.valid) {

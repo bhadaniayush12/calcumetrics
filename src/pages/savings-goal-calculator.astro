@@ -370,7 +370,7 @@ const jsonld = {
       <section aria-labelledby="sg-calculator-faq">
         <h2 id="sg-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {((jsonld['@graph'][2] as any)?.mainEntity || []).map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
               <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
@@ -450,7 +450,7 @@ const jsonld = {
       const vTarget = validate(rawTarget, { required: true, min: 1000, label: 'Target Goal Amount' });
       const vCurrent = validate(rawCurrent, { required: true, min: 0, label: 'Current Savings' });
       const vRate = validate(rawRate, { required: true, min: 0, max: 100, decimal: true, label: 'Expected Return' });
-      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integer: true, label: 'Time Horizon' });
+      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integerOnly: true, label: 'Time Horizon' });
 
       if (!vTarget.valid) { showError(vTarget.error!.message); return; }
       if (!vCurrent.valid) { showError(vCurrent.error!.message); return; }

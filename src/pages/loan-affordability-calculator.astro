@@ -347,7 +347,7 @@ const jsonld = {
       <section aria-labelledby="afford-calculator-faq">
         <h2 id="afford-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {((jsonld['@graph'][2] as any)?.mainEntity || []).map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
               <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
@@ -439,7 +439,7 @@ const jsonld = {
 
       const vB = validate(rawB, { required: true, min: 100, label: 'Monthly Repayment Budget' });
       const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
-      const vY = validate(rawY, { required: true, min: 1, max: 40, integer: true, label: 'Loan Term' });
+      const vY = validate(rawY, { required: true, min: 1, max: 40, integerOnly: true, label: 'Loan Term' });
 
       if (!vB.valid) { showError(vB.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
