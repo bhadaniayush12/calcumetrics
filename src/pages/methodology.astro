@@ -3,13 +3,41 @@ import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
 
 const canonicalUrl = 'https://calcumetrics.com/methodology';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: 'Methodology: Formulas & Conventions',
+      url: canonicalUrl,
+      description: 'Formulas, conventions, data sources, and our correction policy for all Calcumetrics calculators.',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Methodology', item: canonicalUrl },
+      ],
+    },
+  ],
+};
 ---
 <Layout
   title="Methodology: Our Formulas & Conventions | Calcumetrics"
   description="Formulas, conventions, data sources, and our correction policy for all Calcumetrics calculators."
   canonical={canonicalUrl}
 >
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
   <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center gap-1.5 text-xs text-text-muted">
+        <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="text-text-primary font-medium" aria-current="page">Methodology</li>
+      </ol>
+    </nav>
     <!-- 1. Title + Introduction -->
     <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-3">Methodology</h1>

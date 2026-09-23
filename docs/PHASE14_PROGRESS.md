@@ -11,9 +11,9 @@
 |------|--------|
 | Phase | PHASE 14 — SEO IMPLEMENTATION |
 | Branch | development |
-| Latest commit | d38cc32 (Batch 4) |
-| Latest commit message | feat(phase14-seo): batch 4 audit of all 50 calculators across 5 categories |
-| Overall Phase Status | **IN PROGRESS — BATCH 5 COMPLETE** |
+| Latest commit | fbcbb58 (Batch 5 follow-up) |
+| Latest commit message | fix(calculators): resolve validation rule typing and FAQ navigation type narrowing |
+| Overall Phase Status | **IN PROGRESS — BATCH 6 COMPLETE** |
 
 ---
 
@@ -26,8 +26,8 @@
 | BATCH 2 | Sitemap, indexability, URL audit | **COMPLETE** | 38e446a |
 | BATCH 3 | Homepage, /calculators, 5 category pages | **COMPLETE** | b1127ff |
 | BATCH 4 | All 50 calculators (category by category) | **COMPLETE** | d38cc32 |
-| BATCH 5 | Blog SEO, internal linking, calculator ↔ article relationships | **COMPLETE** | pending commit |
-| BATCH 6 | Structured data, breadcrumbs, OG/social, image SEO | NOT STARTED |  |
+| BATCH 5 | Blog SEO, internal linking, calculator ↔ article relationships | **COMPLETE** | 8d491a6, fbcbb58 |
+| BATCH 6 | Structured data, breadcrumbs, OG/social, image SEO | **COMPLETE** | pending commit |
 | BATCH 7 | Final generated HTML audit, SEO regression, QA | NOT STARTED |  |
 
 ---
@@ -161,7 +161,14 @@
 - [x] Automated test suite `src/data/blog/seo.test.ts` validates all internal links ✅
 
 ## Structured Data Status
-- Baseline assessment done; full audit and fixes in Batch 6
+- [x] WebApplication schema verified on 100% of calculators (50/50) ✅
+- [x] FAQPage schema verified on 100% of calculators (50/50) ✅
+- [x] BreadcrumbList schema verified on 100% of calculators (50/50) with matching visible breadcrumbs ✅
+- [x] CollectionPage + ItemList + BreadcrumbList verified on all 5 category hubs ✅
+- [x] CollectionPage + ItemList + BreadcrumbList verified on /calculators directory with visible breadcrumbs ✅
+- [x] Article schema verified on all 30 blog posts with image, author, and publisher entities ✅
+- [x] AboutPage + BreadcrumbList on /about, ContactPage + BreadcrumbList on /contact ✅
+- [x] WebPage + BreadcrumbList on all supporting policy pages (/methodology, /privacy-policy, /terms, /disclaimer, /cookie-policy) ✅
 
 ## Blog Post Audit Status (30/30 done ✅)
 - [x] Phase11: 10 posts — titles, descriptions, and internal links audited & optimized ✅
@@ -176,9 +183,11 @@
 ## Test Results
 - Pre-baseline: 394 tests, 22 files — ALL PASS ✅
 - Batch 5: 398 tests, 23 files — ALL PASS ✅
+- Batch 6: 400 tests, 23 files — ALL PASS ✅
 
 ## Build Results
 - Batch 4 & 5: 96 pages built with astro build in ~1.5s — ALL PASS ✅
+- Batch 6: 96 pages built with astro build in 1.66s — ALL PASS ✅
 
 ## Browser QA Results
 - Not started
@@ -189,39 +198,34 @@
 
 | ID | Priority | Defect | Target Batch | Status |
 |----|----------|--------|--------------|--------|
-| D1 | HIGH | `/og/default.png` missing from `public/` | BATCH 6 | Pending Batch 6 |
+| D1 | HIGH | `/og/default.png` missing from `public/` | BATCH 6 | ✅ Fixed in Batch 6 (1200x630 default PNG generated) |
 | D2 | MEDIUM | `og:type` always "website" even for Article pages | BATCH 1 | ✅ Fixed in 5c27344 |
-| D3 | MEDIUM | No `twitter:title`, `twitter:description`, `twitter:image` | BATCH 1 | ✅ Fixed in 5c27344 |
-| D4 | LOW | Blog post author is Organization, not Person | BATCH 6 | Pending Batch 6 |
+| D3 | MEDIUM | No `twitter:title`, `twitter:description`, `twitter:image` | BATCH 1 | ✅ Fixed in 5c27344 & Batch 6 |
+| D4 | LOW | Blog post author is Organization, not Person | BATCH 6 | ✅ Fixed in Batch 6 (Entity resolved with @id and /about link) |
 | D5 | LOW | Organization schema missing logo, sameAs | BATCH 3 | ✅ Fixed in b1127ff |
 | D6 | LOW | sitemap-pages.xml uses single hardcoded lastmod | BATCH 2 | ✅ Fixed in 38e446a |
 | D7 | LOW | sitemap-hubs.xml uses hardcoded lastmod | BATCH 2 | ✅ Fixed in 38e446a |
 | D8 | LOW | About page title repeats brand unnecessarily | BATCH 1 | ✅ Fixed in 5c27344 |
 | D9 | MEDIUM | /404 noindex not verified | BATCH 1 | ✅ Verified (robots="noindex,follow") |
 | D10 | LOW | robots.txt doesn't explicitly list AI bots | BATCH 1 | ✅ Fixed in 5c27344 |
-| D11 | LOW | No per-article OG images | BATCH 6 | Pending Batch 6 |
-| D12 | LOW | No og:image:width / og:image:height | BATCH 1 | ✅ Fixed in 5c27344 |
+| D11 | LOW | No per-article OG images | BATCH 6 | ✅ Fixed in Batch 6 (30 per-article + 6 category OG PNGs generated) |
+| D12 | LOW | No og:image:width / og:image:height | BATCH 1 | ✅ Fixed in 5c27344 (1200x630) |
 | D13 | MEDIUM | Calculator pages don't link to relevant blog articles | BATCH 5 | ✅ Fixed in Batch 5 (50/50 linked) |
 | D14 | MEDIUM | Blog relatedArticles may reference non-existent slugs | BATCH 5 | ✅ Verified 100% valid in Batch 5 |
 
 ---
 
 ## Remaining Issues
-See "Known Defects" table above: D1, D4, D11 (Batch 6).
+All baseline defects (D1 through D14) are resolved!
+Proceed to **BATCH 7**: Final generated HTML audit, final SEO regression, and final QA.
 
 ## Exact Next Action
 
-1. **BATCH 5 CHECKPOINT:**
-   - Run `npm test` (done: ✅ 398 pass)
-   - Run `npm run build` (done: ✅ 96 pages built)
-   - Run `git diff --check` (done: ✅ clean)
-   - Commit BATCH 5 to development
-   - Push to origin/development
-
-2. **Then begin BATCH 6:** Structured data, breadcrumbs, OG/social, image SEO
-   - Fix D1: ensure `/og/default.png` exists or fallback is verified
-   - Fix D4: improve Article schema author attribution
-   - Fix D11: per-article OG image handling
+1. Commit and push BATCH 6 to `origin/development`.
+2. Begin **BATCH 7**:
+   - Inspect and validate generated HTML in `dist/` across all templates.
+   - Run complete final verification checklist.
+   - Browser QA on representative viewports.
 
 
 

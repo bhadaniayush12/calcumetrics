@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import { describe, expect, it } from 'vitest';
 import { BLOG_POSTS } from './posts';
 import { getPublishedTools } from '../../config/site';
@@ -47,6 +49,21 @@ describe('Blog SEO and Internal Linking Audit', () => {
     for (const post of BLOG_POSTS) {
       expect(post.relatedCalculators.length).toBeGreaterThanOrEqual(2);
       expect(post.relatedArticles.length).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it('verifies default and category OG images exist', () => {
+    expect(fs.existsSync(path.resolve(process.cwd(), 'public/og/default.png'))).toBe(true);
+    const categories = ['investments', 'loans', 'taxes', 'business', 'corporate-finance', 'blog'];
+    for (const cat of categories) {
+      expect(fs.existsSync(path.resolve(process.cwd(), `public/og/categories/${cat}.png`))).toBe(true);
+    }
+  });
+
+  it('verifies that all 30 blog posts have a generated OG image in public/og/articles/', () => {
+    for (const post of BLOG_POSTS) {
+      const ogPath = path.resolve(process.cwd(), `public/og/articles/${post.slug}.png`);
+      expect(fs.existsSync(ogPath), `Missing OG image for ${post.slug}`).toBe(true);
     }
   });
 });

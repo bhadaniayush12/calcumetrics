@@ -6,13 +6,42 @@ import { getToolCount, CATEGORIES, SITE_EMAIL } from '../config/site';
 const canonicalUrl = 'https://calcumetrics.com/about';
 const toolCount = getToolCount();
 const categoryCount = CATEGORIES.length;
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'AboutPage',
+      name: 'About Calcumetrics',
+      url: canonicalUrl,
+      description: 'Learn about Calcumetrics — our mission, methodology, formula accuracy, and independent financial calculation architecture.',
+      mainEntity: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'About', item: canonicalUrl },
+      ],
+    },
+  ],
+};
 ---
 <Layout
   title="About Calcumetrics | Free Financial Calculators, No Sign-Up"
   description="Learn about Calcumetrics — who runs it, our mission, what the tools are, how we make money, and our approach to formula accuracy."
   canonical={canonicalUrl}
 >
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
   <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center gap-1.5 text-xs text-text-muted">
+        <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="text-text-primary font-medium" aria-current="page">About</li>
+      </ol>
+    </nav>
+
     <!-- 1. WindowFrame Hero -->
     <WindowFrame urlPill="calcumetrics.com/about" class="mb-8">
       <div class="p-6 sm:p-8">

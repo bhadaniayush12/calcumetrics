@@ -3,13 +3,41 @@ import Layout from '../layouts/Layout.astro';
 import { SITE_EMAIL } from '../config/site';
 
 const canonicalUrl = 'https://calcumetrics.com/privacy-policy';
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: 'Privacy Policy',
+      url: canonicalUrl,
+      description: 'How Calcumetrics handles your data, including advertising cookies and user privacy choices.',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Privacy Policy', item: canonicalUrl },
+      ],
+    },
+  ],
+};
 ---
 <Layout
   title="Privacy Policy | Calcumetrics"
   description="How Calcumetrics handles your data, including our use of Google AdSense advertising cookies and your consent choices."
   canonical={canonicalUrl}
 >
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center gap-1.5 text-xs text-text-muted">
+        <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="text-text-primary font-medium" aria-current="page">Privacy Policy</li>
+      </ol>
+    </nav>
     <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Privacy Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
