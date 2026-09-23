@@ -2,20 +2,41 @@
 import Layout from '../layouts/Layout.astro';
 const canonicalUrl = 'https://calcumetrics.com/disclaimer';
 ---
-<Layout title="Disclaimer | Calcumetrics" description="Calcumetrics provides financial calculators for information only. Results are not financial, tax, or legal advice." canonical={canonicalUrl}>
+<Layout
+  title="Disclaimer | Calcumetrics"
+  description="Calcumetrics provides financial calculators for informational and educational purposes only. Results are not financial, tax, investment, or legal advice."
+  canonical={canonicalUrl}
+>
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Disclaimer</h1>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">The calculators on this website are provided for informational and educational purposes only. They are not financial, tax, investment, or legal advice.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Results are estimates</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">All outputs are calculated from the inputs you provide and the stated mathematical formulas. They assume constant rates and stated conventions for the entire projection period. Actual returns, interest rates, tax obligations, and financial outcomes will differ from these estimates.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Returns are not guaranteed</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Investment calculator results (SIP, lump sum, CAGR, XIRR, etc.) assume a constant annual rate that is chosen by you. Past performance of any fund or asset class is not indicative of future returns. Market investments carry risk, including the risk of loss of principal.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Tax and regulatory rates change</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Tax calculator results are based on rates verified as of the date shown on each tool. Tax laws, rates, and slabs change. Verify the applicable rates from official government sources before filing or making tax-related decisions.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Consult a professional</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Before making any significant financial, investment, tax, or legal decision, consult a qualified professional such as a Chartered Accountant (CA), Certified Financial Planner (CFP), or solicitor licensed in your jurisdiction.</p>
-      <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Third-party links</h2>
-      <p class="text-sm text-text-muted leading-relaxed">Links to official sources (government websites, regulators) are provided for convenience. We do not control and are not responsible for the content of external sites.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-6">
+      The calculators, simulation models, and educational articles on Calcumetrics (calcumetrics.com) are provided for informational and educational purposes only. They do not constitute financial, investment, tax, legal, or accounting advice.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Results are mathematical models, not guarantees</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      All calculator outputs are computed strictly from user-provided inputs and established mathematical equations (detailed on our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology page</a>). Calculations assume idealized conditions — such as steady compounding intervals, constant annual growth rates, and static tax slabs throughout the evaluation period. Real-world financial results, market returns, lending terms, and tax liabilities will diverge from these mathematical models.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Investment risk and market volatility</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Investment projections (including SIP, lump sum, CAGR, and XIRR calculations) model user-selected rate assumptions. Past performance of any asset class, mutual fund, index, or security is not indicative of future returns. Market investments are subject to risk, including possible loss of capital.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Tax and regulatory compliance</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Tax tools (such as the Old vs. New Tax Regime comparison, Capital Gains Tax, Advance Tax, HRA exemption, and GST calculators) incorporate statutory provisions (such as the Finance Act 2024 revisions to Section 115BAC, Section 111A/112/112A capital gains rates, and Section 234B/234C installment rules) as verified on the dates noted on each tool. However, individual tax liabilities depend on comprehensive personal factors — including Section 87A marginal relief eligibility, applicable surcharges, health and education cess, set-off of losses, and employer payroll declarations. Tax calculations on this site represent standard scenarios and should not be used as official tax filings.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Consult licensed professionals</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Before executing any major financial, credit, property, or tax decision, verify all figures with official gazettes, bank loan sanction terms, or a licensed professional — such as a Chartered Accountant (CA), Certified Financial Planner (CFP), or legal counsel qualified in your jurisdiction.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">External links and third-party references</h2>
+    <p class="text-sm text-text-muted leading-relaxed">
+      References and links to government portals (e.g. Income Tax Department, Reserve Bank of India, US IRS, SEC) are provided solely for educational reference. Calcumetrics does not control and assumes no responsibility for third-party websites or their current availability.
+    </p>
   </div>
 </Layout>

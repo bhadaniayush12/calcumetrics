@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T12:59:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Disclaimer (/disclaimer)
-- **COMPLETED_UNITS:** 5
-- **IN_PROGRESS:** Supporting Page: Disclaimer (/disclaimer)
-- **NEXT:** Supporting Page: Cookie Policy (/cookie-policy)
+- **LAST_UPDATED:** 2026-09-23T13:00:00+05:30
+- **CURRENT_UNIT:** Supporting Page: Cookie Policy (/cookie-policy)
+- **COMPLETED_UNITS:** 6
+- **IN_PROGRESS:** Supporting Page: Cookie Policy (/cookie-policy)
+- **NEXT:** Supporting Page: 404 Page (/404)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 05: Terms of Use (/terms)
-- **LAST_COMMIT:** 10ef99c
+- **LAST_COMPLETED_UNIT:** Unit 06: Disclaimer (/disclaimer)
+- **LAST_COMMIT:** 69e783c
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -23,7 +23,7 @@
 - [x] Contact (/contact) — PASS
 - [x] Privacy Policy (/privacy-policy & /privacy) — PASS
 - [x] Terms of Use (/terms) — PASS
-- [ ] Disclaimer (/disclaimer)
+- [x] Disclaimer (/disclaimer) — PASS
 - [ ] Cookie Policy (/cookie-policy)
 - [ ] 404 Page (/404)
 
@@ -131,4 +131,17 @@
 - **Intentionally Preserved:**
   - Standard intellectual property protections distinguishing public-domain math formulas from proprietary implementation and copy.
   - Disclaimer of warranties and standard limitation of liability.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 06: Disclaimer Page (/disclaimer) — PASS
+- **Status:** PASS (§12: fully compliant, mathematical estimates, statutory harmony with Phase 8).
+- **Changed:**
+  - Expanded disclaimer clarifying that outputs are mathematical models computed from user inputs and formula conventions, not financial/tax advice or guaranteed outcomes.
+  - Added dedicated section on tax and regulatory compliance explicitly harmonizing with Phase 8 tax architecture (Finance Act 2024 revisions to Section 115BAC, Sections 111A/112/112A capital gains, Sections 234B/234C, Section 87A rebate limitations, surcharge, and cess).
+  - Added cross-link to `/methodology`.
+  - Updated "Last updated" date to 23 September 2026.
+- **Intentionally Preserved:**
+  - Investment risk and market volatility notices (past performance not indicative of future returns, capital loss risk).
+  - Clear directive to consult licensed professionals (CAs, CFPs, solicitors) before signing major contracts or executing tax filings.
+  - External links disclaimer for official regulatory references.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
