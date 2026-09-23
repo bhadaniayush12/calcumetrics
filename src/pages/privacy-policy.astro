@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { SITE_EMAIL } from '../config/site';
+
 const canonicalUrl = 'https://calcumetrics.com/privacy-policy';
 ---
 <Layout
@@ -8,15 +10,15 @@ const canonicalUrl = 'https://calcumetrics.com/privacy-policy';
   canonical={canonicalUrl}
 >
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Privacy Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Effective date: 20 September 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
+      Effective date: 23 September 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Who we are and how to contact us</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics is an independent financial calculator website. For any privacy-related query or to exercise your rights, contact us at: <a href="mailto:hello@calcumetrics.com" class="text-accent hover:underline focus-visible:outline-accent">hello@calcumetrics.com</a>.
+      Calcumetrics is an independent financial calculator website. For any privacy-related query or to exercise your rights, contact us at: <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. What we collect</h2>
@@ -29,7 +31,7 @@ const canonicalUrl = 'https://calcumetrics.com/privacy-policy';
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
       <li><strong>Strictly necessary:</strong> No essential cookies at this time (no login, no session).</li>
-      <li><strong>Preferences:</strong> <code>localStorage</code> key <code>cm_currency</code> — stores your selected currency (e.g. INR, USD). No expiry; stays until you clear browser storage.</li>
+      <li><strong>Preferences:</strong> <code>localStorage</code> keys: <code>cm_currency</code> (stores your selected currency, e.g. INR, USD) and <code>cm_theme</code> (stores your dark/light appearance preference). No expiry; stays until you clear browser storage.</li>
       <li><strong>Advertising (Google AdSense):</strong> When active, Google AdSense sets cookies and uses device identifiers to serve personalised ads and measure ad performance. These are third-party cookies set by Google's ad technology.</li>
       <li><strong>Analytics:</strong> If analytics are added in future, this policy will be updated before they are enabled.</li>
     </ul>
@@ -52,7 +54,7 @@ const canonicalUrl = 'https://calcumetrics.com/privacy-policy';
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Legal bases and your rights</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Depending on your location, you may have rights under GDPR/UK GDPR (access, correction, deletion, restriction, portability, objection, withdrawal of consent), India's Digital Personal Data Protection Act 2023, or applicable US state privacy laws (CCPA/CPRA and others). To exercise any right, contact us at <a href="mailto:hello@calcumetrics.com" class="text-accent hover:underline focus-visible:outline-accent">hello@calcumetrics.com</a>.
+      Depending on your location, you may have rights under GDPR/UK GDPR (access, correction, deletion, restriction, portability, objection, withdrawal of consent), India's Digital Personal Data Protection Act 2023, or applicable US state privacy laws (CCPA/CPRA and others). To exercise any right, contact us at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Data retention and security</h2>

@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://calcumetrics.com',
+  redirects: {
+    '/privacy': '/privacy-policy'
+  },
   vite: {
     plugins: [tailwindcss()]
   }

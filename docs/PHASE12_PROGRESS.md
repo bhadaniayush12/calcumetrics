@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T12:57:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
-- **COMPLETED_UNITS:** 3
-- **IN_PROGRESS:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
-- **NEXT:** Supporting Page: Terms of Use (/terms)
+- **LAST_UPDATED:** 2026-09-23T12:58:00+05:30
+- **CURRENT_UNIT:** Supporting Page: Terms of Use (/terms)
+- **COMPLETED_UNITS:** 4
+- **IN_PROGRESS:** Supporting Page: Terms of Use (/terms)
+- **NEXT:** Supporting Page: Disclaimer (/disclaimer)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 03: Contact (/contact)
-- **LAST_COMMIT:** eaafbd8
+- **LAST_COMPLETED_UNIT:** Unit 04: Privacy Policy (/privacy-policy & /privacy redirect)
+- **LAST_COMMIT:** 848650b
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -21,7 +21,7 @@
 - [x] About (/about) — PARTIAL (§7: verified, accurate, publisher contact added; owner legal entity pending real owner input)
 - [x] Methodology (/methodology) — PASS
 - [x] Contact (/contact) — PASS
-- [ ] Privacy Policy (/privacy-policy & /privacy)
+- [x] Privacy Policy (/privacy-policy & /privacy) — PASS
 - [ ] Terms of Use (/terms)
 - [ ] Disclaimer (/disclaimer)
 - [ ] Cookie Policy (/cookie-policy)
@@ -104,3 +104,17 @@
   - Structured calculation error reporting guidelines (calculator name/URL, exact inputs, received result, expected result).
   - Clear notice that Calcumetrics does not provide 1-on-1 financial, tax, or legal advice.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 04: Privacy Policy Page (/privacy-policy & /privacy redirect) — PASS
+- **Status:** PASS (§10: fully compliant with actual implementation).
+- **Changed:**
+  - Audited code for real storage mechanisms and added `cm_theme` (dark/light theme preference) alongside `cm_currency` in the preferences storage section.
+  - Imported `SITE_EMAIL` from `../config/site` and used for all privacy/data rights contact inquiries.
+  - Updated "Last updated" and "Effective date" to 23 September 2026.
+  - Configured static redirect from `/privacy` to `/privacy-policy` in `astro.config.mjs` ensuring route integrity across all spec references.
+- **Intentionally Preserved:**
+  - Complete, factual description of client-side computation (inputs never transmitted or stored on remote servers).
+  - Accurate distinction between current state (0 essential cookies, no analytics cookies currently active) and planned state (Google AdSense with CMP consent dialog, future cookieless/consent-gated analytics).
+  - Interactive CMP trigger button (`privacy-cookie-settings-link`) wired to `calcumetrics:open-cookie-settings`.
+  - Comprehensive statutory coverage (GDPR, UK GDPR, India DPDP Act 2023, US state privacy laws CCPA/CPRA).
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages + `/privacy/index.html` redirect generated), `git diff --check` PASS.
