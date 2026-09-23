@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:40:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:45:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 9
-- **IN_PROGRESS:** 010. real-rate-of-return
-- **NEXT:** FINAL_PHASE_AUDIT
+- **COMPLETED_ARTICLES:** 10
+- **IN_PROGRESS:** NONE
+- **NEXT:** PHASE_11_COMPLETION_GATE
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** advance-tax-guide
-- **LAST_COMMIT:** e140fdf
+- **LAST_COMPLETED_ARTICLE:** real-rate-of-return
+- **LAST_COMMIT:** 765e26f
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (74 pages)
+- **BUILD_STATUS:** PASS (75 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -27,7 +27,7 @@
 - [x] 007. flat-vs-reducing-interest-rate — DONE (Evergreen)
 - [x] 008. cash-conversion-cycle — DONE (Evergreen)
 - [x] 009. advance-tax-guide — DONE (Evergreen/Statutory)
-- [ ] 010. real-rate-of-return — IN PROGRESS (Evergreen)
+- [x] 010. real-rate-of-return — DONE (Evergreen)
 
 ---
 
@@ -142,6 +142,15 @@
   - Intent: Provide a statutory walkthrough of Section 208 thresholds, quarterly installment due dates (June 15, Sept 15, Dec 15, March 15), safe-harbor rules (12% and 36%), Section 44AD/44ADA single March 15 deadline, and Section 234C windfall relief for capital gains.
   - Linked Calculators: `/in/advance-tax-calculator`, `/in/income-tax-calculator`, `/in/capital-gains-tax-calculator`, `/in/tds-calculator`.
   - Reciprocal Linking Added: Contextual educational callouts added to `/in/advance-tax-calculator` and `/in/tds-calculator`.
-  - Key Content: Section 208 liability threshold (₹10,000 net tax), statutory quarterly installment calendar table, safe-harbor calculations, mathematical distinctions between Section 234C (deferment interest) and Section 234B (year-end shortfall interest), presumptive taxation rules under Sections 44AD and 44ADA (single March 15 installment), the Section 234C proviso protecting unexpected capital gains and dividend windfalls, Section 207 senior citizen exemption, and 4-step compliance action plan.
+  - Key Content: Section 208 liability threshold (₹10,00,00 net tax), statutory quarterly installment calendar table, safe-harbor calculations, mathematical distinctions between Section 234C (deferment interest) and Section 234B (year-end shortfall interest), presumptive taxation rules under Sections 44AD and 44ADA (single March 15 installment), the Section 234C proviso protecting unexpected capital gains and dividend windfalls, Section 207 senior citizen exemption, and 4-step compliance action plan.
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+
+- **010. real-rate-of-return (/blog/real-rate-of-return)**:
+  - Title: The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money
+  - Intent: Dispel the nominal money illusion for bank fixed deposit savers, derive the exact Fisher Equation, model the twin erosion of marginal tax brackets and consumer price inflation, and outline inflation-resilient asset allocation.
+  - Linked Calculators: `/inflation-calculator`, `/fd-calculator`, `/future-value-calculator`, `/compound-interest-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/inflation-calculator` and `/fd-calculator`.
+  - Key Content: The nominal money illusion, derivation of the exact Fisher Equation `r_real = (r_nominal - i) / (1 + i)` versus crude subtraction, after-tax real return formula `r_real_net = [r_nominal(1 - t) - i] / (1 + i)`, the double-squeeze matrix (effective returns across 0%, 10%, 20%, 30% slabs and 4% to 7% inflation proving that 7% FD in 30% slab yields -1.04% real return), worked 10-year ₹10 Lakh deposit case study (nominal balance ₹16.65L purchasing only ₹9.30L in Year-0 real purchasing power = 7.0% wealth contraction), and inflation-defeating asset allocation strategies (Equity SIPs, SGBs, EEE instruments like PPF/EPF, Real Estate).
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
