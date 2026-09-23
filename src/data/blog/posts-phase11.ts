@@ -12,7 +12,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-20',
     readTime: '7 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by CFA & Quantitative Research Panel',
     quickAnswer: 'CAGR measures single lump-sum growth; use XIRR for multiple staggered deposits or SIPs.',
     sources: [
@@ -297,7 +297,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Chartered Accountant (CA) & Debt Advisory Panel',
     quickAnswer: 'Prepaying saves guaranteed post-tax interest (~8.5%); SIP historically compounds higher (~12-14%) with equity market risk.',
     sources: [
@@ -538,7 +538,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-24',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Senior Chartered Accountant (Tax & Statutory Practice)',
     quickAnswer: 'If total deductions (80C, 24(b), 80D) exceed ₹4.25 Lakh, Old Regime saves more tax; otherwise, New Regime wins with lower slabs and ₹75k standard deduction.',
     isFeatured: true,
@@ -874,7 +874,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '10 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Chartered Accountant & Tax Advisory Panel',
     quickAnswer: 'Listed equity LTCG is taxed at 12.5% above ₹1.25 Lakh; legacy real estate (bought pre-July 2024) can opt for 20% with indexation or 12.5% without.',
     sources: [
@@ -1171,7 +1171,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-18',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Corporate Finance & Controller Panel',
     quickAnswer: 'Margin is profit divided by revenue; markup is profit divided by cost. A 25% margin always requires a 33.3% markup.',
     sources: [
@@ -1499,7 +1499,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-19',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by CFA & Investment Valuation Practice',
     quickAnswer: 'NPV measures absolute dollar value creation, while IRR assumes reinvestment at the internal rate—always favor NPV when rankings conflict.',
     sources: [
@@ -1751,7 +1751,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Banking & Retail Credit Specialist',
     quickAnswer: 'Short answer: A 10% flat loan equates to an actual ~18.16% reducing APR because you keep paying interest on principal you already repaid.',
     sources: [
@@ -2009,7 +2009,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-20',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Working Capital & Treasury Panel',
     quickAnswer: 'Cash Conversion Cycle = DIO + DSO - DPO. A shorter or negative cycle lets your business fund working capital using supplier credit for free.',
     sources: [
@@ -2314,7 +2314,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Chartered Accountant & Statutory Compliance Panel',
     quickAnswer: 'Pay advance tax in 4 quarterly tranches (15%, 45%, 75%, 100%) if net annual tax liability exceeds ₹10,000 to avoid mandatory 234B/234C interest.',
     sources: [
@@ -2563,7 +2563,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     dateModified: '2026-09-21',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by CFP® & Wealth Advisory Panel',
     quickAnswer: 'Real Return ≈ Nominal Return - Inflation - Tax. A 7% FD in a 30% tax bracket yields 4.9% post-tax; at 6% inflation, your purchasing power drops 1.1% per year.',
     sources: [
