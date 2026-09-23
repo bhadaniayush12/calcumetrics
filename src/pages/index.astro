@@ -376,7 +376,7 @@ const jsonld = {
             icon: '📈',
             title: 'Why a 10% Flat Loan Actually Costs 18% APR',
             desc: 'Most people compare loans by the headline rate. Here\'s why that\'s wrong — and how to calculate the true cost of any loan.',
-            href: '/blog/flat-rate-vs-apr-loan-cost',
+            href: '/blog/flat-vs-reducing-interest-rate',
             readTime: '6 min read',
           },
           {
@@ -384,7 +384,7 @@ const jsonld = {
             icon: '🏛️',
             title: 'New vs Old Tax Regime: Which Saves You More?',
             desc: 'A worked step-by-step comparison using real FY 2025-26 slabs, standard deductions, and the Section 87A rebate.',
-            href: '/blog/new-vs-old-tax-regime-india',
+            href: '/blog/old-vs-new-tax-regime',
             readTime: '8 min read',
           },
           {
@@ -392,7 +392,7 @@ const jsonld = {
             icon: '📊',
             title: 'Break-Even Analysis: The One Number Every Business Needs',
             desc: 'Fixed costs, variable costs, contribution margin — how to find your break-even point and what it actually means for pricing.',
-            href: '/blog/break-even-analysis-guide',
+            href: '/blog/how-to-calculate-break-even-point',
             readTime: '5 min read',
           },
         ].map((post) => (
@@ -507,12 +507,17 @@ const jsonld = {
 
     if (!sliderMonthly || !sliderRate || !sliderYears) return;
 
+    // Narrowed non-null slider references for closure
+    const monthlyInput = sliderMonthly;
+    const rateInput = sliderRate;
+    const yearsInput = sliderYears;
+
     let activeCurrency: CurrencyCode = getStoredCurrency();
 
     function updateHero() {
-      const monthly = parseFloat(sliderMonthly.value);
-      const rate = parseFloat(sliderRate.value);
-      const years = parseFloat(sliderYears.value);
+      const monthly = parseFloat(monthlyInput.value);
+      const rate = parseFloat(rateInput.value);
+      const years = parseFloat(yearsInput.value);
 
       const symbol = CURRENCY_CONFIG[activeCurrency]?.symbol || '₹';
 
@@ -558,7 +563,7 @@ const jsonld = {
       if (insightText) {
         if (activeCurrency === 'INR') {
           const gainWords = formatIndianWords(r.gain, '₹');
-          insightText.textContent = `₹${formatIndian(monthly)}/month se ${years} saal mein ${gainWords} ka gain, sirf compounding se.`;
+          insightText.textContent = `₹${formatIndian(monthly)}/month over ${years} years yields ${gainWords} in pure compounding gain.`;
         } else {
           insightText.textContent = `${symbol}${new Intl.NumberFormat('en-US').format(monthly)}/month over ${years} years yields ${compactGain} in pure compounding gain.`;
         }
@@ -570,9 +575,9 @@ const jsonld = {
       }
     }
 
-    sliderMonthly.addEventListener('input', updateHero);
-    sliderRate.addEventListener('input', updateHero);
-    sliderYears.addEventListener('input', updateHero);
+    monthlyInput.addEventListener('input', updateHero);
+    rateInput.addEventListener('input', updateHero);
+    yearsInput.addEventListener('input', updateHero);
 
     // Listen to navbar currency switch event to prevent mismatch
     window.addEventListener('cm:currency-change', (e: any) => {
