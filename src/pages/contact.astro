@@ -1,5 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { SITE_EMAIL } from '../config/site';
+
 const canonicalUrl = 'https://calcumetrics.com/contact';
 ---
 <Layout
@@ -8,7 +10,7 @@ const canonicalUrl = 'https://calcumetrics.com/contact';
   canonical={canonicalUrl}
 >
   <div class="max-w-[700px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Contact</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-6">
       This inbox is monitored. We respond to all messages, typically within 2–3 business days.
@@ -16,7 +18,7 @@ const canonicalUrl = 'https://calcumetrics.com/contact';
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Email</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      <a href="mailto:hello@calcumetrics.com" class="text-accent hover:underline focus-visible:outline-accent">hello@calcumetrics.com</a>
+      <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent font-medium">{SITE_EMAIL}</a>
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">Reporting a calculation error</h2>

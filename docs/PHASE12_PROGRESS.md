@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T12:56:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Contact (/contact)
-- **COMPLETED_UNITS:** 2
-- **IN_PROGRESS:** Supporting Page: Contact (/contact)
-- **NEXT:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
+- **LAST_UPDATED:** 2026-09-23T12:57:00+05:30
+- **CURRENT_UNIT:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
+- **COMPLETED_UNITS:** 3
+- **IN_PROGRESS:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
+- **NEXT:** Supporting Page: Terms of Use (/terms)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 02: Methodology (/methodology)
-- **LAST_COMMIT:** 00f4f05
+- **LAST_COMPLETED_UNIT:** Unit 03: Contact (/contact)
+- **LAST_COMMIT:** eaafbd8
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -20,7 +20,7 @@
 
 - [x] About (/about) — PARTIAL (§7: verified, accurate, publisher contact added; owner legal entity pending real owner input)
 - [x] Methodology (/methodology) — PASS
-- [ ] Contact (/contact)
+- [x] Contact (/contact) — PASS
 - [ ] Privacy Policy (/privacy-policy & /privacy)
 - [ ] Terms of Use (/terms)
 - [ ] Disclaimer (/disclaimer)
@@ -90,4 +90,17 @@
   - Engineering standards grid (IEEE 754 64-bit float, Zero remote scripts, Immutable formulas, Annual statutory review).
   - Formula documentation block (SIP annuity-due, EMI, Compound interest, CAGR, WACC, IRR/XIRR Newton-Raphson, NPV).
   - Interest rate conventions (nominal annual rate vs EAR), tax/regulatory verifiedOn data, full floating-point rounding policy, limitations notice, and error correction policy with link to `/contact`.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 03: Contact Page (/contact) — PASS
+- **Status:** PASS (§9: fully compliant).
+- **Changed:**
+  - Imported `SITE_EMAIL` from `../config/site` as single source of truth for email.
+  - Formatted email link with clear styling and verified mailto target (`mailto:hello@calcumetrics.com`).
+  - Updated "Last updated" date to 23 September 2026.
+- **Intentionally Preserved:**
+  - Realistic and grounded response expectation ("typically within 2–3 business days") with zero fake 24/7 SLA.
+  - Zero fabricated phone numbers or physical street addresses.
+  - Structured calculation error reporting guidelines (calculator name/URL, exact inputs, received result, expected result).
+  - Clear notice that Calcumetrics does not provide 1-on-1 financial, tax, or legal advice.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
