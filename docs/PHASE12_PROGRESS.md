@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T12:55:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Methodology (/methodology)
-- **COMPLETED_UNITS:** 1
-- **IN_PROGRESS:** Supporting Page: Methodology (/methodology)
-- **NEXT:** Supporting Page: Contact (/contact)
+- **LAST_UPDATED:** 2026-09-23T12:56:00+05:30
+- **CURRENT_UNIT:** Supporting Page: Contact (/contact)
+- **COMPLETED_UNITS:** 2
+- **IN_PROGRESS:** Supporting Page: Contact (/contact)
+- **NEXT:** Supporting Page: Privacy Policy (/privacy-policy & /privacy)
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 01: About (/about) - PARTIAL (owner identity pending real input)
-- **LAST_COMMIT:** 4571420
+- **LAST_COMPLETED_UNIT:** Unit 02: Methodology (/methodology)
+- **LAST_COMMIT:** 00f4f05
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -19,7 +19,7 @@
 ## Supporting Pages Checklist
 
 - [x] About (/about) — PARTIAL (§7: verified, accurate, publisher contact added; owner legal entity pending real owner input)
-- [ ] Methodology (/methodology)
+- [x] Methodology (/methodology) — PASS
 - [ ] Contact (/contact)
 - [ ] Privacy Policy (/privacy-policy & /privacy)
 - [ ] Terms of Use (/terms)
@@ -76,4 +76,18 @@
   - Owner-facing TODO comment preserved in HTML source for publisher legal name/entity prior to AdSense onboarding.
   - Explanations of client-side architecture, monetization plan (AdSense with CMP, no sponsored/affiliate content), accuracy standards, and link to `/methodology`.
 - **Unresolved item logged (§7):** Owner legal entity name/registration to be supplied by site owner before AdSense submission.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 02: Methodology Page (/methodology) — PASS
+- **Status:** PASS (§8: fully compliant).
+- **Changed:**
+  - Added dedicated section: "Jurisdiction-locked calculators" explaining why regional tax (India Section 115BAC, HRA, GST, TDS) and US 401(k) tools are strictly locked to their native jurisdictions and statutory currencies (₹ and $), and cannot be converted across borders.
+  - Added dedicated section: "Display currency formatting vs. foreign exchange" clarifying that universal calculators allow toggling display currency symbols ($, €, £, ₹) for presentation only without FX conversion or number mutation.
+  - Updated "Last updated" date to 23 September 2026.
+- **Intentionally Preserved:**
+  - Dark WindowFrame interactive methodology sandbox with reactive client-side demo (principal, rate, 5-year fixed term, floating-point math, 0 network requests).
+  - 3-step calculation pipeline cards (Input → Engine → Output).
+  - Engineering standards grid (IEEE 754 64-bit float, Zero remote scripts, Immutable formulas, Annual statutory review).
+  - Formula documentation block (SIP annuity-due, EMI, Compound interest, CAGR, WACC, IRR/XIRR Newton-Raphson, NPV).
+  - Interest rate conventions (nominal annual rate vs EAR), tax/regulatory verifiedOn data, full floating-point rounding policy, limitations notice, and error correction policy with link to `/contact`.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.

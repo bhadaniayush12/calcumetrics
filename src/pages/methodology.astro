@@ -11,7 +11,7 @@ const canonicalUrl = 'https://calcumetrics.com/methodology';
 >
   <div class="max-w-[760px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- 1. Title + Introduction -->
-    <p class="text-xs text-text-muted mb-2">Last updated: 20 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-3">Methodology</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-8">
       Calcumetrics uses standard mathematical formulas from widely accepted financial textbooks and official regulatory sources. This page documents our conventions, assumptions, data sources, and client-side execution architecture.
@@ -216,6 +216,20 @@ const canonicalUrl = 'https://calcumetrics.com/methodology';
         <h2 class="text-xl font-bold text-text-primary mb-3">Interest rate conventions</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
           All calculators use nominal annual rates unless labelled otherwise. We do not use effective annual rate (EAR) unless explicitly stated. This matches the convention of Indian mutual fund platforms, banks, and most retail financial products.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Jurisdiction-locked calculators</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Calculators bound to regional tax statutes or legal frameworks (such as Indian Income Tax under Section 115BAC, HRA exemptions, Capital Gains Tax, GST, TDS, and the US 401(k) calculator) are strictly jurisdiction-locked. They always execute using their designated statutory currency (₹ INR for India-specific tools, $ USD for US 401(k)) and apply local statutory rules directly. They cannot be converted to other jurisdictions or currencies because tax codes and retirement regulations cannot be translated simply via exchange rates.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Display currency formatting vs. foreign exchange</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          For universal financial calculators (e.g. CAGR, NPV, IRR, EMI, Loan Amortization, DCF), Calcumetrics allows users to select their preferred display currency symbol ($, €, £, ₹). This control affects <em>display formatting and symbol presentation only</em>. It does <strong>not</strong> perform real-time currency conversion or modify numerical input/output amounts. Calcumetrics is not a foreign exchange service.
         </p>
       </section>
 
