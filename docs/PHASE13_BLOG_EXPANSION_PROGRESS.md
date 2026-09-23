@@ -4,15 +4,15 @@
 - **PHASE:** 13 (Content Expansion Pre-SEO)
 - **DATE_STARTED:** 2026-09-23
 - **ACTIVE_BRANCH:** `development`
-- **CURRENT_BATCH:** Batch 4 (Articles 26–30)
+- **CURRENT_BATCH:** Batch 4 Completed / Moving to Reciprocal Linking
 - **TOTAL_TARGET_ARTICLES:** 30
 - **EXISTING_PHASE_11_ARTICLES:** 10 (Protected baseline)
-- **NEW_ARTICLES_ADDED:** 15 / 20
+- **NEW_ARTICLES_ADDED:** 20 / 20
 - **CALCULATOR_CATALOG:** 50/50 Locked
 - **TEST_STATUS:** 394/394 PASS
-- **BUILD_STATUS:** 91 pages built (25 blog articles)
+- **BUILD_STATUS:** 96 pages built (30 blog articles)
 - **GIT_CHECK_STATUS:** Clean (0 whitespace errors)
-- **LATEST_COMMIT:** Pending Batch 3 commit
+- **LATEST_COMMIT:** Pending Batch 4 commit
 
 ---
 
@@ -23,9 +23,9 @@
 | **Init** | Research, 50-Tool Map & Tracker Setup | Map & Inventory | **COMPLETE** | Batch 1 checkpoint |
 | **Batch 1** | Investments & Loans Foundation | 5 articles (`ppf-interest-calculation-5th-day-rule`, `traditional-vs-roth-401k`, `apr-vs-apy-compounding-frequency`, `rd-vs-sip`, `debt-to-income-ratio-for-mortgage`) | **COMPLETE** | `08b2157` |
 | **Batch 2** | Debt Payoff, Amortization & Taxes | 5 articles (`debt-avalanche-vs-snowball`, `how-loan-amortization-works`, `fixed-vs-floating-rate-loans`, `ctc-vs-in-hand-salary`, `gst-input-tax-credit-rules`) | **COMPLETE** | `02d21b9` |
-| **Batch 3** | Tax Distinction & Practical Business | 5 articles (`tds-vs-advance-tax-difference`, `how-to-calculate-break-even-point`, `economic-order-quantity-eoq-guide`, `straight-line-vs-reducing-balance-depreciation`, `dscr-ratio-for-business-loans`) | **COMPLETE** | Ready to commit |
-| **Batch 4** | Corporate Finance, Solvency & Valuation | 5 articles (`current-ratio-vs-quick-ratio`, `cogs-vs-opex-accounting`, `how-to-calculate-wacc`, `dcf-valuation-terminal-value-guide`, `payback-period-vs-discounted-payback`) | **PENDING** | — |
-| **Final** | Reciprocal Linking, Test Updates & Audit | 50 tools cross-links, 30-post test assertion, full build verification | **PENDING** | — |
+| **Batch 3** | Tax Distinction & Practical Business | 5 articles (`tds-vs-advance-tax-difference`, `how-to-calculate-break-even-point`, `economic-order-quantity-eoq-guide`, `straight-line-vs-reducing-balance-depreciation`, `dscr-ratio-for-business-loans`) | **COMPLETE** | `9179ba0` |
+| **Batch 4** | Corporate Finance, Solvency & Valuation | 5 articles (`current-ratio-vs-quick-ratio`, `cogs-vs-opex-accounting`, `how-to-calculate-wacc`, `dcf-valuation-terminal-value-guide`, `payback-period-vs-discounted-payback`) | **COMPLETE** | Ready to commit |
+| **Final** | Reciprocal Linking, Test Updates & Audit | 50 tools cross-links, 30-post test assertion, full build verification | **IN_PROGRESS** | — |
 
 ---
 

@@ -6,8 +6,8 @@ describe('Blog posts data integrity', () => {
   const publishedTools = getPublishedTools();
   const validToolPaths = new Set(publishedTools.map((t) => t.path));
 
-  it('contains at least 10 evidenced blog posts', () => {
-    expect(BLOG_POSTS.length).toBeGreaterThanOrEqual(10);
+  it('contains exactly 30 evidenced blog posts', () => {
+    expect(BLOG_POSTS.length).toBe(30);
   });
 
   it('ensures every post has unique slugs and required metadata', () => {
@@ -63,15 +63,15 @@ describe('Blog posts data integrity', () => {
     }
   });
 
-  it('verifies Phase 11 Addendum market classifications and balance', () => {
+  it('verifies Phase 11 & Phase 13 market classifications and balance', () => {
     const counts = { Global: 0, 'India-Only': 0, Both: 0 };
     for (const post of BLOG_POSTS) {
       expect(['Global', 'India-Only', 'Both']).toContain(post.market);
       counts[post.market]++;
     }
-    expect(counts['Global']).toBeGreaterThanOrEqual(4);
-    expect(counts['India-Only']).toBeGreaterThanOrEqual(3);
-    expect(counts['Both']).toBeGreaterThanOrEqual(3);
+    expect(counts['Global']).toBe(18);
+    expect(counts['India-Only']).toBe(7);
+    expect(counts['Both']).toBe(5);
   });
 
   it('verifies Phase 11 Addendum authoritative sources and E-E-A-T signals', () => {
