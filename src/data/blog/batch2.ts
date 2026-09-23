@@ -12,7 +12,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Certified Financial Planner (CFP®)',
     quickAnswer: 'Avalanche pays highest-interest debt first to save the most money mathematically; Snowball pays smallest balances first for psychological momentum.',
     sources: [
@@ -222,7 +222,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Credit Risk & Retail Banking Panel',
     quickAnswer: 'Early EMI payments consist almost entirely of interest; principal reduction accelerates only in the second half of the loan tenure.',
     sources: [
@@ -425,7 +425,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Both',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Senior Retail Lending Specialist',
     quickAnswer: 'Fixed rates guarantee payment certainty; floating rates are typically 1.0%–1.5% cheaper initially and benefit when central bank rates decline.',
     sources: [
@@ -599,7 +599,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Corporate Payroll & Statutory Compliance Lead',
     quickAnswer: 'Take-home salary is typically 70%–80% of CTC after deducting employer/employee EPF, gratuity provisions, professional tax, and monthly TDS.',
     sources: [
@@ -826,7 +826,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'India-Only',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Indirect Tax & GST Advisory Practice',
     quickAnswer: 'ITC can only be claimed if the invoice appears in GSTR-2B, goods/services are received, and the supplier is paid within 180 days.',
     sources: [
