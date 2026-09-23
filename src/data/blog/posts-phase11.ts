@@ -289,7 +289,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
     seoTitle: 'Home Loan Prepayment vs SIP: Mathematical Comparison | Calcumetrics',
     description:
-      'Should you prepay your 8.5% home loan or invest surplus cash in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and post-Budget 2024 tax realities.',
+      'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and post-Budget 2024 tax rules.',
     category: 'Loans',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -528,7 +528,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     title: 'Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula',
     seoTitle: 'Old vs New Tax Regime Breakeven Deduction Formula (Budget 2024) | Calcumetrics',
     description:
-      'Learn the exact breakeven deduction formula between the Old and New Tax Regime after Budget 2024, including the ₹75,000 standard deduction and salary-by-salary lookup tables.',
+      'Breakeven deduction guide between Old and New Tax Regime after Budget 2024, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -859,9 +859,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'capital-gains-tax-rules',
     title: 'Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule',
-    seoTitle: 'Capital Gains Tax Rules India: 12.5% LTCG & Property Grandfathering | Calcumetrics',
+    seoTitle: 'Capital Gains Tax Rules India: 12.5% LTCG & Grandfathering | Calcumetrics',
     description:
-      'Complete guide to capital gains tax in India after the Finance (No. 2) Act 2024. Understand the new 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh exemption, and the dual-option real estate indexation rule.',
+      'India capital gains tax guide after Budget 2024: new 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh exemption, and the dual-option real estate indexation rule explained.',
     category: 'Taxes',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -1482,7 +1482,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     title: 'NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting',
     seoTitle: 'NPV vs IRR: Conflicting Results, Crossover Rate & Decision Rules | Calcumetrics',
     description:
-      'Learn why NPV and IRR give conflicting recommendations for mutually exclusive projects, how the reinvestment rate assumption distorts IRR, and how to find Fisher crossover rate.',
+      'Why NPV and IRR give conflicting project rankings, how the reinvestment rate assumption distorts IRR, and how to find the Fisher crossover rate with formulas.',
     category: 'Corporate Finance',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -1986,9 +1986,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'cash-conversion-cycle',
     title: 'The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency',
-    seoTitle: 'Cash Conversion Cycle (CCC): Formula, Benchmarks & Negative Working Capital | Calcumetrics',
+    seoTitle: 'Cash Conversion Cycle (CCC): Formula, Benchmarks & Solvency | Calcumetrics',
     description:
-      'Master the Cash Conversion Cycle (CCC) formula: DIO + DSO - DPO. Learn how working capital velocity determines solvency, why profitable firms go bust, and how to operate on negative float.',
+      'Master the Cash Conversion Cycle formula: DIO + DSO - DPO. Learn how working capital velocity determines solvency and how top retailers run negative float.',
     category: 'Business',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -2289,9 +2289,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'advance-tax-guide',
     title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
-    seoTitle: 'Advance Tax Due Dates FY 2024-25 / AY 2025-26 & Section 234B/234C Penalties | Calcumetrics',
+    seoTitle: 'Advance Tax Due Dates FY 2024-25 & Section 234B/234C Guide | Calcumetrics',
     description:
-      'Quarterly advance tax calendar for individual taxpayers, freelancers, and businesses. Learn Section 208 thresholds, 234B & 234C penal interest rules, and capital gains windfall protections.',
+      'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and capital gains windfall safe harbors.',
     category: 'Taxes',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
@@ -2536,9 +2536,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'real-rate-of-return',
     title: 'The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money',
-    seoTitle: 'Real Rate of Return Formula, Fisher Equation & FD Inflation Erosion | Calcumetrics',
+    seoTitle: 'Real Rate of Return Formula: Fisher Equation & Inflation | Calcumetrics',
     description:
-      'Calculate your true real rate of return after taxes and inflation using the exact Fisher Equation. Discover why a 7% bank fixed deposit (FD) delivers negative purchasing power.',
+      'Calculate true real rate of return after taxes and inflation using the Fisher Equation. Discover why a 7% bank fixed deposit (FD) yields negative real wealth.',
     category: 'Investments',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',

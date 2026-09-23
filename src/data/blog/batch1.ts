@@ -399,7 +399,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     title: 'APR vs. APY Explained: How Compounding Frequency Silently Changes Your True Return',
     seoTitle: 'APR vs APY: Formula, Differences & Compounding Frequency | Calcumetrics',
     description:
-      'Understand how Annual Percentage Rate (APR) differs from Annual Percentage Yield (APY), how daily vs monthly compounding widens the gap, and how lenders and banks use each.',
+      'How APR differs from APY, how compounding frequency widens the gap between nominal and effective rates, and how lenders quote interest to borrowers and savers.',
     category: 'Investments',
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
