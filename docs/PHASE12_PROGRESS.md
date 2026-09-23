@@ -2,21 +2,21 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T13:01:00+05:30
-- **CURRENT_UNIT:** Supporting Page: 404 Page (/404)
-- **COMPLETED_UNITS:** 7
-- **IN_PROGRESS:** Supporting Page: 404 Page (/404)
-- **NEXT:** Objective B: Global Shell & Header Audit
+- **LAST_UPDATED:** 2026-09-23T13:03:00+05:30
+- **CURRENT_UNIT:** Objective B: Global Shell & Header Audit
+- **COMPLETED_UNITS:** 8
+- **IN_PROGRESS:** Objective B: Global Shell & Header Audit
+- **NEXT:** Objective B: Navigation & Search Audit
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 07: Cookie Policy (/cookie-policy)
-- **LAST_COMMIT:** 6b2ae56
+- **LAST_COMPLETED_UNIT:** Unit 08: 404 Page (/404)
+- **LAST_COMMIT:** a4196d4
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
 
-## Supporting Pages Checklist
+## Supporting Pages Checklist (OBJECTIVE A: COMPLETE)
 
 - [x] About (/about) — PARTIAL (§7: verified, accurate, publisher contact added; owner legal entity pending real owner input)
 - [x] Methodology (/methodology) — PASS
@@ -25,7 +25,7 @@
 - [x] Terms of Use (/terms) — PASS
 - [x] Disclaimer (/disclaimer) — PASS
 - [x] Cookie Policy (/cookie-policy) — PASS
-- [ ] 404 Page (/404)
+- [x] 404 Page (/404) — PASS
 
 ---
 
@@ -156,4 +156,16 @@
 - **Intentionally Preserved:**
   - Strict distinction between current state (0 tracking/advertising cookies, functional localStorage only) and planned state (Google AdSense with Google-certified CMP, cookieless/consent-gated analytics).
   - External opt-out resources (Digital Advertising Alliance, Google Ad Settings).
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 08: 404 Page (/404) — PASS
+- **Status:** PASS (§14: fully compliant, active recovery paths).
+- **Changed:**
+  - Added interactive script to wire up the 404 search input (`notfound-search`), dispatching the global `cm:open-search` custom event on click, focus, or Enter keydown to immediately open the global search modal.
+- **Intentionally Preserved:**
+  - WindowFrame with `urlPill="calcumetrics.com/404"`, subtle calculator doodle, and giant faded 404 backdrop.
+  - Return to homepage primary CTA button (`Take me back home →`).
+  - Real, non-fake category navigation chips linking to `/investments`, `/loans`, `/taxes`, `/business`, `/corporate-finance`, and `/calculators` with verified total count (50 calculators).
+  - Search discovery recovery allowing users to find any tool in the 50-calculator catalog.
+  - Search engine meta directive (`robots="noindex,follow"`).
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.

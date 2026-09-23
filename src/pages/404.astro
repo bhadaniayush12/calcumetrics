@@ -108,3 +108,20 @@ const totalCount = getToolCount();
     </div>
   </div>
 </Layout>
+
+<script>
+  const searchInput = document.getElementById('notfound-search');
+  if (searchInput) {
+    const triggerSearch = () => {
+      window.dispatchEvent(new CustomEvent('cm:open-search'));
+    };
+    searchInput.addEventListener('click', triggerSearch);
+    searchInput.addEventListener('focus', triggerSearch);
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        triggerSearch();
+      }
+    });
+  }
+</script>
