@@ -2,16 +2,16 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:35:00+05:30
+- **LAST_UPDATED:** 2026-09-23T05:40:00+05:30
 - **TARGET_ARTICLES:** 10
-- **COMPLETED_ARTICLES:** 8
-- **IN_PROGRESS:** 009. advance-tax-guide
-- **NEXT:** 010. real-rate-of-return
+- **COMPLETED_ARTICLES:** 9
+- **IN_PROGRESS:** 010. real-rate-of-return
+- **NEXT:** FINAL_PHASE_AUDIT
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_ARTICLE:** cash-conversion-cycle
-- **LAST_COMMIT:** 10420eb
+- **LAST_COMPLETED_ARTICLE:** advance-tax-guide
+- **LAST_COMMIT:** e140fdf
 - **TEST_STATUS:** PASS (389/389 tests)
-- **BUILD_STATUS:** PASS (73 pages)
+- **BUILD_STATUS:** PASS (74 pages)
 - **BROWSER_QA_STATUS:** PENDING
 
 ---
@@ -26,8 +26,8 @@
 - [x] 006. npv-vs-irr — DONE (Evergreen)
 - [x] 007. flat-vs-reducing-interest-rate — DONE (Evergreen)
 - [x] 008. cash-conversion-cycle — DONE (Evergreen)
-- [ ] 009. advance-tax-guide — IN PROGRESS (Evergreen/Statutory)
-- [ ] 010. real-rate-of-return — PENDING (Evergreen)
+- [x] 009. advance-tax-guide — DONE (Evergreen/Statutory)
+- [ ] 010. real-rate-of-return — IN PROGRESS (Evergreen)
 
 ---
 
@@ -134,5 +134,14 @@
   - Linked Calculators: `/cash-conversion-cycle-calculator`, `/working-capital-calculator`, `/inventory-turnover-calculator`, `/dscr-calculator`.
   - Reciprocal Linking Added: Contextual educational callouts added to `/cash-conversion-cycle-calculator` and `/working-capital-calculator`.
   - Key Content: The profitable insolvency paradox, comparison between the Operating Cycle ($DIO + DSO$) and Cash Conversion Cycle ($DIO + DSO - DPO$), detailed breakdown of the 3 pillars (DIO, DSO, DPO), cross-sector industry benchmarks table (Amazon -32d, Walmart +2d, Apple -71d, Auto OEM +35d, Industrial Machinery +110d, B2B SaaS +15d), Apple's negative working capital float case study (holding cash for 71 days before supplier disbursement), and 5 practical operational interventions (2/10 Net 30 trade discounts, SKU culling, automated dunning, supplier terms negotiation, and milestone billing).
+  - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
+  - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+
+- **009. advance-tax-guide (/blog/advance-tax-guide)**:
+  - Title: Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest
+  - Intent: Provide a statutory walkthrough of Section 208 thresholds, quarterly installment due dates (June 15, Sept 15, Dec 15, March 15), safe-harbor rules (12% and 36%), Section 44AD/44ADA single March 15 deadline, and Section 234C windfall relief for capital gains.
+  - Linked Calculators: `/in/advance-tax-calculator`, `/in/income-tax-calculator`, `/in/capital-gains-tax-calculator`, `/in/tds-calculator`.
+  - Reciprocal Linking Added: Contextual educational callouts added to `/in/advance-tax-calculator` and `/in/tds-calculator`.
+  - Key Content: Section 208 liability threshold (₹10,000 net tax), statutory quarterly installment calendar table, safe-harbor calculations, mathematical distinctions between Section 234C (deferment interest) and Section 234B (year-end shortfall interest), presumptive taxation rules under Sections 44AD and 44ADA (single March 15 installment), the Section 234C proviso protecting unexpected capital gains and dividend windfalls, Section 207 senior citizen exemption, and 4-step compliance action plan.
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.

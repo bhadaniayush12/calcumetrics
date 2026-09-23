@@ -2139,4 +2139,233 @@ export const BLOG_POSTS: BlogPost[] = [
       </p>
     `,
   },
+  {
+    slug: 'advance-tax-guide',
+    title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
+    seoTitle: 'Advance Tax Due Dates FY 2024-25 / AY 2025-26 & Section 234B/234C Penalties | Calcumetrics',
+    description:
+      'Quarterly advance tax calendar for individual taxpayers, freelancers, and businesses. Learn Section 208 thresholds, 234B & 234C penal interest rules, and capital gains windfall protections.',
+    category: 'Taxes',
+    publishDate: '2026-09-23',
+    dateModified: '2026-09-23',
+    readTime: '8 min read',
+    author: 'Calcumetrics Tax Research Team',
+    type: 'Evergreen',
+    summary:
+      'If your net estimated tax liability exceeds ₹10,000 in a financial year, failing to pay taxes in quarterly installments triggers mandatory 1% per month penal interest under Sections 234B and 234C of the Income-tax Act. This comprehensive guide details the June 15, Sept 15, Dec 15, and March 15 quarterly calendar, the 12% and 36% safe harbors, special rules for Section 44AD/44ADA presumptive taxpayers, and how to protect capital gains windfalls from penal interest.',
+    relatedCalculators: [
+      {
+        name: 'Advance Tax Calculator',
+        path: '/in/advance-tax-calculator',
+        description: 'Calculate your quarterly installment obligations and evaluate Section 234B/234C exposure.',
+        badge: 'Quarterly Schedule',
+      },
+      {
+        name: 'Income Tax Calculator',
+        path: '/in/income-tax-calculator',
+        description: 'Estimate your total annual tax liability across Old vs. New Tax Regimes.',
+        badge: 'Slab Comparison',
+      },
+      {
+        name: 'Capital Gains Tax Calculator',
+        path: '/in/capital-gains-tax-calculator',
+        description: 'Compute STCG and LTCG tax liabilities to determine windfall advance tax installments.',
+        badge: 'Equity & Property',
+      },
+      {
+        name: 'TDS Calculator',
+        path: '/in/tds-calculator',
+        description: 'Calculate tax deducted at source to find your net advance tax payable.',
+      },
+    ],
+    relatedArticles: [
+      {
+        slug: 'capital-gains-tax-rules',
+        title: 'Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule',
+        description: 'Understand capital gains rates and Section 234C windfall relief for stock and property sales.',
+      },
+      {
+        slug: 'old-vs-new-tax-regime',
+        title: 'Old vs. New Tax Regime FY 2024-25 & 2025-26: The Definitive Breakeven Analysis',
+        description: 'Determine your baseline annual tax liability before scheduling quarterly advance tax payments.',
+      },
+    ],
+    faqs: [
+      {
+        question: 'Who is required to pay advance tax under Section 208?',
+        answer: 'Under Section 208 of the Income-tax Act, every taxpayer—whether a salaried individual, freelancer, consultant, partnership firm, or corporation—whose estimated total tax liability for the financial year (after deducting TDS and TCS credits) is ₹10,000 or more, is legally obligated to pay advance tax in quarterly installments.',
+      },
+      {
+        question: 'How do Section 234B and Section 234C penal interest differ?',
+        answer: 'Section 234C penalizes the deferment or shortfall of individual quarterly installments during the financial year, charging 1% simple interest per month (or part of a month) for 3 months on each defaulted installment. Section 234B penalizes the failure to pay at least 90% of your total assessed tax by the end of the financial year (March 31), charging 1% interest per month from April 1 of the assessment year until full payment is completed.',
+      },
+      {
+        question: 'What is the advance tax deadline for freelancers and professionals opting for Section 44ADA?',
+        answer: 'Eligible professionals and small business owners filing under presumptive taxation schemes (Section 44ADA or Section 44AD) are not required to pay advance tax across four quarterly installments. Instead, they enjoy a special statutory relaxation allowing them to pay 100% of their advance tax in a single installment on or before March 15 of the financial year.',
+      },
+      {
+        question: 'How do sudden capital gains or dividend windfalls avoid Section 234C penalties?',
+        answer: 'Because capital gains from stock or real estate sales, lottery winnings, and dividend incomes cannot be accurately predicted in advance, the proviso to Section 234C grants statutory safe-harbor relief. No penal interest under Section 234C is levied provided the taxpayer pays the required advance tax on such windfall income in the remaining quarterly installments due after the date the gain was realized.',
+      },
+      {
+        question: 'Are senior citizens exempt from paying advance tax?',
+        answer: 'Yes. Under Section 207(2), a resident senior citizen (aged 60 years or older) who does not derive any income from business or profession is completely exempt from paying advance tax, even if their tax liability on pensions, interest, or capital gains exceeds ₹10,000. They can settle their entire tax liability as self-assessment tax at the time of filing their annual ITR.',
+      },
+    ],
+    content: `
+      <p class="text-base text-text-muted leading-relaxed mb-6 font-normal">
+        For salaried employees in India whose employers deduct Tax Deducted at Source (TDS) under Section 192 every month, the concept of paying taxes directly to the government during the financial year rarely crosses their minds. But for <strong>freelancers, tech consultants, doctors, lawyers, stock market traders, and real estate sellers</strong>, ignoring advance tax is a recipe for costly statutory penalties.
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        Under the Income-tax Act, 1961, tax compliance follows the <strong>"Pay as You Earn"</strong> doctrine. If your estimated net tax liability exceeds ₹10,000 in a financial year, the government requires you to remit that tax in four quarterly installments. Missing these deadlines triggers mandatory, non-waivable penal interest charges under <strong>Section 234B and Section 234C</strong>.
+      </p>
+
+      <div class="p-4 bg-surface border border-accent/30 rounded-card mb-8 text-xs text-text-muted">
+        <strong class="text-text-primary text-sm block mb-1">Check Your Advance Tax Installment Schedule:</strong>
+        Calculate your exact quarterly due amounts and test Section 234B/234C penalty exposure with our <a href="/in/advance-tax-calculator" class="text-accent font-medium hover:underline">Advance Tax Calculator</a>, or verify your underlying slab liability with our <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a>.
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Section 208 Applicability Rule</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Under <strong>Section 208</strong> of the Income-tax Act, advance tax liability arises when:
+      </p>
+
+      <div class="bg-canvas border border-border rounded-card p-4 mb-6 font-mono text-xs text-text-primary text-center">
+        Net Estimated Tax Liability = (Total Gross Tax &minus; TDS &minus; TCS &minus; Reliefs) &ge; ₹10,000
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        Even salaried individuals become liable for advance tax if they earn substantial non-salary income—such as savings bank interest, fixed deposit interest, mutual fund capital gains, rental income, or crypto profits—and have not declared these additional revenues to their employer for enhanced workplace TDS deductions.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Quarterly Installment Calendar &amp; Safe Harbors</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        For all non-presumptive taxpayers (individuals, HUFs, partnership firms, and companies), advance tax must be remitted according to four statutory milestones:
+      </p>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Quarter</th>
+              <th class="p-3">Statutory Due Date</th>
+              <th class="p-3 text-accent font-bold">Cumulative Target</th>
+              <th class="p-3">Statutory Safe Harbor</th>
+              <th class="p-3">Interest Duration if Defaulted</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted font-mono">
+            <tr>
+              <td class="p-3 font-sans font-medium text-text-primary">Q1</td>
+              <td class="p-3">On or before <strong>June 15</strong></td>
+              <td class="p-3 font-bold text-accent">15% of net tax</td>
+              <td class="p-3 text-text-primary">12% minimum</td>
+              <td class="p-3 font-sans text-xs">1% per month for 3 months (Section 234C)</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-sans font-medium text-text-primary">Q2</td>
+              <td class="p-3">On or before <strong>September 15</strong></td>
+              <td class="p-3 font-bold text-accent">45% of net tax</td>
+              <td class="p-3 text-text-primary">36% minimum</td>
+              <td class="p-3 font-sans text-xs">1% per month for 3 months (Section 234C)</td>
+            </tr>
+            <tr>
+              <td class="p-3 font-sans font-medium text-text-primary">Q3</td>
+              <td class="p-3">On or before <strong>December 15</strong></td>
+              <td class="p-3 font-bold text-accent">75% of net tax</td>
+              <td class="p-3 text-text-primary">75% (No safe harbor)</td>
+              <td class="p-3 font-sans text-xs">1% per month for 3 months (Section 234C)</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-sans font-medium text-text-primary">Q4</td>
+              <td class="p-3">On or before <strong>March 15</strong></td>
+              <td class="p-3 font-bold text-accent">100% of net tax</td>
+              <td class="p-3 text-text-primary">100% (No safe harbor)</td>
+              <td class="p-3 font-sans text-xs">1% for 1 month (March) (Section 234C)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        <strong>The Safe Harbor Protection:</strong> Notice that for the June 15 and September 15 installments, the Income Tax Department provides a built-in statutory buffer. If you pay at least <strong>12%</strong> by June 15 (instead of 15%) or at least <strong>36%</strong> by September 15 (instead of 45%), no Section 234C penal interest is charged on that quarter's shortfall.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Section 234B vs. Section 234C: Understanding the Difference</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Many taxpayers conflate Sections 234B and 234C, but they penalize two completely different compliance failures:
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-bold text-text-primary">Section 234C (Deferment Interest)</h4>
+            <span class="text-xs font-mono text-red-400 font-semibold">Quarterly Slips</span>
+          </div>
+          <p class="text-xs text-text-muted mb-3">Penalizes falling behind the quarterly schedule during the financial year:</p>
+          <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
+            Interest = Shortfall &times; 1% &times; 3 Months
+          </div>
+          <p class="text-xs text-text-muted mt-2">Applies even if you pay all your tax by March 31 if earlier installments were underpaid.</p>
+        </div>
+
+        <div class="p-4 bg-surface border border-border rounded-card">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-sm font-bold text-text-primary">Section 234B (Year-End Shortfall)</h4>
+            <span class="text-xs font-mono text-red-400 font-semibold">Assessment Default</span>
+          </div>
+          <p class="text-xs text-text-muted mb-3">Triggered if total advance tax paid by March 31 is <strong>less than 90%</strong> of final assessed tax:</p>
+          <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
+            Interest = (Assessed Tax &minus; Advance Paid) &times; 1% / Month
+          </div>
+          <p class="text-xs text-text-muted mt-2">Runs from April 1 of the assessment year until the date you pay self-assessment tax.</p>
+        </div>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Presumptive Taxation: The Section 44AD / 44ADA Super-Exemption</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        If you are an eligible freelancer, technical consultant, architect, or doctor declaring profits under <strong>Section 44ADA</strong> (50% presumptive profit on gross receipts up to ₹75 Lakhs), or a small business declaring income under <strong>Section 44AD</strong> (6% or 8% on turnover up to ₹3 Crores), you are completely exempt from the 4-quarter installment schedule.
+      </p>
+
+      <div class="bg-surface border border-accent/30 rounded-card p-5 mb-6 text-xs text-text-muted">
+        <strong class="text-text-primary text-sm block mb-1">The Single March 15 Deadline:</strong>
+        Presumptive taxpayers are legally permitted to pay <strong>100% of their advance tax in a single lump-sum installment on or before March 15</strong>. You incur zero Section 234C interest for skipping the June, September, and December dates.
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Windfall Proviso: Capital Gains &amp; Dividend Protection</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        A common fear among retail equity investors and property sellers is: <em>"If I sell stock in January for a ₹10 Lakh long-term capital gain, will I be penalized under Section 234C for failing to pay advance tax on that gain in June and September?"</em>
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The answer is an emphatic <strong>NO</strong>. The Indian Parliament recognized that taxpayers cannot foresee sudden capital gains, speculative lottery wins, or unexpected dividend declarations before they happen.
+      </p>
+
+      <div class="bg-canvas border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-2">
+        <p class="font-semibold text-text-primary text-sm">The Statutory Rule (Section 234C Proviso):</p>
+        <p>1. If capital gains occur on January 10 (Quarter 4), you were not required to anticipate them in Q1, Q2, or Q3.</p>
+        <p>2. You must calculate the capital gains tax liability using our <a href="/in/capital-gains-tax-calculator" class="text-accent font-medium hover:underline">Capital Gains Tax Calculator</a>.</p>
+        <p>3. Pay the full advance tax on that gain in the <strong>subsequent remaining installments</strong>—in this case, on or before March 15.</p>
+        <p class="pt-2 border-t border-border font-bold text-accent">Zero Section 234C penal interest will be charged on preceding quarters!</p>
+      </div>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">6. Senior Citizen Exemption (Section 207)</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        Under <strong>Section 207(2)</strong>, resident individuals aged 60 years or older who do not have any income chargeable under the head "Profits and Gains of Business or Profession" (PGBP) are <strong>totally exempt from advance tax</strong>. Even if a retiree earns substantial interest income or capital gains from redeeming mutual funds, they can pay their tax as Self-Assessment Tax without any Section 234B or 234C interest penalties when filing their annual return.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion: 4 Steps to Penalty-Free Compliance</h2>
+      <div class="bg-canvas border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
+        <p><strong class="text-text-primary">Step 1: Estimate Total Annual Income Early (By June 1)</strong><br>
+        Aggregate your professional invoices, rental income, FD interest, and foreign dividends.</p>
+        <p><strong class="text-text-primary">Step 2: Reconcile TDS Credits in Form 26AS / AIS</strong><br>
+        Deduct all withholding tax credits from your gross tax using our <a href="/in/tds-calculator" class="text-accent font-medium hover:underline">TDS Calculator</a>.</p>
+        <p><strong class="text-text-primary">Step 3: Meet the 12% and 36% Safe Harbor Targets</strong><br>
+        Always remit at least 12% by June 15 and 36% by September 15 to safeguard against unexpected income spikes.</p>
+        <p><strong class="text-text-primary">Step 4: Pay Challan ITNS 280 Online</strong><br>
+        Navigate to the Protean (TIN-NSDL) e-tax portal, select Major Head (0021) and Minor Head (100 - Advance Tax), and remit payments via net banking or UPI.</p>
+      </div>
+    `,
+  },
 ];
