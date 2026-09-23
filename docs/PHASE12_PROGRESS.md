@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T13:00:00+05:30
-- **CURRENT_UNIT:** Supporting Page: Cookie Policy (/cookie-policy)
-- **COMPLETED_UNITS:** 6
-- **IN_PROGRESS:** Supporting Page: Cookie Policy (/cookie-policy)
-- **NEXT:** Supporting Page: 404 Page (/404)
+- **LAST_UPDATED:** 2026-09-23T13:01:00+05:30
+- **CURRENT_UNIT:** Supporting Page: 404 Page (/404)
+- **COMPLETED_UNITS:** 7
+- **IN_PROGRESS:** Supporting Page: 404 Page (/404)
+- **NEXT:** Objective B: Global Shell & Header Audit
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 06: Disclaimer (/disclaimer)
-- **LAST_COMMIT:** 69e783c
+- **LAST_COMPLETED_UNIT:** Unit 07: Cookie Policy (/cookie-policy)
+- **LAST_COMMIT:** 6b2ae56
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -24,7 +24,7 @@
 - [x] Privacy Policy (/privacy-policy & /privacy) — PASS
 - [x] Terms of Use (/terms) — PASS
 - [x] Disclaimer (/disclaimer) — PASS
-- [ ] Cookie Policy (/cookie-policy)
+- [x] Cookie Policy (/cookie-policy) — PASS
 - [ ] 404 Page (/404)
 
 ---
@@ -144,4 +144,16 @@
   - Investment risk and market volatility notices (past performance not indicative of future returns, capital loss risk).
   - Clear directive to consult licensed professionals (CAs, CFPs, solicitors) before signing major contracts or executing tax filings.
   - External links disclaimer for official regulatory references.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 07: Cookie Policy Page (/cookie-policy) — PASS
+- **Status:** PASS (§13: fully compliant with actual implementation).
+- **Changed:**
+  - Audited local storage implementation and explicitly documented both `cm_currency` (currency display preference) and `cm_theme` (dark/light mode preference) as functional client-side storage keys.
+  - Added `<script>` listener to wire up the "Cookie settings" button (`open-cookie-settings-btn`), dispatching `calcumetrics:open-cookie-settings` event to trigger the CMP consent dialog.
+  - Imported `SITE_EMAIL` from `../config/site` for questions.
+  - Updated "Last updated" date to 23 September 2026.
+- **Intentionally Preserved:**
+  - Strict distinction between current state (0 tracking/advertising cookies, functional localStorage only) and planned state (Google AdSense with Google-certified CMP, cookieless/consent-gated analytics).
+  - External opt-out resources (Digital Advertising Alliance, Google Ad Settings).
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
