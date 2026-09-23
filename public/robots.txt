@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
+# Allow major AI crawlers explicitly (supplements wildcard)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
 Sitemap: https://calcumetrics.com/sitemap-index.xml
