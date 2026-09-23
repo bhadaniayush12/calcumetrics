@@ -158,6 +158,10 @@ const jsonld = {
 <script>
   function initDirectory() {
     const searchInput = document.getElementById('calc-search') as HTMLInputElement | null;
+    const grid = document.getElementById('calc-grid');
+    if (!grid || grid.dataset.bound) return;
+    grid.dataset.bound = 'true';
+
     const countEl = document.getElementById('calc-count');
     const filterBtns = document.querySelectorAll<HTMLButtonElement>('.chip-filter');
     const toolCards = document.querySelectorAll<HTMLAnchorElement>('#calc-grid [data-tool-name]');

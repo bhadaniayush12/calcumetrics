@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T14:45:00+05:30
-- **CURRENT_UNIT:** Objective B: Currency Control, Theme & Footer Audit
-- **COMPLETED_UNITS:** 9
-- **IN_PROGRESS:** Objective B: Currency Control, Theme & Footer Audit
-- **NEXT:** Objective B: Currency Control, Theme & Footer Audit
+- **LAST_UPDATED:** 2026-09-23T14:48:00+05:30
+- **CURRENT_UNIT:** Objective B: Calculator Page Shell & Blog UI Audit
+- **COMPLETED_UNITS:** 10
+- **IN_PROGRESS:** Objective B: Calculator Page Shell & Blog UI Audit
+- **NEXT:** Objective B: Calculator Page Shell & Blog UI Audit
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 09: Global Shell, Header, Navigation & Search Audit
-- **LAST_COMMIT:** dd41663
+- **LAST_COMPLETED_UNIT:** Unit 10: Currency, Theme, Footer, WindowFrame, Home, Directory & Categories Audit
+- **LAST_COMMIT:** da345bc
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -35,14 +35,14 @@
 - [x] Header
 - [x] Navigation
 - [x] Search
-- [ ] Currency control
+- [x] Currency control
 - [x] Language control (English-only preserved)
-- [ ] Theme / dark mode
-- [ ] Footer
-- [ ] WindowFrame
-- [ ] Homepage
-- [ ] Calculators directory (/calculators)
-- [ ] Category pages (/investments, /loans, /taxes, /business, /corporate-finance)
+- [x] Theme / dark mode
+- [x] Footer
+- [x] WindowFrame
+- [x] Homepage
+- [x] Calculators directory (/calculators)
+- [x] Category pages (/investments, /loans, /taxes, /business, /corporate-finance)
 - [ ] Calculator shell (sample representative calculators)
 - [ ] Blog index (/blog)
 - [ ] Blog article (/blog/[slug])
@@ -179,4 +179,18 @@
 - **Intentionally Preserved:**
   - Responsive header layout: 64px fixed/sticky shell with backdrop blur (`backdrop-blur-md`), brand mark, category nav links, "All Calculators" mega menu, Cmd+K / Ctrl+K search trigger button, currency selector, theme toggle, and mobile hamburger drawer.
   - Command palette: Fast search indexing all 50 calculators with title, slug, category, keywords, tags, ESC key handler, autofocus, and recent/popular search suggestions.
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 10: Currency, Theme, Footer, WindowFrame, Home, Directory & Categories Audit — PASS
+- **Status:** PASS (§8, §9, §26.2, §26.4, §26.5: complete and verified).
+- **Changed:**
+  - `src/pages/calculators.astro`: Added idempotent `grid.dataset.bound` guard inside `initDirectory()` to prevent duplicate search input and filter button event listeners across Astro view transitions.
+- **Audited & Verified:**
+  - **Currency Control (§8):** Phase 9 currency architecture locked. Display formatting only; zero FX conversions; `/in/*` INR locked; `/us/*` USD locked. Canonical localStorage key `cm_currency` validated with fallback to INR.
+  - **Theme / Dark Mode (§9):** Instant theme initialization in `Layout.astro` preventing light flash; clean dark mode tokens (`#0F1211`, `#171A18`, `#F7F7F4`, `#5FCDB6`); moon/sun icons synced on desktop and mobile; no contrast regressions.
+  - **Footer (§26):** 6-column layout (Taxes, Investments, Business, Corporate Finance, Loans, Company & Legal); all 38 links resolve without broken targets; "Cookie settings" button dispatches `calcumetrics:open-cookie-settings`; dynamic copyright year; no-advice disclaimer.
+  - **WindowFrame Component (§26.2):** 12px card radius, 1px border, 40px bar, 3 colored dots (`#FF5F56`, `#FFBD2E`, `#27C93F`), optional URL pill with lock icon, no blur/shadow.
+  - **Homepage (`/`):** 50-tool trust stats, SIP preview in WindowFrame, popular tools, browse by 5 categories, differentiator cards, dark CTA block, no email capture, no ads.
+  - **Directory (`/calculators`):** Live search & category filters, static HTML links for SEO, aria-live result count.
+  - **Category Pages:** `/investments`, `/loans`, `/taxes`, `/business`, `/corporate-finance` — verified breadcrumbs, schema, counts, responsive grid cards.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
