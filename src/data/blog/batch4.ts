@@ -12,7 +12,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by Corporate Finance & Financial Analysis Panel',
     quickAnswer: 'Current Ratio includes inventory; Quick (Acid-Test) Ratio excludes inventory and prepaid expenses to test immediate liquidity against current liabilities.',
     sources: [
@@ -210,7 +210,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Chartered Accountant & Corporate Controller',
     quickAnswer: 'COGS includes direct production costs (materials, direct labor); OpEx covers running the business (salaries, rent, marketing, utilities).',
     sources: [
@@ -413,7 +413,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by CFA & Corporate Valuation Practice',
     quickAnswer: 'WACC blends after-tax debt cost and equity cost using market values; it sets the minimum hurdle rate for corporate capital investments.',
     sources: [
@@ -607,7 +607,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-24',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Dev',
     reviewer: 'Reviewed by CFA & Investment Banking Valuation Panel',
     quickAnswer: 'Terminal Value typically represents 65%–80% of total company valuation in a 5–10 year DCF model; a 0.5% tweak in WACC or growth significantly alters intrinsic value.',
     sources: [
@@ -831,7 +831,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Priyanshu Bhadauriya',
+    author: 'Yuvraj',
     reviewer: 'Reviewed by Capital Budgeting & Corporate Finance Panel',
     quickAnswer: 'Simple Payback ignores time value of money; Discounted Payback discounts future cash flows at the hurdle rate to find the real break-even year.',
     sources: [
