@@ -2,14 +2,14 @@
 
 - **STATUS:** IN_PROGRESS
 - **PHASE:** 12
-- **LAST_UPDATED:** 2026-09-23T13:03:00+05:30
-- **CURRENT_UNIT:** Objective B: Global Shell & Header Audit
-- **COMPLETED_UNITS:** 8
-- **IN_PROGRESS:** Objective B: Global Shell & Header Audit
-- **NEXT:** Objective B: Navigation & Search Audit
+- **LAST_UPDATED:** 2026-09-23T14:45:00+05:30
+- **CURRENT_UNIT:** Objective B: Currency Control, Theme & Footer Audit
+- **COMPLETED_UNITS:** 9
+- **IN_PROGRESS:** Objective B: Currency Control, Theme & Footer Audit
+- **NEXT:** Objective B: Currency Control, Theme & Footer Audit
 - **BLOCKER:** NONE
-- **LAST_COMPLETED_UNIT:** Unit 08: 404 Page (/404)
-- **LAST_COMMIT:** a4196d4
+- **LAST_COMPLETED_UNIT:** Unit 09: Global Shell, Header, Navigation & Search Audit
+- **LAST_COMMIT:** dd41663
 - **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **BROWSER_QA_STATUS:** PENDING
@@ -31,12 +31,12 @@
 
 ## UI/UX Areas Checklist
 
-- [ ] Global shell
-- [ ] Header
-- [ ] Navigation
-- [ ] Search
+- [x] Global shell
+- [x] Header
+- [x] Navigation
+- [x] Search
 - [ ] Currency control
-- [ ] Language control (English-only preserved)
+- [x] Language control (English-only preserved)
 - [ ] Theme / dark mode
 - [ ] Footer
 - [ ] WindowFrame
@@ -168,4 +168,15 @@
   - Real, non-fake category navigation chips linking to `/investments`, `/loans`, `/taxes`, `/business`, `/corporate-finance`, and `/calculators` with verified total count (50 calculators).
   - Search discovery recovery allowing users to find any tool in the 50-calculator catalog.
   - Search engine meta directive (`robots="noindex,follow"`).
+- **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.
+
+### Unit 09: Global Shell, Header, Navigation & Search Audit — PASS
+- **Status:** PASS (§16–§18, §21, §24: complete and verified).
+- **Changed:**
+  - `src/components/Header.astro`: Imported `SHOW_LANGUAGE` flag from `../config/site`. Guarded both desktop language menu dropdown and mobile utility row `mobile-lang-select` behind `{SHOW_LANGUAGE && (...)}` to strictly enforce English-only launch constraint (C5 & §17) without unready Hindi switches or non-existent `/hi/` routes exposed.
+  - `src/components/Header.astro`: Added keyboard `Escape` handler to close tools dropdown and return focus to `tools-menu-button`. Added idempotent `.dataset.*Bound` guards across tools dropdown, search trigger buttons, theme toggle buttons, mobile drawer menu, and mobile tools accordion to prevent duplicate event listener accumulation on client-side navigations.
+  - `src/components/ui/SearchModal.astro`: Updated search input placeholder from outdated `Search 24+ calculators` to dynamic `Search ${tools.length} calculators (e.g. SIP, EMI, GST, NPV)...`, correctly reflecting the locked 50-calculator catalog. Added idempotent `dataset.paletteBound` guard to prevent duplicate keyboard/open event bindings across page loads.
+- **Intentionally Preserved:**
+  - Responsive header layout: 64px fixed/sticky shell with backdrop blur (`backdrop-blur-md`), brand mark, category nav links, "All Calculators" mega menu, Cmd+K / Ctrl+K search trigger button, currency selector, theme toggle, and mobile hamburger drawer.
+  - Command palette: Fast search indexing all 50 calculators with title, slug, category, keywords, tags, ESC key handler, autofocus, and recent/popular search suggestions.
 - **Verification:** `npm test` PASS (394/394 tests), `npm run build` PASS (76 pages built), `git diff --check` PASS.

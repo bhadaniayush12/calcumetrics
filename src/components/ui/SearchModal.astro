@@ -49,7 +49,7 @@ const popularSearches = [
       <input
         type="search"
         id="search-palette-input"
-        placeholder="Search 24+ calculators (e.g. SIP, EMI, GST, NPV)..."
+        placeholder={`Search ${tools.length} calculators (e.g. SIP, EMI, GST, NPV)...`}
         autocomplete="off"
         spellcheck="false"
         class="flex-1 bg-transparent border-none text-[18px] text-text-primary placeholder:text-text-muted focus:outline-none min-w-0"
@@ -279,6 +279,8 @@ const popularSearches = [
     const popularBtns = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-popular-search]'));
 
     if (!backdrop || !input) return;
+    if (backdrop.dataset.paletteBound) return;
+    backdrop.dataset.paletteBound = 'true';
 
     let activeCategory = 'All';
     let selectedIndex = 0;
