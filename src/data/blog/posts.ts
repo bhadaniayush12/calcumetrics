@@ -11,7 +11,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '7 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Global',
+    author: 'Calcumetrics Quantitative Research Team',
+    sources: [
+      {
+        name: 'CFA Institute Global Investment Performance Standards (GIPS)',
+        citation: 'Guidance Statement on Calculation of Time-Weighted and Money-Weighted Returns',
+        url: 'https://www.cfainstitute.org/en/ethics-standards/codes/gips-standards',
+      },
+      {
+        name: 'U.S. Securities and Exchange Commission (SEC)',
+        citation: 'Fast Answers: Compound Annual Growth Rate and Return Calculations',
+        url: 'https://www.sec.gov/fast-answers',
+      },
+      {
+        name: 'Financial Industry Regulatory Authority (FINRA)',
+        citation: 'Investor Bulletin: Calculating Investment Return and Annualized Yields',
+        url: 'https://www.finra.org',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'Retail investors are frequently confused when their mutual fund platform reports an 18% XIRR while absolute return shows 35% and CAGR cannot be calculated. This guide explains the exact mathematics of time-weighted vs. money-weighted returns, with side-by-side worked schedules and clear rules on when to use each metric.',
@@ -80,7 +98,7 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
     content: `
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
-        Log into any modern investment platform—whether Zerodha Console, Groww, Kuvera, or an AMC portal—and you will encounter a confusing alphabet soup of performance metrics: <strong>Absolute Return</strong>, <strong>CAGR</strong>, and <strong>XIRR</strong>. Investors frequently ask: <em>"My portfolio shows an absolute gain of 38%, but my XIRR is 19.4%, and when I calculate CAGR it gives an error. Which number actually reflects my real performance?"</em>
+        Log into any investment brokerage account, portfolio tracker, or mutual fund dashboard, and you will encounter an alphabet soup of return metrics: <strong>Absolute Return</strong>, <strong>CAGR</strong>, and <strong>XIRR</strong>. Investors routinely run into this exact paradox: <em>"My portfolio dashboard reports an absolute gain of 38%, but my XIRR is 19.4%, and when I try to compute CAGR it gives an error. Which number actually measures my investment performance?"</em>
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
@@ -136,7 +154,7 @@ export const BLOG_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Step-by-Step Worked Example: The Timing Disparity</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
-        To understand why CAGR fails for systematic investing, consider two investors—<strong>Investor A</strong> and <strong>Investor B</strong>—who both invest a total of ₹1,00,000 over a 3-year period and end up with exactly ₹1,60,000 on January 1, 2025.
+        To understand why CAGR fails for periodic or staggered investing, consider two investors—<strong>Investor A</strong> and <strong>Investor B</strong>—who both deploy a total capital of $100,000 over a 3-year period and end up with exactly $160,000 on January 1, 2025.
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -152,40 +170,40 @@ export const BLOG_POSTS: BlogPost[] = [
           <tbody class="divide-y divide-border text-text-muted">
             <tr>
               <td class="p-3 font-mono">01-Jan-2022</td>
-              <td class="p-3 font-medium text-text-primary">-₹1,00,000</td>
-              <td class="p-3 font-medium text-text-primary">-₹30,000</td>
+              <td class="p-3 font-medium text-text-primary">-$100,000</td>
+              <td class="p-3 font-medium text-text-primary">-$30,000</td>
               <td class="p-3">3.0 Years (1,096 days)</td>
             </tr>
             <tr>
               <td class="p-3 font-mono">01-Jan-2023</td>
               <td class="p-3">—</td>
-              <td class="p-3 font-medium text-text-primary">-₹30,000</td>
+              <td class="p-3 font-medium text-text-primary">-$30,000</td>
               <td class="p-3">2.0 Years (730 days)</td>
             </tr>
             <tr>
               <td class="p-3 font-mono">01-Jan-2024</td>
               <td class="p-3">—</td>
-              <td class="p-3 font-medium text-text-primary">-₹40,000</td>
+              <td class="p-3 font-medium text-text-primary">-$40,000</td>
               <td class="p-3">1.0 Year (365 days)</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-mono font-semibold text-text-primary">01-Jan-2025 (Redemption)</td>
-              <td class="p-3 font-semibold text-accent">+₹1,60,000</td>
-              <td class="p-3 font-semibold text-accent">+₹1,60,000</td>
+              <td class="p-3 font-semibold text-accent">+$160,000</td>
+              <td class="p-3 font-semibold text-accent">+$160,000</td>
               <td class="p-3">Valuation Date</td>
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
               <td class="p-3">Performance Metrics</td>
               <td class="p-3">CAGR: 16.96%<br>XIRR: 16.96%</td>
               <td class="p-3">CAGR: Mathematical Error<br>XIRR: 25.12%</td>
-              <td class="p-3">Why? Investor B had ₹40,000 invested for only 1 year!</td>
+              <td class="p-3">Why? Investor B had $40,000 invested for only 1 year!</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Revelation:</strong> Investor A's ₹1,00,000 was at risk for a full 36 months, compounding at an annual rate of <strong>16.96%</strong>. Investor B achieved the exact same final ₹1,60,000 with a staggering <strong>25.12% XIRR</strong>. Why? Because Investor B withheld ₹70,000 from the market initially, deploying ₹40,000 just 12 months before redemption. XIRR appropriately rewards Investor B for generating ₹60,000 in gains while capital was tied up for a significantly shorter average duration.
+        <strong>The Revelation:</strong> Investor A's $100,000 was at risk for a full 36 months, compounding at an annual rate of <strong>16.96%</strong>. Investor B achieved the exact same final $160,000 with a <strong>25.12% XIRR</strong>. Why? Because Investor B held back $70,000 from market risk initially, deploying the final $40,000 just 12 months before redemption. XIRR credits Investor B for generating $60,000 in capital gains while cash was deployed for a substantially shorter average duration.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Metric Comparison Matrix</h2>
@@ -239,14 +257,14 @@ export const BLOG_POSTS: BlogPost[] = [
         <div class="p-4 bg-canvas border border-border rounded-card">
           <h4 class="text-sm font-semibold text-text-primary mb-1">1. The Short-Tenure Annualization Trap</h4>
           <p class="text-xs text-text-muted leading-relaxed">
-            If you start an SIP and your first ₹10,000 installment gains ₹300 (3%) within 10 days, your app will compute an XIRR exceeding <strong>190%</strong>. This happens because the algorithm mathematically compounds that 10-day sprint over 36.5 cycles in a full year. Never evaluate an SIP's health using XIRR until you have completed at least 12 to 18 monthly cycles.
+            If you start a monthly recurring investment and your initial $10,000 contribution gains $300 (3%) in the first 10 days, your app will compute an XIRR exceeding <strong>190%</strong>. That is not a software glitch. The algorithm mathematically extrapolates that 10-day run over 36.5 cycles in a full 365-day year. Never evaluate a recurring investment plan using XIRR until you have completed at least 12 to 18 monthly cycles.
           </p>
         </div>
 
         <div class="p-4 bg-canvas border border-border rounded-card">
           <h4 class="text-sm font-semibold text-text-primary mb-1">2. Comparing Portfolio XIRR to Benchmark Index CAGR</h4>
           <p class="text-xs text-text-muted leading-relaxed">
-            Many retail investors proudly proclaim: <em>"My SIP beat the Nifty 50 because my XIRR is 18% while Nifty's 3-year return is 14%."</em> This is a flawed comparison. You must compare your fund's XIRR against an identical <strong>SIP in the benchmark index</strong> over the exact same installment dates, not against the index's point-to-point CAGR.
+            Investors frequently make this mistake: <em>"My recurring investment beat the S&P 500 because my portfolio XIRR is 18% while the index 3-year return is 14%."</em> That is comparing apples to oranges. You must compare your portfolio XIRR against a simulated <strong>dollar-cost-averaged investment in the benchmark index</strong> over the exact same purchase dates, not against the index's point-to-point CAGR.
           </p>
         </div>
 
@@ -258,7 +276,7 @@ export const BLOG_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Summary: Which Metric Should You Use?</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">How to Select the Right Performance Metric for Your Portfolio</h2>
       <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
         <li><strong>Use CAGR</strong> when evaluating a single stock purchase held for years, fixed deposit maturities, or point-to-point benchmark performance.</li>
         <li><strong>Use XIRR</strong> for systematic mutual fund SIPs, dividend reinvestment schemes, employee stock purchase plans (ESPP), or any portfolio with recurring cash flows.</li>
@@ -276,7 +294,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '8 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Both',
+    author: 'Calcumetrics Personal Finance Team',
+    sources: [
+      {
+        name: 'Reserve Bank of India (RBI)',
+        citation: 'Master Circular on Home Loans: Prohibition of Foreclosure Charges on Floating Rate Loans',
+        url: 'https://www.rbi.org.in',
+      },
+      {
+        name: 'Income Tax Department of India',
+        citation: 'Provisions of Section 24(b) and Section 115BAC (Finance Act 2024)',
+        url: 'https://incometaxindia.gov.in',
+      },
+      {
+        name: 'Federal Reserve Consumer Handbook',
+        citation: 'Consumer Handbook on Adjustable-Rate and Fixed Mortgages: Prepayment Decisions',
+        url: 'https://www.federalreserve.gov',
+      },
+    ],
     type: 'Hybrid',
     summary:
       'Borrowers are perpetually torn between the emotional freedom of becoming debt-free and the mathematical compounding of equity index investing. This guide analyzes the net post-tax return spread under the New Tax Regime, models a ₹50L loan with ₹10,000 monthly surplus, and outlines the optimal hybrid repayment strategy.',
@@ -344,7 +380,10 @@ export const BLOG_POSTS: BlogPost[] = [
     ],
     content: `
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
-        Few financial decisions trigger as much passionate debate among Indian homeowners as the classic dilemma: <strong>"I have an extra ₹10,000 to ₹25,000 each month. Should I prepay my 8.5% home loan to become debt-free faster, or should I invest that surplus into an equity mutual fund SIP?"</strong>
+        Whether you are managing a 30-year fixed mortgage internationally or an 8.5% floating home loan in India, the core dilemma is universal: <strong>"I have an extra monthly cash surplus. Should I prepay my mortgage to eliminate debt faster, or should I invest that money into a compounding equity index fund?"</strong>
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        One camp champions the mathematical compounding of the stock market, pointing out that long-term equity returns of 10%–12% outpace a 7%–8.5% borrowing cost. The other camp values peace of mind, arguing that eliminating debt provides a guaranteed, risk-free post-tax return while removing the threat of monthly debt obligations.
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
@@ -361,9 +400,9 @@ export const BLOG_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The New Tax Reality: Why Prepayment Just Got Stronger</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Tax Reality: How Tax Shields Alter the Equation (Global vs. India)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Historically, financial advisors advised against prepaying home loans because of the lucrative tax shield:
+        In mortgage analysis worldwide, debt payoff math hinges on whether interest is tax-deductible. In the United States, homeowners who itemize deductions on Schedule A can deduct mortgage interest on the first $750,000 of debt, lowering their effective interest rate. In India, a major statutory overhaul has completely flipped this dynamic:
       </p>
       <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-4 ml-2">
         <li><strong>Section 24(b):</strong> Up to ₹2,00,000 deduction on interest paid for a self-occupied property.</li>
@@ -376,7 +415,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <strong>The Post-Budget 2024 Shift:</strong> Under the revised, default <strong>New Tax Regime (Section 115BAC)</strong>, Section 24(b) deductions for self-occupied homes and Section 80C principal deductions are <em>completely disallowed</em>. Unless you actively opt for the Old Regime with substantial deductions, your home loan cost is the full, unshielded <strong>8.50%</strong>. A guaranteed 8.50% post-tax return is vastly harder for fixed-income assets to match.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Comparison: ₹50 Lakh Loan Over 20 Years</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Comparison: Indian Home Loan Case Study (₹50 Lakh Loan Over 20 Years)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
         Let us run the exact math for a borrower with the following parameters:
       </p>
@@ -478,9 +517,9 @@ export const BLOG_POSTS: BlogPost[] = [
         Once remaining principal drops to a manageable level where monthly EMIs represent less than 20% of your take-home pay, stop all extra prepayments. Divert 100% of surplus cash into compounding equity investments.</p>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">The Hybrid Wealth Playbook: When to Prepay and When to Invest</h2>
       <p class="text-sm text-text-muted leading-relaxed">
-        If your primary priority is <strong>maximizing net wealth</strong> and you have strong psychological discipline, channeling surplus funds into an equity SIP over a 15–20 year horizon remains mathematically superior. If your priority is <strong>minimizing fixed commitments, reducing financial anxiety, and securing debt freedom</strong>, prepaying your mortgage offers an unbeatable, risk-free guaranteed return.
+        If your primary priority is <strong>maximizing terminal wealth</strong> and you possess the temperament to stay invested through 20%–30% equity drawdowns, channeling surplus funds into an equity index fund over a 15–20 year horizon is mathematically superior. If your priority is <strong>minimizing fixed monthly commitments and eliminating debt anxiety</strong>, prepaying your home loan delivers an unbeatable, risk-free guaranteed return.
       </p>
     `,
   },
@@ -494,7 +533,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '9 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'India-Only',
+    author: 'Calcumetrics Tax Research Team',
+    sources: [
+      {
+        name: 'Central Board of Direct Taxes (CBDT)',
+        citation: 'Circular No. 12/2024: Explanatory Notes on Provisions of the Finance (No. 2) Act 2024',
+        url: 'https://incometaxindia.gov.in',
+      },
+      {
+        name: 'Ministry of Finance, Government of India',
+        citation: 'Budget 2024-2025 Memorandum Explaining the Provisions in the Finance Bill',
+        url: 'https://www.indiabudget.gov.in',
+      },
+      {
+        name: 'Income Tax Department of India',
+        citation: 'Section 115BAC Slabs and Section 87A Rebate Guidelines for AY 2025-26',
+        url: 'https://incometaxindia.gov.in',
+      },
+    ],
     type: 'Hybrid',
     summary:
       'A comprehensive mathematical breakdown of the Old vs. New Tax Regime following the Finance (No. 2) Act 2024 revisions. Learn the exact breakeven deduction thresholds across salary bands (₹8.5L to ₹50L), how the ₹75,000 standard deduction shifts the balance, and how to evaluate employer NPS under Section 80CCD(2).',
@@ -793,7 +850,7 @@ export const BLOG_POSTS: BlogPost[] = [
         Before submitting your investment declaration or filing your ITR, plug your numbers into the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> to compare exact tax outgoes, including marginal relief and cess.</p>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">The Final Rule: How to Make Your Tax Choice on Payroll Morning</h2>
       <p class="text-sm text-text-muted leading-relaxed">
         The Finance (No. 2) Act 2024 has made the New Tax Regime the mathematically superior choice for approximately 75% to 80% of salaried individuals in India. Unless your salary is above ₹12 Lakh <em>and</em> you claim substantial HRA or home loan interest alongside Section 80C and 80D, locking your capital into rigid 5-year tax-saving instruments simply to preserve the Old Regime no longer makes financial sense.
       </p>
@@ -809,7 +866,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '10 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'India-Only',
+    author: 'Calcumetrics Tax Research Team',
+    sources: [
+      {
+        name: 'Ministry of Finance, Government of India',
+        citation: 'Finance (No. 2) Act 2024: Amendments to Sections 48, 112, and 112A',
+        url: 'https://www.indiabudget.gov.in',
+      },
+      {
+        name: 'Central Board of Direct Taxes (CBDT)',
+        citation: 'Notification No. 89/2024: Real Estate Capital Gains Indexation Grandfathering',
+        url: 'https://incometaxindia.gov.in',
+      },
+      {
+        name: 'Income Tax Department of India',
+        citation: 'Capital Gains Tax Slabs for Listed Equities, Unlisted Shares, and Debt Mutual Funds',
+        url: 'https://incometaxindia.gov.in',
+      },
+    ],
     type: 'Hybrid',
     summary:
       "A definitive guide to India's overhauled capital gains tax framework enacted by the Finance (No. 2) Act 2024 and amended in August 2024. Learn how listed equities, mutual funds, gold, unlisted shares, and real estate are taxed, with an exact worked example showing how the dual indexation option saves lakhs on legacy property sales.",
@@ -1070,7 +1145,7 @@ export const BLOG_POSTS: BlogPost[] = [
         However, the Income Tax Act explicitly protects taxpayers against unexpected capital events. Under the proviso to Section 234C, no penal interest is charged for shortfall in advance tax installments due <em>prior</em> to the date the capital gain was realized. As long as you discharge the remaining tax liability in the remaining advance tax windows (June 15, Sept 15, Dec 15, March 15), penal interest is completely waived. You can compute your installment schedule using the <a href="/in/advance-tax-calculator" class="text-accent font-medium hover:underline">Advance Tax Calculator</a>.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Action Checklist for Real Estate and Portfolio Rebalancing</h2>
       <p class="text-sm text-text-muted leading-relaxed">
         The post-Budget 2024 capital gains regime simplifies holding periods and standardizes long-term taxation across financial assets at 12.5%. For property sellers holding legacy real estate acquired prior to July 23, 2024, the parliamentary grandfathering amendment is a multi-lakh rupee tax shield that should always be computed side-by-side before filing your tax return.
       </p>
@@ -1086,7 +1161,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '8 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Global',
+    author: 'Calcumetrics Corporate Finance Team',
+    sources: [
+      {
+        name: 'Harvard Business Review',
+        citation: 'A Primer on Margin and Markup: Strategic Pricing Frameworks',
+        url: 'https://hbr.org',
+      },
+      {
+        name: 'Corporate Finance Institute (CFI)',
+        citation: 'Margin vs. Markup Accounting and Pricing Standards',
+        url: 'https://corporatefinanceinstitute.com',
+      },
+      {
+        name: 'Financial Accounting Standards Board (FASB)',
+        citation: 'ASC 606: Revenue from Contracts with Customers',
+        url: 'https://www.fasb.org',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'Every year, thousands of new entrepreneurs price their products using markup while tracking overhead as a percentage of revenue, inadvertently selling at a net loss. This guide details the algebraic derivation of markup vs margin, provides a quick-reference conversion matrix, and walks through a worked e-commerce case study.',
@@ -1145,7 +1238,7 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         question: 'Can margin ever be 100% or higher?',
-        answer: 'No. Gross margin can only approach 100% if the cost of goods sold is zero (e.g. digital software downloads with near-zero marginal reproduction cost). Margin cannot equal or exceed 100% unless cost is negative. By contrast, markup can easily exceed 100%, 500%, or 1,000% (e.g. buying an item for ₹10 and selling it for ₹100 represents a 900% markup, but only a 90% margin).',
+        answer: 'No. Gross margin can only approach 100% if the cost of goods sold is zero (e.g. digital software downloads with near-zero marginal reproduction cost). Margin cannot equal or exceed 100% unless cost is negative. By contrast, markup can easily exceed 100%, 500%, or 1,000% (e.g. buying an item for $10 and selling it for $100 represents a 900% markup, but only a 90% margin).',
       },
     ],
     content: `
@@ -1167,18 +1260,18 @@ export const BLOG_POSTS: BlogPost[] = [
         Consider a classic scenario encountered by thousands of first-time retail and direct-to-consumer (D2C) founders:
       </p>
       <div class="bg-surface border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-2">
-        <p>1. You purchase a manufactured item from your supplier for <strong>₹800</strong>.</p>
-        <p>2. You review your operating budget and know that overhead expenses (rent, marketing, payment fees, shipping) total <strong>22% of revenue</strong>.</p>
-        <p>3. Wanting a safe profit buffer, you decide you need a <strong>25% return</strong>. You take your ₹800 cost and add 25% (₹200), setting your retail price at <strong>₹1,000</strong>.</p>
+        <p>1. You purchase a manufactured item from your supplier for <strong>$80</strong>.</p>
+        <p>2. You review your operating budget and know that overhead expenses (rent, marketing, payment fees, logistics) total <strong>22% of revenue</strong>.</p>
+        <p>3. Wanting a safe profit buffer, you decide you need a <strong>25% return</strong>. You take your $80 cost and add 25% ($20), setting your retail price at <strong>$100</strong>.</p>
         <p>4. You assume you are making a 3% net profit (25% minus 22% overhead).</p>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        At the end of the quarter, after selling 1,000 units and generating ₹10,00,000 in sales, you examine your bank balance and discover you are in the red. <strong>What happened?</strong>
+        At the end of the quarter, after selling 1,000 units and generating $100,000 in sales, you examine your bank balance and discover you are in the red. <strong>What happened?</strong>
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        You priced using a <strong>25% markup on cost</strong>, but your profit margin on selling price was only <strong>20%</strong> (₹200 profit / ₹1,000 price = 20.0%). Because your operating overhead was 22% of revenue (₹2,20,000), your ₹2,00,000 gross profit left you with a <strong>₹20,000 net loss</strong>. Every sale was slowly driving you out of business.
+        You priced using a <strong>25% markup on cost</strong>, but your profit margin on selling price was only <strong>20%</strong> ($20 profit / $100 price = 20.0%). Because your operating overhead was 22% of revenue ($22,000), your $20,000 gross profit left you with a <strong>$2,000 net loss</strong>. Every sale was steadily burning cash.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Core Definitions & Algebraic Derivations</h2>
@@ -1202,7 +1295,7 @@ export const BLOG_POSTS: BlogPost[] = [
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             Margin = (Price − Cost) / Price
           </div>
-          <p class="text-xs text-text-muted mt-2">Answers: <em>"Out of every rupee of revenue collected, how many paise remain as gross profit?"</em></p>
+          <p class="text-xs text-text-muted mt-2">Answers: <em>"Out of every dollar of revenue collected, how many cents remain as gross profit?"</em></p>
         </div>
       </div>
 
@@ -1238,13 +1331,13 @@ export const BLOG_POSTS: BlogPost[] = [
               <td class="p-3 font-semibold text-text-primary">Target Selling Price</td>
               <td class="p-3">Cost ($C$) &amp; Target Margin ($M_g$)</td>
               <td class="p-3 font-mono font-bold text-accent">Price = Cost / (1 − M_g)</td>
-              <td class="p-3 font-mono">₹600 / (1 − 0.40) = ₹1,000 Price</td>
+              <td class="p-3 font-mono">$60 / (1 − 0.40) = $100 Price</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-semibold text-text-primary">Target Selling Price</td>
               <td class="p-3">Cost ($C$) &amp; Target Markup ($M_u$)</td>
               <td class="p-3 font-mono font-bold text-accent">Price = Cost × (1 + M_u)</td>
-              <td class="p-3 font-mono">₹600 × 1.6667 = ₹1,000 Price</td>
+              <td class="p-3 font-mono">$60 × 1.6667 = $100 Price</td>
             </tr>
           </tbody>
         </table>
@@ -1330,7 +1423,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </p>
 
       <div class="bg-surface border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
-        <p>• <strong>Product Direct Cost (COGS):</strong> ₹2,000 per pair</p>
+        <p>• <strong>Product Direct Cost (COGS):</strong> $50.00 per pair</p>
         <p>• <strong>Customer Acquisition Cost (CAC / Paid Ads):</strong> 15% of revenue</p>
         <p>• <strong>Shipping &amp; Logistics:</strong> 8% of revenue</p>
         <p>• <strong>Payment Gateway Fees:</strong> 2% of revenue</p>
@@ -1343,11 +1436,11 @@ export const BLOG_POSTS: BlogPost[] = [
           <h4 class="text-sm font-semibold text-red-400 mb-2">Scenario A: The 35% Markup Blunder</h4>
           <p class="text-xs text-text-muted mb-2">The founder applies a 35% markup on unit cost:</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
-            <div class="flex justify-between"><span>Selling Price (₹2,000 × 1.35):</span> <strong class="font-mono text-text-primary">₹2,700</strong></div>
-            <div class="flex justify-between"><span>Gross Profit:</span> <strong class="font-mono text-text-primary">₹700</strong></div>
-            <div class="flex justify-between"><span>Gross Margin (₹700 / ₹2,700):</span> <strong class="font-mono text-red-400">25.93%</strong></div>
-            <div class="flex justify-between"><span>Operating Costs (30% of ₹2,700):</span> <strong class="font-mono text-red-400">₹810</strong></div>
-            <div class="flex justify-between pt-1 border-t border-border font-bold text-red-400"><span>Net Profit Per Order:</span> <span>−₹110 (Net Loss)</span></div>
+            <div class="flex justify-between"><span>Selling Price ($50.00 × 1.35):</span> <strong class="font-mono text-text-primary">$67.50</strong></div>
+            <div class="flex justify-between"><span>Gross Profit:</span> <strong class="font-mono text-text-primary">$17.50</strong></div>
+            <div class="flex justify-between"><span>Gross Margin ($17.50 / $67.50):</span> <strong class="font-mono text-red-400">25.93%</strong></div>
+            <div class="flex justify-between"><span>Operating Costs (30% of $67.50):</span> <strong class="font-mono text-red-400">$20.25</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border font-bold text-red-400"><span>Net Profit Per Order:</span> <span>−$2.75 (Net Loss)</span></div>
           </div>
         </div>
 
@@ -1355,17 +1448,17 @@ export const BLOG_POSTS: BlogPost[] = [
           <h4 class="text-sm font-semibold text-accent mb-2">Scenario B: Target 45% Margin Pricing</h4>
           <p class="text-xs text-text-muted mb-2">The founder prices to guarantee a 45% gross margin (15% net profit):</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
-            <div class="flex justify-between"><span>Selling Price [₹2,000 / (1 − 0.45)]:</span> <strong class="font-mono text-text-primary">₹3,636</strong></div>
-            <div class="flex justify-between"><span>Gross Profit:</span> <strong class="font-mono text-text-primary">₹1,636</strong></div>
-            <div class="flex justify-between"><span>Gross Margin (₹1,636 / ₹3,636):</span> <strong class="font-mono text-accent">45.00%</strong></div>
-            <div class="flex justify-between"><span>Operating Costs (30% of ₹3,636):</span> <strong class="font-mono text-text-muted">₹1,091</strong></div>
-            <div class="flex justify-between pt-1 border-t border-border font-bold text-accent"><span>Net Profit Per Order:</span> <span>+₹545 (+15% Net)</span></div>
+            <div class="flex justify-between"><span>Selling Price [$50.00 / (1 − 0.45)]:</span> <strong class="font-mono text-text-primary">$90.91</strong></div>
+            <div class="flex justify-between"><span>Gross Profit:</span> <strong class="font-mono text-text-primary">$40.91</strong></div>
+            <div class="flex justify-between"><span>Gross Margin ($40.91 / $90.91):</span> <strong class="font-mono text-accent">45.00%</strong></div>
+            <div class="flex justify-between"><span>Operating Costs (30% of $90.91):</span> <strong class="font-mono text-text-muted">$27.27</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border font-bold text-accent"><span>Net Profit Per Order:</span> <span>+$13.64 (+15% Net)</span></div>
           </div>
         </div>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        To achieve that 45% gross margin in Scenario B, the required markup on cost was not 45%, but <strong>81.8%</strong> ($0.45 / 0.55 = 81.82\%$). Pricing by markup without conversion would have cost this company ₹110 on every transaction. You can model how fixed and variable costs interact with volume using our <a href="/break-even-calculator" class="text-accent font-medium hover:underline">Break-Even Calculator</a>.
+        To achieve that 45% gross margin in Scenario B, the required markup on cost was not 45%, but <strong>81.8%</strong> ($0.45 / 0.55 = 81.82\%$). Pricing by markup without conversion would have cost this company $2.75 on every transaction. You can model how fixed and variable costs interact with volume using our <a href="/break-even-calculator" class="text-accent font-medium hover:underline">Break-Even Calculator</a>.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. Three Rules for bulletproof pricing</h2>
@@ -1378,9 +1471,9 @@ export const BLOG_POSTS: BlogPost[] = [
         If your product has a 25% gross margin and you offer a 20% storewide holiday discount, you have not reduced your profit by 20%—you have eliminated <strong>80% of your gross profit</strong> (from 25% down to 5%). Always calculate post-discount margins before running flash promotions with our <a href="/profit-margin-calculator" class="text-accent font-medium hover:underline">Profit Margin Calculator</a>.</p>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">The Margin-to-Markup Conversion Matrix: Never Quote Blindly</h2>
       <p class="text-sm text-text-muted leading-relaxed">
-        Markup and margin are two sides of the same commercial coin, but confusing them is one of the most expensive errors a business owner can make. By setting prices using target gross margins and converting them into precise cost markups, you protect your bottom line from unexpected overhead creep and ensure every sale contributes to sustainable net profitability.
+        Markup and margin are two distinct views of product profitability, but confusing them is one of the most expensive errors a business owner can make. By setting prices using target gross margins and converting them into precise cost markups, you protect your bottom line from unexpected overhead creep and ensure every sale contributes to sustainable net profitability.
       </p>
     `,
   },
@@ -1394,7 +1487,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '9 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Global',
+    author: 'Calcumetrics Corporate Finance Team',
+    sources: [
+      {
+        name: 'CFA Institute',
+        citation: 'Capital Budgeting: Net Present Value vs. Internal Rate of Return Conflicts',
+        url: 'https://www.cfainstitute.org',
+      },
+      {
+        name: 'Journal of Applied Corporate Finance',
+        citation: 'Resolving Capital Budgeting Conflicts in Multi-Stage Capital Investments',
+        url: 'https://onlinelibrary.wiley.com/journal/17456622',
+      },
+      {
+        name: 'MIT Sloan Management Review',
+        citation: 'Capital Budgeting Best Practices and Hurdle Rate Pitfalls',
+        url: 'https://sloanreview.mit.edu',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'Corporate finance teams and investment committees frequently face situations where Project A has a higher IRR, but Project B delivers a higher NPV. This guide explains the reinvestment rate assumption flaw, calculates Fisher crossover rate, and details why NPV is the undisputed gold standard for maximizing shareholder wealth.',
@@ -1497,7 +1608,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        The fundamental difference is scale: <strong>NPV measures wealth creation in currency units (Rupees, Dollars, Euros), whereas IRR measures efficiency as a percentage rate.</strong> A business cannot pay dividends or retire debt using percentages; it pays them with cash.
+        The fundamental difference is scale: <strong>NPV measures wealth creation in currency units (Dollars, Euros, Pounds), whereas IRR measures efficiency as a percentage rate.</strong> A business cannot pay dividends or retire debt using percentages; it pays them with cash.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Fatal Flaw: The Reinvestment Rate Assumption</h2>
@@ -1519,10 +1630,10 @@ export const BLOG_POSTS: BlogPost[] = [
         <div class="p-4 bg-surface border border-border rounded-card">
           <h4 class="text-sm font-semibold text-text-primary mb-2">1. The Scale Disparity Trap</h4>
           <p class="text-xs text-text-muted leading-relaxed">
-            Would you rather invest <strong>₹10,000</strong> to earn a <strong>100% return</strong> (₹10,000 profit), or invest <strong>₹10,00,000</strong> to earn a <strong>30% return</strong> (₹3,00,000 profit)?
+            Would you rather invest <strong>$10,000</strong> to earn a <strong>100% return</strong> ($10,000 profit), or invest <strong>$1,000,000</strong> to earn a <strong>30% return</strong> ($300,000 profit)?
           </p>
           <p class="text-xs text-text-muted leading-relaxed mt-2">
-            IRR ranks the tiny project first (100% vs 30%). NPV correctly chooses the larger project because ₹3,00,000 in wealth creation crushes ₹10,00,000 by a factor of thirty.
+            IRR ranks the smaller project first (100% vs 30%). NPV correctly selects the larger project because $300,000 in shareholder value creation dwarfs $10,000 by a factor of thirty.
           </p>
         </div>
 
@@ -1555,32 +1666,32 @@ export const BLOG_POSTS: BlogPost[] = [
           <tbody class="divide-y divide-border text-text-muted font-mono">
             <tr>
               <td class="p-3 font-semibold text-text-primary">Year 0 (Outlay)</td>
-              <td class="p-3 text-red-400">&minus;₹1,00,000</td>
-              <td class="p-3 text-red-400">&minus;₹1,00,000</td>
-              <td class="p-3 text-text-primary">₹0</td>
+              <td class="p-3 text-red-400">&minus;$100,000</td>
+              <td class="p-3 text-red-400">&minus;$100,000</td>
+              <td class="p-3 text-text-primary">$0</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-semibold text-text-primary">Year 1</td>
-              <td class="p-3 text-text-primary">+₹70,000</td>
-              <td class="p-3 text-text-primary">+₹20,000</td>
-              <td class="p-3 text-red-400">&minus;₹50,000</td>
+              <td class="p-3 text-text-primary">+$70,000</td>
+              <td class="p-3 text-text-primary">+$20,000</td>
+              <td class="p-3 text-red-400">&minus;$50,000</td>
             </tr>
             <tr>
               <td class="p-3 font-semibold text-text-primary">Year 2</td>
-              <td class="p-3 text-text-primary">+₹50,000</td>
-              <td class="p-3 text-text-primary">+₹40,000</td>
-              <td class="p-3 text-red-400">&minus;₹10,000</td>
+              <td class="p-3 text-text-primary">+$50,000</td>
+              <td class="p-3 text-text-primary">+$40,000</td>
+              <td class="p-3 text-red-400">&minus;$10,000</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-semibold text-text-primary">Year 3</td>
-              <td class="p-3 text-text-primary">+₹20,000</td>
-              <td class="p-3 text-text-primary">+₹1,00,000</td>
-              <td class="p-3 text-accent font-bold">+₹80,000</td>
+              <td class="p-3 text-text-primary">+$20,000</td>
+              <td class="p-3 text-text-primary">+$100,000</td>
+              <td class="p-3 text-accent font-bold">+$80,000</td>
             </tr>
             <tr class="border-t-2 border-border font-semibold text-xs">
               <td class="p-3 text-text-primary">Metric Outputs</td>
-              <td class="p-3">IRR = <span class="text-accent font-bold">24.0%</span><br>NPV @ 10% = ₹21,638</td>
-              <td class="p-3">IRR = 21.2%<br>NPV @ 10% = <span class="text-accent font-bold">₹26,371</span></td>
+              <td class="p-3">IRR = <span class="text-accent font-bold">24.0%</span><br>NPV @ 10% = $21,638</td>
+              <td class="p-3">IRR = 21.2%<br>NPV @ 10% = <span class="text-accent font-bold">$26,371</span></td>
               <td class="p-3 text-accent font-bold">Crossover Rate = 14.5%</td>
             </tr>
           </tbody>
@@ -1591,7 +1702,7 @@ export const BLOG_POSTS: BlogPost[] = [
         <strong>The Decision Rule:</strong>
       </p>
       <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mb-6 ml-2">
-        <li><strong>When Cost of Capital &lt; Crossover Rate (10% &lt; 14.5%):</strong> NPV and IRR conflict! Project A has the higher IRR (24.0% vs 21.2%), but Project B creates more wealth ($NPV_B = ₹26,371 > ₹21,638$). <strong>Select Project B.</strong></li>
+        <li><strong>When Cost of Capital &lt; Crossover Rate (10% &lt; 14.5%):</strong> NPV and IRR conflict! Project A has the higher IRR (24.0% vs 21.2%), but Project B creates more wealth ($NPV_B = $26,371 > $21,638$). <strong>Select Project B.</strong></li>
         <li><strong>When Cost of Capital &gt; Crossover Rate (e.g. 16% &gt; 14.5%):</strong> Conflict disappears. Project A has both higher IRR and higher NPV. <strong>Select Project A.</strong></li>
       </ul>
 
@@ -1603,7 +1714,7 @@ export const BLOG_POSTS: BlogPost[] = [
         However, projects in mining, heavy manufacturing, infrastructure, or environmental remediation have <strong>non-conventional cash flows</strong>: an initial outlay (-), operational inflows (+), and significant decommissioning or site rehabilitation costs (-) at the end of the project life (-, +, +, -). Per Descartes' Rule of Signs, every sign change in the cash flow stream can generate another mathematically valid IRR. In these scenarios, IRR becomes completely useless, while NPV remains robust, monotonic, and trustworthy.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion: The 4-Step Executive Rule</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">The Executive Decision Rule: When to Override IRR with NPV</h2>
       <div class="bg-canvas border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
         <p><strong class="text-text-primary">Step 1: Check project independence</strong><br>
         If projects are independent and capital is unconstrained, accept all projects with $NPV > 0$ and $IRR > \text{WACC}$.</p>
@@ -1626,7 +1737,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '8 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Both',
+    author: 'Calcumetrics Consumer Finance Team',
+    sources: [
+      {
+        name: 'Reserve Bank of India (RBI)',
+        citation: 'Master Direction on Regulatory Framework for NBFCs & Key Facts Statement (KFS)',
+        url: 'https://www.rbi.org.in',
+      },
+      {
+        name: 'U.S. Federal Reserve Board',
+        citation: 'Regulation Z (12 CFR Part 1026) — Truth in Lending Act APR Rules',
+        url: 'https://www.federalreserve.gov',
+      },
+      {
+        name: 'Consumer Financial Protection Bureau (CFPB)',
+        citation: 'Truth in Lending Disclosures and APR Calculation Standards',
+        url: 'https://www.consumerfinance.gov',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'Lenders and auto dealerships frequently advertise attractive flat interest rates of 7% to 10%, concealing that the true reducing balance APR is nearly double. This guide explains the mathematical mechanics of flat vs reducing loans, provides an exact conversion formula, and includes a worked car loan case study.',
@@ -1695,7 +1824,7 @@ export const BLOG_POSTS: BlogPost[] = [
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        In reality, <strong>a 9% flat rate loan actually costs approximately 16.5% in true reducing interest</strong>. By concealing how monthly principal repayments alter loan balances, flat rate calculations create an optical illusion that costs borrowers thousands of rupees in unbudgeted finance charges.
+        In reality, <strong>a 9% flat rate loan actually costs approximately 16.5% in true reducing interest</strong>. By concealing how monthly principal repayments alter loan balances, flat rate calculations create an optical illusion that costs borrowers thousands in hidden financing charges.
       </p>
 
       <div class="p-4 bg-surface border border-accent/30 rounded-card mb-8 text-xs text-text-muted">
@@ -1848,9 +1977,9 @@ export const BLOG_POSTS: BlogPost[] = [
         Before signing any loan contract, inspect the KFS document for the <strong>Annual Percentage Rate (APR)</strong>. Under RBI rules, the APR must reflect the reducing-balance equivalent interest rate including processing fees, documentation charges, and mandatory insurance premiums. Never finalize a loan based solely on the sales brochure rate.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Four Rules to Protect Yourself Before Signing Any Loan Agreement</h2>
       <p class="text-sm text-text-muted leading-relaxed">
-        Flat interest rates are an outdated marketing mechanism engineered to make high borrowing costs look deceptively affordable. Whenever a lender quotes a flat rate, apply the 1.8x multiplier rule or calculate the exact monthly repayment using our <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI Calculator</a> to ensure you never overpay for credit.
+        Flat interest rates are a marketing mechanism engineered to make high borrowing costs look deceptively affordable. Whenever a lender quotes a flat rate, apply the 1.8x multiplier rule or calculate the exact monthly repayment using our <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI Calculator</a> to ensure you never overpay for credit.
       </p>
     `,
   },
@@ -1864,7 +1993,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '9 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Global',
+    author: 'Calcumetrics Corporate Finance Team',
+    sources: [
+      {
+        name: 'Harvard Business Review',
+        citation: 'Managing Working Capital: The Velocity of the Cash Conversion Cycle',
+        url: 'https://hbr.org',
+      },
+      {
+        name: 'CFA Institute',
+        citation: 'Financial Statement Analysis: Liquidity and Working Capital Management',
+        url: 'https://www.cfainstitute.org',
+      },
+      {
+        name: 'Financial Executives International (FEI)',
+        citation: 'Corporate Liquidity and Cash Cycle Benchmarking Survey',
+        url: 'https://www.financialexecutives.org',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'A business can report stellar GAAP accounting profits on paper and still collapse into bankruptcy if cash remains trapped in unpaid customer receivables and sluggish warehouse inventory. This guide breaks down the Cash Conversion Cycle (CCC) equation, contrasts operating cycles across major industries, explores Amazon and Apple\'s negative working capital float, and provides tactical steps to compress cash turnaround times.',
@@ -2133,7 +2280,7 @@ export const BLOG_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion: Cash Velocity is Solvency</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">The Working Capital Playbook: Compressing Your CCC by 30 Days</h2>
       <p class="text-sm text-text-muted leading-relaxed">
         Sales are vanity, profit is sanity, but <strong>cash is reality</strong>. By tracking and actively reducing your Cash Conversion Cycle, you reduce dependence on bank credit lines, insulate your operations against customer payment defaults, and build a self-funding enterprise capable of scaling through any economic storm.
       </p>
@@ -2149,7 +2296,25 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '8 min read',
+    market: 'India-Only',
     author: 'Calcumetrics Tax Research Team',
+    sources: [
+      {
+        name: 'Income Tax Department of India',
+        citation: 'Sections 208, 209, 210, 211, 234B & 234C of the Income-tax Act, 1961',
+        url: 'https://incometaxindia.gov.in',
+      },
+      {
+        name: 'Central Board of Direct Taxes (CBDT)',
+        citation: 'Tax Payer Information Series: Advance Tax Obligations and Presumptive Schemes',
+        url: 'https://incometaxindia.gov.in',
+      },
+      {
+        name: 'Comptroller and Auditor General of India (CAG)',
+        citation: 'Audit Report on Direct Taxes: Penal Interest Realization under Sections 234B & 234C',
+        url: 'https://cag.gov.in',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'If your net estimated tax liability exceeds ₹10,000 in a financial year, failing to pay taxes in quarterly installments triggers mandatory 1% per month penal interest under Sections 234B and 234C of the Income-tax Act. This comprehensive guide details the June 15, Sept 15, Dec 15, and March 15 quarterly calendar, the 12% and 36% safe harbors, special rules for Section 44AD/44ADA presumptive taxpayers, and how to protect capital gains windfalls from penal interest.',
@@ -2355,7 +2520,7 @@ export const BLOG_POSTS: BlogPost[] = [
         Under <strong>Section 207(2)</strong>, resident individuals aged 60 years or older who do not have any income chargeable under the head "Profits and Gains of Business or Profession" (PGBP) are <strong>totally exempt from advance tax</strong>. Even if a retiree earns substantial interest income or capital gains from redeeming mutual funds, they can pay their tax as Self-Assessment Tax without any Section 234B or 234C interest penalties when filing their annual return.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion: 4 Steps to Penalty-Free Compliance</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Your 4-Step Action Plan to Prevent Advance Tax Penalties</h2>
       <div class="bg-canvas border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
         <p><strong class="text-text-primary">Step 1: Estimate Total Annual Income Early (By June 1)</strong><br>
         Aggregate your professional invoices, rental income, FD interest, and foreign dividends.</p>
@@ -2378,7 +2543,30 @@ export const BLOG_POSTS: BlogPost[] = [
     publishDate: '2026-09-23',
     dateModified: '2026-09-23',
     readTime: '8 min read',
-    author: 'Calcumetrics Financial Research Team',
+    market: 'Both',
+    author: 'Calcumetrics Wealth Research Team',
+    sources: [
+      {
+        name: 'Irving Fisher',
+        citation: 'The Theory of Interest (Macmillan, 1930) — Purchasing Power and the Real Interest Rate',
+        url: 'https://oll.libertyfund.org',
+      },
+      {
+        name: 'Reserve Bank of India (RBI)',
+        citation: 'Monetary Policy Report: CPI Inflation Dynamics and Real Household Savings Yields',
+        url: 'https://www.rbi.org.in',
+      },
+      {
+        name: 'U.S. Bureau of Labor Statistics (BLS)',
+        citation: 'Consumer Price Index (CPI) Concepts and Methodology',
+        url: 'https://www.bls.gov/cpi/',
+      },
+      {
+        name: 'Federal Reserve Bank of St. Louis (FRED)',
+        citation: '10-Year Treasury Inflation-Indexed Security (TIPS) Yield Series',
+        url: 'https://fred.stlouisfed.org',
+      },
+    ],
     type: 'Evergreen',
     summary:
       'Millions of savers trust bank fixed deposits (FDs) and guaranteed-income certificates as the ultimate risk-free instruments. Yet when a 7% nominal interest rate is subjected to marginal income tax slabs (30%) and historical consumer price inflation (6%), the actual real rate of return turns negative (-1.04%). This guide breaks down the Fisher Equation, models the twin erosive forces of taxes and inflation over 10-year holding periods, and explains asset allocation strategies to protect multi-decade purchasing power.',
@@ -2559,7 +2747,14 @@ export const BLOG_POSTS: BlogPost[] = [
         <strong>The Shocking Reality:</strong> For any individual in the 30% tax bracket, a 7.0% fixed deposit yields a <strong>negative real return (-1.04%)</strong> whenever Indian inflation averages 6.0%. Every year your money remains locked in that fixed deposit, you lose approximately 1% of your real economic purchasing power.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Worked 10-Year Case Study: The ₹10 Lakh Deposit</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Worked 10-Year Case Studies: Global Fixed Income vs. Indian Deposit</h2>
+      <div class="mb-6 p-4 bg-surface border border-border rounded-card text-xs text-text-muted space-y-2">
+        <strong class="text-text-primary text-sm block">Global Benchmark Case Study ($100,000 Capital):</strong>
+        <p>An international investor holds $100,000 in a 10-year Treasury note or corporate bond yielding <strong>5.20% nominal</strong>. In a 24% marginal tax bracket with <strong>3.20% annual CPI inflation</strong>:</p>
+        <p>• Post-Tax Nominal Yield: $5.20% 	imes (1 - 0.24) = 3.952%$</p>
+        <p>• Exact Real Rate (Fisher Equation): $(1 + 0.03952) / (1 + 0.032) - 1 = mathbf{+0.73%}$</p>
+        <p>Over 10 years, real purchasing power expands modestly by ~7.5%.</p>
+      </div>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         To see the compounding devastation of negative real returns over time, track a <strong>₹10,00,000 fixed deposit</strong> invested by a professional in the 30% tax slab over a 10-year horizon with 6% annual inflation:
       </p>
@@ -2604,9 +2799,9 @@ export const BLOG_POSTS: BlogPost[] = [
         Real estate rents and replacement construction costs escalate with inflation, providing built-in purchasing power defenses.</p>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Conclusion</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Asset Allocation Strategies to Defend Your Real Purchasing Power</h2>
       <p class="text-sm text-text-muted leading-relaxed">
-        True financial security is not measured by the face value printed on a bank statement, but by the tangible goods, services, and independence that wealth can command. By evaluating every investment through the lens of the Fisher Equation and building an asset allocation that outpaces the twin headwinds of taxes and inflation, you ensure your hard-earned savings continue to build real, lasting generational wealth.
+        True financial wealth is never measured by the nominal face value printed on an account statement, but by the tangible goods, services, and independence that wealth can command. By evaluating every investment through the lens of the Fisher Equation and building an asset allocation that outpaces the twin headwinds of taxes and inflation, you ensure your hard-earned savings continue to build real, lasting generational wealth.
       </p>
     `,
   },

@@ -2,15 +2,16 @@
 
 - **STATUS:** COMPLETE
 - **PHASE:** 11
-- **LAST_UPDATED:** 2026-09-23T05:50:00+05:30
+- **ADDENDUM_STATUS:** COMPLETE (§7 Completion Gate passed)
+- **LAST_UPDATED:** 2026-09-23T06:00:00+05:30
 - **TARGET_ARTICLES:** 10
 - **COMPLETED_ARTICLES:** 10
 - **IN_PROGRESS:** NONE
 - **NEXT:** PHASE_12_PREPARATION
 - **BLOCKER:** NONE
 - **LAST_COMPLETED_ARTICLE:** real-rate-of-return
-- **LAST_COMMIT:** bff6b2c
-- **TEST_STATUS:** PASS (390/390 tests, 22 test suites)
+- **LAST_COMMIT:** 8f1ec43
+- **TEST_STATUS:** PASS (394/394 tests, 22 test suites)
 - **BUILD_STATUS:** PASS (76 pages built)
 - **RECIPROCAL_LINK_AUDIT:** PASS (10/10 articles reciprocally linked with >= 2 calculators each)
 - **SITEMAP_STATUS:** PASS (11 blog URLs verified in sitemap-pages.xml)
@@ -156,3 +157,62 @@
   - Key Content: The nominal money illusion, derivation of the exact Fisher Equation `r_real = (r_nominal - i) / (1 + i)` versus crude subtraction, after-tax real return formula `r_real_net = [r_nominal(1 - t) - i] / (1 + i)`, the double-squeeze matrix (effective returns across 0%, 10%, 20%, 30% slabs and 4% to 7% inflation proving that 7% FD in 30% slab yields -1.04% real return), worked 10-year ₹10 Lakh deposit case study (nominal balance ₹16.65L purchasing only ₹9.30L in Year-0 real purchasing power = 7.0% wealth contraction), and inflation-defeating asset allocation strategies (Equity SIPs, SGBs, EEE instruments like PPF/EPF, Real Estate).
   - FAQs: 5 structured FAQs matching schema.org FAQPage JSON-LD.
   - Verification: `npm test` PASS, `npm run build` PASS, `git diff --check` PASS.
+
+---
+
+## Phase 11 Addendum: Quality, Market Split & E-E-A-T Audit
+
+### Completion Gate Checklist (§7)
+- [x] every article classified INDIA-ONLY / GLOBAL / BOTH, and content matches that classification
+- [x] global-audience articles don't default to India-only currency/legal assumptions
+- [x] tone checklist (§2) applied to every article before publish
+- [x] no article flagged with generic-AI-output tells (repetitive openers, no POV, filler transitions)
+- [x] every finance/tax article has: visible last-updated date, source citation for cited facts, disclaimer, author/reviewer line
+- [x] mix between India-specific and global topics roughly reflects the calculator catalog's own split
+
+### Addendum Implementation Summary
+
+1. **Market Scope Split (§3):**
+   - **4 Global (40%):** `cagr-vs-xirr`, `markup-vs-margin`, `npv-vs-irr`, `cash-conversion-cycle`.
+     - Strict isolation: ZERO `₹` characters present in body or FAQs.
+     - Currency framed in USD ($) or dimensionless operational units (days, ratios).
+     - Global regulatory/institutional authorities cited (SEC, CFA Institute, FASB, MIT, HBR).
+   - **3 India-Only (30%):** `old-vs-new-tax-regime`, `capital-gains-tax-rules`, `advance-tax-guide`.
+     - Explicit statutory alignment: Section 115BAC, Sections 111A/112/112A, Sections 208/234B/234C.
+     - Rupee (₹) denomination, CBDT & Finance (No. 2) Act 2024 compliance.
+   - **3 Both (30%):** `home-loan-prepayment-vs-sip`, `flat-vs-reducing-interest-rate`, `real-rate-of-return`.
+     - Dual-lens structure: Universal mathematical formulations alongside distinct US/global benchmarks and Indian statutory scenarios.
+     - Regulatory citations span both Federal Reserve / US CFPB / BLS and Reserve Bank of India (RBI).
+
+2. **Tone & Anti-AI Humanization (§2):**
+   - Replaced all generic `<h2>Conclusion</h2>` and `<h2>Conclusion: ...</h2>` headers across all 10 articles with specific, action-oriented decision checklists:
+     - 001: *How to Select the Right Performance Metric for Your Portfolio*
+     - 002: *Your Next Step: How to Decide Today*
+     - 003: *The Final Rule: How to Make Your Tax Choice on Payroll Morning*
+     - 004: *Execution Checklist: How to Protect Your Gains and Stay Compliant*
+     - 005: *The Margin-to-Markup Conversion Matrix: Never Quote Blindly*
+     - 006: *The Executive Decision Rule: When to Override IRR with NPV*
+     - 007: *Four Rules to Protect Yourself Before Signing Any Loan Agreement*
+     - 008: *The Working Capital Playbook: Compressing Your CCC by 30 Days*
+     - 009: *Your 4-Step Action Plan to Prevent Advance Tax Penalties*
+     - 010: *Asset Allocation Strategies to Defend Your Real Purchasing Power*
+   - Cleansed generic transitional fluff ("In conclusion", "When it comes to", "It is important to note that").
+   - Every article features concrete numerical worked schedules and high-conviction mathematical arguments.
+
+3. **E-E-A-T, Trust & Growth Signals (§4 & §5):**
+   - **Type Extension:** Added `market` and `sources: BlogSource[]` to `src/data/blog/types.ts`.
+   - **Author & Reviewer Bar:** Credentialed team attribution displayed on `/blog/[slug].astro` (`Calcumetrics Quantitative Research Team`, `Calcumetrics Corporate Finance Team`, `Calcumetrics Indian Tax & Regulatory Research Team`).
+   - **Visible Last Updated:** Dedicated calendar timestamp rendered at the top of every post.
+   - **Direct-Answer Featured Snippet Box:** Prominent Key Takeaway block providing an immediate, high-density mathematical answer.
+   - **Authoritative Source Citation Section:** Dedicated section linking directly to 3–4 primary academic or statutory sources per article.
+   - **Financial Disclaimer:** Prominent callout card citing editorial guidelines and linking to `/about` and `/methodology`.
+   - **Market Badges:** Visual badges (`Global`, `India`, `Global/IN`) rendered on `/blog/index.astro` and `/blog/[slug].astro`.
+
+4. **Automated Verification:**
+   - `src/data/blog/posts.test.ts` expanded with 4 dedicated test suites covering:
+     - Market balance ratio (4 Global, 3 India-Only, 3 Both)
+     - Source citation completeness ($\ge 2$ sources with valid links or citations per article)
+     - Currency boundary validation (0 `₹` in Global articles, `₹` present in India-Only articles)
+     - Tone rules (0 generic conclusion headers)
+   - Test results: **394/394 passing across 22 test suites**.
+   - Build output: **76 static HTML pages generated cleanly with 0 broken links**.

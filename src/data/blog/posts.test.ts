@@ -62,4 +62,49 @@ describe('Blog posts data integrity', () => {
       }
     }
   });
+
+  it('verifies Phase 11 Addendum market classifications and balance', () => {
+    const counts = { Global: 0, 'India-Only': 0, Both: 0 };
+    for (const post of BLOG_POSTS) {
+      expect(['Global', 'India-Only', 'Both']).toContain(post.market);
+      counts[post.market]++;
+    }
+    expect(counts['Global']).toBe(4);
+    expect(counts['India-Only']).toBe(3);
+    expect(counts['Both']).toBe(3);
+  });
+
+  it('verifies Phase 11 Addendum authoritative sources and E-E-A-T signals', () => {
+    for (const post of BLOG_POSTS) {
+      expect(post.author).toBeTruthy();
+      expect(post.sources).toBeDefined();
+      expect(post.sources?.length).toBeGreaterThanOrEqual(2);
+      for (const src of post.sources!) {
+        expect(src.name).toBeTruthy();
+        expect(src.citation || src.url).toBeTruthy();
+      }
+    }
+  });
+
+  it('enforces Phase 11 Addendum market currency boundaries (no ₹ in global articles)', () => {
+    for (const post of BLOG_POSTS) {
+      if (post.market === 'Global') {
+        const hasRupee = post.content.includes('₹');
+        expect(hasRupee).toBe(false);
+      }
+      if (post.market === 'India-Only') {
+        const hasRupee = post.content.includes('₹');
+        expect(hasRupee).toBe(true);
+      }
+    }
+  });
+
+  it('enforces Phase 11 Addendum tone rules (no generic conclusion headers)', () => {
+    for (const post of BLOG_POSTS) {
+      expect(post.content.includes('>Conclusion<')).toBe(false);
+      expect(post.content.includes('>Conclusion:')).toBe(false);
+      expect(post.content.includes('In conclusion')).toBe(false);
+      expect(post.content.includes('When it comes to')).toBe(false);
+    }
+  });
 });

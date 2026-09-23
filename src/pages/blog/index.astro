@@ -61,8 +61,19 @@ const jsonld = {
         <article class="bg-surface border border-border rounded-card p-5 flex flex-col justify-between hover:border-accent transition-standard focus-within:border-accent">
           <div>
             <div class="flex items-center justify-between text-xs text-text-muted mb-2">
-              <span class="font-semibold text-accent uppercase tracking-wider">{post.category}</span>
-              <span>{post.readTime}</span>
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="font-semibold text-accent uppercase tracking-wider">{post.category}</span>
+                {post.market === 'Global' && (
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">Global</span>
+                )}
+                {post.market === 'India-Only' && (
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">India</span>
+                )}
+                {post.market === 'Both' && (
+                  <span class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">Global/IN</span>
+                )}
+              </div>
+              <span class="shrink-0">{post.readTime}</span>
             </div>
             <h2 class="text-base font-bold text-text-primary mb-2 leading-snug">
               <a href={`/blog/${post.slug}`} class="hover:text-accent transition-standard focus-visible:outline-accent">

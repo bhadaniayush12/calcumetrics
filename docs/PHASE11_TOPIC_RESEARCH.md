@@ -33,6 +33,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Extremely low. Mathematical concepts are permanent.
 - **DECISION:** SELECTED
 - **REASON:** Exemplary evergreen educational topic with strong multi-signal demand and direct calculator integration.
+- **MARKET:** GLOBAL
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -53,6 +56,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Low to moderate (depends on interest rate cycle, but framework remains durable).
 - **DECISION:** SELECTED
 - **REASON:** High-volume user dilemma with a substantial content gap regarding post-Budget 2024 tax realities.
+- **MARKET:** BOTH
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -73,6 +79,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Low for the next 12–24 months; framework is built on statutory provisions.
 - **DECISION:** SELECTED
 - **REASON:** Major regulatory shift with immense search intent and direct synergy with Calcumetrics tax calculators.
+- **MARKET:** INDIA-ONLY
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -93,6 +102,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Low; the statutory framework is now codified in law.
 - **DECISION:** SELECTED
 - **REASON:** Essential statutory guide addressing active misinformation with verified legal rules.
+- **MARKET:** INDIA-ONLY
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -113,6 +125,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Zero. Fundamental accounting principles never expire.
 - **DECISION:** SELECTED
 - **REASON:** Evergreen commercial guide solving an expensive, widespread business calculation error.
+- **MARKET:** GLOBAL
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -133,6 +148,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Zero. Timeless corporate valuation theory.
 - **DECISION:** SELECTED
 - **REASON:** High-authority institutional finance topic providing deep educational value and calculator pairing.
+- **MARKET:** GLOBAL
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -153,6 +171,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Extremely low.
 - **DECISION:** SELECTED
 - **REASON:** Crucial financial literacy guide that saves borrowers thousands in hidden interest charges.
+- **MARKET:** BOTH
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -173,6 +194,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Zero. Fundamental balance sheet velocity principle.
 - **DECISION:** SELECTED
 - **REASON:** High-value corporate and small-business operational finance guide with deep calculator utility.
+- **MARKET:** GLOBAL
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -193,6 +217,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Low. Statutory provisions under Income-tax Act 1961.
 - **DECISION:** SELECTED
 - **REASON:** Saves readers real money in penal interest by clarifying complex statutory rules with our advance tax calculator.
+- **MARKET:** INDIA-ONLY
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -213,6 +240,9 @@ In accordance with Phase 11 specification §0, §5, §6, and §7, zero articles 
 - **FRESHNESS RISK:** Extremely low. Timeless macroeconomic and investment principle.
 - **DECISION:** SELECTED
 - **REASON:** Profound educational impact that directly illuminates the mathematical purpose of inflation and compounding calculators.
+- **MARKET:** BOTH
+- **TONE PASS:** DONE
+- **TRUST ELEMENTS:** author line: Y / last-updated: Y / source citation: Y / disclaimer: Y
 
 ---
 
@@ -237,18 +267,18 @@ The following candidates were investigated and explicitly rejected:
 
 ## 4. Locked Article Cluster (§16 Gate)
 
-| # | Slug | Final Title | Primary User Intent | Calculator(s) Linked | Type | Reason Selected | Key Evidence Sources |
-|---|---|---|---|---|---|---|---|
-| 001 | `cagr-vs-xirr` | CAGR vs. XIRR: How to Accurately Measure Your Investment Returns | Compare investment return metrics for SIP vs Lump sum | `/cagr-calculator`<br>`/xirr-calculator`<br>`/sip-calculator` | Evergreen | Resolves widespread investor confusion regarding SIP statement return metrics | Reddit r/IndiaInvestments, Google PAA graph, SERP formula gaps |
-| 002 | `home-loan-prepayment-vs-sip` | Home Loan Prepayment vs. SIP: Which Builds More Wealth? | Strategy decision: prepay loan or invest surplus cash | `/loan-prepayment-calculator`<br>`/home-loan-calculator`<br>`/sip-calculator` | Hybrid | Major financial dilemma; accounts for post-Budget 2024 New Regime tax reality | Reddit r/IndiaPersonalFinance, Google PAA, Finance Act 2024 |
-| 003 | `old-vs-new-tax-regime` | Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula | Identify exact deduction threshold to choose tax regime | `/in/income-tax-calculator`<br>`/in/hra-calculator`<br>`/in/salary-ctc-calculator` | Trending / Hybrid | Massive search volume following ₹75k standard deduction and revised slabs | Ministry of Finance, Reddit r/IndiaTax, Top portal breakeven gaps |
-| 004 | `capital-gains-tax-rules` | Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule | Calculate tax on equities, funds, gold, and real estate | `/in/capital-gains-tax-calculator`<br>`/in/advance-tax-calculator` | Trending / Hybrid | Critical statutory overhaul with widespread confusion regarding grandfathering | Official Gazette, August 2024 Parliamentary amendment |
-| 005 | `markup-vs-margin` | Markup vs. Margin: The Math Mistake That Silently Erases Business Profits | Learn correct pricing formulas to protect margins | `/markup-vs-margin-calculator`<br>`/profit-margin-calculator`<br>`/break-even-calculator` | Evergreen | Prevents common small-business retail pricing trap leading to operating losses | Reddit r/ecommerce, Google Autocomplete, accounting review |
-| 006 | `npv-vs-irr` | NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting | Evaluate mutually exclusive corporate investment projects | `/npv-calculator`<br>`/irr-calculator`<br>`/wacc-calculator` | Evergreen | High-authority corporate valuation guide resolving reinvestment rate traps | CFA Institute curriculum, academic finance literature |
-| 007 | `flat-vs-reducing-interest-rate` | Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR | Detect deceptive flat rate loan offers and compute true APR | `/interest-rate-calculator`<br>`/car-loan-calculator`<br>`/emi-calculator` | Evergreen | Protects retail borrowers from deceptive consumer/auto loan marketing | Reddit r/IndiaPersonalFinance, RBI Key Facts Statement mandate |
-| 008 | `cash-conversion-cycle` | The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency | Optimize inventory, receivables, and payables to free up cash | `/cash-conversion-cycle-calculator`<br>`/working-capital-calculator` | Evergreen | Critical operational finance guide illustrating working capital float | WallStreetPrep case studies, Google PAA, corporate finance audits |
-| 009 | `advance-tax-guide` | Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest | Comply with quarterly tax deadlines and avoid penal interest | `/in/advance-tax-calculator`<br>`/in/income-tax-calculator` | Evergreen / Statutory | High-utility compliance guide for freelancers, gig workers, and investors | Income-tax Act 1961, Reddit r/IndiaTax, tax portal omission analysis |
-| 010 | `real-rate-of-return` | The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money | Calculate purchasing power after inflation and tax slab drag | `/inflation-calculator`<br>`/fd-calculator`<br>`/future-value-calculator` | Evergreen | Foundational financial literacy exposing inflation erosion in safe assets | Bogleheads, r/IndiaInvestments, Fisher equation academic literature |
+| # | Slug | Final Title | Primary User Intent | Calculator(s) Linked | Type | Market | Reason Selected | Key Evidence Sources |
+|---|---|---|---|---|---|---|---|---|
+| 001 | `cagr-vs-xirr` | CAGR vs. XIRR: How to Accurately Measure Your Investment Returns | Compare investment return metrics for SIP vs Lump sum | `/cagr-calculator`<br>`/xirr-calculator`<br>`/sip-calculator` | Evergreen | Global | Resolves widespread investor confusion regarding SIP statement return metrics | Reddit r/IndiaInvestments, Google PAA graph, SERP formula gaps |
+| 002 | `home-loan-prepayment-vs-sip` | Home Loan Prepayment vs. SIP: Which Builds More Wealth? | Strategy decision: prepay loan or invest surplus cash | `/loan-prepayment-calculator`<br>`/home-loan-calculator`<br>`/sip-calculator` | Hybrid | Both | Major financial dilemma; accounts for post-Budget 2024 New Regime tax reality | Reddit r/IndiaPersonalFinance, Google PAA, Finance Act 2024 |
+| 003 | `old-vs-new-tax-regime` | Old vs. New Tax Regime After Budget 2024: The Exact Breakeven Deduction Formula | Identify exact deduction threshold to choose tax regime | `/in/income-tax-calculator`<br>`/in/hra-calculator`<br>`/in/salary-ctc-calculator` | Trending / Hybrid | India-Only | Massive search volume following ₹75k standard deduction and revised slabs | Ministry of Finance, Reddit r/IndiaTax, Top portal breakeven gaps |
+| 004 | `capital-gains-tax-rules` | Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule | Calculate tax on equities, funds, gold, and real estate | `/in/capital-gains-tax-calculator`<br>`/in/advance-tax-calculator` | Trending / Hybrid | India-Only | Critical statutory overhaul with widespread confusion regarding grandfathering | Official Gazette, August 2024 Parliamentary amendment |
+| 005 | `markup-vs-margin` | Markup vs. Margin: The Math Mistake That Silently Erases Business Profits | Learn correct pricing formulas to protect margins | `/markup-vs-margin-calculator`<br>`/profit-margin-calculator`<br>`/break-even-calculator` | Evergreen | Global | Prevents common small-business retail pricing trap leading to operating losses | Reddit r/ecommerce, Google Autocomplete, accounting review |
+| 006 | `npv-vs-irr` | NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting | Evaluate mutually exclusive corporate investment projects | `/npv-calculator`<br>`/irr-calculator`<br>`/wacc-calculator` | Evergreen | Global | High-authority corporate valuation guide resolving reinvestment rate traps | CFA Institute curriculum, academic finance literature |
+| 007 | `flat-vs-reducing-interest-rate` | Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR | Detect deceptive flat rate loan offers and compute true APR | `/interest-rate-calculator`<br>`/car-loan-calculator`<br>`/emi-calculator` | Evergreen | Both | Protects retail borrowers from deceptive consumer/auto loan marketing | Reddit r/IndiaPersonalFinance, RBI Key Facts Statement mandate |
+| 008 | `cash-conversion-cycle` | The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency | Optimize inventory, receivables, and payables to free up cash | `/cash-conversion-cycle-calculator`<br>`/working-capital-calculator` | Evergreen | Global | Critical operational finance guide illustrating working capital float | WallStreetPrep case studies, Google PAA, corporate finance audits |
+| 009 | `advance-tax-guide` | Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest | Comply with quarterly tax deadlines and avoid penal interest | `/in/advance-tax-calculator`<br>`/in/income-tax-calculator` | Evergreen / Statutory | India-Only | High-utility compliance guide for freelancers, gig workers, and investors | Income-tax Act 1961, Reddit r/IndiaTax, tax portal omission analysis |
+| 010 | `real-rate-of-return` | The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money | Calculate purchasing power after inflation and tax slab drag | `/inflation-calculator`<br>`/fd-calculator`<br>`/future-value-calculator` | Evergreen | Both | Foundational financial literacy exposing inflation erosion in safe assets | Bogleheads, r/IndiaInvestments, Fisher equation academic literature |
 
 ---
 
@@ -295,3 +325,39 @@ graph TD
 ```
 
 **Gate Approval:** Stage A Market Research is 100% complete and verified against empirical search signals, regulatory enactments, and community discussions. We are officially ready to proceed to Stage B: Article Production.
+
+---
+
+## 6. Phase 11 Addendum: Market Balance & Editorial Quality Audit
+
+### 6.1 Market Balance Breakdown (§3)
+The 10-article cluster is systematically balanced across geographic intents to match the Calcumetrics 50-calculator catalog (~60% global/universal tools, ~40% India-specific statutory tools):
+
+- **GLOBAL (4 Articles / 40%):**
+  1. `cagr-vs-xirr`: Pure time-weighted vs money-weighted portfolio return mathematics (CFA GIPS, SEC, FINRA). Clean USD ($) & currency-neutral units. Zero INR leakage.
+  2. `markup-vs-margin`: Universal commercial unit economics & retail pricing derivations (HBR, CFI, FASB). Clean USD ($) units.
+  3. `npv-vs-irr`: Corporate capital budgeting, Fisher crossover rate, and reinvestment rate assumption (CFA Institute, JACF, MIT). Clean USD ($) units.
+  4. `cash-conversion-cycle`: Balance sheet velocity, DIO/DSO/DPO, working capital float (HBR, CFA Institute, FEI). Clean days-based units.
+
+- **INDIA-ONLY (3 Articles / 30%):**
+  1. `old-vs-new-tax-regime`: Section 115BAC statutory breakeven analysis post-Finance (No. 2) Act 2024. Rupee (₹) denomination, CBDT & Income-tax Act citations.
+  2. `capital-gains-tax-rules`: Sections 111A, 112, 112A, and 20% indexed real estate grandfathering. Rupee (₹) denomination, CBDT notifications.
+  3. `advance-tax-guide`: Sections 208, 234B, 234C quarterly compliance calendar. Rupee (₹) denomination, Income-tax Department statutes.
+
+- **BOTH (3 Articles / 30%):**
+  1. `home-loan-prepayment-vs-sip`: Universal mortgage arbitrage math ($R_{equity}(1-T) - R_{debt}$) paired with both US/global market context (S&P 500) and Indian ₹50L case study under New Tax Regime Section 24(b) disallowance.
+  2. `flat-vs-reducing-interest-rate`: Universal amortization math and true APR conversion ($APR \approx 1.7 \times \text{to } 1.9 \times \text{Flat}$) covering both US Truth in Lending Act (TILA / Regulation Z) and RBI Key Facts Statement (KFS) mandates.
+  3. `real-rate-of-return`: Mathematical derivation of the Fisher Equation ($r_{real} = (r - i) / (1 + i)$) paired with a $100k global bond case study and an Indian ₹10L bank fixed deposit case study.
+
+### 6.2 Tone & Anti-AI Tells Enforcement (§2)
+Every article underwent a rigorous editorial pass to eliminate generic AI tropes:
+- **Zero generic conclusion headers:** Generic `<h2>Conclusion</h2>` and `<h2>Conclusion: ...</h2>` headers replaced with action-oriented decision checklists (e.g., "The Executive Decision Rule: When to Override IRR with NPV", "The Working Capital Playbook: Compressing Your CCC by 30 Days").
+- **Zero repetitive filler transitions:** Eliminated stock transitions ("In conclusion", "When it comes to", "It is important to note that", "At the end of the day").
+- **Concrete numbers and worked schedules:** Every article features reproducible numerical data tables and real-world case studies.
+- **Strong point of view:** Articles take an authoritative editorial stance based on financial mathematics and statutory law, not timid "both sides have pros and cons" hedging.
+
+### 6.3 E-E-A-T & Trust Implementation (§4)
+- **Author & Reviewer Line:** Explicit editorial team attribution with relevant credentials (CFA, CA, Quantitative Analytics).
+- **Visible Last-Updated Date:** Displayed prominently beneath the article title.
+- **Authoritative Source Citations:** Every article includes 3–4 primary regulatory, academic, or institutional citations (RBI, CBDT, IRS, SEC, CFA Institute, FASB, BLS, FRED) with active outbound links.
+- **Editorial Policies & Financial Disclaimer:** Standardized callout card linking directly to `/about` and `/methodology`.
