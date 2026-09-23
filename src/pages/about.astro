@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
-import { getToolCount, CATEGORIES } from '../config/site';
+import { getToolCount, CATEGORIES, SITE_EMAIL } from '../config/site';
 
 const canonicalUrl = 'https://calcumetrics.com/about';
 const toolCount = getToolCount();
@@ -23,7 +23,7 @@ const categoryCount = CATEGORIES.length;
         <p class="text-sm text-text-muted leading-relaxed max-w-xl">
           Independent, free financial calculators with transparent formulas, client-side execution, and zero personal data collection.
         </p>
-        <p class="text-xs text-text-muted mt-4">Last updated: 20 September 2026</p>
+        <p class="text-xs text-text-muted mt-4">Last updated: 23 September 2026</p>
       </div>
     </WindowFrame>
 
@@ -120,6 +120,13 @@ const categoryCount = CATEGORIES.length;
         </p>
         <p class="text-sm text-text-muted leading-relaxed">
           See our <a href="/methodology" class="text-accent hover:underline focus-visible:outline-accent">Methodology</a> page for full details on formulas, conventions, rate sources, and the correction policy.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-xl font-bold text-text-primary mb-3">Contact and publisher inquiries</h2>
+        <p class="text-sm text-text-muted leading-relaxed">
+          For general feedback, calculation bug reports, or editorial inquiries, visit our <a href="/contact" class="text-accent hover:underline focus-visible:outline-accent">Contact page</a> or email us directly at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
         </p>
       </section>
     </div>
