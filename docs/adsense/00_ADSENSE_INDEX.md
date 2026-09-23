@@ -1,6 +1,6 @@
 # AdSense Knowledge Base — Index
 
-This directory is the **project-supplied AdSense policy reference** for Fix The Speaker.
+This directory is the **project-supplied AdSense policy reference** for the site/project being audited.
 
 It is the authoritative source that any AI agent or developer MUST read before making AdSense-related decisions, recommendations, or code changes.
 
@@ -50,7 +50,7 @@ Read them in order for a full AdSense audit. Do not skip files.
 Every AdSense finding or recommendation MUST be labelled with exactly one of:
 
 | Label | Meaning |
-|-------|---------|
+|------|---------|
 | **EXPLICIT POLICY REQUIREMENT** | The supplied knowledge base file directly states this is required. Quote the source. |
 | **POLICY PROHIBITION** | The supplied knowledge base file directly prohibits this. Quote the source. |
 | **APPROVAL-RISK INFERENCE** | The knowledge base does not explicitly state this, but the pattern suggests approval risk. State the inference clearly. |
@@ -63,7 +63,7 @@ Every AdSense finding or recommendation MUST be labelled with exactly one of:
 
 ## Website Preservation Rules
 
-Fix The Speaker is a **launched, live website**. No change is permitted without a source-supported reason:
+The target site/project is the website being audited. No change is permitted without a source-supported reason:
 
 - Do NOT rebuild, redesign, or restructure the site without explicit justification.
 - Do NOT remove working features.
