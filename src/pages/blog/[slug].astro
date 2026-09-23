@@ -242,29 +242,18 @@ const jsonld = {
       </section>
     )}
 
-    <!-- Founder & Author Bio Box (§12) -->
-    <div class="mt-12 p-6 bg-surface border border-border rounded-card flex flex-col sm:flex-row items-start sm:items-center gap-5">
-      <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/30 flex items-center justify-center text-accent text-lg font-bold shrink-0 shadow-sm">
-        PB
+    <!-- Author Box -->
+    <div class="mt-12 p-6 bg-surface border border-border rounded-card flex items-start gap-5">
+      <div class="w-14 h-14 rounded-xl bg-accent/10 border border-accent/30 flex items-center justify-center text-accent text-lg font-bold shrink-0 shadow-sm">
+        {post.author.slice(0, 1).toUpperCase()}
       </div>
       <div class="flex-1">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-          <div>
-            <h3 class="text-sm font-bold text-text-primary">
-              Written by <a href="/about" class="text-accent hover:underline">Priyanshu Bhadauriya</a>
-            </h3>
-            <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">Founder &amp; Lead Developer · Calcumetrics</span>
-          </div>
-          <div class="flex items-center gap-3 text-xs text-text-muted">
-            <a href="https://linkedin.com/in/priyanshubhadauriya" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-standard">LinkedIn</a>
-            <span>•</span>
-            <a href="https://x.com/calcumetrics" target="_blank" rel="noopener noreferrer" class="hover:text-accent transition-standard">X</a>
-            <span>•</span>
-            <a href="/about" class="hover:text-accent transition-standard">About</a>
-          </div>
-        </div>
-        <p class="text-xs text-text-muted leading-relaxed">
-          Priyanshu builds independent, client-side financial engines engineered specifically for commerce students, CA aspirants, and everyday retail investors who require exact formulas and zero promotional clutter.
+        <h3 class="text-sm font-bold text-text-primary mb-1">
+          Written by <a href="/about" class="text-accent hover:underline">{post.author}</a>
+        </h3>
+        <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">Calcumetrics Contributor</span>
+        <p class="text-xs text-text-muted leading-relaxed mt-2">
+          This guide is part of the Calcumetrics editorial library, created to explain financial concepts and calculations clearly for readers using the platform.
         </p>
       </div>
     </div>
