@@ -37,7 +37,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'UPI MDR Calculator',
       url: canonicalUrl,
-      description: 'Calculate UPI merchant fees, interchange rates on PPI wallets and RuPay credit cards on UPI, GST deductions, and net bank settlement.',
+      description: 'Calculate UPI MDR charges — interchange fees on PPI wallets and RuPay credit cards on UPI, 18% GST deductions, and net bank settlement.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -105,8 +105,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="UPI MDR Calculator: Merchant Discount Rates | Calcumetrics"
-  description="Calculate UPI merchant fees, interchange rates on PPI wallets and RuPay credit cards on UPI, GST deductions, and net bank settlement."
+  title="UPI MDR Calculator: UPI MDR Charges & Net Settlement | Calcumetrics"
+  description="Free UPI MDR calculator. Compute mdr on upi transactions — interchange fees on PPI wallets & RuPay credit cards on UPI, 18% GST, and net bank settlement."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

@@ -25,7 +25,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Economic Order Quantity (EOQ) Calculator',
       url: canonicalUrl,
-      description: 'Calculate the optimal inventory order quantity (EOQ) that minimizes combined ordering and holding costs with annual ordering schedule.',
+      description: 'Calculate economic order quantity (EOQ) — the optimal inventory batch size that minimises combined annual ordering and holding costs, with reorder schedule and total cost breakdown.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -93,8 +93,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="EOQ Calculator: Economic Order Quantity | Calcumetrics"
-  description="Calculate the optimal order size that minimizes annual holding and ordering costs with reorder schedules and cost minimization curves."
+  title="Calculate Economic Order Quantity (EOQ) | Calcumetrics"
+  description="Calculate economic order quantity (EOQ) to minimise annual ordering and holding costs. Includes eoq formula calculator, reorder schedule, and cost breakdown."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

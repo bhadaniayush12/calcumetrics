@@ -38,7 +38,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: '401(k) Calculator (US)',
       url: canonicalUrl,
-      description: 'Calculate 401(k) retirement savings growth with employer match, compound interest, and annual contribution limits.',
+      description: 'Free 401(k) calculator to estimate retirement savings growth with employer match, compound returns, and IRS contribution limits.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -107,7 +107,7 @@ const jsonld = {
 
 <Layout
   title="401(k) Calculator: Retirement Savings Growth | Calcumetrics"
-  description="Calculate 401(k) retirement savings growth with employer match, compound returns, pre-tax tax advantages, and statutory IRS contribution limits."
+  description="Free 401(k) calculator. Estimate 401(k) retirement savings growth with employer match, compound returns, pre-tax advantages, and IRS contribution limits."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -146,7 +146,7 @@ const jsonld = {
           prefix="$"
           value="100,000"
           isNumeric={true}
-          localeFormat="western"
+          localeFormat="international"
           helperText="Gross pre-tax annual income"
           inputmode="decimal"
           aria-describedby="k401-error-msg"
@@ -468,7 +468,7 @@ const jsonld = {
     const errAlert = document.getElementById('k401-error-alert');
     const errMsg = document.getElementById('k401-error-msg');
 
-    if (!salaryInput || !contribInput || !rateInput || !yearsInput) return;
+    if (!salaryInput || !contribInput || !matchInput || !matchLimitInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { salary: 100000, contrib: 8, match: 50, matchLimit: 6, rate: 8, years: 30 };
     let timer: ReturnType<typeof setTimeout>;
@@ -581,8 +581,8 @@ const jsonld = {
     document.getElementById('k401-reset')?.addEventListener('click', () => {
       salaryInput.value = fmtLiveInput(String(DEFAULTS.salary));
       contribInput.value = String(DEFAULTS.contrib);
-      if (matchInput) matchInput.value = String(DEFAULTS.match);
-      if (matchLimitInput) matchLimitInput.value = String(DEFAULTS.matchLimit);
+      matchInput.value = String(DEFAULTS.match);
+      matchLimitInput.value = String(DEFAULTS.matchLimit);
       rateInput.value = String(DEFAULTS.rate);
       yearsInput.value = String(DEFAULTS.years);
 

@@ -26,7 +26,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Present Value Calculator',
       url: canonicalUrl,
-      description: 'Calculate the present value of a future cash flow using a chosen discount rate and compounding frequency.',
+      description: 'Free present value calculator. Apply the present value formula: PV = FV / (1+r/n)^(nt) to discount future lump sums back to present worth.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -95,7 +95,7 @@ const jsonld = {
 
 <Layout
   title="Present Value Calculator: Discount Cash Flows | Calcumetrics"
-  description="Calculate the present value (PV) of any future sum using a chosen discount rate and compounding frequency. Instant, free, and fully client-side."
+  description="Free present value calculator. Apply the present value formula: PV = FV / (1+r/n)^(nt) to discount future lump sums at any compound frequency."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

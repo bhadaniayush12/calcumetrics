@@ -131,6 +131,13 @@ export interface ValidationRules {
   integerOnly?: boolean;
 
   /**
+   * Alias for `integerOnly`.
+   * When true, non-integer values return 'NOT_AN_INTEGER'.
+   * Default: false.
+   */
+  integer?: boolean;
+
+  /**
    * Currency metadata for this field.
    * Validates currency code is one of 'INR', 'USD', 'EUR', 'GBP'.
    * Does NOT perform FX conversion or rate adjustments.
@@ -428,7 +435,7 @@ export function validate(
   }
 
   // ── Step 3: Integer Only Check ───────────────────────────────────────────
-  if (rules.integerOnly === true && !Number.isInteger(parsed)) {
+  if ((rules.integerOnly === true || rules.integer === true) && !Number.isInteger(parsed)) {
     return fail('NOT_AN_INTEGER', rules);
   }
 

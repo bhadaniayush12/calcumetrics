@@ -30,7 +30,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Discounted Payback Period Calculator',
       url: canonicalUrl,
-      description: 'Calculate the discounted payback period (DPP) — the time required to recover an initial investment from time-value-adjusted future cash flows.',
+      description: 'Free discounted payback period calculator. Apply the discounted payback period formula with TVM discount rates to evaluate capital recovery.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -98,8 +98,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="Discounted Payback Period Calculator | Calcumetrics"
-  description="Calculate the discounted payback period (DPP) using present-value-adjusted cash flows. Compare to simple payback period. Free, instant, and fully client-side."
+  title="Discounted Payback Period Calculator: DPP Formula | Calcumetrics"
+  description="Free discounted payback period calculator. Apply the discounted payback period formula with TVM discount rates to measure capital recovery timeline."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -337,7 +337,7 @@ const jsonld = {
       <section aria-labelledby="dpp-faq">
         <h2 id="dpp-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {(jsonld['@graph'] as any)[2]?.mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
               <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">

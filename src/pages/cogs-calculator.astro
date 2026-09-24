@@ -40,7 +40,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Cost of Goods Sold (COGS) Calculator',
       url: canonicalUrl,
-      description: 'Calculate Cost of Goods Sold (COGS), Goods Available for Sale, Gross Profit, and Gross Profit Margin for retail and manufacturing.',
+      description: 'Apply the cogs formula to calculate Cost of Goods Sold, Goods Available for Sale, Gross Profit, and Gross Profit Margin for retail and manufacturing businesses.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -108,8 +108,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="Cost of Goods Sold (COGS) Calculator | Calcumetrics"
-  description="Calculate Cost of Goods Sold (COGS), Goods Available for Sale, Gross Profit, and Gross Profit Margin for retail and manufacturing."
+  title="COGS Formula Calculator: Cost of Goods Sold | Calcumetrics"
+  description="Free cogs formula calculator. Compute cost of goods sold formula result, Goods Available for Sale, Gross Profit, and Gross Margin for retail and manufacturing."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -396,7 +396,7 @@ const jsonld = {
       <section aria-labelledby="cogs-calculator-faq">
         <h2 id="cogs-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {(jsonld['@graph'] as any)[2]?.mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
               <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">

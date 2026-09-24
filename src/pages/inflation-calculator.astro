@@ -93,8 +93,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="Inflation Calculator: Future Cost & Value | Calcumetrics"
-  description="Calculate the future cost of goods, historic price escalation, and purchasing power loss over time across customizable inflation rates."
+  title="Inflation Calculator: Future Cost & Purchasing Power | Calcumetrics"
+  description="Free inflation calculator. Track price rises over time — works as a cpi inflation calculator and dollar inflation calculator. See purchasing power changes."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -351,7 +351,7 @@ const jsonld = {
       <section aria-labelledby="inf-calculator-faq">
         <h2 id="inf-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {(jsonld['@graph'] as any)[2]?.mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
               <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">

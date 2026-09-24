@@ -26,7 +26,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Interest Rate Calculator',
       url: canonicalUrl,
-      description: 'Solve for the implied annual interest rate from loan principal, monthly EMI payment, and loan tenure.',
+      description: 'Free interest rate calculator to solve for effective interest rate and annual loan rate from principal amount, monthly EMI, and loan tenure.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -95,7 +95,7 @@ const jsonld = {
 
 <Layout
   title="Interest Rate Calculator: Implied Loan Rate | Calcumetrics"
-  description="Solve for the hidden or implied annual interest rate from loan amount, monthly EMI, and loan tenure. Free, fast, 100% client-side solver."
+  description="Free interest rate calculator. Solve for the effective interest rate or hidden monthly interest rate from loan amount, EMI payment, and loan tenure."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

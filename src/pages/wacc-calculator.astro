@@ -37,7 +37,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'WACC Calculator',
       url: canonicalUrl,
-      description: 'Calculate Weighted Average Cost of Capital (WACC) from equity value, debt value, cost of equity, cost of debt, and corporate tax rate.',
+      description: 'Free WACC calculator. Apply the wacc formula to calculate weighted average cost of capital from equity, debt, and corporate tax shields.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -106,7 +106,7 @@ const jsonld = {
 
 <Layout
   title="WACC Calculator: Weighted Average Cost of Capital | Calcumetrics"
-  description="Calculate Weighted Average Cost of Capital (WACC) from market equity, debt, cost of equity, debt rate, and tax shield. Instant, exact, and interactive."
+  description="Free WACC calculator. Apply the wacc formula to calculate weighted average cost of capital from equity, debt, hurdle rates, and corporate tax shields."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

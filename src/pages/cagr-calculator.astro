@@ -26,7 +26,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'CAGR Calculator',
       url: canonicalUrl,
-      description: 'Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1.',
+      description: 'Calculate the Compound Annual Growth Rate (CAGR) using the cagr formula: CAGR = (Ending Value / Beginning Value)^(1/Years) − 1. Ideal cagr growth rate calculator for investment analysis.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -78,8 +78,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="CAGR Calculator: Compound Annual Growth Rate | Calcumetrics"
-  description="Calculate the Compound Annual Growth Rate between any two investment values over a time period. CAGR = (FV/PV)^(1/n) − 1."
+  title="CAGR Calculator: Compound Annual Growth Rate Formula | Calcumetrics"
+  description="Free CAGR calculator. Compute compound annual growth rate using the cagr formula: CAGR = (FV/PV)^(1/n) − 1. Instant cagr growth rate calculator with chart."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
