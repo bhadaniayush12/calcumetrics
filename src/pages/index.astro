@@ -27,8 +27,8 @@ const totalCount = getToolCount();
 
 // Most popular — hand-picked 6 for the homepage with badge labels
 const popularConfig: Record<string, string> = {
-  'sip-calculator':       'Most Popular',
-  'emi-calculator':       'Most Popular',
+  'sip-calculator':       'Featured',
+  'emi-calculator':       'Featured',
   'fd-calculator':        'Investments',
   'cagr-calculator':      'Investments',
   'wacc-calculator':      'Corporate Finance',
@@ -296,9 +296,9 @@ const jsonld = {
           >
             <div class="flex items-start justify-between mb-2">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider">{tool.category}</span>
-              {popularConfig[tool.slug] === 'Most Popular' && (
+              {popularConfig[tool.slug] === 'Featured' && (
                 <span class="inline-flex items-center px-1.5 py-0.5 rounded-chip bg-accent/10 border border-accent/20 text-[10px] font-semibold text-accent uppercase tracking-wider">
-                  Popular
+                  Featured
                 </span>
               )}
             </div>
