@@ -176,7 +176,7 @@ const jsonld = {
                     </div>
                     <div class="pt-2 border-t border-dark-border flex items-center justify-between text-[10px] text-dark-muted">
                       <span>Display format:</span>
-                      <span class="text-dark-text font-mono font-medium">Indian Lakhs/Crores</span>
+                      <span id="demo-display-format" class="text-dark-text font-mono font-medium">Indian Lakhs/Crores</span>
                     </div>
                   </div>
                 </div>
@@ -844,6 +844,13 @@ const jsonld = {
 
 <script>
   import { animateValue } from '../lib/animate-number';
+  import {
+    formatDisplayCurrency,
+    getStoredCurrency,
+    normalizeCurrency,
+    getCurrencyConfig,
+    type CurrencyCode,
+  } from '../lib/currency';
 
   function initMethodologySandbox() {
     const pInput = document.getElementById('demo-principal') as HTMLInputElement | null;
@@ -853,12 +860,11 @@ const jsonld = {
     const engineCalc = document.getElementById('demo-engine-calc');
     const outputResult = document.getElementById('demo-output-result');
     const outputGain = document.getElementById('demo-output-gain');
+    const displayFormatEl = document.getElementById('demo-display-format');
 
     if (!pInput || !rInput) return;
 
-    function formatIndianRupee(num: number): string {
-      return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(num));
-    }
+    let currentCurrency: CurrencyCode = getStoredCurrency();
 
     function updateValues() {
       if (!pInput || !rInput) return;
@@ -866,25 +872,43 @@ const jsonld = {
       const rPercent = parseFloat(rInput.value) || 7.5;
       const t = 5;
       const r = rPercent / 100;
+      const config = getCurrencyConfig(currentCurrency);
 
-      if (pVal) pVal.textContent = formatIndianRupee(P);
+      if (pVal) pVal.textContent = formatDisplayCurrency(P, currentCurrency);
       if (rVal) rVal.textContent = `${rPercent.toFixed(2)}%`;
       if (engineCalc) {
-        engineCalc.textContent = `${P.toLocaleString('en-IN')} × (1 + ${(r).toFixed(3)})^${t}`;
+        engineCalc.textContent = `${P.toLocaleString(config.locale)} × (1 + ${r.toFixed(3)})^${t}`;
       }
 
       const A = P * Math.pow(1 + r, t);
       const gain = A - P;
 
-      const formattedCorpus = formatIndianRupee(A);
-      const formattedGain = `+ ${formatIndianRupee(gain)} wealth gain`;
+      const formattedCorpus = formatDisplayCurrency(A, currentCurrency);
+      const formattedGain = `+ ${formatDisplayCurrency(gain, currentCurrency)} wealth gain`;
 
       if (outputResult) animateValue(outputResult, formattedCorpus, { duration: 150 });
       if (outputGain) animateValue(outputGain, formattedGain, { duration: 150 });
+
+      if (displayFormatEl) {
+        displayFormatEl.textContent =
+          currentCurrency === 'INR' ? 'Indian Lakhs/Crores' : 'International grouping';
+      }
     }
 
     pInput.addEventListener('input', updateValues);
     rInput.addEventListener('input', updateValues);
+
+    // Global currency synchronization listener with duplicate guard
+    const win = window as any;
+    if (win.__cmMethodologyCurrencyHandler) {
+      window.removeEventListener('cm:currency-change', win.__cmMethodologyCurrencyHandler);
+    }
+    win.__cmMethodologyCurrencyHandler = (e: any) => {
+      const code = e?.detail?.code ? normalizeCurrency(e.detail.code) : getStoredCurrency();
+      currentCurrency = code;
+      updateValues();
+    };
+    window.addEventListener('cm:currency-change', win.__cmMethodologyCurrencyHandler);
 
     // Initial run
     updateValues();
