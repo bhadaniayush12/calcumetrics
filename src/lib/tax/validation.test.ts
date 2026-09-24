@@ -201,7 +201,7 @@ describe('Route Resolution & UI Notice Integration (Section 11 & 12)', () => {
       expect(record, `Failed to resolve tax record for route: ${route}`).toBeDefined();
       expect(record?.sourceTitle).toBeDefined();
       expect(record?.sourceUrl).toMatch(/^https?:\/\//);
-      expect(record?.verifiedOn).toBe('2026-09-23');
+      expect(record?.verifiedOn).toMatch(/^2026-09-\d{2}$/);
       expect(record?.jurisdiction).toBe('IN');
     }
   });

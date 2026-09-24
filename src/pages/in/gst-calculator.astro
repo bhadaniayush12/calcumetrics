@@ -31,8 +31,8 @@ const totalCompact = formatIndianCompact(initialResult.totalAmount, '₹');
 const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'gst-calculator' && t.status === 'published').slice(0, 4);
 
 const canonicalUrl = 'https://calcumetrics.com/in/gst-calculator';
-const pageTitle = 'GST Calculator India (GST 2.0): Calculate 0%, 5%, 18% & 40% Slabs';
-const pageDesc = 'Free GST 2.0 Calculator India (Updated September 2026). Calculate 0%, 5%, 18% & 40% GST slabs, add or remove GST from invoice amount with intra-state (CGST+SGST) and inter-state IGST split.';
+const pageTitle = 'GST 2.0 Calculator India: 0%, 5%, 18% & 40% | Calcumetrics';
+const pageDesc = 'Free GST 2.0 Calculator India. Calculate 0%, 5%, 18% & 40% slabs, add or remove GST, and get exact intra-state (CGST+SGST) and inter-state IGST splits.';
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -122,16 +122,16 @@ const jsonld = {
   >
     <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
-          GST Calculator (India)
+          GST Calculator (GST 2.0)
         </h1>
         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          GST 2.0 Ready
+          Last verified: 24 Sept 2026
         </span>
       </div>
-      <p class="text-sm text-text-muted mb-6 leading-relaxed">
-        Calculate GST 2.0 amounts (0%, 5%, 18%, 40%), inclusive/exclusive pricing, and CGST/SGST/IGST tax splits instantly.
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://www.cbic.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Central Board of Indirect Taxes and Customs (CBIC)</a> · Slabs: 0%, 5%, 18%, 40%.
       </p>
 
       <!-- Amount Input + Presets -->

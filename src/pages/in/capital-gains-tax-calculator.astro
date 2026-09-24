@@ -103,7 +103,7 @@ const ASSET_OPTIONS = [
 ---
 
 <Layout
-  title="Capital Gains Tax Calculator India: LTCG & STCG (Budget 2024 Rates) | Calcumetrics"
+  title="Capital Gains Tax Calculator India: LTCG & STCG | Calcumetrics"
   description="Calculate your Indian capital gains tax under updated post-Budget 2024 tax rules (12.5% LTCG, 20% STCG). Free, instant, and accurate."
   canonical={canonicalUrl}
 >
@@ -117,8 +117,21 @@ const ASSET_OPTIONS = [
     heroLabel="Estimated Capital Gains Tax"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Capital Gains Tax Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Estimate your capital gains tax liability under Section 111A, 112, and 112A reflecting current Finance Act rules.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">Capital Gains Tax Calculator: FY 2026-27</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Sections 111A, 112, 112A.
+      </p>
+
+      <!-- Surcharge Disclaimer (§18) -->
+      <div class="mb-5 p-3 rounded-card bg-amber-500/10 border border-amber-500/20 text-xs text-text-muted leading-relaxed">
+        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">⚠️ Surcharge Disclaimer:</strong>
+        Computations calculate 12.5% LTCG, 20% STCG, ₹1.25 Lakh exemption, and 4% Health & Education Cess. <strong>Surcharge on taxable capital gains where total taxable income exceeds ₹50 Lakh (capped at 15% for Section 111A/112A) is not modeled.</strong>
+      </div>
 
       <!-- Error alert -->
       <div id="cgt-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

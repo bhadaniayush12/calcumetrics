@@ -94,7 +94,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="Advance Tax Calculator India: Instalments & Due Dates | Calcumetrics"
+  title="Advance Tax Calculator India (FY 2026-27) | Calcumetrics"
   description="Calculate your advance tax quarterly installment schedule and due dates under Section 208/211 of the Indian Income-tax Act. Instant, free, and accurate."
   canonical={canonicalUrl}
 >
@@ -108,8 +108,21 @@ const jsonld = {
     heroLabel="Estimated Advance Tax Due"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Advance Tax Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Determine your quarterly installment schedule and compliance dates under Section 208 of the Income-tax Act.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">Advance Tax Calculator: FY 2026-27 / AY 2027-28</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Sections 208, 209, 211.
+      </p>
+
+      <!-- Surcharge Disclaimer (§18) -->
+      <div class="mb-5 p-3 rounded-card bg-amber-500/10 border border-amber-500/20 text-xs text-text-muted leading-relaxed">
+        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">⚠️ Surcharge Disclaimer:</strong>
+        Computations calculate statutory quarterly payment schedules (15%, 45%, 75%, 100%) on base estimated tax. <strong>Surcharge on taxable income exceeding ₹50 Lakh (10% to 25%) is not modeled.</strong> Taxpayers with high net worth should consult a CA.
+      </div>
 
       <!-- Error alert -->
       <div id="at-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

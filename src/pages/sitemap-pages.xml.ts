@@ -4,16 +4,16 @@ import { BLOG_POSTS } from '../data/blog/posts';
 export const GET: APIRoute = async () => {
   // Static pages with their last meaningful update date
   const staticPages = [
-    { path: '/',               lastmod: '2026-09-23' },
-    { path: '/calculators',   lastmod: '2026-09-23' },
-    { path: '/blog',          lastmod: '2026-09-23' },
-    { path: '/about',         lastmod: '2026-09-23' },
-    { path: '/contact',       lastmod: '2026-09-23' },
-    { path: '/methodology',   lastmod: '2026-09-23' },
-    { path: '/privacy-policy',lastmod: '2026-09-23' },
-    { path: '/terms',         lastmod: '2026-09-23' },
-    { path: '/disclaimer',    lastmod: '2026-09-23' },
-    { path: '/cookie-policy', lastmod: '2026-09-23' },
+    { path: '/',               lastmod: '2026-09-24' },
+    { path: '/calculators',   lastmod: '2026-09-24' },
+    { path: '/blog',          lastmod: '2026-09-24' },
+    { path: '/about',         lastmod: '2026-09-24' },
+    { path: '/privacy-policy',lastmod: '2026-09-24' },
+    { path: '/cookie-policy', lastmod: '2026-09-24' },
+    { path: '/methodology',   lastmod: '2026-09-24' },
+    { path: '/contact',       lastmod: '2026-09-20' },
+    { path: '/terms',         lastmod: '2026-09-20' },
+    { path: '/disclaimer',    lastmod: '2026-09-20' },
   ];
 
   // Blog posts use their individual dateModified for accurate freshness signals

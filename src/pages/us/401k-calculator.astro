@@ -106,7 +106,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="401(k) Calculator: Retirement Savings Growth with Employer Match | Calcumetrics"
+  title="401(k) Calculator: Retirement Savings Growth | Calcumetrics"
   description="Calculate 401(k) retirement savings growth with employer match, compound interest, and annual contribution limits."
   canonical={canonicalUrl}
 >
@@ -121,8 +121,15 @@ const jsonld = {
     calcType="advanced"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">401(k) Calculator (US)</h1>
-      <p class="text-sm text-text-muted mb-6">Estimate your retirement balance including employee contributions and employer matching.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">401(k) Calculator (US)</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-4">
+        Statutory baseline: <a href="https://www.irs.gov" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Internal Revenue Service (IRS)</a> · Contribution Limits &amp; SECURE 2.0.
+      </p>
 
       <!-- Error alert -->
       <div id="k401-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

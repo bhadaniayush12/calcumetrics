@@ -189,7 +189,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate Public Provident Fund maturity value with India-specific interest rates and 15-year lock-in.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
   {
     name: '401(k) Calculator',
@@ -199,7 +199,7 @@ export const TOOLS: Tool[] = [
     region: 'US',
     description: 'Calculate 401(k) retirement savings growth with employer match and annual contribution limits.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
 
   // ── Loans ──────────────────────────────────────────────────────────────────
@@ -273,7 +273,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate House Rent Allowance tax exemption under India\'s Income Tax rules.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
 
   // ── Business ───────────────────────────────────────────────────────────────
@@ -285,7 +285,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate UPI merchant fees, interchange rates on PPI wallets and RuPay credit cards, and net settlement.',
     status: 'published',
-    dateModified: '2026-09-20',
+    dateModified: '2026-09-24',
   },
   {
     name: 'Break-even Calculator',
@@ -536,7 +536,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate tax deducted at source for supported India income and payment scenarios.',
     status: 'published',
-    dateModified: '2026-09-22',
+    dateModified: '2026-09-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
@@ -547,7 +547,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Estimate Indian capital gains tax for supported asset types, holding periods, and tax rules.',
     status: 'published',
-    dateModified: '2026-09-22',
+    dateModified: '2026-09-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
@@ -558,7 +558,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Estimate advance income-tax instalments under applicable Indian tax rules.',
     status: 'published',
-    dateModified: '2026-09-22',
+    dateModified: '2026-09-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
@@ -569,7 +569,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Break down salary and CTC components for an India employment package.',
     status: 'published',
-    dateModified: '2026-09-22',
+    dateModified: '2026-09-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {

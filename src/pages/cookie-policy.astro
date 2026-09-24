@@ -38,7 +38,7 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Cookie Policy</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 24 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Cookie Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-6">
       This policy explains how Calcumetrics (calcumetrics.com) uses cookies and browser local storage, their exact technical purposes, and how you can control your preferences.
@@ -61,29 +61,27 @@ const jsonld = {
       Calcumetrics plans to display advertising via Google AdSense in future. When enabled, Google and its certified vendor partners may use cookies (such as the DoubleClick cookie) and device identifiers to serve ads and measure ad impressions.
     </p>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      <strong>Consent Management:</strong> Before any advertising cookies are activated for visitors in the European Economic Area (EEA), United Kingdom, and Switzerland, a Google-certified Consent Management Platform (CMP) will be presented. You will have full granular control to grant or deny consent. You can reopen your consent choices at any time by clicking the <button type="button" id="open-cookie-settings-btn" class="text-accent hover:underline cursor-pointer focus-visible:outline-accent font-medium">Cookie settings</button> button.
+      <strong>Future Consent Management:</strong> Before any advertising cookies are activated for visitors in the European Economic Area (EEA), United Kingdom, Switzerland, or other regulated jurisdictions, an interactive Consent Management Platform (CMP) dialog will be deployed in accordance with Google EU User Consent Policy and IAB TCF standards. This policy will be updated before any advertising cookies are enabled.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Planned analytics cookies</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Self-hosted typography &amp; zero external tracking</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      No analytics cookies are currently set on Calcumetrics. If web analytics are introduced in the future, we will prioritize privacy-respecting, cookieless or consent-gated solutions and update this policy prior to activation.
+      All web fonts (including Inter and Playfair Display) are self-hosted locally directly on our own domain servers. We do not load fonts, scripts, or stylesheets from Google Fonts or third-party CDNs, ensuring that your IP address and browser headers are never transmitted to external font services.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. How to control and delete browser storage</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Cookieless web analytics (Cloudflare Web Analytics)</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      You can clear your stored preferences at any time by clearing your browser cache and local storage in your browser settings. To opt out of interest-based advertising from participating ad networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
+      We use Cloudflare Web Analytics to measure high-level traffic and site performance. Cloudflare Web Analytics is 100% cookieless and does not use local storage or fingerprinting. It does not track users across sites, does not collect personal data, and does not log IP addresses.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Questions and updates</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. How to control and delete browser storage</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      You can clear your stored preferences (such as remembered currency) at any time by clearing your browser's local storage and cache in your browser settings. To opt out of interest-based advertising across participating networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
+    </p>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Questions and updates</h2>
     <p class="text-sm text-text-muted leading-relaxed">
       If you have questions about our cookie or local storage practices, please contact us at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>. We update this policy whenever storage mechanisms change.
     </p>
   </div>
 </Layout>
-
-<script>
-  // Wire up the cookie settings button to trigger the CMP consent dialog
-  document.getElementById('open-cookie-settings-btn')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('calcumetrics:open-cookie-settings'));
-  });
-</script>

@@ -13,7 +13,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Global',
     author: 'Dev',
-    reviewer: 'Reviewed by Certified Financial Planner (CFP®)',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Avalanche pays highest-interest debt first to save the most money mathematically; Snowball pays smallest balances first for psychological momentum.',
     sources: [
       {
@@ -223,7 +223,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Global',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Credit Risk & Retail Banking Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Early EMI payments consist almost entirely of interest; principal reduction accelerates only in the second half of the loan tenure.',
     sources: [
       {
@@ -426,7 +426,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Both',
     author: 'Dev',
-    reviewer: 'Reviewed by Senior Retail Lending Specialist',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Fixed rates guarantee payment certainty; floating rates are typically 1.0%–1.5% cheaper initially and benefit when central bank rates decline.',
     sources: [
       {
@@ -600,7 +600,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     readTime: '9 min read',
     market: 'India-Only',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Corporate Payroll & Statutory Compliance Lead',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Take-home salary is typically 70%–80% of CTC after deducting employer/employee EPF, gratuity provisions, professional tax, and monthly TDS.',
     sources: [
       {
@@ -676,7 +676,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         question: 'How does the New Tax Regime impact in-hand salary compared to the Old Regime?',
         answer:
-          'Under the New Tax Regime, employees benefit from lower slab rates, a ₹75,000 standard deduction, and complete tax exemption on taxable income up to ₹7.75 lakh (via Section 87A rebate). For employees who do not have large home loan interest (Section 24b) or Section 80C investments, the New Tax Regime substantially reduces monthly TDS, increasing monthly in-hand cash.',
+          'Under the New Tax Regime, employees benefit from lower slab rates, a ₹75,000 standard deduction, and complete tax exemption on gross income up to ₹12.75 lakh (via Section 87A rebate for taxable income up to ₹12 lakh). For employees who do not have large home loan interest (Section 24b) or Section 80C investments, the New Tax Regime substantially reduces monthly TDS, increasing monthly in-hand cash.',
       },
     ],
     content: `
@@ -827,7 +827,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     readTime: '9 min read',
     market: 'India-Only',
     author: 'Dev',
-    reviewer: 'Reviewed by Indirect Tax & GST Advisory Practice',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'ITC can only be claimed if the invoice appears in GSTR-2B, goods/services are received, and the supplier is paid within 180 days.',
     sources: [
       {

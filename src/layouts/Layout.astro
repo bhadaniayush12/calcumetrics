@@ -67,10 +67,7 @@ const resolvedOgAlt = ogImageAlt || title;
         } catch (e) {}
       })();
     </script>
-    <!-- Brand Font & Favicons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+    <!-- Favicons -->
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png" />
@@ -112,6 +109,9 @@ const resolvedOgAlt = ogImageAlt || title;
     <!-- AdSense script placeholder — insert after CMP, async, with data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" -->
 
     <!-- Section 11: Self-host Inter via @font-face with font-display: swap -->
+
+    <!-- Cloudflare Web Analytics (Cookieless, privacy-preserving) -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "01d0a5f7cefa40f4b360b031d279cf43"}'></script>
 
     <!-- Page-specific head content (JSON-LD, extra meta, etc.) -->
     <slot name="head" />

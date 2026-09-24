@@ -107,7 +107,7 @@ const SECTION_OPTIONS = [
 ---
 
 <Layout
-  title="TDS Calculator India: Calculate Tax Deducted at Source & Net Payout | Calcumetrics"
+  title="TDS Calculator India: Tax Deducted at Source | Calcumetrics"
   description="Calculate TDS deduction, net receivable payment, and statutory exemption thresholds under the Indian Income-tax Act. Instant, free, and accurate."
   canonical={canonicalUrl}
 >
@@ -121,8 +121,15 @@ const SECTION_OPTIONS = [
     heroLabel="Estimated TDS Deducted"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">TDS Calculator (India)</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate Tax Deducted at Source and net receivable amount under applicable Income-tax Act sections.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">TDS Calculator: FY 2026-27</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Chapter XVII-B.
+      </p>
 
       <!-- Error alert -->
       <div id="tds-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

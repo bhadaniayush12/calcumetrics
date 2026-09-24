@@ -11,12 +11,15 @@ export const GET: APIRoute = async () => {
   });
 
   const urls = eligibleCategories
-    .map(
-      (cat) => `  <url>
+    .map((cat) => {
+      const list = toolsByCategory.get(cat.name) ?? [];
+      const dates = list.map((t) => t.dateModified).filter(Boolean);
+      const latest = dates.length ? dates.sort().reverse()[0] : '2026-09-20';
+      return `  <url>
     <loc>https://calcumetrics.com${cat.href}</loc>
-    <lastmod>2026-09-23</lastmod>
-  </url>`
-    )
+    <lastmod>${latest}</lastmod>
+  </url>`;
+    })
     .join('\n');
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>

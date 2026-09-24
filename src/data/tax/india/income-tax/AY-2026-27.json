@@ -10,13 +10,13 @@
   "source": "Income Tax Department (CBDT)",
   "sourceUrl": "https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-06/CBDT_e-filing_ITR-3_Validation%20Rules_V1.0_AY%2026-27.pdf",
   "sourceTitle": "CBDT e-Filing ITR-3 Validation Rules AY 2026-27",
-  "verifiedOn": "2026-09-23",
-  "notes": "Rules for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961 transitional framework prior to full cutover to the Income-tax Act, 2025.",
+  "verifiedOn": "2026-09-24",
+  "notes": "Rules for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961 transitional framework prior to full cutover to the Income-tax Act, 2025. Standard deduction under New Regime is ₹75,000 and Section 87A rebate applies up to taxable income of ₹12,00,000 (zero tax up to ₹12.75 Lakh gross).",
   "assumptions": [
     "Taxpayer is an individual resident below 60 years of age filing under transitional rules for FY 2025-26.",
     "Standard deduction under New Tax Regime is ₹75,000.",
     "Standard deduction under Old Tax Regime is ₹50,000.",
-    "Section 87A rebate applies up to ₹7,00,000 under New Regime and ₹5,00,000 under Old Regime.",
+    "Section 87A rebate applies up to ₹12,00,000 under New Regime (zero tax up to ₹12.75 Lakh gross) and ₹5,00,000 under Old Regime.",
     "4% Health & Education Cess applies to total tax liability."
   ],
   "limitations": [
@@ -28,15 +28,16 @@
   "values": {
     "newRegime": {
       "standardDeduction": 75000,
-      "rebate87AMaxTaxable": 700000,
+      "rebate87AMaxTaxable": 1200000,
       "cessRatePct": 4,
       "slabs": [
-        { "min": 0, "max": 300000, "ratePct": 0 },
-        { "min": 300000, "max": 700000, "ratePct": 5 },
-        { "min": 700000, "max": 1000000, "ratePct": 10 },
-        { "min": 1000000, "max": 1200000, "ratePct": 15 },
-        { "min": 1200000, "max": 1500000, "ratePct": 20 },
-        { "min": 1500000, "max": null, "ratePct": 30 }
+        { "min": 0, "max": 400000, "ratePct": 0 },
+        { "min": 400000, "max": 800000, "ratePct": 5 },
+        { "min": 800000, "max": 1200000, "ratePct": 10 },
+        { "min": 1200000, "max": 1600000, "ratePct": 15 },
+        { "min": 1600000, "max": 2000000, "ratePct": 20 },
+        { "min": 2000000, "max": 2400000, "ratePct": 25 },
+        { "min": 2400000, "max": null, "ratePct": 30 }
       ]
     },
     "oldRegime": {

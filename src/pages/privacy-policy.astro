@@ -38,10 +38,10 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Privacy Policy</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 23 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 24 September 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Privacy Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Effective date: 23 September 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
+      Effective date: 24 September 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Who we are and how to contact us</h2>
@@ -51,33 +51,24 @@ const jsonld = {
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. What we collect</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Calculator inputs:</strong> All calculator inputs are processed entirely in your browser. They are not transmitted to our servers, not stored, and not sent to any third party. Calculator state may be saved to your browser's URL hash (for share links) or <code>localStorage</code> (for remembered currency preference — key: <code>cm_currency</code>). This data stays on your device only.</p>
-    <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Usage data:</strong> When Google AdSense is active, Google's ad technology collects standard web data — including IP address, device identifiers, browser type, and pages visited — for the purpose of serving and measuring ads. We do not separately collect or log server-side usage data beyond what is standard in web server access logs (IP, URL, timestamp), which are retained for a short period for security purposes.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Self-hosted typography:</strong> All fonts (Inter and Playfair Display) are self-hosted directly on our origin servers. We do not load fonts, scripts, or styles from Google Fonts, Google CDN, or other third-party font networks, guaranteeing that no IP address or browser telemetry is shared with external font providers.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Cookieless web analytics:</strong> We use Cloudflare Web Analytics to monitor aggregate traffic, page views, and performance. Cloudflare Web Analytics is privacy-first, 100% cookieless, and does not use <code>localStorage</code> or fingerprinting. It does not track you across other websites, does not collect personal identifiers, and does not retain IP addresses.</p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Cookies and similar technologies</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Cookies and browser storage</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We use the following categories of cookies and storage:
+      Calcumetrics does <strong>not</strong> set any tracking cookies or third-party advertising cookies. We only use functional browser storage (<code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">localStorage</code>) to preserve your explicit user interface choices:
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
-      <li><strong>Strictly necessary:</strong> No essential cookies at this time (no login, no session).</li>
-      <li><strong>Preferences:</strong> <code>localStorage</code> keys: <code>cm_currency</code> (stores your selected currency, e.g. INR, USD) and <code>cm_theme</code> (stores your dark/light appearance preference). No expiry; stays until you clear browser storage.</li>
-      <li><strong>Advertising (Google AdSense):</strong> When active, Google AdSense sets cookies and uses device identifiers to serve personalised ads and measure ad performance. These are third-party cookies set by Google's ad technology.</li>
-      <li><strong>Analytics:</strong> If analytics are added in future, this policy will be updated before they are enabled.</li>
+      <li><code>cm_currency</code>: Remembers your selected currency symbol (e.g., INR, USD, EUR) across tools.</li>
+      <li><code>cm_theme</code>: Remembers your light/dark mode preference if toggled.</li>
     </ul>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      To manage your preferences, use the <button type="button" id="privacy-cookie-settings-link" class="text-accent hover:underline cursor-pointer focus-visible:outline-accent">Cookie settings</button> link (opens the consent dialog) or see our <a href="/cookie-policy" class="text-accent hover:underline focus-visible:outline-accent">Cookie Policy</a>.
+      This data resides exclusively on your local device and is never sent to our servers. You can clear this data at any time via your browser settings. For full details, see our <a href="/cookie-policy" class="text-accent hover:underline focus-visible:outline-accent">Cookie Policy</a>.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Third-party advertising — Google AdSense</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Advertising and future consent</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We plan to display ads through Google AdSense. Google and its partners use cookies and identifiers (including the DoubleClick cookie) to serve ads based on your prior visits to this or other websites.
-    </p>
-    <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
-      <li>For users in the EEA, UK, and Switzerland: personalised ads will only be served after you give consent through our Google-certified Consent Management Platform (CMP). Until then, you may see non-personalised ads only.</li>
-      <li>To opt out of personalised ads: visit <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">aboutads.info</a> or your <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.</li>
-      <li>Read <a href="https://policies.google.com/technologies/partner-sites" rel="noopener noreferrer" class="text-accent hover:underline">how Google uses information from sites that use its services</a>.</li>
-    </ul>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We load AdSense scripts asynchronously, after consent state is known. We never send calculator inputs or results to Google Analytics or any advertising system — only page-level events (such as "calculator page viewed") may be recorded.
+      Third-party advertising (such as Google AdSense) is not currently active on this site. If we introduce advertising or cookie-based services in the future, we will deploy a certified Consent Management Platform (CMP) and update this policy prior to activation. No ad network or tracking scripts will execute without appropriate user consent.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Legal bases and your rights</h2>
@@ -87,7 +78,7 @@ const jsonld = {
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Data retention and security</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We do not store calculator inputs on any server. Any data held by Google AdSense or analytics providers is subject to Google's own retention policies. We implement HTTPS, HSTS, and standard security headers. No system is 100% secure; use this site at your own risk.
+      We do not store calculator inputs on any server. Aggregate analytics data from Cloudflare Web Analytics is retained per Cloudflare's privacy guidelines. We enforce HTTPS, HSTS, and strict security headers.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">7. Children</h2>
@@ -101,10 +92,3 @@ const jsonld = {
     </p>
   </div>
 </Layout>
-
-<script>
-  // Reuse the footer's cookie settings event so this link also opens the CMP
-  document.getElementById('privacy-cookie-settings-link')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('calcumetrics:open-cookie-settings'));
-  });
-</script>

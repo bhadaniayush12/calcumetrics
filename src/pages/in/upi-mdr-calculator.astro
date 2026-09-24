@@ -105,7 +105,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="UPI MDR Calculator: Merchant Discount Rates & GST Settlement | Calcumetrics"
+  title="UPI MDR Calculator: Merchant Discount Rates | Calcumetrics"
   description="Calculate UPI merchant fees, interchange rates on PPI wallets and RuPay credit cards on UPI, GST deductions, and net bank settlement."
   canonical={canonicalUrl}
 >
@@ -119,8 +119,25 @@ const jsonld = {
     heroLabel="Estimated Net Settlement"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">UPI MDR Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate interchange fees, 18% GST, and net merchant payouts on UPI and RuPay credit transactions.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">UPI MDR Calculator</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-3">
+        Governed by <a href="https://www.npci.org.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">NPCI Guidelines</a> &amp; Payment and Settlement Systems Act.
+      </p>
+
+      <!-- Upcoming 15 October Regulation Notice -->
+      <div class="mb-5 p-3.5 rounded-card bg-amber-500/10 border border-amber-500/30 text-xs text-text-primary">
+        <strong class="font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400 mb-1">
+          <span>⚠️</span> Upcoming NPCI Rule Update (Effective 15 October 2026):
+        </strong>
+        <p class="text-text-muted leading-relaxed">
+          NPCI has revised the merchant interchange framework taking effect <strong>15 October 2026</strong>: a standard <strong>0.4% MDR</strong> applies to commercial P2M transactions above ₹2,000 (capped at ₹300), flat ₹5 on essential utilities/fuel, while transactions up to ₹2,000 and small merchants (up to ₹1L/month) remain <strong>100% free (0% MDR)</strong>.
+        </p>
+      </div>
 
       <!-- Error alert -->
       <div id="mdr-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" fill="none">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&amp;display=swap');
     .wordmark-text {
       font-family: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
       font-size: 34px;

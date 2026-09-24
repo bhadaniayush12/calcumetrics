@@ -389,7 +389,7 @@ export function getAuthoritativeSources(): SourceEntry[] {
 
 /** Route to tax record mapping for UI display in IndiaTaxSourceNotice */
 const ROUTE_TAX_RECORD_MAP: Record<string, TaxRecord> = {
-  '/in/income-tax-calculator': INDIA_TAX_DATA.incomeTax['AY-2025-26'],
+  '/in/income-tax-calculator': INDIA_TAX_DATA.incomeTax['TY-2026-27'],
   '/in/gst-calculator': INDIA_TAX_DATA.gst.current,
   '/in/hra-calculator': INDIA_TAX_DATA.hra['AY-2026-27'],
   '/in/tds-calculator': INDIA_TAX_DATA.tds.current,

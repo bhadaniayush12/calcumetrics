@@ -95,7 +95,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="PPF Calculator: Maturity Value & Tax-Free Interest | Calcumetrics India"
+  title="PPF Calculator: Maturity & Tax-Free Returns | Calcumetrics"
   description="Calculate your Public Provident Fund (PPF) maturity value and interest with annual compounding over 15 to 30 years. Section 80C EEE status."
   canonical={canonicalUrl}
 >
@@ -110,8 +110,15 @@ const jsonld = {
     calcType="simple"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Public Provident Fund (PPF) Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate maturity value and tax-free interest on your PPF account over 15 to 30 years.</p>
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">PPF Calculator</h1>
+        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
+          Last verified: 24 Sept 2026
+        </span>
+      </div>
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://dea.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Ministry of Finance (DEA)</a> · 7.1% p.a., EEE Tax Status under Section 80C.
+      </p>
 
       <!-- Error alert -->
       <div id="ppf-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">

@@ -13,7 +13,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '7 min read',
     market: 'Global',
     author: 'Dev',
-    reviewer: 'Reviewed by CFA & Quantitative Research Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'CAGR measures single lump-sum growth; use XIRR for multiple staggered deposits or SIPs.',
     sources: [
       {
@@ -298,7 +298,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Both',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Chartered Accountant (CA) & Debt Advisory Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Prepaying saves guaranteed post-tax interest (~8.5%); SIP historically compounds higher (~12-14%) with equity market risk.',
     sources: [
       {
@@ -539,8 +539,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '9 min read',
     market: 'India-Only',
     author: 'Dev',
-    reviewer: 'Reviewed by Senior Chartered Accountant (Tax & Statutory Practice)',
-    quickAnswer: 'If total deductions (80C, 24(b), 80D) exceed ₹4.25 Lakh, Old Regime saves more tax; otherwise, New Regime wins with lower slabs and ₹75k standard deduction.',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
+    quickAnswer: 'For salaried earners below ₹12.75 Lakh gross, the New Regime offers ₹0 tax; for a ₹15 Lakh salary, you need over ₹5.43 Lakh in eligible deductions before the Old Regime saves any tax.',
     isFeatured: true,
     sources: [
       {
@@ -561,12 +561,12 @@ export const PHASE_11_POSTS: BlogPost[] = [
     ],
     type: 'Hybrid',
     summary:
-      'A comprehensive mathematical breakdown of the Old vs. New Tax Regime under current statutory rules. Learn the exact breakeven deduction thresholds across salary bands (₹8.5L to ₹50L), how the ₹75,000 standard deduction shifts the balance, and how to evaluate employer NPS under Section 80CCD(2).',
+      'A comprehensive mathematical breakdown of the Old vs. New Tax Regime under current statutory rules. Learn the exact breakeven deduction thresholds across salary bands (₹12.75L to ₹50L), how the ₹75,000 standard deduction and ₹12 Lakh Section 87A rebate shift the balance, and how to evaluate employer NPS under Section 80CCD(2).',
     relatedCalculators: [
       {
         name: 'Income Tax Calculator (India)',
         path: '/in/income-tax-calculator',
-        description: 'Compare side-by-side tax liability under Old and New regimes for FY 2024-25 and FY 2025-26.',
+        description: 'Compare side-by-side tax liability under Old and New regimes for FY 2025-26 and FY 2026-27.',
         badge: 'Current Tax Slabs',
       },
       {
@@ -596,7 +596,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     faqs: [
       {
         question: 'What is the breakeven deduction between Old and New Tax Regime for a ₹15 Lakh salary?',
-        answer: 'For a gross salary of ₹15,00,000 in FY 2024-25 / FY 2025-26, the breakeven eligible deduction is ₹4,08,333 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹4,08,333, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
+        answer: 'For a gross salary of ₹15,00,000 under the current statutory framework (FY 2025-27), the breakeven eligible deduction is ₹5,43,750 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹5,43,750, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
       },
       {
         question: 'Is the standard deduction ₹75,000 in both Old and New Tax Regimes?',
@@ -604,7 +604,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
       {
         question: 'Up to what income is tax zero under the New Tax Regime?',
-        answer: 'Under the New Tax Regime, a resident individual with a gross total income up to ₹7,75,000 pays zero tax. This consists of the ₹75,000 standard deduction bringing taxable income down to ₹7,00,000, followed by the Section 87A rebate of up to ₹25,000 which completely eliminates the tax liability.',
+        answer: 'Under the New Tax Regime, a resident individual with a gross total income up to ₹12,75,000 pays zero tax. This consists of the ₹75,000 standard deduction bringing taxable income down to ₹12,00,000, followed by the Section 87A rebate of up to ₹60,000 which completely eliminates the tax liability.',
       },
       {
         question: 'Can I switch between the Old and New Tax Regime every year?',
@@ -635,9 +635,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </p>
 
       <ul class="list-disc list-inside text-sm text-text-muted space-y-2 mb-6 ml-2">
-        <li><strong>Enhanced Standard Deduction:</strong> The standard deduction for salaried individuals under the New Regime was increased by 50%, rising from <strong>₹50,000 to ₹75,000</strong>. Under the Old Regime, the standard deduction remains frozen at ₹50,000.</li>
-        <li><strong>Widened Tax Slab Bands:</strong> The 10% and 15% slab thresholds were expanded by ₹1,00,000 each, delaying entry into the higher 15% and 20% marginal brackets.</li>
-        <li><strong>Zero Tax Up to ₹7.75 Lakh:</strong> With the ₹75,000 standard deduction and the Section 87A rebate for taxable incomes up to ₹7,00,000, anyone earning up to ₹7,75,000 gross salary pays <strong>₹0 in income tax</strong> under the New Regime without investing a single rupee in tax-saving instruments.</li>
+        <li><strong>Enhanced Standard Deduction:</strong> The standard deduction for salaried individuals under the New Regime is <strong>₹75,000</strong>. Under the Old Regime, the standard deduction remains frozen at ₹50,000.</li>
+        <li><strong>Widened Tax Slab Bands:</strong> The tax slabs are structured in uniform ₹4,00,000 bands: 0-4L (Nil), 4-8L (5%), 8-12L (10%), 12-16L (15%), 16-20L (20%), 20-24L (25%), and above ₹24L (30%).</li>
+        <li><strong>Zero Tax Up to ₹12.75 Lakh:</strong> With the ₹75,000 standard deduction and the Section 87A rebate for taxable incomes up to ₹12,00,000, anyone earning up to ₹12,75,000 gross salary pays <strong>₹0 in income tax</strong> under the New Regime without investing a single rupee in tax-saving instruments.</li>
       </ul>
 
       <div class="overflow-x-auto mb-6">
@@ -656,37 +656,47 @@ export const PHASE_11_POSTS: BlogPost[] = [
               <td class="p-3">Nil</td>
             </tr>
             <tr class="bg-canvas">
-              <td class="p-3 font-medium text-text-primary">₹2,50,001 to ₹3,00,000</td>
+              <td class="p-3 font-medium text-text-primary">₹2,50,001 to ₹4,00,000</td>
               <td class="p-3">5%</td>
               <td class="p-3">Nil</td>
             </tr>
             <tr>
-              <td class="p-3 font-medium text-text-primary">₹3,00,001 to ₹5,00,000</td>
+              <td class="p-3 font-medium text-text-primary">₹4,00,001 to ₹5,00,000</td>
               <td class="p-3">5%</td>
               <td class="p-3 text-accent font-semibold">5%</td>
             </tr>
             <tr class="bg-canvas">
-              <td class="p-3 font-medium text-text-primary">₹5,00,001 to ₹7,00,000</td>
+              <td class="p-3 font-medium text-text-primary">₹5,00,001 to ₹8,00,000</td>
               <td class="p-3 text-red-400 font-semibold">20%</td>
               <td class="p-3 text-accent font-semibold">5%</td>
             </tr>
             <tr>
-              <td class="p-3 font-medium text-text-primary">₹7,00,001 to ₹10,00,000</td>
+              <td class="p-3 font-medium text-text-primary">₹8,00,001 to ₹10,00,000</td>
               <td class="p-3 text-red-400 font-semibold">20%</td>
               <td class="p-3 text-accent font-semibold">10%</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-medium text-text-primary">₹10,00,001 to ₹12,00,000</td>
               <td class="p-3 text-red-400 font-semibold">30%</td>
-              <td class="p-3 text-accent font-semibold">15%</td>
+              <td class="p-3 text-accent font-semibold">10%</td>
             </tr>
             <tr>
-              <td class="p-3 font-medium text-text-primary">₹12,00,001 to ₹15,00,000</td>
+              <td class="p-3 font-medium text-text-primary">₹12,00,001 to ₹16,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">30%</td>
+              <td class="p-3 text-accent font-semibold">15%</td>
+            </tr>
+            <tr class="bg-canvas">
+              <td class="p-3 font-medium text-text-primary">₹16,00,001 to ₹20,00,000</td>
               <td class="p-3 text-red-400 font-semibold">30%</td>
               <td class="p-3 text-accent font-semibold">20%</td>
             </tr>
+            <tr>
+              <td class="p-3 font-medium text-text-primary">₹20,00,001 to ₹24,00,000</td>
+              <td class="p-3 text-red-400 font-semibold">30%</td>
+              <td class="p-3 text-accent font-semibold">25%</td>
+            </tr>
             <tr class="bg-canvas">
-              <td class="p-3 font-medium text-text-primary">Above ₹15,00,000</td>
+              <td class="p-3 font-medium text-text-primary">Above ₹24,00,000</td>
               <td class="p-3 font-semibold text-text-primary">30%</td>
               <td class="p-3 font-semibold text-text-primary">30%</td>
             </tr>
@@ -725,7 +735,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Master Breakeven Deduction Table by Salary Band</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
-        Here is the exact mathematical breakeven schedule for salaried individuals in FY 2024-25 and FY 2025-26:
+        Here is the exact mathematical breakeven schedule for salaried individuals under the current statutory framework (FY 2025-27):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -741,52 +751,38 @@ export const PHASE_11_POSTS: BlogPost[] = [
           </thead>
           <tbody class="divide-y divide-border text-text-muted">
             <tr>
-              <td class="p-3 font-semibold text-text-primary">₹7,75,000</td>
+              <td class="p-3 font-semibold text-text-primary">₹12,75,000</td>
               <td class="p-3 text-accent font-semibold">₹0</td>
               <td class="p-3">₹5,00,000</td>
-              <td class="p-3 font-mono font-bold text-accent">₹2,25,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹7,25,000</td>
               <td class="p-3">New Regime is unbeatable (zero tax with zero investments).</td>
             </tr>
             <tr class="bg-canvas">
-              <td class="p-3 font-semibold text-text-primary">₹10,00,000</td>
-              <td class="p-3 font-semibold">₹44,200</td>
-              <td class="p-3">₹6,50,000</td>
-              <td class="p-3 font-mono font-bold text-accent">₹3,00,000</td>
-              <td class="p-3">Hard to beat New Regime unless you have substantial HRA or home loan interest.</td>
-            </tr>
-            <tr>
-              <td class="p-3 font-semibold text-text-primary">₹12,50,000</td>
-              <td class="p-3 font-semibold">₹80,600</td>
-              <td class="p-3">₹8,25,000</td>
-              <td class="p-3 font-mono font-bold text-accent">₹3,75,000</td>
-              <td class="p-3">Requires ₹1.5L 80C + ₹25k 80D + ~₹2L HRA to make Old Regime viable.</td>
-            </tr>
-            <tr class="bg-canvas">
               <td class="p-3 font-semibold text-text-primary">₹15,00,000</td>
-              <td class="p-3 font-semibold">₹1,30,000</td>
-              <td class="p-3">₹10,41,667</td>
-              <td class="p-3 font-mono font-bold text-accent">₹4,08,333</td>
-              <td class="p-3">Old Regime requires &gt;₹4.08 Lakh in deductions to save tax.</td>
+              <td class="p-3 font-semibold">₹97,500</td>
+              <td class="p-3">₹9,06,250</td>
+              <td class="p-3 font-mono font-bold text-accent">₹5,43,750</td>
+              <td class="p-3">Old Regime requires &gt;₹5.44 Lakh in deductions to save tax.</td>
             </tr>
             <tr>
               <td class="p-3 font-semibold text-text-primary">₹20,00,000</td>
-              <td class="p-3 font-semibold">₹2,78,200</td>
-              <td class="p-3">₹15,16,667</td>
-              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
-              <td class="p-3">Old Regime viable only with high HRA + home loan interest + 80C + 80D.</td>
+              <td class="p-3 font-semibold">₹1,92,400</td>
+              <td class="p-3">₹12,41,667</td>
+              <td class="p-3 font-mono font-bold text-accent">₹7,08,333</td>
+              <td class="p-3">Old Regime viable only with exceptionally high HRA + home loan interest + 80C + 80D.</td>
             </tr>
             <tr class="bg-canvas">
               <td class="p-3 font-semibold text-text-primary">₹25,00,000</td>
-              <td class="p-3 font-semibold">₹4,34,200</td>
-              <td class="p-3">₹20,16,667</td>
-              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
-              <td class="p-3">Breakeven plateaus around ₹4.33–₹4.50 Lakh across upper salary brackets.</td>
+              <td class="p-3 font-semibold">₹3,19,800</td>
+              <td class="p-3">₹16,50,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹8,00,000</td>
+              <td class="p-3">Requires ₹8.00 Lakh in deductions to beat New Regime.</td>
             </tr>
             <tr>
               <td class="p-3 font-semibold text-text-primary">₹50,00,000</td>
-              <td class="p-3 font-semibold">₹12,14,200</td>
-              <td class="p-3">₹45,16,667</td>
-              <td class="p-3 font-mono font-bold text-accent">₹4,33,333</td>
+              <td class="p-3 font-semibold">₹10,99,800</td>
+              <td class="p-3">₹41,50,000</td>
+              <td class="p-3 font-mono font-bold text-accent">₹8,00,000</td>
               <td class="p-3">Surcharge rates apply above ₹50L. New Regime caps surcharge at 25% (vs 37% Old).</td>
             </tr>
           </tbody>
@@ -809,9 +805,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
           <p class="text-xs text-text-muted mb-3">• Section 80D (Health Insurance): ₹25,000</p>
           <p class="text-xs font-semibold text-text-primary mb-1">Total Deductions: ₹1,75,000</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
-            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-accent font-mono">₹1,30,000</strong></div>
-            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-red-400 font-mono">₹2,00,200</strong></div>
-            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>New Regime Advantage:</span> <span>Saves ₹70,200/yr</span></div>
+            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-accent font-mono">₹97,500</strong></div>
+            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-red-400 font-mono">₹2,02,800</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>New Regime Advantage:</span> <span>Saves ₹1,05,300/yr</span></div>
           </div>
         </div>
 
@@ -823,15 +819,15 @@ export const PHASE_11_POSTS: BlogPost[] = [
           <p class="text-xs text-text-muted mb-3">• Section 80CCD(1B) NPS: ₹50,000</p>
           <p class="text-xs font-semibold text-text-primary mb-1">Total Deductions: ₹4,90,000</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
-            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-text-muted font-mono">₹1,30,000</strong></div>
-            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-accent font-mono">₹1,07,640</strong></div>
-            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>Old Regime Advantage:</span> <span>Saves ₹22,360/yr</span></div>
+            <div class="flex justify-between"><span>New Regime Tax:</span> <strong class="text-text-muted font-mono">₹97,500</strong></div>
+            <div class="flex justify-between"><span>Old Regime Tax:</span> <strong class="text-accent font-mono">₹1,08,680</strong></div>
+            <div class="flex justify-between pt-1 border-t border-border text-accent font-semibold"><span>New Regime Advantage:</span> <span>Saves ₹11,180/yr</span></div>
           </div>
         </div>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Takeaway:</strong> For Employee A, choosing the Old Regime would trigger an accidental tax penalty of over ₹70,000 per year. For Employee B, who pays substantial rent in a metro and aggressively exhausts multiple deduction sections, the Old Regime still delivers a modest ₹22,360 tax saving.
+        <strong>The Takeaway:</strong> For Employee A, choosing the Old Regime would trigger an accidental tax penalty of over ₹1,05,000 per year. Even for Employee B, who pays substantial rent in a metro and aggressively exhausts multiple deduction sections totaling ₹4,90,000, the New Regime still delivers an ₹11,180 tax saving thanks to the widened slabs and ₹75,000 standard deduction.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Secret Weapon: Section 80CCD(2) Employer NPS</h2>
@@ -875,7 +871,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '10 min read',
     market: 'India-Only',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Chartered Accountant & Tax Advisory Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Listed equity LTCG is taxed at 12.5% above ₹1.25 Lakh; legacy real estate (bought pre-July 2024) can opt for 20% with indexation or 12.5% without.',
     sources: [
       {
@@ -1172,7 +1168,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Global',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Corporate Finance & Controller Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Margin is profit divided by revenue; markup is profit divided by cost. A 25% margin always requires a 33.3% markup.',
     sources: [
       {
@@ -1500,7 +1496,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '9 min read',
     market: 'Global',
     author: 'Dev',
-    reviewer: 'Reviewed by CFA & Investment Valuation Practice',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'NPV measures absolute dollar value creation, while IRR assumes reinvestment at the internal rate—always favor NPV when rankings conflict.',
     sources: [
       {
@@ -1752,7 +1748,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Both',
     author: 'Dev',
-    reviewer: 'Reviewed by Banking & Retail Credit Specialist',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Short answer: A 10% flat loan equates to an actual ~18.16% reducing APR because you keep paying interest on principal you already repaid.',
     sources: [
       {
@@ -2010,7 +2006,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '9 min read',
     market: 'Global',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by Working Capital & Treasury Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Cash Conversion Cycle = DIO + DSO - DPO. A shorter or negative cycle lets your business fund working capital using supplier credit for free.',
     sources: [
       {
@@ -2315,7 +2311,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'India-Only',
     author: 'Dev',
-    reviewer: 'Reviewed by Chartered Accountant & Statutory Compliance Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Pay advance tax in 4 quarterly tranches (15%, 45%, 75%, 100%) if net annual tax liability exceeds ₹10,000 to avoid mandatory 234B/234C interest.',
     sources: [
       {
@@ -2564,7 +2560,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     readTime: '8 min read',
     market: 'Both',
     author: 'Yuvraj',
-    reviewer: 'Reviewed by CFP® & Wealth Advisory Panel',
+    reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Real Return ≈ Nominal Return - Inflation - Tax. A 7% FD in a 30% tax bracket yields 4.9% post-tax; at 6% inflation, your purchasing power drops 1.1% per year.',
     sources: [
       {

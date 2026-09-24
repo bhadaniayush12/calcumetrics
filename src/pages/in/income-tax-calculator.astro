@@ -35,8 +35,8 @@ const savingsCompact = formatIndianCompact(result.taxSavings, '₹');
 
 const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'income-tax-calculator' && t.status === 'published').slice(0, 4);
 const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator';
-const pageTitle = 'Income Tax Calculator: Old vs New Regime (FY 2025-26 & 2026-27)';
-const pageDesc = 'Free Income Tax Calculator India (FY 2025-26 & FY 2026-27). Compare New vs Old Tax Regime, Section 87A rebate (zero tax up to ₹12.75 Lakh), ₹75,000 standard deduction, and marginal relief.';
+const pageTitle = 'Income Tax Calculator FY 2026-27 / AY 2027-28 | Calcumetrics';
+const pageDesc = 'Income Tax Calculator India (FY 2026-27 / AY 2027-28). Compare New vs Old Regime with ₹75k standard deduction, ₹12L Sec 87A rebate, and marginal relief.';
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -134,17 +134,23 @@ const jsonld = {
   >
     <!-- ── INPUT CARD ─────────────────────────────────────────────────────────── -->
     <Fragment slot="inputs">
-      <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
-          Income Tax Calculator
+          Income Tax Calculator: FY 2026-27 / AY 2027-28
         </h1>
         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          FY 2025-26 & 2026-27
+          Last verified: 24 Sept 2026
         </span>
       </div>
-      <p class="text-sm text-text-muted mb-6 leading-relaxed">
-        Compare New Tax Regime (AY 2026-27 & 2027-28) with Old Regime to find your highest annual tax savings.
+      <p class="text-xs text-text-muted mb-4">
+        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Succeeded legacy Income-tax Act 1961.
       </p>
+
+      <!-- Surcharge Disclaimer (§18) -->
+      <div class="mb-5 p-3 rounded-card bg-amber-500/10 border border-amber-500/20 text-xs text-text-muted leading-relaxed">
+        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">⚠️ Surcharge Disclaimer:</strong>
+        Computations model base statutory slab rates, ₹75,000 standard deduction, Section 87A rebate (zero tax up to ₹12.75 Lakh gross), and 4% Health & Education Cess. <strong>Surcharge on taxable income exceeding ₹50 Lakh (10% to 25%) is not modeled.</strong> Taxpayers with income above ₹50 Lakh should consult a tax professional for surcharge and marginal relief calculations.
+      </div>
 
       <!-- Gross Annual Income Input + Presets -->
       <div class="mb-6">
@@ -443,12 +449,12 @@ const jsonld = {
         <div class="space-y-3">
           {[
             {
-              q: 'What are the major changes in the New Tax Regime under Budget 2024?',
-              a: 'Budget 2024 increased the standard deduction for salaried employees from ₹50,000 to ₹75,000 under the New Tax Regime and widened the income slabs: 0-3L (Nil), 3-7L (5%), 7-10L (10%), 10-12L (15%), 12-15L (20%), and above 15L (30%).',
+              q: 'What are the current New Tax Regime slabs for FY 2025-26 and FY 2026-27?',
+              a: 'Under the current New Tax Regime, the standard deduction for salaried individuals is ₹75,000 and the slabs are: ₹0-₹4 Lakh (Nil), ₹4-₹8 Lakh (5%), ₹8-₹12 Lakh (10%), ₹12-₹16 Lakh (15%), ₹16-₹20 Lakh (20%), ₹20-₹24 Lakh (25%), and above ₹24 Lakh (30%).',
             },
             {
               q: 'How does the Section 87A tax rebate work in the New Tax Regime?',
-              a: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹7,00,000 receive a 100% tax rebate under Section 87A. Combined with the ₹75,000 standard deduction, salaried employees earning up to ₹7,75,000 pay zero income tax.',
+              a: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹12,00,000 receive a 100% tax rebate under Section 87A (rebate up to ₹60,000). Combined with the ₹75,000 standard deduction, salaried employees earning gross income up to ₹12,75,000 pay zero income tax, with marginal relief protecting against tax cliffs for income slightly exceeding ₹12 Lakh.',
             },
             {
               q: 'Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?',
@@ -501,7 +507,7 @@ const jsonld = {
         <div>
           <span>Last updated: <strong>September 2026</strong></span>
           <span class="mx-2">·</span>
-          <span>Verified against Income Tax Act statutory provisions (FY 2025-26 & FY 2026-27)</span>
+          <span>Verified against Income Tax Act statutory provisions (FY 2026-27 / AY 2027-28)</span>
         </div>
         <div>
           <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
