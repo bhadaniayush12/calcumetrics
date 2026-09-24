@@ -40,3 +40,9 @@ npm run build
 ```bash
 npm test
 ```
+
+### Deploy to Cloudflare Pages
+
+```bash
+npm run deploy
+```
