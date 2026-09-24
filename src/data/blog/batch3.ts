@@ -4,7 +4,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'tds-vs-advance-tax-difference',
     title: 'TDS vs. Advance Tax vs. Self-Assessment Tax: Why TDS Deductions Might Not Save You From Penal Interest',
-    seoTitle: 'TDS vs Advance Tax vs Self-Assessment Tax: Differences & Rules | Calcumetrics',
+    seoTitle: 'TDS vs Advance Tax vs Self-Assessment Tax | Calcumetrics',
     description:
       'Understand the critical statutory differences between TDS, Advance Tax, and Self-Assessment Tax in India, and how to avoid Section 234B & 234C interest.',
     category: 'Taxes',
@@ -62,7 +62,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
       {
         slug: 'advance-tax-guide',
         title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
-        description: 'Review statutory quarterly tax installment schedules and avoid penal interest charges.',
+        description: 'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and windfall safe harbors.',
       },
       {
         slug: 'ctc-vs-in-hand-salary',
@@ -199,7 +199,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-break-even-point',
     title: 'How to Calculate Your Break-Even Point: A Step-by-Step Guide with Realistic Examples',
-    seoTitle: 'How to Calculate Break-Even Point: Formulas & Examples | Calcumetrics',
+    seoTitle: 'Break-Even Point: How to Calculate with Formula | Calcumetrics',
     description:
       'Learn how to calculate break-even point in units and dollars. Master contribution margins, cost classification, and margin of safety calculations.',
     category: 'Business',
@@ -422,7 +422,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'economic-order-quantity-eoq-guide',
     title: 'Economic Order Quantity (EOQ) Explained: Finding the Perfect Balance Between Ordering and Holding Costs',
-    seoTitle: 'Economic Order Quantity (EOQ): Formula, Calculation & Guide | Calcumetrics',
+    seoTitle: 'Markup vs Margin: Differences & Formulas | Calcumetrics',
     description:
       'Master the Economic Order Quantity (EOQ) formula. Learn how balancing inventory holding costs with setup/ordering costs minimizes total logistics expenditure.',
     category: 'Business',
@@ -655,9 +655,9 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'straight-line-vs-reducing-balance-depreciation',
     title: 'Straight-Line vs. Written Down Value (WDV) Depreciation: Which Method Should Your Business Use?',
-    seoTitle: 'Straight-Line vs WDV Depreciation: Differences, Tax & Formulas | Calcumetrics',
+    seoTitle: 'Straight-Line vs WDV Depreciation: Differences | Calcumetrics',
     description:
-      'Compare Straight-Line vs Written Down Value (WDV / Declining Balance) depreciation. Learn how tax shields, cash flow timing, and asset matching dictate the choice.',
+      'Compare Straight-Line vs Written Down Value (WDV) depreciation. Learn how tax shields, cash flow timing, and asset matching dictate the choice.',
     category: 'Business',
     publishDate: '2026-09-18',
     dateModified: '2026-09-22',
@@ -865,7 +865,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'dscr-ratio-for-business-loans',
     title: 'What Is DSCR? How Lenders Use the Debt Service Coverage Ratio to Approve Commercial Loans',
-    seoTitle: 'DSCR Ratio Explained: Formula, Commercial Lending & Covenants | Calcumetrics',
+    seoTitle: 'NPV vs IRR: Decision Rules & Differences | Calcumetrics',
     description:
       'Learn how commercial banks calculate Debt Service Coverage Ratio (DSCR), evaluate Net Operating Income (NOI), and set loan covenants.',
     category: 'Business',
@@ -923,7 +923,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
       {
         slug: 'debt-to-income-ratio-for-mortgage',
         title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
-        description: 'Examine residential debt underwriting standards and personal credit ratios.',
+        description: 'Master the debt-to-income ratio calculations lenders use for mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and steps to lower your ratio.',
       },
       {
         slug: 'cash-conversion-cycle',

@@ -6,7 +6,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
     seoTitle: 'CAGR vs XIRR: When to Use Each Return Metric | Calcumetrics',
     description:
-      'Learn the critical differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing distorts returns, and how to avoid the short-holding annualization trap.',
+      'Learn the key differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing impacts returns, and how to avoid annualization traps.',
     category: 'Investments',
     publishDate: '2026-04-12',
     dateModified: '2026-09-20',
@@ -63,7 +63,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       {
         slug: 'home-loan-prepayment-vs-sip',
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
-        description: 'Compare guaranteed debt interest savings against volatile compounding equity market returns.',
+        description: 'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and tax rules.',
       },
       {
         slug: 'real-rate-of-return',
@@ -257,21 +257,21 @@ export const PHASE_11_POSTS: BlogPost[] = [
       
       <div class="space-y-4 mb-6">
         <div class="p-4 bg-canvas border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">1. The Short-Tenure Annualization Trap</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">1. The Short-Tenure Annualization Trap</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             If you start a monthly recurring investment and your initial $10,000 contribution gains $300 (3%) in the first 10 days, your app will compute an XIRR exceeding <strong>190%</strong>. That is not a software glitch. The algorithm mathematically extrapolates that 10-day run over 36.5 cycles in a full 365-day year. Never evaluate a recurring investment plan using XIRR until you have completed at least 12 to 18 monthly cycles.
           </p>
         </div>
 
         <div class="p-4 bg-canvas border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">2. Comparing Portfolio XIRR to Benchmark Index CAGR</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">2. Comparing Portfolio XIRR to Benchmark Index CAGR</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Investors frequently make this mistake: <em>"My recurring investment beat the S&P 500 because my portfolio XIRR is 18% while the index 3-year return is 14%."</em> That is comparing apples to oranges. You must compare your portfolio XIRR against a simulated <strong>dollar-cost-averaged investment in the benchmark index</strong> over the exact same purchase dates, not against the index's point-to-point CAGR.
           </p>
         </div>
 
         <div class="p-4 bg-canvas border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">3. The Multiple Roots & Failure-to-Converge Risk</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">3. The Multiple Roots & Failure-to-Converge Risk</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             When an investor makes repeated withdrawals alternating with fresh investments, the cash flow signs flip multiple times (+, -, +, -). Under Descartes' Rule of Signs, this polynomial equation can yield multiple mathematical solutions or cause the Newton-Raphson algorithm to fail entirely. If your portfolio app displays '#NUM!' or NaN, this sign-alternation issue is the root cause.
           </p>
@@ -289,9 +289,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'home-loan-prepayment-vs-sip',
     title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
-    seoTitle: 'Home Loan Prepayment vs SIP: Mathematical Comparison | Calcumetrics',
+    seoTitle: 'Home Loan Prepayment vs SIP: Math Comparison | Calcumetrics',
     description:
-      'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and current FY 2025-27 tax rules.',
+      'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and tax rules.',
     category: 'Loans',
     publishDate: '2026-04-26',
     dateModified: '2026-09-22',
@@ -480,28 +480,28 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">1. The Illiquidity Trap</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">1. The Illiquidity Trap</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Every rupee prepaid into a mortgage is locked inside your home. If a medical emergency or layoff strikes, you cannot ask the bank to refund your prepaid equity. By contrast, an equity mutual fund portfolio can be partially liquidated within 48 hours.
           </p>
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">2. Market Volatility & Sequence Risk</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">2. Market Volatility & Sequence Risk</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             An 8.5% interest saving is 100% guaranteed. Equity returns of 12% are volatile averages. If the stock market enters a multi-year bear market or prolonged stagnation, your SIP portfolio might deliver only 7-8% returns, erasing the arbitrage.
           </p>
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">3. Front-Loaded Interest Amortization</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">3. Front-Loaded Interest Amortization</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             In Year 1 of a 20-year mortgage, approximately <strong>82% of every rupee paid in EMI goes directly to interest</strong>, while only 18% repays principal. Prepaying early delivers disproportionately massive interest savings compared to prepaying late.
           </p>
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">4. The Discipline Fallacy</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">4. The Discipline Fallacy</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             The SIP strategy only beats prepayment if you actually invest the surplus every single month without fail. In practice, many borrowers who decide not to prepay end up spending the surplus on lifestyle inflation rather than investing it.
           </p>
@@ -530,7 +530,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'old-vs-new-tax-regime',
     title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
-    seoTitle: 'Old vs New Tax Regime Breakeven Deduction Formula | Calcumetrics',
+    seoTitle: 'Flat vs Reducing Interest Rates: Conversion | Calcumetrics',
     description:
       'Breakeven deduction guide between Old and New Tax Regime for FY 2025-27, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',
@@ -799,7 +799,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Employee A (Standard Investments)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Employee A (Standard Investments)</h3>
           <p class="text-xs text-text-muted mb-2">• Lives in parents' house (no HRA claimed)</p>
           <p class="text-xs text-text-muted mb-2">• Section 80C (EPF + ELSS): ₹1,50,000</p>
           <p class="text-xs text-text-muted mb-3">• Section 80D (Health Insurance): ₹25,000</p>
@@ -812,7 +812,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Employee B (High Deductions)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Employee B (High Deductions)</h3>
           <p class="text-xs text-text-muted mb-1">• Rents apartment (HRA Exemption): ₹2,40,000</p>
           <p class="text-xs text-text-muted mb-1">• Section 80C: ₹1,50,000</p>
           <p class="text-xs text-text-muted mb-1">• Section 80D (Self + Parents): ₹50,000</p>
@@ -862,7 +862,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'capital-gains-tax-rules',
     title: 'Capital Gains Tax in India: Rates, Holding Periods, and the Real Estate Indexation Rule',
-    seoTitle: 'Capital Gains Tax Rules India: 12.5% LTCG & Grandfathering | Calcumetrics',
+    seoTitle: 'Capital Gains Tax Rules: LTCG, STCG & Rates | Calcumetrics',
     description:
       'India capital gains tax guide: 12.5% LTCG rate, 20% STCG, ₹1.25 Lakh annual exemption, and the dual-option real estate indexation rule explained.',
     category: 'Taxes',
@@ -967,7 +967,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-accent mb-2">12 Months: Listed Securities</h4>
+          <h3 class="text-sm font-semibold text-accent mb-2">12 Months: Listed Securities</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Assets that qualify as Long-Term after just 12 months of holding:
           </p>
@@ -980,7 +980,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-accent mb-2">24 Months: All Other Assets</h4>
+          <h3 class="text-sm font-semibold text-accent mb-2">24 Months: All Other Assets</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Assets that require 24 months of holding to qualify as Long-Term:
           </p>
@@ -1127,17 +1127,17 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="space-y-3 mb-6 text-xs text-text-muted">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54: Reinvestment in Residential Property</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">Section 54: Reinvestment in Residential Property</h3>
           <p class="leading-relaxed">Available to individuals and HUFs selling a residential house. If you purchase another residential property within 1 year before or 2 years after the sale date (or construct within 3 years), capital gains up to ₹10 Crore are fully exempt.</p>
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54EC: Capital Gain Bonds</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">Section 54EC: Capital Gain Bonds</h3>
           <p class="leading-relaxed">Invest up to ₹50 Lakh in approved infrastructure bonds (REC, PFC, NHAI, IRFC) within 6 months of selling land or buildings. The bonds carry a mandatory 5-year lock-in period and provide 100% tax relief on the invested amount.</p>
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-1">Section 54F: Sale of Any Non-Residential Asset</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-1">Section 54F: Sale of Any Non-Residential Asset</h3>
           <p class="leading-relaxed">Selling gold, commercial property, or unlisted shares? You can claim proportionate tax exemption by reinvesting the entire <em>net sale consideration</em> (not just the gain) into a new residential home, provided you do not own more than one house on the transfer date.</p>
         </div>
       </div>
@@ -1159,7 +1159,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'markup-vs-margin',
     title: 'Markup vs. Margin: The Math Mistake That Silently Erases Business Profits',
-    seoTitle: 'Markup vs Margin: Formula, Conversion Matrix & Pricing Math | Calcumetrics',
+    seoTitle: 'Markup vs Margin: Differences & Formulas | Calcumetrics',
     description:
       'Learn the exact mathematical difference between markup and margin, how to convert between them, and how confusing them leads to hidden business losses.',
     category: 'Business',
@@ -1288,7 +1288,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Markup (Cost-Centric)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Markup (Cost-Centric)</h3>
           <p class="text-xs text-text-muted mb-3">Profit expressed as a percentage of the acquisition or production cost:</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             Markup = (Price − Cost) / Cost
@@ -1297,7 +1297,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Margin (Revenue-Centric)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Margin (Revenue-Centric)</h3>
           <p class="text-xs text-text-muted mb-3">Profit expressed as a percentage of the final customer selling price:</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             Margin = (Price − Cost) / Price
@@ -1440,7 +1440,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-red-400 mb-2">Scenario A: The 35% Markup Blunder</h4>
+          <h3 class="text-sm font-semibold text-red-400 mb-2">Scenario A: The 35% Markup Blunder</h3>
           <p class="text-xs text-text-muted mb-2">The founder applies a 35% markup on unit cost:</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
             <div class="flex justify-between"><span>Selling Price ($50.00 × 1.35):</span> <strong class="font-mono text-text-primary">$67.50</strong></div>
@@ -1452,7 +1452,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-accent mb-2">Scenario B: Target 45% Margin Pricing</h4>
+          <h3 class="text-sm font-semibold text-accent mb-2">Scenario B: Target 45% Margin Pricing</h3>
           <p class="text-xs text-text-muted mb-2">The founder prices to guarantee a 45% gross margin (15% net profit):</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
             <div class="flex justify-between"><span>Selling Price [$50.00 / (1 − 0.45)]:</span> <strong class="font-mono text-text-primary">$90.91</strong></div>
@@ -1487,7 +1487,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'npv-vs-irr',
     title: 'NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting',
-    seoTitle: 'NPV vs IRR: Conflicting Results, Crossover Rate & Decision Rules | Calcumetrics',
+    seoTitle: 'NPV vs IRR: Decision Rules & Differences | Calcumetrics',
     description:
       'Why NPV and IRR give conflicting project rankings, how the reinvestment rate assumption distorts IRR, and how to find the Fisher crossover rate with formulas.',
     category: 'Corporate Finance',
@@ -1598,7 +1598,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Net Present Value (NPV)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Net Present Value (NPV)</h3>
           <p class="text-xs text-text-muted mb-3">Absolute dollar addition to enterprise value discounted at cost of capital ($r$):</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             NPV = &Sigma; [ CF_t / (1 + r)^t ] &minus; Initial_Outlay
@@ -1607,7 +1607,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Internal Rate of Return (IRR)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Internal Rate of Return (IRR)</h3>
           <p class="text-xs text-text-muted mb-3">The discount rate that forces the project's NPV to exactly zero:</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             0 = &Sigma; [ CF_t / (1 + IRR)^t ] &minus; Initial_Outlay
@@ -1637,7 +1637,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">1. The Scale Disparity Trap</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">1. The Scale Disparity Trap</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Would you rather invest <strong>$10,000</strong> to earn a <strong>100% return</strong> ($10,000 profit), or invest <strong>$1,000,000</strong> to earn a <strong>30% return</strong> ($300,000 profit)?
           </p>
@@ -1647,7 +1647,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">2. The Cash Flow Timing Trap</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">2. The Cash Flow Timing Trap</h3>
           <p class="text-xs text-text-muted leading-relaxed">
             Project A generates heavy cash inflows in Year 1. Project B generates larger total inflows, but weighted toward Year 4 and Year 5.
           </p>
@@ -1739,7 +1739,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'flat-vs-reducing-interest-rate',
     title: 'Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR',
-    seoTitle: 'Flat vs Reducing Interest Rate Formula & Conversion Table | Calcumetrics',
+    seoTitle: 'Flat vs Reducing Interest Rates: Conversion | Calcumetrics',
     description:
       'Learn the difference between flat and reducing interest rates, how to convert a flat rate into true reducing APR, and why a 10% flat loan actually costs ~18%.',
     category: 'Loans',
@@ -1868,7 +1868,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </p>
 
       <div class="bg-surface border border-border rounded-card p-5 mb-6 text-xs text-text-muted space-y-3">
-        <h4 class="text-sm font-semibold text-text-primary">The Closed-Form Equivalence Formula:</h4>
+        <h3 class="text-sm font-semibold text-text-primary">The Closed-Form Equivalence Formula:</h3>
         <div class="bg-canvas p-3 rounded font-mono text-xs text-accent font-bold text-center">
           Reducing APR &approx; Flat_Rate &times; [ (2 &times; n) / (n + 1) ]
         </div>
@@ -1952,7 +1952,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-red-400 mb-2">Offer A: Dealership NBFC (8.5% Flat)</h4>
+          <h3 class="text-sm font-semibold text-red-400 mb-2">Offer A: Dealership NBFC (8.5% Flat)</h3>
           <p class="text-xs text-text-muted mb-2">• Loan Principal: ₹10,00,000</p>
           <p class="text-xs text-text-muted mb-2">• Stated Rate: 8.5% Flat</p>
           <p class="text-xs text-text-muted mb-3">• Annual Interest: ₹10L × 8.5% = ₹85,000</p>
@@ -1964,7 +1964,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-accent mb-2">Offer B: Commercial Bank (14.0% Reducing)</h4>
+          <h3 class="text-sm font-semibold text-accent mb-2">Offer B: Commercial Bank (14.0% Reducing)</h3>
           <p class="text-xs text-text-muted mb-2">• Loan Principal: ₹10,00,000</p>
           <p class="text-xs text-text-muted mb-2">• Stated Rate: 14.0% Reducing Balance</p>
           <p class="text-xs text-text-muted mb-3">• Interest charged strictly on monthly balance</p>
@@ -1997,7 +1997,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'cash-conversion-cycle',
     title: 'The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency',
-    seoTitle: 'Cash Conversion Cycle (CCC): Formula, Benchmarks & Solvency | Calcumetrics',
+    seoTitle: 'Cash Conversion Cycle (CCC): Formula & Guide | Calcumetrics',
     description:
       'Master the Cash Conversion Cycle formula: DIO + DSO - DPO. Learn how working capital velocity determines solvency and how top retailers run negative float.',
     category: 'Business',
@@ -2108,7 +2108,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Operating Cycle (Total Pipeline)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Operating Cycle (Total Pipeline)</h3>
           <p class="text-xs text-text-muted mb-3">The total elapsed time from purchasing raw materials to collecting cash from customers:</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             Operating Cycle = DIO + DSO
@@ -2117,7 +2117,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Cash Conversion Cycle (Net Cash Gap)</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Cash Conversion Cycle (Net Cash Gap)</h3>
           <p class="text-xs text-text-muted mb-3">The net time during which the company's own capital is locked up without liquidity:</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             CCC = DIO + DSO &minus; DPO
@@ -2138,7 +2138,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <div class="space-y-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-sm font-bold text-text-primary">1. Days Inventory Outstanding (DIO)</h4>
+            <h3 class="text-sm font-bold text-text-primary">1. Days Inventory Outstanding (DIO)</h3>
             <span class="text-xs font-mono text-accent font-semibold">Inventory Speed</span>
           </div>
           <p class="text-xs text-text-muted mb-2">How many days goods sit on warehouse shelves before being sold to a customer:</p>
@@ -2150,7 +2150,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
         <div class="p-4 bg-surface border border-border rounded-card">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-sm font-bold text-text-primary">2. Days Sales Outstanding (DSO)</h4>
+            <h3 class="text-sm font-bold text-text-primary">2. Days Sales Outstanding (DSO)</h3>
             <span class="text-xs font-mono text-accent font-semibold">Collection Speed</span>
           </div>
           <p class="text-xs text-text-muted mb-2">The average number of days required to collect payment after making a credit sale:</p>
@@ -2162,7 +2162,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
         <div class="p-4 bg-surface border border-border rounded-card">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-sm font-bold text-text-primary">3. Days Payable Outstanding (DPO)</h4>
+            <h3 class="text-sm font-bold text-text-primary">3. Days Payable Outstanding (DPO)</h3>
             <span class="text-xs font-mono text-accent font-semibold">Vendor Financing</span>
           </div>
           <p class="text-xs text-text-muted mb-2">The average number of days a company takes to pay its trade vendors and suppliers:</p>
@@ -2302,9 +2302,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'advance-tax-guide',
     title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
-    seoTitle: 'Advance Tax Due Dates FY 2024-25 & Section 234B/234C Guide | Calcumetrics',
+    seoTitle: 'Advance Tax Guide: Slabs, Due Dates & Rules | Calcumetrics',
     description:
-      'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and capital gains windfall safe harbors.',
+      'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and windfall safe harbors.',
     category: 'Taxes',
     publishDate: '2026-08-02',
     dateModified: '2026-09-23',
@@ -2480,7 +2480,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-sm font-bold text-text-primary">Section 234C (Deferment Interest)</h4>
+            <h3 class="text-sm font-bold text-text-primary">Section 234C (Deferment Interest)</h3>
             <span class="text-xs font-mono text-red-400 font-semibold">Quarterly Slips</span>
           </div>
           <p class="text-xs text-text-muted mb-3">Penalizes falling behind the quarterly schedule during the financial year:</p>
@@ -2492,7 +2492,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
         <div class="p-4 bg-surface border border-border rounded-card">
           <div class="flex items-center justify-between mb-2">
-            <h4 class="text-sm font-bold text-text-primary">Section 234B (Year-End Shortfall)</h4>
+            <h3 class="text-sm font-bold text-text-primary">Section 234B (Year-End Shortfall)</h3>
             <span class="text-xs font-mono text-red-400 font-semibold">Assessment Default</span>
           </div>
           <p class="text-xs text-text-muted mb-3">Triggered if total advance tax paid by March 31 is <strong>less than 90%</strong> of final assessed tax:</p>
@@ -2551,7 +2551,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'real-rate-of-return',
     title: 'The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money',
-    seoTitle: 'Real Rate of Return Formula: Fisher Equation & Inflation | Calcumetrics',
+    seoTitle: 'Real Rate of Return: Formula & Inflation | Calcumetrics',
     description:
       'Calculate true real rate of return after taxes and inflation using the Fisher Equation. Discover why a 7% bank fixed deposit (FD) yields negative real wealth.',
     category: 'Investments',
@@ -2684,7 +2684,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Exact Gross Fisher Equation</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Exact Gross Fisher Equation</h3>
           <p class="text-xs text-text-muted mb-2">Relates nominal rate ($r_n$) and inflation ($i$):</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             (1 + r_real) = (1 + r_n) / (1 + i)
@@ -2695,7 +2695,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">Post-Tax Real Rate Equation</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">Post-Tax Real Rate Equation</h3>
           <p class="text-xs text-text-muted mb-2">Incorporates marginal tax slab ($t$):</p>
           <div class="bg-canvas p-2.5 rounded font-mono text-xs text-text-primary text-center">
             r_net = r_n &times; (1 &minus; t)
@@ -2778,7 +2778,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-text-primary mb-2">The Face-Value Illusion</h4>
+          <h3 class="text-sm font-semibold text-text-primary mb-2">The Face-Value Illusion</h3>
           <div class="border-t border-border pt-2 text-xs space-y-1.5 text-text-muted">
             <div class="flex justify-between"><span>Initial Deposit:</span> <strong class="font-mono text-text-primary">₹10,00,000</strong></div>
             <div class="flex justify-between"><span>Nominal Interest (7% annual):</span> <strong class="font-mono text-text-primary">₹9,67,151</strong></div>
@@ -2789,7 +2789,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
 
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-sm font-semibold text-red-400 mb-2">The Purchasing Power Reality</h4>
+          <h3 class="text-sm font-semibold text-red-400 mb-2">The Purchasing Power Reality</h3>
           <div class="border-t border-border pt-2 text-xs space-y-1.5 text-text-muted">
             <div class="flex justify-between"><span>Nominal Balance (Year 10):</span> <strong class="font-mono text-text-primary">₹16,65,400</strong></div>
             <div class="flex justify-between"><span>Cumulative Inflation Deflator (6%):</span> <strong class="font-mono text-text-primary">1.7908&times;</strong></div>

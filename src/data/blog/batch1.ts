@@ -4,7 +4,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'ppf-interest-calculation-5th-day-rule',
     title: 'PPF Interest Calculation Explained: Why Depositing Before the 5th Earns Thousands More',
-    seoTitle: 'PPF Interest Calculation: The 5th Day Rule Explained | Calcumetrics',
+    seoTitle: 'PPF Interest Calculation: 5th Day Rule Guide | Calcumetrics',
     description:
       'Understand the statutory 5th-of-the-month PPF deposit rule, how monthly interest is computed on the lowest balance, and the compounding loss of late deposits.',
     category: 'Investments',
@@ -67,7 +67,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
       {
         slug: 'cagr-vs-xirr',
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
-        description: 'Learn the critical differences between CAGR and XIRR across staggered investment schedules.',
+        description: 'Learn the key differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing impacts returns, and how to avoid annualization traps.',
       },
     ],
     faqs: [
@@ -200,7 +200,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'traditional-vs-roth-401k',
     title: 'Traditional vs. Roth 401(k): How to Choose Based on Your Current and Future Tax Bracket',
-    seoTitle: 'Traditional vs Roth 401k: Tax Bracket Decision Guide | Calcumetrics',
+    seoTitle: 'Traditional vs Roth 401(k): Tax Decision Guide | Calcumetrics',
     description:
       'Compare upfront tax deductions against tax-free retirement withdrawals. Learn how marginal vs effective tax rates and employer match rules drive the decision.',
     category: 'Investments',
@@ -401,7 +401,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'apr-vs-apy-compounding-frequency',
     title: 'APR vs. APY Explained: How Compounding Frequency Silently Changes Your True Return',
-    seoTitle: 'APR vs APY: Formula, Differences & Compounding Frequency | Calcumetrics',
+    seoTitle: 'APR vs APY: Differences, Formulas & Frequency | Calcumetrics',
     description:
       'How APR differs from APY, how compounding frequency widens the gap between nominal and effective rates, and how lenders quote interest to borrowers and savers.',
     category: 'Investments',
@@ -610,7 +610,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     title: 'Recurring Deposit (RD) vs. SIP: Which Is Best for Your Investment Time Horizon?',
     seoTitle: 'RD vs SIP: Risk, Return & Tax Comparison | Calcumetrics',
     description:
-      'Compare guaranteed bank Recurring Deposits with market-linked Systematic Investment Plans. Discover the optimal strategy for short-term vs long-term financial goals.',
+      'Compare guaranteed bank Recurring Deposits with market-linked Systematic Investment Plans. Discover the optimal strategy for short and long-term goals.',
     category: 'Investments',
     publishDate: '2026-08-30',
     dateModified: '2026-09-22',
@@ -677,7 +677,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
       {
         slug: 'home-loan-prepayment-vs-sip',
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
-        description: 'Compare guaranteed debt interest savings against volatile compounding equity market returns.',
+        description: 'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and tax rules.',
       },
     ],
     faqs: [
@@ -806,9 +806,9 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'debt-to-income-ratio-for-mortgage',
     title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
-    seoTitle: 'Debt-to-Income Ratio (DTI) for Mortgages: Limits & Calculations | Calcumetrics',
+    seoTitle: 'Home Loan Prepayment vs SIP: Math Comparison | Calcumetrics',
     description:
-      'Master the debt-to-income ratio calculations lenders use to approve mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and actionable steps to lower your ratio.',
+      'Master the debt-to-income ratio calculations lenders use for mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and steps to lower your ratio.',
     category: 'Loans',
     publishDate: '2026-09-02',
     dateModified: '2026-09-22',

@@ -108,7 +108,9 @@ const resolvedOgAlt = ogImageAlt || title;
     <!-- CMP script placeholder — insert Google Privacy & Messaging or a certified CMP here -->
     <!-- AdSense script placeholder — insert after CMP, async, with data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" -->
 
-    <!-- Section 11: Self-host Inter via @font-face with font-display: swap -->
+    <!-- Preload fonts used above the fold (Inter 400 & 600) -->
+    <link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Cloudflare Web Analytics (Cookieless, privacy-preserving) -->
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "01d0a5f7cefa40f4b360b031d279cf43"}'></script>

@@ -4,7 +4,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'current-ratio-vs-quick-ratio',
     title: 'Current Ratio vs. Quick Ratio: How to Accurately Measure Short-Term Solvency',
-    seoTitle: 'Current Ratio vs Quick Ratio: Formulas, Differences & Benchmarks | Calcumetrics',
+    seoTitle: 'Current vs Quick Ratio: Formulas & Benchmarks | Calcumetrics',
     description:
       'Learn the critical balance sheet differences between Current Ratio and Quick Ratio (Acid-Test). Understand why inventory distorts liquidity analysis.',
     category: 'Business',
@@ -202,9 +202,9 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'cogs-vs-opex-accounting',
     title: 'COGS vs. Operating Expenses (OpEx): Why Misclassifying Costs Distorts Your Profit Margins',
-    seoTitle: 'COGS vs OpEx: Definitions, Differences & Margin Impact | Calcumetrics',
+    seoTitle: 'DSCR Ratio for Business Loans: Formula & Guide | Calcumetrics',
     description:
-      'Learn the critical accounting differences between Cost of Goods Sold (COGS) and Operating Expenses (OpEx), and how proper classification protects your gross margins.',
+      'Learn the accounting differences between Cost of Goods Sold (COGS) and Operating Expenses (OpEx), and how proper classification protects gross margins.',
     category: 'Business',
     publishDate: '2026-09-21',
     dateModified: '2026-09-22',
@@ -405,7 +405,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-wacc',
     title: 'How to Calculate WACC: The Formula, Capital Structure Weights, and Real-World Hurdles',
-    seoTitle: 'How to Calculate WACC: Formula, CAPM & Hurdle Rates | Calcumetrics',
+    seoTitle: 'Markup vs Margin: Differences & Formulas | Calcumetrics',
     description:
       'Master the Weighted Average Cost of Capital (WACC) formula. Learn CAPM cost of equity, after-tax cost of debt, and capital structure weights.',
     category: 'Corporate Finance',
@@ -468,7 +468,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
       {
         slug: 'cagr-vs-xirr',
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
-        description: 'Understand the mathematical mechanics of time-weighted vs. money-weighted returns.',
+        description: 'Learn the key differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing impacts returns, and how to avoid annualization traps.',
       },
     ],
     faqs: [
@@ -599,7 +599,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'dcf-valuation-terminal-value-guide',
     title: 'Discounted Cash Flow (DCF) Valuation: How Terminal Value Drives 70% of Company Worth',
-    seoTitle: 'DCF Valuation & Terminal Value: Gordon Growth vs Exit Multiples | Calcumetrics',
+    seoTitle: 'NPV vs IRR: Decision Rules & Differences | Calcumetrics',
     description:
       'Learn how to model Discounted Cash Flow (DCF) valuations, forecast Free Cash Flow to Firm (FCFF), and accurately calculate Terminal Value.',
     category: 'Corporate Finance',
@@ -823,7 +823,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'payback-period-vs-discounted-payback',
     title: 'Payback Period vs. Discounted Payback Period: Why Ignoring the Time Value of Money Misleads Investors',
-    seoTitle: 'Payback Period vs Discounted Payback: Formulas & Decision Rules | Calcumetrics',
+    seoTitle: 'Payback Period vs Discounted Payback: Formulas | Calcumetrics',
     description:
       'Compare standard Payback Period with Discounted Payback Period. Learn how factoring in cost of capital and time value prevents flawed capital allocation.',
     category: 'Corporate Finance',
@@ -1014,13 +1014,13 @@ export const BATCH_4_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-1">Simple Payback Result</h4>
+          <h3 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-1">Simple Payback Result</h3>
           <p class="text-xs text-text-muted mb-1">2 Years + ($30,000 needed / $35,000 cash flow in Year 3):</p>
           <p class="text-base font-mono font-bold text-text-primary">2.86 Years</p>
           <p class="text-xs text-text-muted mt-1">Gives management a false sense that capital is recovered before Year 3 ends.</p>
         </div>
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-1">Discounted Payback Result</h4>
+          <h3 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-1">Discounted Payback Result</h3>
           <p class="text-xs text-text-muted mb-1">3 Years + ($12,960 needed / $23,905 discounted inflow in Year 4):</p>
           <p class="text-base font-mono font-bold text-accent">3.54 Years</p>
           <p class="text-xs text-text-muted mt-1">Reflects true economic break-even after paying the 10% cost of capital.</p>

@@ -4,7 +4,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'debt-avalanche-vs-snowball',
     title: 'Debt Avalanche vs. Debt Snowball: The Math Behind Paying Off High-Interest Debt',
-    seoTitle: 'Debt Avalanche vs Snowball: Math, Methods & Comparison | Calcumetrics',
+    seoTitle: 'Debt Avalanche vs Snowball: Payoff Comparison | Calcumetrics',
     description:
       'Compare the interest-saving math of the Debt Avalanche against the psychological momentum of the Debt Snowball to choose your optimal debt payoff strategy.',
     category: 'Loans',
@@ -62,7 +62,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         slug: 'debt-to-income-ratio-for-mortgage',
         title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
-        description: 'Master the debt-to-income ratio calculations lenders use to evaluate borrowing eligibility.',
+        description: 'Master the debt-to-income ratio calculations lenders use for mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and steps to lower your ratio.',
       },
       {
         slug: 'flat-vs-reducing-interest-rate',
@@ -182,7 +182,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Avalanche Execution Order</h4>
+          <h3 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Avalanche Execution Order</h3>
           <ol class="text-xs text-text-muted space-y-1.5 list-decimal pl-4 leading-relaxed">
             <li><strong>Step 1:</strong> Pay $150 min + $450 extra = $600/mo to Credit Card A (24.99% APR). Cleared in ~9 months.</li>
             <li><strong>Step 2:</strong> Roll $600 into Auto Loan C (7.5% APR), paying $900/mo total. Cleared in ~8 months.</li>
@@ -191,7 +191,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
           </ol>
         </div>
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h4 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Snowball Execution Order</h4>
+          <h3 class="text-xs font-bold text-text-primary uppercase tracking-wider mb-2">Snowball Execution Order</h3>
           <ol class="text-xs text-text-muted space-y-1.5 list-decimal pl-4 leading-relaxed">
             <li><strong>Step 1:</strong> Pay $100 min + $450 extra = $550/mo to Medical Bill B ($1,200 balance). Cleared in under 3 months!</li>
             <li><strong>Step 2:</strong> Roll $550 into Credit Card A, paying $700/mo total. Cleared in ~7 months.</li>
@@ -214,7 +214,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'how-loan-amortization-works',
     title: 'How Loan Amortization Actually Works: Why Your Early EMIs Barely Touch the Principal',
-    seoTitle: 'How Loan Amortization Works: Principal vs Interest Math | Calcumetrics',
+    seoTitle: 'Loan Amortization: How Payment Schedules Work | Calcumetrics',
     description:
       'Discover the compounding mechanics of loan amortization schedules, why early payments are mostly interest, and how early prepayments save massive interest.',
     category: 'Loans',
@@ -272,7 +272,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         slug: 'home-loan-prepayment-vs-sip',
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
-        description: 'Compare guaranteed debt interest savings against volatile compounding equity market returns.',
+        description: 'Prepay an 8.5% home loan or invest in an equity mutual fund SIP? Compare guaranteed debt savings with compounding market returns and tax rules.',
       },
       {
         slug: 'flat-vs-reducing-interest-rate',
@@ -417,7 +417,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'fixed-vs-floating-rate-loans',
     title: 'Fixed vs. Floating Interest Rate Loans: How to Decide in Changing Rate Cycles',
-    seoTitle: 'Fixed vs Floating Interest Rates: Pros, Cons & Decision Guide | Calcumetrics',
+    seoTitle: 'Home Loan Prepayment vs SIP: Math Comparison | Calcumetrics',
     description:
       'Compare fixed rate certainty against floating rate benchmark savings. Learn how rate cycles, reset spreads, and prepayment penalties dictate the best choice.',
     category: 'Loans',
@@ -569,13 +569,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
 
       <div class="space-y-4 mb-6">
         <div class="p-4 bg-surface border-l-4 border-blue-500 rounded-r text-sm text-text-muted">
-          <h4 class="font-bold text-text-primary text-xs uppercase tracking-wider mb-1">Scenario 1: Cyclical Trough (Rates are Historically Low)</h4>
+          <h3 class="font-bold text-text-primary text-xs uppercase tracking-wider mb-1">Scenario 1: Cyclical Trough (Rates are Historically Low)</h3>
           <p class="leading-relaxed">
             When central bank benchmark rates sit at generational lows (such as during post-recession quantitative easing), a <strong>fixed-rate loan</strong> is almost always superior. You lock in a historically cheap cost of capital for 15 to 30 years, rendering your budget immune to the eventual inflationary rate hikes that follow economic recoveries.
           </p>
         </div>
         <div class="p-4 bg-surface border-l-4 border-emerald-500 rounded-r text-sm text-text-muted">
-          <h4 class="font-bold text-text-primary text-xs uppercase tracking-wider mb-1">Scenario 2: Cyclical Peak (Rates are Elevated to Fight Inflation)</h4>
+          <h3 class="font-bold text-text-primary text-xs uppercase tracking-wider mb-1">Scenario 2: Cyclical Peak (Rates are Elevated to Fight Inflation)</h3>
           <p class="leading-relaxed">
             When central banks have completed aggressive tightening cycles and headline inflation is moderating, locking in a fixed rate locks you into peak borrowing costs. In this environment, a <strong>floating-rate loan</strong> allows you to benefit from future central bank rate cuts immediately as monetary policy eases, without having to pay thousands of dollars in formal refinancing appraisal and legal fees.
           </p>
@@ -591,7 +591,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'ctc-vs-in-hand-salary',
     title: 'CTC vs. In-Hand Salary in India: The Real Math Behind Your Offer Letter',
-    seoTitle: 'CTC vs In-Hand Salary in India: Deductions, PF & Net Pay | Calcumetrics',
+    seoTitle: 'CTC vs In-Hand Salary: Deductions & Take-Home | Calcumetrics',
     description:
       'Learn the exact mathematical breakdown between Cost to Company (CTC) and net take-home salary in India, including EPF, gratuity, and income tax.',
     category: 'Taxes',
@@ -654,7 +654,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
       {
         slug: 'advance-tax-guide',
         title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
-        description: 'Understand statutory quarterly tax installment schedules and avoid penal interest charges.',
+        description: 'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and windfall safe harbors.',
       },
     ],
     faqs: [
@@ -818,7 +818,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'gst-input-tax-credit-rules',
     title: 'GST Input Tax Credit (ITC) in India: How to Calculate Net Tax Liability and Avoid Section 17(5) Traps',
-    seoTitle: 'GST Input Tax Credit (ITC) Guide: Formula & Blocked Credit Rules | Calcumetrics',
+    seoTitle: 'GST Input Tax Credit (ITC) Rules & Formula | Calcumetrics',
     description:
       'Learn how to calculate net GST liability using Input Tax Credit (ITC), master GSTR-2B reconciliation rules, and avoid Section 17(5) blocked credit pitfalls.',
     category: 'Taxes',
