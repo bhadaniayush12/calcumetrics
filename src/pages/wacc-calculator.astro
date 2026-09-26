@@ -45,14 +45,23 @@ const jsonld = {
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
       dateModified: '2026-09-22',
-      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://calcumetrics.com/logo.svg',
+        },
+      },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
-        { '@type': 'ListItem', position: 3, name: 'WACC Calculator' },
+        { '@type': 'ListItem', position: 3, name: 'WACC Calculator', item: canonicalUrl },
       ],
     },
     {
@@ -217,7 +226,7 @@ const jsonld = {
       </Alert>
 
       <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="wacc-calculate" type="button">Calculate</Button>
+        <Button variant="primary" id="wacc-calculate" type="button">Calculate Cost of Capital (WACC)</Button>
         <Button variant="ghost" id="wacc-reset" type="button">Reset</Button>
       </div>
     </Fragment>
@@ -228,6 +237,9 @@ const jsonld = {
         <div id="wacc-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
           {result.waccPct.toFixed(2)}%
         </div>
+        <p id="wacc-plain-translation" class="text-xs text-dark-muted mt-1.5 leading-relaxed">
+          Your business pays roughly <strong class="text-dark-text">~{result.waccPct.toFixed(2)}%/year</strong> to fund its capital — new projects must beat this rate to create value
+        </p>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
@@ -547,6 +559,11 @@ const jsonld = {
       if (resAfterTaxDebt) resAfterTaxDebt.textContent = afterTaxDebtVal;
       if (resTaxShield) resTaxShield.textContent = taxShieldVal;
       if (mobileHero) mobileHero.textContent = heroVal;
+
+      const plainEl = document.getElementById('wacc-plain-translation');
+      if (plainEl) {
+        plainEl.innerHTML = `Your business pays roughly <strong class="text-dark-text">~${res.waccPct.toFixed(2)}%/year</strong> to fund its capital — new projects must beat this rate to create value`;
+      }
 
       const wrapper = document.getElementById('wacc-composition-wrapper');
       if (wrapper && res.totalCapital > 0) {

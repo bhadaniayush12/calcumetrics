@@ -79,6 +79,7 @@ const jsonld = {
   canonical={canonicalUrl}
   ogType="article"
   ogImage={articleOgImage}
+  ogImageAlt={`${post.title} — Financial analysis and calculation guide cover`}
   slimFooter={true}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

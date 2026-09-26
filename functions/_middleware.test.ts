@@ -13,6 +13,9 @@ describe('Cloudflare Pages _middleware', () => {
     const response = await onRequest(context);
     expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
+    expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
+    expect(response.headers.get('Content-Security-Policy')).toContain("default-src 'self'");
   });
 
   it('adds X-Robots-Tag on branch preview pages.dev subdomains', async () => {
@@ -36,6 +39,8 @@ describe('Cloudflare Pages _middleware', () => {
     const response = await onRequest(context);
     expect(response.headers.get('X-Robots-Tag')).toBeNull();
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
+    expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
   });
 
   it('does NOT add X-Robots-Tag on www.calcumetrics.com', async () => {
@@ -57,5 +62,39 @@ describe('Cloudflare Pages _middleware', () => {
     const response = await onRequest(context);
     expect(response.status).toBe(304);
     expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
+  });
+
+  it('catches unhandled errors and returns 500 status with security headers', async () => {
+    const context = {
+      request: new Request('https://calcumetrics.com/broken-endpoint'),
+      next: async () => {
+        throw new Error('Unexpected crash');
+      },
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(500);
+    expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
+    expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
+    expect(response.headers.get('Content-Security-Policy')).toContain("default-src 'self'");
+  });
+
+  it('serves 500.html from ASSETS when next() throws and ASSETS binding exists', async () => {
+    const context = {
+      request: new Request('https://calcumetrics.com/broken-endpoint'),
+      next: async () => {
+        throw new Error('Unexpected crash');
+      },
+      env: {
+        ASSETS: {
+          fetch: async () => new Response('<html><body>Custom 500 Page</body></html>', { status: 200 }),
+        },
+      },
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(500);
+    const body = await response.text();
+    expect(body).toContain('Custom 500 Page');
   });
 });

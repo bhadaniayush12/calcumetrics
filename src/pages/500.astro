@@ -1,8 +1,8 @@
 ---
 /**
- * 404 Page — Section 26.4
- * Must return HTTP 404 status.
- * WindowFrame with URL pill, giant faded "404", doodle, CTA, search, category links.
+ * 500 Page — Server Error
+ * Custom internal error page matching Calcumetrics design system.
+ * WindowFrame with URL pill, giant faded "500", calculator error doodle, CTA buttons, search, category links.
  * No ads.
  */
 import Layout from '../layouts/Layout.astro';
@@ -13,15 +13,15 @@ const totalCount = getToolCount();
 ---
 
 <Layout
-  title='Page Not Found | Calcumetrics'
-  description="The page you're looking for doesn't exist. Browse our financial calculators or return to the homepage."
+  title="Calculation Interrupted | Calcumetrics"
+  description="An unexpected server error occurred while processing this calculation. Browse our financial calculators or return to the homepage."
   robots="noindex,follow"
 >
   <div class="min-h-[70vh] flex items-center justify-center py-16 px-4">
     <div class="max-w-[600px] w-full text-center">
-      <WindowFrame urlPill="calcumetrics.com/404" class="mb-8">
+      <WindowFrame urlPill="calcumetrics.com/500" class="mb-8">
         <div class="p-10 relative overflow-hidden">
-          <!-- Giant faded 404 -->
+          <!-- Giant faded 500 -->
           <div
             class="absolute inset-0 flex items-center justify-center select-none pointer-events-none"
             aria-hidden="true"
@@ -30,37 +30,40 @@ const totalCount = getToolCount();
               class="text-[160px] sm:text-[200px] font-bold tabular-nums text-disabled-bg leading-none"
               style="line-height: 1;"
             >
-              404
+              500
             </span>
           </div>
 
           <!-- Doodle (inline SVG, aria-hidden) -->
           <div class="relative z-10 mb-6" aria-hidden="true">
             <svg width="64" height="64" viewBox="0 0 64 64" fill="none" class="mx-auto" aria-hidden="true">
-              <!-- Simple calculator doodle -->
+              <!-- Calculator frame -->
               <rect x="12" y="8" width="40" height="48" rx="4" stroke="#D8DDD9" stroke-width="1.5" fill="none"/>
+              <!-- Screen with error indicator -->
               <rect x="18" y="14" width="28" height="10" rx="2" fill="#EEF0EE"/>
+              <text x="32" y="21.5" font-size="8" font-family="monospace" font-weight="600" fill="#991B1B" text-anchor="middle">ERR: 500</text>
+              <!-- Buttons -->
               <circle cx="22" cy="34" r="3" fill="#D8DDD9"/>
               <circle cx="32" cy="34" r="3" fill="#D8DDD9"/>
               <circle cx="42" cy="34" r="3" fill="#176B5B"/>
               <circle cx="22" cy="44" r="3" fill="#D8DDD9"/>
               <circle cx="32" cy="44" r="3" fill="#D8DDD9"/>
               <circle cx="42" cy="44" r="3" fill="#D8DDD9"/>
-              <!-- Arrow doodle -->
-              <path d="M54 20 C 62 14, 62 28, 54 24" stroke="#D8DDD9" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <!-- Warning glitch doodle -->
+              <path d="M52 16 L56 24 M56 16 L52 24" stroke="#C53030" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
           </div>
 
           <!-- Content -->
           <div class="relative z-10">
-            <h1 class="text-2xl font-bold text-text-primary mb-2">The math isn&rsquo;t mathing</h1>
+            <h1 class="text-2xl font-bold text-text-primary mb-2">Calculation interrupted</h1>
             <p class="text-sm text-text-muted mb-6">
-              This page doesn&rsquo;t exist. The URL may have changed or the page may have been removed.
+              Something went wrong on our end while processing this request. Please refresh the page to retry, or browse our calculators.
             </p>
 
             <!-- Search -->
             <div class="relative mb-6">
-              <label for="notfound-search" class="sr-only">Search calculators</label>
+              <label for="servererror-search" class="sr-only">Search calculators</label>
               <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none" aria-hidden="true">
                 <svg class="w-4 h-4 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -68,13 +71,14 @@ const totalCount = getToolCount();
               </span>
               <input
                 type="search"
-                id="notfound-search"
+                id="servererror-search"
                 placeholder="Search calculators…"
                 class="w-full h-11 pl-9 pr-4 bg-canvas border border-border rounded-control text-sm text-text-primary placeholder:text-text-muted focus-visible:outline-accent transition-standard"
                 aria-label="Search calculators"
               />
             </div>
 
+            <!-- Action buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
                 href="/"
@@ -89,6 +93,11 @@ const totalCount = getToolCount();
                 Browse all calculators
               </a>
             </div>
+
+            <!-- Secondary retry link -->
+            <p class="text-xs text-text-muted mt-4">
+              You can also <button type="button" id="reload-btn" class="underline hover:text-text-primary transition-standard cursor-pointer">refresh this page</button> to retry the calculation.
+            </p>
           </div>
         </div>
       </WindowFrame>
@@ -118,7 +127,7 @@ const totalCount = getToolCount();
 </Layout>
 
 <script>
-  const searchInput = document.getElementById('notfound-search');
+  const searchInput = document.getElementById('servererror-search');
   if (searchInput) {
     const triggerSearch = () => {
       window.dispatchEvent(new CustomEvent('cm:open-search'));
@@ -130,6 +139,13 @@ const totalCount = getToolCount();
         e.preventDefault();
         triggerSearch();
       }
+    });
+  }
+
+  const reloadBtn = document.getElementById('reload-btn');
+  if (reloadBtn) {
+    reloadBtn.addEventListener('click', () => {
+      window.location.reload();
     });
   }
 </script>

@@ -34,14 +34,23 @@ const jsonld = {
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
       dateModified: '2026-09-20',
-      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://calcumetrics.com/logo.svg',
+        },
+      },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Investments', item: 'https://calcumetrics.com/investments' },
-        { '@type': 'ListItem', position: 3, name: 'CAGR Calculator' },
+        { '@type': 'ListItem', position: 3, name: 'CAGR Calculator', item: canonicalUrl },
       ],
     },
     {
@@ -158,7 +167,7 @@ const jsonld = {
       </Alert>
 
       <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="cagr-calculate" type="button">Calculate</Button>
+        <Button variant="primary" id="cagr-calculate" type="button">Calculate Annual Growth (CAGR)</Button>
         <Button variant="ghost" id="cagr-reset" type="button">Reset</Button>
       </div>
     </Fragment>

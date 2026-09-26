@@ -53,14 +53,23 @@ const jsonld = {
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en-IN',
       dateModified: '2026-09-24',
-      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://calcumetrics.com/logo.svg',
+        },
+      },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Loans', item: 'https://calcumetrics.com/loans' },
-        { '@type': 'ListItem', position: 3, name: 'EMI Calculator' },
+        { '@type': 'ListItem', position: 3, name: 'EMI Calculator', item: canonicalUrl },
       ],
     },
     {
@@ -361,7 +370,7 @@ const jsonld = {
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
         >
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.598 2.669-.699c.969.54 1.771.782 2.791.782 3.183 0 5.769-2.587 5.77-5.766.001-3.182-2.585-5.768-5.77-5.768zm0 10.362c-.896 0-1.637-.247-2.366-.679l-.17-.1-1.758.461.469-1.714-.111-.177c-.476-.757-.727-1.466-.726-2.392.001-2.483 2.022-4.503 4.506-4.503 2.481 0 4.502 2.021 4.503 4.503-.001 2.483-2.023 4.503-4.507 4.503zm2.593-3.374c-.142-.071-.84-.415-.97-.462-.13-.047-.225-.071-.32.071-.095.142-.367.462-.45.557-.083.095-.166.107-.308.036s-.601-.222-1.145-.707c-.424-.378-.71-.845-.793-.987-.083-.142-.009-.219.062-.29.064-.064.142-.166.213-.249.071-.083.095-.142.142-.237.047-.095.024-.178-.012-.249s-.32-.771-.439-1.055c-.116-.277-.234-.239-.32-.243-.083-.004-.178-.005-.273-.005s-.249.036-.379.178c-.13.142-.498.486-.498 1.185s.51 1.375.581 1.47c.071.095 1.004 1.533 2.433 2.15.34.147.606.235.813.301.341.109.652.093.898.056.274-.041.84-.344.959-.676.119-.332.119-.617.083-.676-.035-.06-.13-.095-.272-.166z"/>
           </svg>
           Share on WhatsApp

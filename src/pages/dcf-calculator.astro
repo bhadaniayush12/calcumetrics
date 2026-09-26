@@ -35,14 +35,23 @@ const jsonld = {
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
       dateModified: '2026-09-22',
-      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://calcumetrics.com/logo.svg',
+        },
+      },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Corporate Finance', item: 'https://calcumetrics.com/corporate-finance' },
-        { '@type': 'ListItem', position: 3, name: 'DCF Calculator' },
+        { '@type': 'ListItem', position: 3, name: 'DCF Calculator', item: canonicalUrl },
       ],
     },
     {
@@ -194,7 +203,7 @@ const jsonld = {
       </Alert>
 
       <div class="flex gap-3 mt-6">
-        <Button variant="primary" id="dcf-calculate" type="button">Calculate</Button>
+        <Button variant="primary" id="dcf-calculate" type="button">Calculate DCF Valuation</Button>
         <Button variant="ghost" id="dcf-reset" type="button">Reset</Button>
       </div>
     </Fragment>

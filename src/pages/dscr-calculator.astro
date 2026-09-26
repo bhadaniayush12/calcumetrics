@@ -33,14 +33,23 @@ const jsonld = {
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
       dateModified: '2026-09-22',
-      publisher: { '@id': 'https://calcumetrics.com/#org' },
+      publisher: {
+        '@type': 'Organization',
+        '@id': 'https://calcumetrics.com/#org',
+        name: 'Calcumetrics',
+        url: 'https://calcumetrics.com',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://calcumetrics.com/logo.svg',
+        },
+      },
     },
     {
       '@type': 'BreadcrumbList',
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
         { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' },
-        { '@type': 'ListItem', position: 3, name: 'DSCR Calculator' },
+        { '@type': 'ListItem', position: 3, name: 'DSCR Calculator', item: canonicalUrl },
       ],
     },
     {
@@ -155,7 +164,7 @@ const jsonld = {
       </div>
 
       <div class="flex gap-3">
-        <Button variant="primary" id="dscr-calculate" type="button">Calculate</Button>
+        <Button variant="primary" id="dscr-calculate" type="button">Calculate Debt Coverage (DSCR)</Button>
         <Button variant="ghost" id="dscr-reset" type="button">Reset</Button>
       </div>
     </Fragment>
@@ -166,6 +175,9 @@ const jsonld = {
         <div id="dscr-result-hero" class="text-[40px] leading-none font-semibold tabular-nums text-dark-accent" aria-live="polite">
           {initialResult.dscr.toFixed(2)}x
         </div>
+        <p id="dscr-plain-translation" class="text-xs text-dark-muted mt-1.5 leading-relaxed">
+          You generate <strong class="text-dark-text">₹{initialResult.dscr.toFixed(2)} in operating income</strong> for every ₹1 of loan payments due
+        </p>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
@@ -431,6 +443,15 @@ const jsonld = {
       if (resDebt) resDebt.textContent = fmtVal(debt);
       if (resCushion) resCushion.textContent = fmtVal(cushion);
       if (resAssessment) resAssessment.textContent = res.assessment;
+
+      const plainEl = document.getElementById('dscr-plain-translation');
+      if (plainEl) {
+        if (res.dscr >= 1.0) {
+          plainEl.innerHTML = `You generate <strong class="text-dark-text">${currSym}${res.dscr.toFixed(2)} in operating income</strong> for every ${currSym}1 of loan payments due`;
+        } else {
+          plainEl.innerHTML = `Operating income falls short — you only generate <strong class="text-dark-text">${currSym}${res.dscr.toFixed(2)}</strong> for every ${currSym}1 of debt due`;
+        }
+      }
 
       const wrapper = document.getElementById('dscr-composition-wrapper');
       if (wrapper && noi > 0) {
