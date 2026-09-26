@@ -37,6 +37,7 @@ const gainCompact = formatIndianCompact(result.gain, '₹');
 const gainPctFmt = formatPercent(result.gainPct, 1);
 const initialGainWords = formatIndianWords(result.gain, '₹');
 const extraGainWords = formatIndianWords(extraGainDiff, '₹');
+const initialMultiple = parseFloat((result.maturity / result.invested).toFixed(2));
 
 // Related calculators (exclude self)
 const related = TOOLS.filter(
@@ -327,6 +328,9 @@ const jsonld = {
             ({heroExact})
           </span>
         </div>
+        <p id="sip-plain-translation" class="text-[11px] text-dark-muted mt-1 leading-relaxed">
+          You invest <strong class="text-dark-text">{investedCompact}</strong> and compounding adds <strong class="text-dark-accent">{gainCompact}</strong> more — your money grows <strong class="text-dark-text">{initialMultiple}×</strong> its invested value
+        </p>
       </div>
 
       <!-- Secondary metrics -->
@@ -707,6 +711,7 @@ const jsonld = {
     const resGainCompact = document.getElementById('sip-result-gain-compact');
     const resGain = document.getElementById('sip-result-gain');
     const resGainPct = document.getElementById('sip-result-gain-pct');
+    const sipPlainEl = document.getElementById('sip-plain-translation');
 
     const insightCompounding = document.getElementById('sip-insight-compounding');
     const insightCuriosity = document.getElementById('sip-insight-curiosity');
@@ -812,6 +817,11 @@ const jsonld = {
       if (resGainCompact) anim(resGainCompact, `+${compGain}`);
       if (resGain) anim(resGain, `(+${fmtCurrency(r.gain)})`);
       if (resGainPct) anim(resGainPct, r.gainPct.toFixed(1) + '%');
+
+      if (sipPlainEl && r.maturity > 0 && r.invested > 0) {
+        const multiple = parseFloat((r.maturity / r.invested).toFixed(2));
+        sipPlainEl.innerHTML = `You invest <strong class="text-dark-text">${compInvested}</strong> and compounding adds <strong class="text-dark-accent">${compGain}</strong> more — your money grows <strong class="text-dark-text">${multiple}×</strong> its invested value`;
+      }
 
       // Update Composition Bar
       updateCompositionBar(r.principalFraction, r.gainFraction, r.invested, r.gain);

@@ -169,6 +169,9 @@ const jsonld = {
         <div id="cagr-result-pct" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
           {result.cagrPct.toFixed(2)}%
         </div>
+        <p id="cagr-plain-translation" class="text-xs text-dark-muted mt-1.5 leading-relaxed">
+          At this rate, your money doubles every <strong class="text-dark-text">~3.8 years</strong>
+        </p>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
@@ -312,6 +315,7 @@ const jsonld = {
     const resAbsRet = document.getElementById('cagr-result-absret');
     const resMult = document.getElementById('cagr-result-multiple');
     const mobileHero = document.getElementById('calc-mobile-hero');
+    const plainEl = document.getElementById('cagr-plain-translation');
 
     const errorAlert = document.getElementById('cagr-error-alert');
     const errorMessage = document.getElementById('cagr-error-message');
@@ -413,6 +417,18 @@ const jsonld = {
       if (resAbsRet) resAbsRet.textContent = absRetStr;
       if (resMult) resMult.textContent = multStr;
       if (mobileHero) mobileHero.textContent = cagrPctStr;
+
+      if (plainEl) {
+        if (res.cagr > 0) {
+          const doublingYears = Math.log(2) / Math.log(1 + res.cagr);
+          plainEl.innerHTML = `At this rate, your money doubles every <strong class="text-dark-text">~${doublingYears.toFixed(1)} years</strong>`;
+        } else if (res.cagr < 0 && res.cagr > -1) {
+          const halvingYears = Math.log(0.5) / Math.log(1 + res.cagr);
+          plainEl.innerHTML = `At this rate, your investment loses half its value in <strong class="text-dark-text">~${halvingYears.toFixed(1)} years</strong>`;
+        } else {
+          plainEl.textContent = '';
+        }
+      }
 
       // Phase 4.4 URL State Serialization
       updateHash(serializeHash({ pv, fv, y }));
