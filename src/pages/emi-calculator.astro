@@ -32,7 +32,12 @@ const totalPaymentCompact = formatIndianCompact(result.totalPayment, '₹');
 
 const related = TOOLS.filter(
   (t) => (t.category === 'Loans' || t.category === 'Investments') && t.slug !== 'emi-calculator' && t.status === 'published'
-).slice(0, 4);
+).sort((a, b) => {
+  // Loans first, Investments as secondary fill
+  if (a.category === 'Loans' && b.category !== 'Loans') return -1;
+  if (a.category !== 'Loans' && b.category === 'Loans') return 1;
+  return 0;
+}).slice(0, 4);
 
 const canonicalUrl = 'https://calcumetrics.com/emi-calculator';
 const pageTitle = 'EMI Calculator: Home, Car & Personal Loan EMI | Calcumetrics';
