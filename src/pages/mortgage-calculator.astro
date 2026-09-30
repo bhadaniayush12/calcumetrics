@@ -9,11 +9,11 @@ import Alert from '../components/ui/Alert.astro';
 import { calcAmortization } from '../lib/finance/amortization';
 import { TOOLS } from '../config/site';
 
-const DEFAULT = { homePrice: 5000000, downPaymentPct: 20, rate: 8.5, years: 20 };
+const DEFAULT = { homePrice: 400000, downPaymentPct: 20, rate: 6.75, years: 30 };
 const principal = DEFAULT.homePrice * (1 - DEFAULT.downPaymentPct / 100);
 const result = calcAmortization(principal, DEFAULT.rate, DEFAULT.years);
 
-const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+const fmtCurrency = (n: number, sym = '$', locale = 'en-US') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'mortgage-calculator' && t.status === 'published').slice(0, 3);
@@ -102,8 +102,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="Mortgage Calculator: Payments & Amortization | Calcumetrics"
-  description="Free mortgage calculator. Estimate monthly mortgage payment, amortization schedule, down payment, and total loan interest over 10 to 30 years."
+  title="Mortgage Calculator: Monthly Payment & Amortization | Calcumetrics"
+  description="Free US mortgage calculator. Estimate monthly payment on a 15 or 30-year fixed-rate mortgage, see amortization schedule, down payment impact, and total interest cost."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -118,7 +118,13 @@ const jsonld = {
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Mortgage Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Estimate your monthly mortgage repayment, loan principal, and total interest over time.</p>
+      <p class="text-sm text-text-muted mb-4">Estimate your monthly payment on a fixed-rate mortgage, see amortization schedule, and understand total interest cost.</p>
+
+      <!-- India audience cross-link -->
+      <div class="mb-5 flex items-start gap-2 rounded-card border border-border bg-surface px-4 py-3 text-xs text-text-muted">
+        <span class="mt-0.5 shrink-0 text-accent">🇮🇳</span>
+        <span>Looking for Indian home loan calculations in ₹? Use our <a href="/home-loan-calculator" class="text-accent font-medium hover:underline">Home Loan EMI Calculator</a> — defaults to Indian rates and lakh/crore formatting.</span>
+      </div>
 
       <!-- Error alert -->
       <div id="mort-error-alert" class="hidden mb-5" role="alert" aria-live="assertive">
@@ -132,16 +138,16 @@ const jsonld = {
         <Input
           id="mort-price"
           label="Home Purchase Price"
-          prefix="₹"
-          value="50,00,000"
+          prefix="$"
+          value="400,000"
           isNumeric={true}
-          localeFormat="indian"
+          localeFormat="international"
           helperText="Total purchase price of the property"
           inputmode="decimal"
           aria-describedby="mort-error-msg"
         />
         <div class="mt-2">
-          <Slider id="mort-price-slider" min={500000} max={50000000} step={50000} value={5000000} ariaLabel="Home price slider" />
+          <Slider id="mort-price-slider" min={50000} max={2000000} step={5000} value={400000} ariaLabel="Home price slider" />
         </div>
       </div>
 
@@ -168,14 +174,14 @@ const jsonld = {
           id="mort-rate"
           label="Annual Interest Rate"
           suffix="%"
-          value="8.5"
+          value="6.75"
           isNumeric={true}
           helperText="Fixed annual mortgage rate"
           inputmode="decimal"
           aria-describedby="mort-error-msg"
         />
         <div class="mt-2">
-          <Slider id="mort-rate-slider" min={3} max={18} step={0.1} value={8.5} ariaLabel="Interest rate slider" />
+          <Slider id="mort-rate-slider" min={2} max={15} step={0.05} value={6.75} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -184,14 +190,14 @@ const jsonld = {
         <Input
           id="mort-years"
           label="Loan Term (Years)"
-          value="20"
+          value="30"
           isNumeric={true}
-          helperText="Repayment period in years"
+          helperText="15 or 30-year fixed is most common in the US"
           inputmode="numeric"
           aria-describedby="mort-error-msg"
         />
         <div class="mt-2">
-          <Slider id="mort-years-slider" min={5} max={30} step={1} value={20} ariaLabel="Loan term slider" />
+          <Slider id="mort-years-slider" min={5} max={30} step={1} value={30} ariaLabel="Loan term slider" />
         </div>
       </div>
 
@@ -270,7 +276,7 @@ const jsonld = {
 
         <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Consider a property purchased for <strong>₹50,00,000</strong> with a <strong>20% down payment</strong> (₹10,00,000) funded upfront, leaving a net loan balance of <strong>₹40,00,000</strong> borrowed at an annual fixed rate of <strong>8.50%</strong> over <strong>20 years (240 months)</strong>:
+          Consider a home purchased for <strong>$400,000</strong> with a <strong>20% down payment</strong> ($80,000) paid upfront, leaving a net loan of <strong>$320,000</strong> at a fixed rate of <strong>6.75%</strong> over <strong>30 years (360 months)</strong>:
         </p>
 
         <div class="overflow-x-auto border border-border rounded-card mb-6">
@@ -287,50 +293,50 @@ const jsonld = {
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Home Purchase Price</td>
                 <td class="py-2.5 px-4 font-mono">Agreed Contract Price</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹50,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">$400,000</td>
                 <td class="py-2.5 px-4">Total gross real estate transaction value.</td>
               </tr>
               <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Upfront Down Payment (20%)</td>
-                <td class="py-2.5 px-4 font-mono">₹50,00,000 &times; 20%</td>
-                <td class="py-2.5 px-4 font-mono">₹10,00,000</td>
-                <td class="py-2.5 px-4">Instant equity buffer; eliminates private mortgage insurance (PMI) mandates.</td>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Down Payment (20%)</td>
+                <td class="py-2.5 px-4 font-mono">$400,000 &times; 20%</td>
+                <td class="py-2.5 px-4 font-mono">$80,000</td>
+                <td class="py-2.5 px-4">Instant equity buffer; avoids PMI requirement.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Net Principal Borrowed (P)</td>
-                <td class="py-2.5 px-4 font-mono">₹50,00,000 &minus; ₹10,00,000</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹40,00,000</td>
-                <td class="py-2.5 px-4">Total bank debt disbursed and amortized.</td>
+                <td class="py-2.5 px-4 font-mono">$400,000 &minus; $80,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">$320,000</td>
+                <td class="py-2.5 px-4">Total loan amount disbursed and amortized over 30 years.</td>
               </tr>
               <tr class="bg-surface/50 font-semibold text-text-primary">
-                <td class="py-2.5 px-4">Monthly Mortgage Payment (EMI)</td>
-                <td class="py-2.5 px-4 font-mono">Amortization Formula (n=240, r=0.70833%)</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹34,713 / Month</td>
-                <td class="py-2.5 px-4">Fixed monthly payment due every 30 days for 20 continuous years.</td>
+                <td class="py-2.5 px-4">Monthly Mortgage Payment</td>
+                <td class="py-2.5 px-4 font-mono">Amortization Formula (n=360, r=0.5625%)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">$2,076 / Month</td>
+                <td class="py-2.5 px-4">Fixed monthly payment for 30 years.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
-                <td class="py-2.5 px-4 font-mono">Interest: ₹40L &times; 0.70833% = ₹28,333<br />Principal: ₹34,713 &minus; ₹28,333 = ₹6,380</td>
-                <td class="py-2.5 px-4 font-mono">81.6% Interest / 18.4% Principal</td>
-                <td class="py-2.5 px-4">Notice that early installments almost exclusively service interest overhead.</td>
+                <td class="py-2.5 px-4 font-mono">Interest: $320k &times; 0.5625% = $1,800<br />Principal: $2,076 &minus; $1,800 = $276</td>
+                <td class="py-2.5 px-4 font-mono">86.7% Interest / 13.3% Principal</td>
+                <td class="py-2.5 px-4">Early payments are overwhelmingly interest — equity builds slowly at first.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Repaid</td>
                 <td class="py-2.5 px-4 font-mono">Original Principal</td>
-                <td class="py-2.5 px-4 font-mono">₹40,00,000 (48.0%)</td>
+                <td class="py-2.5 px-4 font-mono">$320,000 (42.8%)</td>
                 <td class="py-2.5 px-4">Retires the entirety of debt obligation.</td>
               </tr>
               <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Paid to Bank</td>
-                <td class="py-2.5 px-4 font-mono">(₹34,713 &times; 240) &minus; ₹40,00,000</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹43,31,103 (52.0%)</td>
-                <td class="py-2.5 px-4">Financing cost exceeds the entire original borrowed principal!</td>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Paid</td>
+                <td class="py-2.5 px-4 font-mono">($2,076 &times; 360) &minus; $320,000</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">$427,185 (57.2%)</td>
+                <td class="py-2.5 px-4">Interest exceeds the original loan amount over 30 years.</td>
               </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
-                <td class="py-3 px-4">Total Real Estate Outlay</td>
-                <td class="py-3 px-4 font-mono">₹10,00,000 (Down) + ₹83,31,103 (Debt)</td>
-                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹93,31,103</td>
-                <td class="py-3 px-4">1.87&times; the original property purchase price.</td>
+                <td class="py-3 px-4">Total Housing Outlay</td>
+                <td class="py-3 px-4 font-mono">$80,000 (Down) + $747,185 (Loan+Interest)</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">$747,185</td>
+                <td class="py-3 px-4">1.87&times; the original purchase price.</td>
               </tr>
             </tbody>
           </table>
@@ -340,24 +346,24 @@ const jsonld = {
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">Loan Term Trade-off: 15 vs 20 vs 30 Years</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
-              On the same ₹40,00,000 loan at 8.50% interest, choosing loan tenure changes the total financing burden radically:
+              On the same $320,000 loan at 6.75% interest, choosing your loan term changes the total financing cost dramatically:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>15-Year Term:</strong> EMI is ₹39,403 (+₹4,690/mo), but total interest drops to ₹30,92,492 — saving <strong>₹12,38,611 in interest</strong> and retiring debt 5 years earlier.</li>
-              <li><strong>20-Year Term (Default):</strong> Balanced EMI of ₹34,713 with total interest of ₹43,31,103.</li>
-              <li><strong>30-Year Term:</strong> EMI falls to ₹30,757 (saving ₹3,956/mo), but total interest explodes to ₹70,72,374 — costing an extra <strong>₹27,41,271 in pure bank interest</strong>!</li>
+              <li><strong>15-Year Fixed:</strong> Payment rises to $2,832/mo (+$756/mo), but total interest drops to $189,708 — <strong>saving $237,477 in interest</strong> and retiring debt 15 years earlier.</li>
+              <li><strong>20-Year Term:</strong> Payment of $2,433/mo with total interest of $263,960 — saving $163,225 vs 30-year.</li>
+              <li><strong>30-Year Fixed (Default):</strong> Lowest monthly payment at $2,076/mo, but total interest reaches $427,185 — more than the original loan amount.</li>
             </ul>
           </div>
 
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">The Equity "Crossover Point"</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
-              Because of reducing-balance mechanics, your monthly payments shift from interest-heavy to principal-heavy over time:
+              Because of reducing-balance amortization, your monthly payment shifts from interest-heavy to principal-heavy over time:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Years 1–5:</strong> Over 75% of your cumulative payments go toward interest. Home equity grows very slowly.</li>
-              <li><strong>The Crossover Point:</strong> At Month 137 (~Year 11.5), the interest portion falls below 50% for the first time.</li>
-              <li><strong>Prepayment Acceleration:</strong> Adding just 1 extra EMI payment per year directly to principal shortens a 20-year mortgage by nearly 3.5 years and saves over ₹7.5 Lakhs in interest.</li>
+              <li><strong>Years 1–5:</strong> Over 80% of each payment goes toward interest on a 30-year mortgage. Home equity builds slowly.</li>
+              <li><strong>The Crossover Point:</strong> Around Month 238 (~Year 19.8 on a 30-year), monthly principal finally exceeds monthly interest for the first time.</li>
+              <li><strong>One Extra Payment Per Year:</strong> Making 13 payments instead of 12 each year cuts a 30-year mortgage down to about 26 years and saves tens of thousands in interest.</li>
             </ul>
           </div>
         </div>
@@ -365,9 +371,9 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Exclusions</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-            <li><strong>PITI vs Principal &amp; Interest:</strong> This calculator models pure Principal &amp; Interest (PI). Full housing outlays (PITI) also include municipal property taxes, homeowner's insurance, and private mortgage insurance (PMI).</li>
-            <li><strong>Floating vs Fixed Rates:</strong> Most residential mortgages are floating-rate (repo-linked in India, or adjustable-rate ARM in the US). If central bank benchmark rates rise by 100 bps, your tenure or EMI will automatically increase.</li>
-            <li><strong>Closing &amp; Acquisition Costs:</strong> Stamp duty, registration charges, legal title vetting, and loan origination fees (typically 4% to 8% of property value) must be funded out-of-pocket and are not included in the loan balance.</li>
+            <li><strong>PITI vs Principal &amp; Interest:</strong> This calculator models pure Principal &amp; Interest (P&amp;I). A full PITI payment also includes property taxes, homeowner's insurance, and PMI — which together can add $300–$600/month on a typical US home.</li>
+            <li><strong>Fixed vs Adjustable Rate (ARM):</strong> This calculator assumes a fixed rate for the full term. On an ARM (e.g., 5/1 ARM), your rate is fixed for the initial period then adjusts annually, which can raise or lower your monthly payment.</li>
+            <li><strong>Closing Costs:</strong> US mortgage closing costs typically run 2%–5% of the loan amount (origination fees, title insurance, appraisal, prepaid escrow) and are paid out-of-pocket at closing — not included in this loan balance calculation.</li>
           </ul>
         </div>
       </section>
@@ -421,8 +427,8 @@ const jsonld = {
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcAmortization } from '../lib/finance/amortization';
 
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  let currSym = '$';
+  let currLocale = 'en-US';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -456,7 +462,7 @@ const jsonld = {
 
     if (!priceInput || !downInput || !rateInput || !yearsInput) return;
 
-    const DEFAULTS = { homePrice: 5000000, downPaymentPct: 20, rate: 8.5, years: 20 };
+    const DEFAULTS = { homePrice: 400000, downPaymentPct: 20, rate: 6.75, years: 30 };
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -564,7 +570,7 @@ const jsonld = {
 
       if (priceSlider) {
         priceSlider.value = String(DEFAULTS.homePrice);
-        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.homePrice - 500000) / (50000000 - 500000)) * 100}%`);
+        priceSlider.style.setProperty('--slider-pct', `${((DEFAULTS.homePrice - 50000) / (2000000 - 50000)) * 100}%`);
       }
       if (downSlider) {
         downSlider.value = String(DEFAULTS.downPaymentPct);
@@ -572,7 +578,7 @@ const jsonld = {
       }
       if (rateSlider) {
         rateSlider.value = String(DEFAULTS.rate);
-        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (18 - 3)) * 100}%`);
+        rateSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 2) / (15 - 2)) * 100}%`);
       }
       if (yearsSlider) {
         yearsSlider.value = String(DEFAULTS.years);
@@ -652,9 +658,10 @@ const jsonld = {
     });
     try {
       const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      // Only override the default USD if the user has explicitly saved a different currency
+      if (saved && !saved.includes('USD')) {
+        currSym = saved.includes('€') ? '€' : saved.includes('£') ? '£' : saved.includes('₹') ? '₹' : '$';
+        currLocale = saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : saved.includes('INR') ? 'en-IN' : 'en-US';
       }
     } catch (e) {}
   }
