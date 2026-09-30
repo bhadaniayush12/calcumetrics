@@ -72,7 +72,41 @@ export function getCalculatorType(pathname: string): string {
 }
 
 /**
- * Sends the calculate_click event to GA4 if analytics consent is granted.
+ * Sends the 'calculate_complete' event to GA4 when a user's calculator produces a result.
+ * Includes 'calculator_type' parameter (e.g. 'emi', 'sip', 'mortgage', 'ppf', 'income_tax').
+ * Respects Google Consent Mode v2: only fires if analytics consent is granted.
+ */
+export function trackCalculateComplete(calculatorType: string): boolean {
+  if (typeof window === 'undefined') return false;
+
+  // Consent Mode v2 Gate: Only fire if analytics consent is granted
+  if (!hasAnalyticsConsent()) {
+    return false;
+  }
+
+  const payload = {
+    calculator_type: calculatorType,
+  };
+
+  if (typeof (window as any).gtag === 'function') {
+    (window as any).gtag('event', 'calculate_complete', payload);
+    return true;
+  }
+
+  if (Array.isArray((window as any).dataLayer)) {
+    (window as any).dataLayer.push({
+      event: 'calculate_complete',
+      ...payload,
+    });
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Sends calculation completion events to GA4 if analytics consent is granted.
+ * Fires 'calculate_complete' as well as legacy 'calculate_click'.
  * Respects Google Consent Mode v2.
  */
 export function trackCalculatorCompletion(calculatorType: string): boolean {
@@ -87,18 +121,25 @@ export function trackCalculatorCompletion(calculatorType: string): boolean {
     calculator_type: calculatorType,
   };
 
+  let sent = false;
+
   if (typeof (window as any).gtag === 'function') {
+    (window as any).gtag('event', 'calculate_complete', payload);
     (window as any).gtag('event', 'calculate_click', payload);
-    return true;
+    sent = true;
   }
 
   if (Array.isArray((window as any).dataLayer)) {
     (window as any).dataLayer.push({
+      event: 'calculate_complete',
+      ...payload,
+    });
+    (window as any).dataLayer.push({
       event: 'calculate_click',
       ...payload,
     });
-    return true;
+    sent = true;
   }
 
-  return false;
+  return sent;
 }

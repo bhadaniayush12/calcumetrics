@@ -28,7 +28,8 @@ const result = calcWACCFromValues(
 
 const fmtCur = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'wacc-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['dcf-calculator', 'npv-calculator', 'irr-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/wacc-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',

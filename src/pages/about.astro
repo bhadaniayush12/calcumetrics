@@ -360,6 +360,8 @@ const jsonld = {
 
         <!-- TAB 4: CORRECTIONS LOG -->
         <div id="tab-panel-corrections" class="hidden space-y-6">
+          <div id="corrections" class="scroll-mt-24"></div>
+          <div id="corrections-log" class="scroll-mt-24"></div>
           <div class="flex items-center justify-between">
             <div>
               <h2 class="text-xl font-bold text-text-primary mb-1">
@@ -549,6 +551,21 @@ const jsonld = {
           switchTab(tab);
         });
       });
+
+      function handleHash() {
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        if (hash === 'corrections' || hash === 'corrections-log') {
+          switchTab('corrections');
+        } else if (hash === 'testing') {
+          switchTab('testing');
+        } else if (hash === 'money' || hash === 'ethics') {
+          switchTab('money');
+        } else if (hash === 'overview' || hash === 'story') {
+          switchTab('overview');
+        }
+      }
+      handleHash();
+      window.addEventListener('hashchange', handleHash);
 
       // Traffic Light buttons
       const redBtn = document.getElementById('traffic-dot-red');

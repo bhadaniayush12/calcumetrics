@@ -317,7 +317,7 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
     normalizeCurrency,
   } from '../../lib/currency';
   import { animateValue } from '../../lib/animate-number';
-  import { trackCalculatorCompletion, getCalculatorType } from '../../lib/analytics';
+  import { trackCalculatorCompletion, trackCalculateComplete, getCalculatorType } from '../../lib/analytics';
 
   /**
    * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.

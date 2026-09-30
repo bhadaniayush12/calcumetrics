@@ -40,9 +40,8 @@ const extraGainWords = formatIndianWords(extraGainDiff, '₹');
 const initialMultiple = parseFloat((result.maturity / result.invested).toFixed(2));
 
 // Related calculators (exclude self)
-const related = TOOLS.filter(
-  (t) => (t.category === 'Investments' || t.category === 'Loans') && t.slug !== 'sip-calculator' && t.status === 'published'
-).slice(0, 4);
+const RELATED_SLUGS = ['lump-sum-calculator', 'xirr-calculator', 'cagr-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 // SEO Canonical & Schema
 const canonicalUrl = 'https://calcumetrics.com/sip-calculator';
@@ -61,7 +60,7 @@ const jsonld = {
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en-IN',
       dateModified: '2026-09-24',
       publisher: {

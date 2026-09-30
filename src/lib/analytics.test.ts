@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getCalculatorType, hasAnalyticsConsent, trackCalculatorCompletion } from './analytics';
+import { getCalculatorType, hasAnalyticsConsent, trackCalculatorCompletion, trackCalculateComplete } from './analytics';
 
 describe('analytics module', () => {
   let store: Record<string, string> = {};
@@ -87,13 +87,66 @@ describe('analytics module', () => {
     });
   });
 
+  describe('trackCalculateComplete', () => {
+    it('fires gtag calculate_complete event with calculator_type when consent is granted', () => {
+      const gtagSpy = vi.fn();
+      (globalThis as any).window.gtag = gtagSpy;
+
+      const result = trackCalculateComplete('income_tax');
+      expect(result).toBe(true);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_complete', {
+        calculator_type: 'income_tax',
+      });
+    });
+
+    it('correctly passes all sample calculator types', () => {
+      const gtagSpy = vi.fn();
+      (globalThis as any).window.gtag = gtagSpy;
+
+      for (const type of ['emi', 'sip', 'mortgage', 'ppf', 'income_tax']) {
+        trackCalculateComplete(type);
+        expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_complete', {
+          calculator_type: type,
+        });
+      }
+    });
+
+    it('does NOT fire calculate_complete when consent is denied (Consent Mode v2)', () => {
+      const gtagSpy = vi.fn();
+      (globalThis as any).window.gtag = gtagSpy;
+      (globalThis as any).window.dataLayer = [
+        ['consent', 'default', { analytics_storage: 'denied' }],
+      ];
+
+      const result = trackCalculateComplete('emi');
+      expect(result).toBe(false);
+      expect(gtagSpy).not.toHaveBeenCalled();
+    });
+
+    it('falls back to dataLayer.push when gtag is absent', () => {
+      delete (globalThis as any).window.gtag;
+      const dl: any[] = [];
+      (globalThis as any).window.dataLayer = dl;
+
+      const result = trackCalculateComplete('sip');
+      expect(result).toBe(true);
+      expect(dl).toContainEqual({
+        event: 'calculate_complete',
+        calculator_type: 'sip',
+      });
+    });
+  });
+
   describe('trackCalculatorCompletion', () => {
-    it('fires gtag calculate_click event with calculator_type when consent is granted', () => {
+    it('fires calculate_complete and calculate_click events with calculator_type when consent is granted', () => {
       const gtagSpy = vi.fn();
       (globalThis as any).window.gtag = gtagSpy;
 
       const result = trackCalculatorCompletion('income_tax');
       expect(result).toBe(true);
+      expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_complete', {
+        calculator_type: 'income_tax',
+      });
       expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_click', {
         calculator_type: 'income_tax',
       });
@@ -118,6 +171,10 @@ describe('analytics module', () => {
 
       const result = trackCalculatorCompletion('sip');
       expect(result).toBe(true);
+      expect(dl).toContainEqual({
+        event: 'calculate_complete',
+        calculator_type: 'sip',
+      });
       expect(dl).toContainEqual({
         event: 'calculate_click',
         calculator_type: 'sip',

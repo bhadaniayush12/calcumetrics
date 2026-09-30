@@ -14,7 +14,8 @@ import { TOOLS } from '../config/site';
 const DEFAULT = { principal: 100000, rate: 8, years: 10 };
 const result = calcLumpSum(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, 'annually');
 const fmt = (n: number) => '₹' + formatIndian(n);
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'lump-sum-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['sip-calculator', 'cagr-calculator', 'compound-interest-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/lump-sum-calculator';
 
 const jsonld = {

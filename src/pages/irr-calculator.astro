@@ -23,7 +23,8 @@ const totalInflows = DEFAULT.cfs.reduce((a, b) => a + b, 0);
 
 const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'irr-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['npv-calculator', 'payback-period-calculator', 'wacc-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/irr-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',

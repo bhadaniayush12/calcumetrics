@@ -20,7 +20,8 @@ const result = calcNPVDetails(DEFAULT.discountRate, DEFAULT.initialOutflow, DEFA
 
 const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'npv-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['irr-calculator', 'payback-period-calculator', 'wacc-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/npv-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',

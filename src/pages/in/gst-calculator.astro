@@ -28,7 +28,8 @@ const baseCompact = formatIndianCompact(initialResult.baseAmount, '₹');
 const totalExact = fmt(initialResult.totalAmount);
 const totalCompact = formatIndianCompact(initialResult.totalAmount, '₹');
 
-const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'gst-calculator' && t.status === 'published').slice(0, 4);
+const RELATED_SLUGS = ['upi-mdr-calculator', 'profit-margin-calculator', 'income-tax-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/in/gst-calculator';
 const pageTitle = 'GST Calculator India: 0%, 5%, 18% & 40% Slabs | Calcumetrics';

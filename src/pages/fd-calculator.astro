@@ -28,9 +28,8 @@ const principalCompact = formatIndianCompact(DEFAULT.principal, '₹');
 const interestExact = fmt(result.interest);
 const interestCompact = formatIndianCompact(result.interest, '₹');
 
-const related = TOOLS.filter(
-  (t) => (t.category === 'Investments' || t.category === 'Loans') && t.slug !== 'fd-calculator' && t.status === 'published'
-).slice(0, 4);
+const RELATED_SLUGS = ['rd-calculator', 'compound-interest-calculator', 'ppf-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/fd-calculator';
 const pageTitle = 'FD Calculator: Fixed Deposit Interest & Returns | Calcumetrics';
@@ -48,7 +47,7 @@ const jsonld = {
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en-IN',
       dateModified: '2026-09-24',
       publisher: {

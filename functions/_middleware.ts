@@ -13,9 +13,26 @@ const CSP_POLICY =
   "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.googletagmanager.com https://cloudflareinsights.com https://*.cloudflareinsights.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;";
 
 export async function onRequest(context: PagesContext): Promise<Response> {
+  const url = new URL(context.request.url);
+
+  // Canonical domain enforcement: 301 permanent redirect www.calcumetrics.com -> calcumetrics.com
+  if (url.hostname === 'www.calcumetrics.com') {
+    const canonicalTarget = new URL(context.request.url);
+    canonicalTarget.hostname = 'calcumetrics.com';
+    canonicalTarget.protocol = 'https:';
+
+    return new Response(null, {
+      status: 301,
+      statusText: 'Moved Permanently',
+      headers: {
+        Location: canonicalTarget.toString(),
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      },
+    });
+  }
+
   try {
     const response = await context.next();
-    const url = new URL(context.request.url);
 
     const newHeaders = new Headers(response.headers);
 

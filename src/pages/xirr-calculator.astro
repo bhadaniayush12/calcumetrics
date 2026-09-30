@@ -19,9 +19,8 @@ const initialResult = calcXIRR(parsedFlows);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
-const related = TOOLS.filter(
-  (t) => t.category === 'Investments' && t.slug !== 'xirr-calculator' && t.status === 'published'
-).slice(0, 3);
+const RELATED_SLUGS = ['cagr-calculator', 'sip-calculator', 'roi-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/xirr-calculator';
 const jsonld = {

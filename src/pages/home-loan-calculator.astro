@@ -16,9 +16,8 @@ const initialResult = calcEMI(initialLoan, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
-const related = TOOLS.filter(
-  (t) => t.category === 'Loans' && t.slug !== 'home-loan-calculator' && t.status === 'published'
-).slice(0, 3);
+const RELATED_SLUGS = ['mortgage-calculator', 'loan-affordability-calculator', 'loan-prepayment-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/home-loan-calculator';
 const jsonld = {

@@ -17,7 +17,8 @@ const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 const fmtPct = (n: number) => n.toFixed(2) + '%';
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'future-value-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['present-value-calculator', 'compound-interest-calculator', 'savings-goal-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/future-value-calculator';
 const jsonld = {
   '@context': 'https://schema.org',

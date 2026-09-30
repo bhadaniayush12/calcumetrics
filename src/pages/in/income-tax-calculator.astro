@@ -34,7 +34,8 @@ const oldTaxCompact = formatIndianCompact(result.oldRegime.totalTax, '₹');
 const savingsExact = fmt(result.taxSavings);
 const savingsCompact = formatIndianCompact(result.taxSavings, '₹');
 
-const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'income-tax-calculator' && t.status === 'published').slice(0, 4);
+const RELATED_SLUGS = ['salary-ctc-calculator', 'hra-calculator', 'tds-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator';
 const pageTitle = 'Income Tax Calculator FY 2026-27 / AY 2027-28 | Calcumetrics';
 const pageDesc = 'Free income tax calculator India (FY 2026-27). Compare income tax calculator new regime vs old regime with ₹75k standard deduction and ₹12L rebate.';

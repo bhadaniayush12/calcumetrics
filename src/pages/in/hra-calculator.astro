@@ -16,7 +16,8 @@ const initialResult = calcHRA(DEFAULT.basicSalary, DEFAULT.hraReceived, DEFAULT.
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Taxes' && t.slug !== 'hra-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['salary-ctc-calculator', 'income-tax-calculator', 'tds-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/hra-calculator';
 const jsonld = {
   '@context': 'https://schema.org',

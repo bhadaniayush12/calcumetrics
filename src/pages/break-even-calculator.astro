@@ -15,7 +15,8 @@ const result = calcBreakEven(DEFAULT.fixedCosts, DEFAULT.price, DEFAULT.variable
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'break-even-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['profit-margin-calculator', 'markup-vs-margin-calculator', 'cogs-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/break-even-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',

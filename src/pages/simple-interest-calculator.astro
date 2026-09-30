@@ -15,7 +15,8 @@ const result = calcSimpleInterest(DEFAULT.principal, DEFAULT.rate, DEFAULT.years
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Investments' && t.slug !== 'simple-interest-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['compound-interest-calculator', 'fd-calculator', 'interest-rate-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/simple-interest-calculator' as string;
 const jsonld = {
   '@context': 'https://schema.org',

@@ -15,9 +15,8 @@ const initialResult = calcLoanPrepayment(DEFAULT.principal, DEFAULT.rate, DEFAUL
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
-const related = TOOLS.filter(
-  (t) => t.category === 'Loans' && t.slug !== 'loan-prepayment-calculator' && t.status === 'published'
-).slice(0, 3);
+const RELATED_SLUGS = ['home-loan-calculator', 'mortgage-calculator', 'loan-amortization-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/loan-prepayment-calculator';
 const jsonld = {

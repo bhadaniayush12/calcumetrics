@@ -43,14 +43,44 @@ describe('Cloudflare Pages _middleware', () => {
     expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
   });
 
-  it('does NOT add X-Robots-Tag on www.calcumetrics.com', async () => {
+  it('permanently redirects (301) www.calcumetrics.com to https://calcumetrics.com/', async () => {
+    let nextCalled = false;
     const context = {
       request: new Request('https://www.calcumetrics.com/'),
+      next: async () => {
+        nextCalled = true;
+        return new Response('OK');
+      },
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.statusText).toBe('Moved Permanently');
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/');
+    expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
+    expect(nextCalled).toBe(false);
+  });
+
+  it('permanently redirects (301) subpaths and query parameters from www.calcumetrics.com', async () => {
+    const context = {
+      request: new Request('https://www.calcumetrics.com/mortgage-calculator?downPayment=20&rate=7.5'),
       next: async () => new Response('OK'),
     };
 
     const response = await onRequest(context);
-    expect(response.headers.get('X-Robots-Tag')).toBeNull();
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/mortgage-calculator?downPayment=20&rate=7.5');
+  });
+
+  it('permanently redirects (301) http://www.calcumetrics.com to https://calcumetrics.com', async () => {
+    const context = {
+      request: new Request('http://www.calcumetrics.com/mortgage-calculator'),
+      next: async () => new Response('OK'),
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/mortgage-calculator');
   });
 
   it('handles 304 Not Modified without throwing', async () => {

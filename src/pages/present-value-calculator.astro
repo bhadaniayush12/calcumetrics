@@ -17,7 +17,8 @@ const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 const fmtPct = (n: number) => n.toFixed(2) + '%';
 
-const related = TOOLS.filter((t) => t.category === 'Corporate Finance' && t.slug !== 'present-value-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['future-value-calculator', 'compound-interest-calculator', 'npv-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/present-value-calculator';
 const jsonld = {
   '@context': 'https://schema.org',
@@ -103,8 +104,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="Present Value Calculator: Discount Cash Flows | Calcumetrics"
-  description="Free present value calculator. Apply the present value formula: PV = FV / (1+r/n)^(nt) to discount future lump sums at any compound frequency."
+  title="Present Value Calculator: Discount Future Cash Flows | Calcumetrics"
+  description="Find the present value of future cash flows or lump sums using the PV formula. Supports annual, monthly, and daily discount rates. Instant and free."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>

@@ -13,7 +13,7 @@ Execute these operational steps immediately upon DNS cutover to production:
 
 ### 1.1 Infrastructure & DNS Validation
 - [ ] **Apex Domain & CNAME Configuration:** Verify Cloudflare Pages custom domain binding for `calcumetrics.com`. Ensure CNAME flattening is active on the apex domain.
-- [ ] **WWW to Non-WWW Canonical Redirect:** Confirm that `https://www.calcumetrics.com` permanently redirects (HTTP 301) to `https://calcumetrics.com/` without chaining.
+- [x] **WWW to Non-WWW Canonical Redirect:** Enforce permanent redirect (HTTP 301) from `https://www.calcumetrics.com` to `https://calcumetrics.com/` via Cloudflare Pages middleware (`functions/_middleware.ts`) and `public/_redirects` without redirect chaining.
 - [ ] **HTTPS & HSTS Enforcement:** Confirm HTTP requests automatically upgrade to HTTPS with strict transport security (`max-age=31536000; includeSubDomains; preload`).
 - [ ] **Cloudflare Preview Host Disallow:** Verify `calcumetrics.pages.dev` and all `*.pages.dev` branch deployments serve `X-Robots-Tag: noindex, nofollow` headers via `public/_headers`.
 

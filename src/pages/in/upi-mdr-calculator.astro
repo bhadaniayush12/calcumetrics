@@ -28,7 +28,8 @@ const initialResult = calcUPIMDR(
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 
-const related = TOOLS.filter((t) => t.category === 'Business' && t.slug !== 'upi-mdr-calculator' && t.status === 'published').slice(0, 3);
+const RELATED_SLUGS = ['gst-calculator', 'profit-margin-calculator', 'break-even-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/upi-mdr-calculator';
 const jsonld = {
   '@context': 'https://schema.org',

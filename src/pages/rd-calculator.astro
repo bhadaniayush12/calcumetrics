@@ -16,9 +16,8 @@ const defaultGainPct = result.invested > 0 ? (result.interest / result.invested)
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
-const related = TOOLS.filter(
-  (t) => t.category === 'Investments' && t.slug !== 'rd-calculator' && t.status === 'published'
-).slice(0, 3);
+const RELATED_SLUGS = ['fd-calculator', 'sip-calculator', 'compound-interest-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/rd-calculator';
 const jsonld = {

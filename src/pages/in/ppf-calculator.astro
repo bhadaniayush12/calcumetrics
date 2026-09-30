@@ -15,9 +15,8 @@ const result = calcPPF(DEFAULT.annual, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
-const related = TOOLS.filter(
-  (t) => t.category === 'Investments' && t.slug !== 'ppf-calculator' && t.status === 'published'
-).slice(0, 3);
+const RELATED_SLUGS = ['fd-calculator', 'rd-calculator', 'income-tax-calculator'];
+const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/in/ppf-calculator';
 const jsonld = {
@@ -104,8 +103,8 @@ const jsonld = {
 ---
 
 <Layout
-  title="PPF Calculator: Maturity Value & Tax-Free Returns India | Calcumetrics"
-  description="Free ppf calculator India. Calculate ppf maturity value, annual interest, and Section 80C EEE tax benefit over 15 to 30 years. Instant online ppf calculator."
+  title="PPF Calculator 2026 — Maturity Value & 7.1% Returns | Calcumetrics"
+  description="Calculate PPF maturity value at 7.1% p.a. with Section 80C EEE tax-free returns for FY 2026-27. View 15-year growth table instantly."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
