@@ -202,7 +202,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'cogs-vs-opex-accounting',
     title: 'COGS vs. Operating Expenses (OpEx): Why Misclassifying Costs Distorts Your Profit Margins',
-    seoTitle: 'DSCR Ratio for Business Loans: Formula & Guide | Calcumetrics',
+    seoTitle: 'COGS vs OpEx: Cost Classification & Profit Margins | Calcumetrics',
     description:
       'Learn the accounting differences between Cost of Goods Sold (COGS) and Operating Expenses (OpEx), and how proper classification protects gross margins.',
     category: 'Business',
@@ -405,7 +405,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-wacc',
     title: 'How to Calculate WACC: The Formula, Capital Structure Weights, and Real-World Hurdles',
-    seoTitle: 'Markup vs Margin: Differences & Formulas | Calcumetrics',
+    seoTitle: 'How to Calculate WACC: Formula & Capital Structure | Calcumetrics',
     description:
       'Master the Weighted Average Cost of Capital (WACC) formula. Learn CAPM cost of equity, after-tax cost of debt, and capital structure weights.',
     category: 'Corporate Finance',
@@ -599,7 +599,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'dcf-valuation-terminal-value-guide',
     title: 'Discounted Cash Flow (DCF) Valuation: How Terminal Value Drives 70% of Company Worth',
-    seoTitle: 'NPV vs IRR: Decision Rules & Differences | Calcumetrics',
+    seoTitle: 'DCF Valuation & Terminal Value: Complete Guide | Calcumetrics',
     description:
       'Learn how to model Discounted Cash Flow (DCF) valuations, forecast Free Cash Flow to Firm (FCFF), and accurately calculate Terminal Value.',
     category: 'Corporate Finance',
