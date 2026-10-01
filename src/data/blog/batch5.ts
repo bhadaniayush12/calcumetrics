@@ -6,7 +6,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
     title: 'Debt-to-Income Ratio in the UK: What Lenders Actually Look At (And How to Calculate Yours)',
     seoTitle: 'Debt-to-Income Ratio UK: Mortgage Rules & Calculator | Calcumetrics',
     description:
-      'UK mortgage lenders do not call it DTI — they use Loan-to-Income multiples and affordability stress tests. Learn both, calculate your ratio, and understand the FCA rules that govern mortgage approvals.',
+      'UK mortgage lenders use Loan-to-Income multiples and stress tests instead of DTI. Learn how affordability works and calculate your ratio under FCA rules.',
     category: 'Loans',
     publishDate: '2026-09-30',
     dateModified: '2026-09-30',
@@ -281,7 +281,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
     title: 'How Mortgage Amortization Works: Every Payment Explained (With the Exact Math)',
     seoTitle: 'How Mortgage Amortization Works: Schedule & Formula Explained | Calcumetrics',
     description:
-      'Understand exactly how each mortgage payment splits between principal and interest, why you pay mostly interest for years, and how extra payments change your payoff date. Includes the full amortization formula and a worked 30-year example.',
+      'See how mortgage payments split between principal and interest, why early payments are interest-heavy, and how extra payments cut your loan payoff date.',
     category: 'Loans',
     publishDate: '2026-09-30',
     dateModified: '2026-09-30',

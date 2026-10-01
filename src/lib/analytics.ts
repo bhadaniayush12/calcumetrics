@@ -121,12 +121,10 @@ export function trackCalculatorCompletion(calculatorType: string): boolean {
     calculator_type: calculatorType,
   };
 
-  let sent = false;
-
   if (typeof (window as any).gtag === 'function') {
     (window as any).gtag('event', 'calculate_complete', payload);
     (window as any).gtag('event', 'calculate_click', payload);
-    sent = true;
+    return true;
   }
 
   if (Array.isArray((window as any).dataLayer)) {
@@ -138,8 +136,8 @@ export function trackCalculatorCompletion(calculatorType: string): boolean {
       event: 'calculate_click',
       ...payload,
     });
-    sent = true;
+    return true;
   }
 
-  return sent;
+  return false;
 }

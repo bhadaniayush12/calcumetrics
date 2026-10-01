@@ -24,6 +24,7 @@ import type { HTMLAttributes } from 'astro/types';
 import AdSlot from '../ui/AdSlot.astro';
 import IndiaTaxSourceNotice from './IndiaTaxSourceNotice.astro';
 import { getCalculatorType } from '../../lib/analytics';
+import { ADS_ENABLED } from '../../config/site';
 
 interface Props {
   toolName: string;
@@ -252,9 +253,11 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
   <!-- Reserved ad slot (§9 & §21): ≥24px below content, ≥24px from any button.
        Desktop leaderboard 90px min-height. Renders live ad only when ADS_ENABLED=true.
        Per AdSense policy: NO ads on homepage, 404, legal pages, Contact, About. -->
-  <div class="mt-10 pt-6 border-t border-border">
-    <AdSlot format="leaderboard" />
-  </div>
+  {ADS_ENABLED && (
+    <div class="mt-10 pt-6 border-t border-border">
+      <AdSlot format="leaderboard" />
+    </div>
+  )}
 </div>
 
 <!-- Mobile: Fixed bottom bar (hidden on desktop) -->
