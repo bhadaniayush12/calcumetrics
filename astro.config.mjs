@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://calcumetrics.com',
   trailingSlash: 'never',
+  build: {
+    format: 'file'
+  },
   redirects: {
     '/privacy': '/privacy-policy'
   },
