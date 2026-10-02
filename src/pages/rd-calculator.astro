@@ -380,14 +380,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initRDCalc() {
-    if ((window as any).__cmRDBound) return;
-    (window as any).__cmRDBound = true;
-
     const mInput = document.getElementById('rd-monthly') as HTMLInputElement | null;
     const rInput = document.getElementById('rd-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('rd-months') as HTMLInputElement | null;
@@ -405,6 +402,22 @@ const jsonld = {
     const errMsg = document.getElementById('rd-error-msg');
 
     if (!mInput || !rInput || !yInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (mInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    mInput.dataset.bound = 'true';
 
     const DEFAULTS = { monthly: 5000, rate: 7.0, months: 60 };
     let timer: ReturnType<typeof setTimeout>;
@@ -418,13 +431,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawM = mInput!.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
-      const rawMo = yInput!.value.replace(/[^0-9.]/g, '');
+      const numM = parseSmartInput(mInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numMo = parseSmartInput(yInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vM = validate(rawM, { required: true, min: 100, label: 'Monthly Installment' });
-      const vR = validate(rawR, { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
-      const vMo = validate(rawMo, { required: true, min: 1, max: 240, integer: true, label: 'Tenure in Months' });
+      const vM = validate(numM ?? '', { required: true, min: 100, label: 'Monthly Installment' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
+      const vMo = validate(numMo ?? '', { required: true, min: 1, max: 240, integer: true, label: 'Tenure in Months' });
 
       if (!vM.valid) { showError(vM.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -480,15 +493,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -525,19 +545,30 @@ const jsonld = {
     });
 
     document.getElementById('rd-copy-btn')?.addEventListener('click', async () => {
-      const rawM = mInput.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput.value.replace(/[^0-9.]/g, '');
-      const rawMo = yInput.value.replace(/[^0-9.]/g, '');
+      const numM = parseSmartInput(mInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numMo = parseSmartInput(yInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vM = validate(rawM, { required: true, min: 100, label: 'M' });
-      const vR = validate(rawR, { required: true, min: 0.1, label: 'R' });
-      const vMo = validate(rawMo, { required: true, min: 1, label: 'Mo' });
+      const vM = validate(numM ?? '', { required: true, min: 100, label: 'M' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'R' });
+      const vMo = validate(numMo ?? '', { required: true, min: 1, label: 'Mo' });
 
       if (!vM.valid || !vR.valid || !vMo.valid) return;
 
       const res = calcRDClient(vM.value!, vR.value!, vMo.value!);
       const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('rd-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -547,7 +578,18 @@ const jsonld = {
     });
 
     document.getElementById('rd-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('rd-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -575,16 +617,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initRDCalc();

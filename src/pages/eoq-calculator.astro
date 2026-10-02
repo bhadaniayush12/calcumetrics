@@ -471,14 +471,11 @@ const jsonld = {
     return new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)) + ' Units';
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initEOQCalc() {
-    if ((window as any).__cmEoqBound) return;
-    (window as any).__cmEoqBound = true;
-
     const dInput = document.getElementById('eoq-demand') as HTMLInputElement | null;
     const sInput = document.getElementById('eoq-order-cost') as HTMLInputElement | null;
     const hInput = document.getElementById('eoq-holding-cost') as HTMLInputElement | null;
@@ -497,6 +494,22 @@ const jsonld = {
     const errMsg = document.getElementById('eoq-error-msg');
 
     if (!dInput || !sInput || !hInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (dInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    dInput.dataset.bound = 'true';
 
     const DEFAULTS = { d: 10000, s: 500, h: 25 };
     let timer: ReturnType<typeof setTimeout>;
@@ -510,13 +523,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawD = dInput!.value.replace(/[^0-9.]/g, '');
-      const rawS = sInput!.value.replace(/[^0-9.]/g, '');
-      const rawH = hInput!.value.replace(/[^0-9.]/g, '');
+      const numD = parseSmartInput(dInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numS = parseSmartInput(sInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numH = parseSmartInput(hInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vD = validate(rawD, { required: true, min: 1, label: 'Annual Demand' });
-      const vS = validate(rawS, { required: true, min: 0.01, label: 'Order Cost' });
-      const vH = validate(rawH, { required: true, min: 0.01, label: 'Holding Cost' });
+      const vD = validate(numD ?? '', { required: true, min: 1, label: 'Annual Demand' });
+      const vS = validate(numS ?? '', { required: true, min: 0.01, label: 'Order Cost' });
+      const vH = validate(numH ?? '', { required: true, min: 0.01, label: 'Holding Cost' });
 
       if (!vD.valid) { showError(vD.error!.message); return; }
       if (!vS.valid) { showError(vS.error!.message); return; }
@@ -570,15 +583,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     }
 
@@ -618,12 +638,12 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('eoq-copy-btn')?.addEventListener('click', async () => {
-      const rawD = dInput.value.replace(/[^0-9.]/g, '');
-      const rawS = sInput.value.replace(/[^0-9.]/g, '');
-      const rawH = hInput.value.replace(/[^0-9.]/g, '');
-      const vD = validate(rawD, { required: true, min: 1, label: 'Demand' });
-      const vS = validate(rawS, { required: true, min: 0.01, label: 'Order Cost' });
-      const vH = validate(rawH, { required: true, min: 0.01, label: 'Holding Cost' });
+      const numD = parseSmartInput(dInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numS = parseSmartInput(sInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numH = parseSmartInput(hInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vD = validate(numD ?? '', { required: true, min: 1, label: 'Demand' });
+      const vS = validate(numS ?? '', { required: true, min: 0.01, label: 'Order Cost' });
+      const vH = validate(numH ?? '', { required: true, min: 0.01, label: 'Holding Cost' });
       if (!vD.valid || !vS.valid || !vH.valid) return;
 
       const d = vD.value!;
@@ -631,7 +651,18 @@ const jsonld = {
       const h = vH.value!;
       const res = calcEOQ(d, s, h);
       const text = `EOQ Result: Demand ${d} units, Setup Cost ${fmtVal(s)}, Holding Cost ${fmtVal(h)} => Optimal Order Quantity: ${fmtUnits(res.eoqRounded)} (${res.ordersPerYear.toFixed(1)} orders/yr). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('eoq-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -641,7 +672,18 @@ const jsonld = {
     });
 
     document.getElementById('eoq-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('eoq-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -669,16 +711,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initEOQCalc();

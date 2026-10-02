@@ -407,6 +407,7 @@ const jsonld = {
 <script>
   import { calcCCC } from '../lib/accounting/ratios';
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
@@ -416,14 +417,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initCCCCalc() {
-    if ((window as any).__cmCccBound) return;
-    (window as any).__cmCccBound = true;
-
     const arInput = document.getElementById('ccc-ar') as HTMLInputElement | null;
     const revInput = document.getElementById('ccc-rev') as HTMLInputElement | null;
     const invInput = document.getElementById('ccc-inv') as HTMLInputElement | null;
@@ -440,6 +438,22 @@ const jsonld = {
     const errMsg = document.getElementById('ccc-error-msg');
 
     if (!arInput || !revInput || !invInput || !cogsInput || !apInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (arInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    arInput.dataset.bound = 'true';
 
     const DEFAULTS = { ar: 200000, rev: 2000000, inv: 300000, cogs: 1200000, ap: 150000 };
 
@@ -452,17 +466,17 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawAr = arInput!.value.replace(/[^0-9.]/g, '');
-      const rawRev = revInput!.value.replace(/[^0-9.]/g, '');
-      const rawInv = invInput!.value.replace(/[^0-9.]/g, '');
-      const rawCogs = cogsInput!.value.replace(/[^0-9.]/g, '');
-      const rawAp = apInput!.value.replace(/[^0-9.]/g, '');
+      const numAr = parseSmartInput(arInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRev = parseSmartInput(revInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numInv = parseSmartInput(invInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numCogs = parseSmartInput(cogsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numAp = parseSmartInput(apInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
-      const vRev = validate(rawRev, { required: true, min: 1, label: 'Revenue' });
-      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
-      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'COGS' });
-      const vAp = validate(rawAp, { required: true, min: 0, label: 'Accounts Payable' });
+      const vAr = validate(numAr ?? '', { required: true, min: 0, label: 'Accounts Receivable' });
+      const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Revenue' });
+      const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inventory' });
+      const vCogs = validate(numCogs ?? '', { required: true, min: 1, label: 'COGS' });
+      const vAp = validate(numAp ?? '', { required: true, min: 0, label: 'Accounts Payable' });
 
       if (!vAr.valid) { showError(vAr.error!.message); return; }
       if (!vRev.valid) { showError(vRev.error!.message); return; }
@@ -523,23 +537,34 @@ const jsonld = {
     });
 
     document.getElementById('ccc-copy-btn')?.addEventListener('click', async () => {
-      const rawAr = arInput.value.replace(/[^0-9.]/g, '');
-      const rawRev = revInput.value.replace(/[^0-9.]/g, '');
-      const rawInv = invInput.value.replace(/[^0-9.]/g, '');
-      const rawCogs = cogsInput.value.replace(/[^0-9.]/g, '');
-      const rawAp = apInput.value.replace(/[^0-9.]/g, '');
+      const numAr = parseSmartInput(arInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRev = parseSmartInput(revInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numInv = parseSmartInput(invInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numCogs = parseSmartInput(cogsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numAp = parseSmartInput(apInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vAr = validate(rawAr, { required: true, min: 0, label: 'AR' });
-      const vRev = validate(rawRev, { required: true, min: 1, label: 'Rev' });
-      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inv' });
-      const vCogs = validate(rawCogs, { required: true, min: 1, label: 'COGS' });
-      const vAp = validate(rawAp, { required: true, min: 0, label: 'AP' });
+      const vAr = validate(numAr ?? '', { required: true, min: 0, label: 'AR' });
+      const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Rev' });
+      const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inv' });
+      const vCogs = validate(numCogs ?? '', { required: true, min: 1, label: 'COGS' });
+      const vAp = validate(numAp ?? '', { required: true, min: 0, label: 'AP' });
 
       if (!vAr.valid || !vRev.valid || !vInv.valid || !vCogs.valid || !vAp.valid) return;
 
       const res = calcCCC(vAr.value!, vRev.value!, vInv.value!, vCogs.value!, vAp.value!, 365);
       const text = `Cash Conversion Cycle: ${res.ccc.toFixed(1)} Days (DSO: ${res.dso.toFixed(1)}d, DIO: ${res.dsi.toFixed(1)}d, DPO: ${res.dpo.toFixed(1)}d). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ccc-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -549,7 +574,18 @@ const jsonld = {
     });
 
     document.getElementById('ccc-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ccc-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -581,16 +617,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initCCCCalc();

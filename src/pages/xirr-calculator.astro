@@ -377,6 +377,7 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
 
@@ -424,9 +425,6 @@ const jsonld = {
   ];
 
   function initXIRRCalc() {
-    if ((window as any).__cmXIRRBound) return;
-    (window as any).__cmXIRRBound = true;
-
     const container = document.getElementById('xirr-rows-container');
     const addBtn = document.getElementById('xirr-add-row');
     const calcBtn = document.getElementById('xirr-calculate');
@@ -442,6 +440,22 @@ const jsonld = {
     const errMsg = document.getElementById('xirr-error-msg');
 
     if (!container) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (container.dataset.bound === 'true') {
+      recalculateXIRR();
+      return;
+    }
+    container.dataset.bound = 'true';
 
     function showError(msg: string) {
       if (errAlert) errAlert.classList.remove('hidden');
@@ -581,7 +595,18 @@ const jsonld = {
       const res = calcXIRRClient(flows);
       if (!res.valid) return;
       const text = `XIRR: ${res.xirrPct.toFixed(2)}% across ${flows.length} cash flows. ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('xirr-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -591,7 +616,18 @@ const jsonld = {
     });
 
     document.getElementById('xirr-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('xirr-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -604,16 +640,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initXIRRCalc();

@@ -393,14 +393,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initPPFCalc() {
-    if ((window as any).__cmPPFBound) return;
-    (window as any).__cmPPFBound = true;
-
     const aInput = document.getElementById('ppf-annual') as HTMLInputElement | null;
     const rInput = document.getElementById('ppf-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('ppf-years') as HTMLInputElement | null;
@@ -418,6 +415,12 @@ const jsonld = {
 
     if (!aInput || !rInput || !yInput) return;
 
+    if (aInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    aInput.dataset.bound = 'true';
+
     const DEFAULTS = { annual: 150000, rate: 7.1, years: 15 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -430,13 +433,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawA = aInput!.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
-      const rawY = yInput!.value.replace(/[^0-9.]/g, '');
+      const numA = parseSmartInput(aInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vA = validate(rawA, { required: true, min: 500, max: 150000, label: 'Yearly Investment' });
-      const vR = validate(rawR, { required: true, min: 1, max: 15, decimal: true, label: 'Interest Rate' });
-      const vY = validate(rawY, { required: true, min: 15, max: 50, integer: true, label: 'Tenure in Years' });
+      const vA = validate(numA ?? '', { required: true, min: 500, max: 150000, label: 'Yearly Investment' });
+      const vR = validate(numR ?? '', { required: true, min: 1, max: 15, decimal: true, label: 'Interest Rate' });
+      const vY = validate(numY ?? '', { required: true, min: 15, max: 50, integer: true, label: 'Tenure in Years' });
 
       if (!vA.valid) { showError(vA.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -491,15 +494,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -536,19 +546,30 @@ const jsonld = {
     });
 
     document.getElementById('ppf-copy-btn')?.addEventListener('click', async () => {
-      const rawA = aInput.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput.value.replace(/[^0-9.]/g, '');
-      const rawY = yInput.value.replace(/[^0-9.]/g, '');
+      const numA = parseSmartInput(aInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vA = validate(rawA, { required: true, min: 500, max: 150000, label: 'A' });
-      const vR = validate(rawR, { required: true, min: 1, label: 'R' });
-      const vY = validate(rawY, { required: true, min: 15, label: 'Y' });
+      const vA = validate(numA ?? '', { required: true, min: 500, max: 150000, label: 'A' });
+      const vR = validate(numR ?? '', { required: true, min: 1, label: 'R' });
+      const vY = validate(numY ?? '', { required: true, min: 15, label: 'Y' });
 
       if (!vA.valid || !vR.valid || !vY.valid) return;
 
       const res = calcPPFClient(vA.value!, vR.value!, vY.value!);
       const text = `PPF: ${fmtVal(vA.value!)}/yr for ${vY.value} yrs at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ppf-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -558,7 +579,18 @@ const jsonld = {
     });
 
     document.getElementById('ppf-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ppf-share-btn');
       if (btn) {
         const orig = btn.textContent;

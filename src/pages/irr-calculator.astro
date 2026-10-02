@@ -375,6 +375,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
   import { setResult } from '../lib/result-bus';
   import { calcIRR, calcNPV } from '../lib/calculators/corporate';
@@ -430,6 +431,23 @@ const jsonld = {
 
     if (!initInput || !hInput || !cf1Input || !cf2Input || !cf3Input || !cf4Input) return;
 
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (initInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    initInput.dataset.bound = 'true';
+
     const DEFAULTS = { c0: 100000, h: 12, c1: 30000, c2: 40000, c3: 50000, c4: 60000 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -447,12 +465,20 @@ const jsonld = {
     }
 
     function recalc() {
-      const valH = validate(hInput.value, irrSchema.h);
-      const valC0 = validate(initInput.value, irrSchema.c0);
-      const valC1 = validate(cf1Input.value, irrSchema.c1);
-      const valC2 = validate(cf2Input.value, irrSchema.c2);
-      const valC3 = validate(cf3Input.value, irrSchema.c3);
-      const valC4 = validate(cf4Input.value, irrSchema.c4);
+      const isEur = currLocale === 'de-DE';
+      const numH = parseSmartInput(hInput.value, isEur ? 'EUR' : undefined);
+      const numC0 = parseSmartInput(initInput.value, isEur ? 'EUR' : undefined);
+      const numC1 = parseSmartInput(cf1Input.value, isEur ? 'EUR' : undefined);
+      const numC2 = parseSmartInput(cf2Input.value, isEur ? 'EUR' : undefined);
+      const numC3 = parseSmartInput(cf3Input.value, isEur ? 'EUR' : undefined);
+      const numC4 = parseSmartInput(cf4Input.value, isEur ? 'EUR' : undefined);
+
+      const valH = validate(numH ?? hInput.value, irrSchema.h);
+      const valC0 = validate(numC0 ?? initInput.value, irrSchema.c0);
+      const valC1 = validate(numC1 ?? cf1Input.value, irrSchema.c1);
+      const valC2 = validate(numC2 ?? cf2Input.value, irrSchema.c2);
+      const valC3 = validate(numC3 ?? cf3Input.value, irrSchema.c3);
+      const valC4 = validate(numC4 ?? cf4Input.value, irrSchema.c4);
 
       if (!valH.valid || !valC0.valid || !valC1.valid || !valC2.valid || !valC3.valid || !valC4.valid) {
         const firstErr = (!valH.valid && valH.error.message) ||
@@ -585,15 +611,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     }
 
@@ -606,13 +639,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const num = parseFloat(input.value);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = String(num);
+          recalc();
+        }
       });
     }
 
@@ -621,8 +663,15 @@ const jsonld = {
 
     [cf1Input, cf2Input, cf3Input, cf4Input].forEach((el) => {
       el?.addEventListener('input', () => {
-        el.value = fmtLiveInput(el.value);
         debounce();
+      });
+      el?.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(el.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          el.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     });
 
@@ -739,24 +788,16 @@ const jsonld = {
       }
     });
 
-    const win = window as any;
-    if (!win.__cmIRRCurrencyBound) {
-      win.__cmIRRCurrencyBound = true;
-      window.addEventListener('cm:currency-change', (e: any) => {
-        if (e.detail?.symbol) {
-          currSym = e.detail.symbol;
-          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-          recalc();
-        }
-      });
-    }
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
+        recalc();
       }
-    } catch (e) {}
+    });
 
     // Phase 4.4 URL State Restoration
     const currentHash = readCurrentHash();

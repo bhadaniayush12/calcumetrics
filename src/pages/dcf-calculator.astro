@@ -468,14 +468,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initDCFCalc() {
-    if ((window as any).__cmDCFBound) return;
-    (window as any).__cmDCFBound = true;
-
     const fcf1Input = document.getElementById('dcf-fcf1') as HTMLInputElement | null;
     const growthInput = document.getElementById('dcf-growth') as HTMLInputElement | null;
     const discountInput = document.getElementById('dcf-discount') as HTMLInputElement | null;
@@ -496,6 +493,22 @@ const jsonld = {
     const errMsg = document.getElementById('dcf-error-msg');
 
     if (!fcf1Input || !growthInput || !discountInput || !terminalInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (fcf1Input.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    fcf1Input.dataset.bound = 'true';
 
     const DEFAULTS = { fcf1: 100000, growth: 10, discount: 12, terminal: 3 };
     let timer: ReturnType<typeof setTimeout>;
@@ -509,15 +522,15 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawFcf = fcf1Input!.value.replace(/[^0-9.]/g, '');
+      const numFcf = parseSmartInput(fcf1Input!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawGrowth = growthInput!.value.replace(/[^0-9.-]/g, '');
-      const rawDiscount = discountInput!.value.replace(/[^0-9.]/g, '');
+      const numDiscount = parseSmartInput(discountInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawTerminal = terminalInput!.value.replace(/[^0-9.-]/g, '');
 
-      const vFcf = validate(rawFcf, { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
-      const vGrowth = validate(rawGrowth, { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
-      const vDiscount = validate(rawDiscount, { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
-      const vTerminal = validate(rawTerminal, { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
+      const vFcf = validate(numFcf ?? '', { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
+      const vGrowth = validate(numGrowth ?? '', { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
+      const vDiscount = validate(numDiscount ?? '', { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
+      const vTerminal = validate(numTerminal ?? '', { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
 
       if (!vFcf.valid) { showError(vFcf.error!.message); return; }
       if (!vGrowth.valid) { showError(vGrowth.error!.message); return; }
@@ -582,15 +595,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -636,21 +656,32 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('dcf-copy-btn')?.addEventListener('click', async () => {
-      const rawFcf = fcf1Input.value.replace(/[^0-9.]/g, '');
+      const numFcf = parseSmartInput(fcf1Input.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawGrowth = growthInput.value.replace(/[^0-9.-]/g, '');
-      const rawDiscount = discountInput.value.replace(/[^0-9.]/g, '');
+      const numDiscount = parseSmartInput(discountInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawTerminal = terminalInput.value.replace(/[^0-9.-]/g, '');
 
-      const vFcf = validate(rawFcf, { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
-      const vGrowth = validate(rawGrowth, { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
-      const vDiscount = validate(rawDiscount, { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
-      const vTerminal = validate(rawTerminal, { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
+      const vFcf = validate(numFcf ?? '', { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
+      const vGrowth = validate(numGrowth ?? '', { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
+      const vDiscount = validate(numDiscount ?? '', { required: true, min: 0.1, max: 100, decimal: true, label: 'Discount Rate' });
+      const vTerminal = validate(numTerminal ?? '', { required: true, min: -10, max: 20, decimal: true, label: 'Terminal Growth Rate' });
 
       if (!vFcf.valid || !vGrowth.valid || !vDiscount.valid || !vTerminal.valid || vDiscount.value! <= vTerminal.value!) return;
 
       const res = calcDCFClient(vFcf.value!, vGrowth.value!, vDiscount.value!, vTerminal.value!);
       const text = `DCF Valuation: Year 1 FCF ${fmtVal(vFcf.value!)}, growth ${vGrowth.value}%, discount ${vDiscount.value}%, terminal ${vTerminal.value}% => Intrinsic Value: ${fmtVal(res.intrinsicValue)}. ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('dcf-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -660,7 +691,18 @@ const jsonld = {
     });
 
     document.getElementById('dcf-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('dcf-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -690,16 +732,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initDCFCalc();

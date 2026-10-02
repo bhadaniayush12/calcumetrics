@@ -38,15 +38,15 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Cookie Policy</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 24 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 2 October 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Cookie Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-6">
       This policy explains how Calcumetrics (calcumetrics.com) uses cookies and browser local storage, their exact technical purposes, and how you can control your preferences.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Current implementation: Functional browser storage</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Functional browser storage (localStorage)</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics does <strong>not</strong> currently set any tracking, profiling, or third-party advertising cookies. We use client-side <code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">localStorage</code> solely to remember your immediate UI preferences between visits:
+      We use client-side <code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">localStorage</code> solely to remember your immediate UI preferences between visits:
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
       <li><code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">cm_currency</code>: Stores your preferred display currency symbol (e.g. INR, USD, EUR, GBP) for universal calculators.</li>
@@ -56,27 +56,33 @@ const jsonld = {
       This data stays strictly on your local device. It is never transmitted to our servers or accessible to third parties.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. Planned advertising cookies (Google AdSense)</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. Web analytics: Google Analytics 4 &amp; Cloudflare</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics plans to display advertising via Google AdSense in future. When enabled, Google and its certified vendor partners may use cookies (such as the DoubleClick cookie) and device identifiers to serve ads and measure ad impressions.
+      We utilize two analytics layers to ensure platform stability and understand aggregate visitor usage:
     </p>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      <strong>Future Consent Management:</strong> Before any advertising cookies are activated for visitors in the European Economic Area (EEA), United Kingdom, Switzerland, or other regulated jurisdictions, an interactive Consent Management Platform (CMP) dialog will be deployed in accordance with Google EU User Consent Policy and IAB TCF standards. This policy will be updated before any advertising cookies are enabled.
-    </p>
+    <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
+      <li><strong>Google Analytics 4 (First-party cookies):</strong> GA4 may set first-party cookies (such as <code>_ga</code> and <code>_ga_*</code>) to distinguish anonymous browser sessions. GA4 is configured with Google Consent Mode v2 (defaulting ad storage and personalization to denied). Calculator inputs, financial figures, and loan details are strictly excluded from all telemetry.</li>
+      <li><strong>Cloudflare Web Analytics (Cookieless):</strong> Provides aggregate, privacy-first pageview and performance measurements without using cookies, local storage, or device fingerprinting.</li>
+    </ul>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Self-hosted typography &amp; zero external tracking</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Advertising cookies (Google AdSense)</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">
+      Calcumetrics displays or plans to display third-party advertisements served by Google AdSense and certified advertising networks to keep our tools free.
+    </p>
+    <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
+      <li>Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on prior visits to this website or other websites on the Internet.</li>
+      <li>Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visits to our site and other sites across the Internet.</li>
+      <li>You can manage or opt out of personalized advertising at <a href="https://adssettings.google.com/" rel="noopener noreferrer" target="_blank" class="text-accent hover:underline focus-visible:outline-accent">Google Ad Settings</a> or via <a href="https://optout.aboutads.info/" rel="noopener noreferrer" target="_blank" class="text-accent hover:underline focus-visible:outline-accent">www.aboutads.info</a>.</li>
+    </ul>
+
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Self-hosted typography &amp; zero external font tracking</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
       All web fonts (including Inter and Playfair Display) are self-hosted locally directly on our own domain servers. We do not load fonts, scripts, or stylesheets from Google Fonts or third-party CDNs, ensuring that your IP address and browser headers are never transmitted to external font services.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Cookieless web analytics (Cloudflare Web Analytics)</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. How to control and delete cookies and storage</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We use Cloudflare Web Analytics to measure high-level traffic and site performance. Cloudflare Web Analytics is 100% cookieless and does not use local storage or fingerprinting. It does not track users across sites, does not collect personal data, and does not log IP addresses.
-    </p>
-
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. How to control and delete browser storage</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-4">
-      You can clear your stored preferences (such as remembered currency) at any time by clearing your browser's local storage and cache in your browser settings. To opt out of interest-based advertising across participating networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
+      You can clear your stored preferences (such as remembered currency) and delete cookies at any time by clearing your browser's local storage and cache in your browser settings. To opt out of interest-based advertising across participating networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Questions and updates</h2>

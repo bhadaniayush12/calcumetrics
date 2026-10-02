@@ -373,6 +373,7 @@ const jsonld = {
 <script>
   import { calcEMI } from '../lib/calculators/emi';
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
@@ -382,14 +383,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initHLCalc() {
-    if ((window as any).__cmHlBound) return;
-    (window as any).__cmHlBound = true;
-
     const priceInput = document.getElementById('hl-price') as HTMLInputElement | null;
     const downInput = document.getElementById('hl-down') as HTMLInputElement | null;
     const rateInput = document.getElementById('hl-rate') as HTMLInputElement | null;
@@ -399,6 +397,25 @@ const jsonld = {
     const rateSlider = document.getElementById('hl-rate-slider') as HTMLInputElement | null;
     const yearsSlider = document.getElementById('hl-years-slider') as HTMLInputElement | null;
 
+    if (!priceInput || !downInput || !rateInput || !yearsInput) return;
+
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (priceInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    priceInput.dataset.bound = 'true';
+
     const resEMI = document.getElementById('hl-result-emi');
     const resPrincipal = document.getElementById('hl-result-principal');
     const resDown = document.getElementById('hl-result-down');
@@ -407,8 +424,6 @@ const jsonld = {
 
     const errAlert = document.getElementById('hl-error-alert');
     const errMsg = document.getElementById('hl-error-msg');
-
-    if (!priceInput || !downInput || !rateInput || !yearsInput) return;
 
     const DEFAULTS = { price: 5000000, downPct: 20, rate: 8.5, years: 20 };
     let timer: ReturnType<typeof setTimeout>;
@@ -422,15 +437,16 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawPrice = priceInput!.value.replace(/[^0-9.]/g, '');
-      const rawDown = downInput!.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+      const isEur = currLocale === 'de-DE';
+      const numPrice = parseSmartInput(priceInput!.value, isEur ? 'EUR' : undefined);
+      const numDown = parseSmartInput(downInput!.value, isEur ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput!.value, isEur ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput!.value, isEur ? 'EUR' : undefined);
 
-      const vPrice = validate(rawPrice, { required: true, min: 100000, label: 'Property Price' });
-      const vDown = validate(rawDown, { required: true, min: 0, max: 95, decimal: true, label: 'Down Payment %' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, max: 40, integer: true, label: 'Tenure' });
+      const vPrice = validate(numPrice ?? priceInput!.value, { required: true, min: 100000, label: 'Property Price' });
+      const vDown = validate(numDown ?? downInput!.value, { required: true, min: 0, max: 95, decimal: true, label: 'Down Payment %' });
+      const vRate = validate(numRate ?? rateInput!.value, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vYears = validate(numYears ?? yearsInput!.value, { required: true, min: 1, max: 40, integer: true, label: 'Tenure' });
 
       if (!vPrice.valid) { showError(vPrice.error!.message); return; }
       if (!vDown.valid) { showError(vDown.error!.message); return; }
@@ -490,15 +506,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -541,22 +564,34 @@ const jsonld = {
     });
 
     document.getElementById('hl-copy-btn')?.addEventListener('click', async () => {
-      const rawPrice = priceInput.value.replace(/[^0-9.]/g, '');
-      const rawDown = downInput.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+      const isEur = currLocale === 'de-DE';
+      const numPrice = parseSmartInput(priceInput.value, isEur ? 'EUR' : undefined);
+      const numDown = parseSmartInput(downInput.value, isEur ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined);
 
-      const vPrice = validate(rawPrice, { required: true, min: 100000, label: 'Property Price' });
-      const vDown = validate(rawDown, { required: true, min: 0, max: 95, label: 'Down Payment' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, label: 'Tenure' });
+      const vPrice = validate(numPrice ?? priceInput.value, { required: true, min: 100000, label: 'Property Price' });
+      const vDown = validate(numDown ?? downInput.value, { required: true, min: 0, max: 95, label: 'Down Payment' });
+      const vRate = validate(numRate ?? rateInput.value, { required: true, min: 0.1, label: 'Rate' });
+      const vYears = validate(numYears ?? yearsInput.value, { required: true, min: 1, label: 'Tenure' });
 
       if (!vPrice.valid || !vDown.valid || !vRate.valid || !vYears.valid) return;
 
       const loan = vPrice.value! * (1 - vDown.value! / 100);
       const res = calcEMI(loan, vRate.value!, vYears.value!);
       const text = `Home Loan EMI: ${fmtVal(res.emiRounded)}/month on property value of ${fmtVal(vPrice.value!)} (${vDown.value}% down, ${vRate.value}% for ${vYears.value} yrs). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('hl-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -566,7 +601,18 @@ const jsonld = {
     });
 
     document.getElementById('hl-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('hl-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -596,16 +642,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initHLCalc();

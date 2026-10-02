@@ -382,6 +382,7 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
 
@@ -422,9 +423,6 @@ const jsonld = {
   function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
 
   function initDPP() {
-    if ((window as any).__cmDPPBound) return;
-    (window as any).__cmDPPBound = true;
-
     const investEl = document.getElementById('dpp-invest') as HTMLInputElement | null;
     const rateEl   = document.getElementById('dpp-rate') as HTMLInputElement | null;
     const investSlider = document.getElementById('dpp-invest-slider') as HTMLInputElement | null;
@@ -433,6 +431,22 @@ const jsonld = {
     const errAlert     = document.getElementById('dpp-error-alert');
     const errMsg       = document.getElementById('dpp-error-msg');
     if (!investEl || !rateEl || !container) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (investEl.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    investEl.dataset.bound = 'true';
 
     const DEFAULT_INVEST = 1000000;
     const DEFAULT_FLOWS = [300000, 350000, 400000, 400000, 500000];
@@ -570,13 +584,36 @@ const jsonld = {
 
     document.getElementById('dpp-copy-btn')?.addEventListener('click', async () => {
       const result = document.getElementById('dpp-result-dpp')?.textContent ?? '';
-      await navigator.clipboard.writeText(`Discounted Payback Period: ${result}. ${location.href.split('#')[0]}`);
+      const textToCopy = `Discounted Payback Period: ${result}. ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('dpp-copy-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
     });
 
     document.getElementById('dpp-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('dpp-share-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
     });
@@ -585,6 +622,9 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });

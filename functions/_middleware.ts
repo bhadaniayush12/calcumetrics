@@ -15,6 +15,25 @@ const CSP_POLICY =
 export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
 
+  // Trailing slash normalization: 301 permanent redirect any URL ending in "/" (except root "/")
+  if (url.pathname !== '/' && url.pathname.endsWith('/')) {
+    const canonicalTarget = new URL(context.request.url);
+    if (canonicalTarget.hostname === 'www.calcumetrics.com') {
+      canonicalTarget.hostname = 'calcumetrics.com';
+      canonicalTarget.protocol = 'https:';
+    }
+    canonicalTarget.pathname = canonicalTarget.pathname.replace(/\/+$/, '');
+
+    return new Response(null, {
+      status: 301,
+      statusText: 'Moved Permanently',
+      headers: {
+        Location: canonicalTarget.toString(),
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      },
+    });
+  }
+
   // Canonical domain enforcement: 301 permanent redirect www.calcumetrics.com -> calcumetrics.com
   if (url.hostname === 'www.calcumetrics.com') {
     const canonicalTarget = new URL(context.request.url);

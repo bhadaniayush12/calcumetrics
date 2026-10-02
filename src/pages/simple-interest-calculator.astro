@@ -290,6 +290,7 @@ const jsonld = {
 <script>
   import { calcSimpleInterest } from '../lib/calculators/simple-interest';
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
 
@@ -326,6 +327,17 @@ const jsonld = {
 
     if (!pInput || !rInput || !yInput) return;
 
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
     if (pInput.dataset.bound === 'true') {
       recalc();
       return;
@@ -358,19 +370,24 @@ const jsonld = {
       if (!pInput || !rInput || !yInput) return;
 
       // Phase 4.3 Centralized Validation Engine
-      const valP = validate(pInput.value, siSchema.p);
+      const isEur = currLocale === 'de-DE';
+      const numP = parseSmartInput(pInput.value, isEur ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, isEur ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput.value, isEur ? 'EUR' : undefined);
+
+      const valP = validate(numP ?? pInput.value, siSchema.p);
       if (!valP.valid) {
         showError(valP.error.message);
         return;
       }
 
-      const valR = validate(rInput.value, siSchema.r);
+      const valR = validate(numR ?? rInput.value, siSchema.r);
       if (!valR.valid) {
         showError(valR.error.message);
         return;
       }
 
-      const valY = validate(yInput.value, siSchema.y);
+      const valY = validate(numY ?? yInput.value, siSchema.y);
       if (!valY.valid) {
         showError(valY.error.message);
         return;
@@ -452,15 +469,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -564,24 +588,16 @@ const jsonld = {
       }
     });
 
-    const win = window as any;
-    if (!win.__cmSICurrencyBound) {
-      win.__cmSICurrencyBound = true;
-      window.addEventListener('cm:currency-change', (e: any) => {
-        if (e.detail?.symbol) {
-          currSym = e.detail.symbol;
-          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-          recalc();
-        }
-      });
-    }
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
+        recalc();
       }
-    } catch (e) {}
+    });
 
     // Phase 4.4 URL State Restoration
     const currentHash = readCurrentHash();

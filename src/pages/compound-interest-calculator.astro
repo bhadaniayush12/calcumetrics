@@ -387,6 +387,7 @@ const jsonld = {
    */
 
   import { validate, type ValidationRules } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { serializeHash, restoreFromHash, readCurrentHash, updateHash } from '../lib/url-state';
   import { setResult } from '../lib/result-bus';
   import { calcLumpSum, type CompoundFrequency } from '../lib/calculators/lumpsum';
@@ -467,14 +468,36 @@ const jsonld = {
 
     if (!pInput || !rInput || !yInput) return;
 
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
+
     const DEFAULTS = { principal: 100000, rate: 8, years: 10, frequency: 'annually' as CompoundFrequency };
     let timer: ReturnType<typeof setTimeout>;
 
     function recalc() {
       // ── Phase 4.3: Centralized validation engine ──────────────────────
-      const pResult = validate(pInput.value, CI_RULES.principal);
-      const rResult = validate(rInput.value, CI_RULES.rate);
-      const yResult = validate(yInput.value, CI_RULES.years);
+      const isEur = currLocale === 'de-DE';
+      const numP = parseSmartInput(pInput.value, isEur ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, isEur ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput.value, isEur ? 'EUR' : undefined);
+
+      const pResult = validate(numP ?? pInput.value, CI_RULES.principal);
+      const rResult = validate(numR ?? rInput.value, CI_RULES.rate);
+      const yResult = validate(numY ?? yInput.value, CI_RULES.years);
 
       setFieldError('ci-principal', pResult.valid ? undefined : pResult.error.message);
       setFieldError('ci-rate', rResult.valid ? undefined : rResult.error.message);
@@ -542,15 +565,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -708,16 +738,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initCICalc();

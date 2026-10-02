@@ -80,106 +80,19 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
     </ol>
   </nav>
 
-  <!-- macOS Get Info Inspector Button -->
-  <button
-    type="button"
-    id="get-info-btn"
-    aria-label="Get Info (⌘I)"
-    title="Get Info (⌘I)"
-    class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard cursor-pointer shadow-mac-subtle select-none"
+  <!-- Formulas & Methodology Link -->
+  <a
+    href="/methodology"
+    class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard shadow-mac-subtle select-none focus-visible:outline-accent"
   >
-    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="16" x2="12" y2="12" />
       <line x1="12" y1="8" x2="12.01" y2="8" />
     </svg>
-    <span class="font-medium">Get Info</span>
-    <kbd class="text-[10px] text-text-muted font-mono bg-canvas border border-border px-1 py-0.2 rounded hidden sm:inline">⌘I</kbd>
-  </button>
-</div>
-
-<!-- macOS Get Info Inspector Modal (⌘I) -->
-<div
-  id="calc-get-info-modal"
-  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[110] hidden items-center justify-center p-4 select-none"
-  role="dialog"
-  aria-modal="true"
-  aria-label="Calculator Information Inspector"
->
-  <div class="bg-surface border border-border rounded-card shadow-mac max-w-md w-full p-6 animate-in fade-in zoom-in-95 duration-150 relative">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-border pb-3 mb-4">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-sm font-bold">
-          ℹ️
-        </div>
-        <div>
-          <p class="text-sm font-bold text-text-primary">{toolName}</p>
-          <p class="text-[11px] text-text-muted">Inspector · Mathematical Specifications</p>
-        </div>
-      </div>
-      <button
-        type="button"
-        id="get-info-close"
-        class="text-text-muted hover:text-text-primary p-1 rounded-control transition-standard cursor-pointer"
-        aria-label="Close inspector"
-      >
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- Inspector Specifications -->
-    <div class="space-y-3.5 text-xs">
-      <div class="p-3 bg-canvas border border-border rounded-control space-y-1">
-        <span class="text-[10px] font-bold uppercase tracking-wider text-text-muted block">Mathematical Model</span>
-        <p class="text-text-primary font-medium leading-relaxed">
-          Standardized statutory &amp; financial equations verified with automated unit test fixtures.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-2 text-[11px]">
-        <div class="p-2.5 bg-canvas border border-border rounded-control">
-          <span class="text-text-muted block text-[10px] uppercase font-bold">Category</span>
-          <span class="text-text-primary font-semibold">{category}</span>
-        </div>
-        <div class="p-2.5 bg-canvas border border-border rounded-control">
-          <span class="text-text-muted block text-[10px] uppercase font-bold">Rates Verified</span>
-          <span class="text-emerald-700 dark:text-emerald-400 font-semibold">Sep 2026 (Quarterly)</span>
-        </div>
-        <div class="p-2.5 bg-canvas border border-border rounded-control">
-          <span class="text-text-muted block text-[10px] uppercase font-bold">Execution</span>
-          <span class="text-text-primary font-semibold">100% Client-Side</span>
-        </div>
-        <div class="p-2.5 bg-canvas border border-border rounded-control">
-          <span class="text-text-muted block text-[10px] uppercase font-bold">Privacy</span>
-          <span class="text-accent font-semibold">0 Server Storage</span>
-        </div>
-      </div>
-
-      <div class="text-[11px] text-text-muted leading-relaxed">
-        Inputs are reactive and recalculated continuously in your browser memory without network latency or data transmission.
-      </div>
-
-      <div class="pt-2 border-t border-border flex items-center justify-between">
-        <a href="/methodology" class="text-xs font-semibold text-accent hover:underline inline-flex items-center gap-1">
-          <span>How is this calculated? Read Methodology &amp; Proofs</span>
-          <span>→</span>
-        </a>
-      </div>
-    </div>
-
-    <div class="mt-4 pt-3 border-t border-border flex justify-end">
-      <button
-        type="button"
-        id="get-info-dismiss"
-        class="px-3.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer"
-      >
-        Done (ESC)
-      </button>
-    </div>
-  </div>
+    <span class="font-medium">Formulas &amp; Methodology</span>
+    <span aria-hidden="true" class="text-accent">&rarr;</span>
+  </a>
 </div>
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->
@@ -599,6 +512,25 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
         }
       });
 
+      // Item 23: Multi-tab currency & theme synchronization
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'cm_currency' && e.newValue) {
+          syncCurrencyFromStorage();
+          const normalized = normalizeCurrency(e.newValue);
+          const config = getCurrencyConfig(normalized);
+          window.dispatchEvent(
+            new CustomEvent('cm:currency-change', {
+              detail: { label: config.label, code: config.code, symbol: config.symbol, format: config.grouping },
+            })
+          );
+        }
+        if (e.key === 'cm_theme' && e.newValue) {
+          const isDark = e.newValue === 'dark';
+          document.documentElement.classList.toggle('dark', isDark);
+          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        }
+      });
+
       // Generic currency prefix updater — registered only once (bypassed for region-locked tools)
       window.addEventListener('cm:currency-change', (e: any) => {
         if (isJurisdictionLocked(window.location.pathname)) return;
@@ -636,42 +568,7 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
       }
     }
 
-    // ── Get Info Inspector Panel (⌘I) ──────────────────────────────────
-    const getInfoBtn = document.getElementById('get-info-btn');
-    const getInfoModal = document.getElementById('calc-get-info-modal');
-    const getInfoClose = document.getElementById('get-info-close');
-    const getInfoDismiss = document.getElementById('get-info-dismiss');
 
-    function toggleGetInfo(force?: boolean) {
-      if (!getInfoModal) return;
-      const isOpen = !getInfoModal.classList.contains('hidden');
-      const shouldOpen = typeof force === 'boolean' ? force : !isOpen;
-
-      if (shouldOpen) {
-        getInfoModal.classList.remove('hidden');
-        getInfoModal.classList.add('flex');
-      } else {
-        getInfoModal.classList.add('hidden');
-        getInfoModal.classList.remove('flex');
-      }
-    }
-
-    getInfoBtn?.addEventListener('click', () => toggleGetInfo(true));
-    getInfoClose?.addEventListener('click', () => toggleGetInfo(false));
-    getInfoDismiss?.addEventListener('click', () => toggleGetInfo(false));
-
-    getInfoModal?.addEventListener('click', (e) => {
-      if (e.target === getInfoModal) toggleGetInfo(false);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'i') {
-        e.preventDefault();
-        toggleGetInfo();
-      } else if (e.key === 'Escape' && getInfoModal && !getInfoModal.classList.contains('hidden')) {
-        toggleGetInfo(false);
-      }
-    });
 
     // ── Auto-track Recently Used Tools ────────────────────────────────
     try {

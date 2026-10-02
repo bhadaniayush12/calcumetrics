@@ -88,11 +88,132 @@ export function formatLiveInput(raw: string, format: LocaleFormat): string {
 }
 
 /**
+ * Universal smart input parser:
+ * - Shorthand multipliers:
+ *   k/K: * 1,000
+ *   m/M: * 1,000,000
+ *   b/B: * 1,000,000,000
+ *   l/L/lac/lacs/lakh/lakhs: * 100,000
+ *   cr/Cr/crore/crores: * 10,000,000
+ * - European decimal comma notation:
+ *   - "4,5" -> 4.5
+ *   - "4,5%" -> 4.5
+ *   - "1.000,50" -> 1000.50
+ *   - When activeCurrency is EUR, single commas act as decimal points (e.g. "1000,50" -> 1000.50)
+ * - Supports negative numbers, leading currency symbols (₹, $, €, £), percentage signs (%)
+ * - Returns number | null
+ */
+export function parseSmartInput(
+  str: string | number | null | undefined,
+  activeCurrency?: string
+): number | null {
+  if (typeof str === 'number') {
+    return isFinite(str) ? (Object.is(str, -0) ? 0 : str) : null;
+  }
+  if (typeof str !== 'string') return null;
+
+  let s = str.trim();
+  if (!s) return null;
+
+  const lower = s.toLowerCase();
+  if (lower === 'infinity' || lower === '+infinity') return Infinity;
+  if (lower === '-infinity') return -Infinity;
+
+  // Strip known currency symbols
+  const CURRENCY_SYMBOLS_REGEX = /[₹$€£]/g;
+  s = s.replace(CURRENCY_SYMBOLS_REGEX, '').trim();
+
+  // Strip percentage sign
+  s = s.replace(/%/g, '').trim();
+
+  // Check sign
+  let sign = 1;
+  if (s.startsWith('-')) {
+    sign = -1;
+    s = s.slice(1).trimStart();
+  } else if (s.startsWith('+')) {
+    s = s.slice(1).trimStart();
+  }
+
+  // Strip currency symbols again if symbol was placed after sign (e.g. "-₹10,000")
+  s = s.replace(CURRENCY_SYMBOLS_REGEX, '').trim();
+  if (!s) return null;
+
+  // Check for shorthand multipliers at the end
+  const suffixMatch = s.match(/^(.*?)\s*(crores?|cr|lakhs?|lacs?|l|k|m|b)$/i);
+  let multiplier = 1;
+  let baseStr = s;
+
+  if (suffixMatch) {
+    baseStr = suffixMatch[1].trim();
+    const suf = suffixMatch[2].toLowerCase();
+    if (suf === 'k') multiplier = 1e3;
+    else if (suf === 'm') multiplier = 1e6;
+    else if (suf === 'b') multiplier = 1e9;
+    else if (suf === 'cr' || suf === 'crore' || suf === 'crores') multiplier = 1e7;
+    else if (suf === 'l' || suf === 'lac' || suf === 'lacs' || suf === 'lakh' || suf === 'lakhs') multiplier = 1e5;
+  }
+
+  if (!baseStr) return null;
+
+  let normalized: string;
+  const hasComma = baseStr.includes(',');
+  const hasDot = baseStr.includes('.');
+
+  if (hasComma && hasDot) {
+    const lastComma = baseStr.lastIndexOf(',');
+    const lastDot = baseStr.lastIndexOf('.');
+    if (lastComma > lastDot) {
+      // European format: "1.000,50" or "1.234.567,89"
+      normalized = baseStr.replace(/\./g, '').replace(',', '.');
+    } else {
+      // International or Indian format: "1,000.50" or "10,00,000.50"
+      normalized = baseStr.replace(/,/g, '');
+    }
+  } else if (hasComma) {
+    const commaCount = (baseStr.match(/,/g) || []).length;
+    if (commaCount > 1) {
+      // Multiple commas: e.g. "1,000,000" or "10,00,000" -> thousand separators
+      normalized = baseStr.replace(/,/g, '');
+    } else {
+      // Exactly one comma
+      const parts = baseStr.split(',');
+      const isEur = activeCurrency?.toUpperCase() === 'EUR';
+      // In Europe or when digits after comma != 3 (e.g. "4,5", "12,75", "0,5"), treat as decimal point
+      if (isEur || parts[1].length !== 3) {
+        normalized = `${parts[0]}.${parts[1]}`;
+      } else {
+        // e.g. "50,000" in USD/INR -> thousand separator
+        normalized = baseStr.replace(/,/g, '');
+      }
+    }
+  } else {
+    normalized = baseStr;
+  }
+
+  // Validate normalized numeric format
+  if (!/^\d+(\.\d+)?$/.test(normalized) && !/^\.\d+$/.test(normalized)) {
+    return null;
+  }
+
+  const num = parseFloat(normalized);
+  if (isNaN(num) || !isFinite(num)) return null;
+
+  let result = sign * num * multiplier;
+  if (Object.is(result, -0)) result = 0;
+  return result;
+}
+
+/**
  * Strip formatting characters and parse to float.
+ * Uses parseSmartInput for shorthand and European notation support.
  * Returns NaN if not a valid number.
  */
-export function parseFormattedNumber(value: string): number {
-  return parseFloat(value.replace(/[^0-9.-]/g, ''));
+export function parseFormattedNumber(value: string, activeCurrency?: string): number {
+  const smart = parseSmartInput(value, activeCurrency);
+  if (smart !== null) return smart;
+  const legacy = parseFloat(value.replace(/[^0-9.-]/g, ''));
+  return legacy;
 }
 
 /**

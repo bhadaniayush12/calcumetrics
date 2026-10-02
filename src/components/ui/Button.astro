@@ -103,23 +103,36 @@ const combinedClasses = `${baseClasses} ${sizeClasses[size]} ${variantClasses[va
       btn.addEventListener('click', async () => {
         const textToCopy = btn.getAttribute('data-copy-text') || btn.innerText;
         try {
-          if (navigator.clipboard) {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(textToCopy);
+          } else {
+            throw new Error('Clipboard API unavailable');
           }
-          const label = btn.querySelector('.btn-label');
-          const copied = btn.querySelector('.btn-copied-label');
-          if (label && copied) {
-            label.classList.add('hidden');
-            copied.classList.remove('hidden');
-            copied.classList.add('inline-flex');
-            setTimeout(() => {
-              label.classList.remove('hidden');
-              copied.classList.add('hidden');
-              copied.classList.remove('inline-flex');
-            }, 2000);
+        } catch {
+          try {
+            const ta = document.createElement('textarea');
+            ta.value = textToCopy;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+          } catch (e) {
+            console.error('Failed to copy', e);
           }
-        } catch (e) {
-          console.error('Failed to copy', e);
+        }
+        const label = btn.querySelector('.btn-label');
+        const copied = btn.querySelector('.btn-copied-label');
+        if (label && copied) {
+          label.classList.add('hidden');
+          copied.classList.remove('hidden');
+          copied.classList.add('inline-flex');
+          setTimeout(() => {
+            label.classList.remove('hidden');
+            copied.classList.add('hidden');
+            copied.classList.remove('inline-flex');
+          }, 2000);
         }
       });
     });

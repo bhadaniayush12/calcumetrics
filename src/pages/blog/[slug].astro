@@ -33,7 +33,7 @@ const jsonld = {
       dateModified: post.dateModified,
       image: [articleOgImageUrl],
       author: {
-        '@type': 'Person',
+        '@type': 'Organization',
         name: post.author,
         url: 'https://calcumetrics.com/about',
       },
@@ -151,7 +151,18 @@ const jsonld = {
     <!-- Prominent Quick Tool Access Callout -->
     <aside aria-label="Related Calculators" class="mb-8 p-4 sm:p-5 bg-surface border border-accent/30 rounded-card shadow-sm">
       <div class="flex items-center gap-2 mb-2">
-        <span class="text-base" aria-hidden="true">🧮</span>
+        <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+          <line x1="8" y1="6" x2="16" y2="6"></line>
+          <line x1="16" y1="14" x2="16" y2="18"></line>
+          <path d="M16 10h.01"></path>
+          <path d="M12 10h.01"></path>
+          <path d="M8 10h.01"></path>
+          <path d="M12 14h.01"></path>
+          <path d="M8 14h.01"></path>
+          <path d="M12 18h.01"></path>
+          <path d="M8 18h.01"></path>
+        </svg>
         <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-primary">
           Calcumetrics Interactive Calculation Tools
         </h2>
@@ -252,9 +263,9 @@ const jsonld = {
         <h3 class="text-sm font-bold text-text-primary mb-1">
           Written by <a href="/about" class="text-accent hover:underline">{post.author}</a>
         </h3>
-        <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">Calcumetrics Contributor</span>
+        <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">Financial Research &amp; Editorial Board</span>
         <p class="text-xs text-text-muted leading-relaxed mt-2">
-          This guide is part of the Calcumetrics editorial library, created to explain financial concepts and calculations clearly for readers using the platform.
+          This guide was developed and fact-checked by the Calcumetrics Editorial Team to explain financial formulas, tax rules, and calculation methodologies clearly for our readers.
         </p>
       </div>
     </div>
@@ -262,7 +273,9 @@ const jsonld = {
     <!-- Author & Trust Disclaimer Note (§4) -->
     <div class="mt-12 p-5 bg-surface/50 border border-border rounded-card text-xs text-text-muted leading-relaxed space-y-2">
       <div class="flex items-center gap-2 text-text-primary font-semibold text-xs uppercase tracking-wider">
-        <span>🛡️</span>
+        <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
         <span>Editorial Standards &amp; Financial Disclaimer</span>
       </div>
       <p>

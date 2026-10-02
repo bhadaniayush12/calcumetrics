@@ -41,21 +41,25 @@ const resolvedOgAlt = ogImageAlt || title;
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) with Google Consent Mode v2 -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('consent', 'default', {
-        'ad_storage': 'denied',
-        'ad_user_data': 'denied',
-        'ad_personalization': 'denied',
-        'analytics_storage': 'granted'
-      });
-      gtag('js', new Date());
+    <!-- Google tag (gtag.js) with Google Consent Mode v2 (production only) -->
+    {import.meta.env.PROD && (
+      <>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
+        <script is:inline>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'granted'
+          });
+          gtag('js', new Date());
 
-      gtag('config', 'G-BGJDT7C82V');
-    </script>
+          gtag('config', 'G-BGJDT7C82V');
+        </script>
+      </>
+    )}
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -113,8 +117,10 @@ const resolvedOgAlt = ogImageAlt || title;
     <link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- Cloudflare Web Analytics (Cookieless, privacy-preserving) -->
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "01d0a5f7cefa40f4b360b031d279cf43"}'></script>
+    <!-- Cloudflare Web Analytics (Cookieless, privacy-preserving, production only) -->
+    {import.meta.env.PROD && (
+      <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "01d0a5f7cefa40f4b360b031d279cf43"}'></script>
+    )}
 
     <!-- Page-specific head content (JSON-LD, extra meta, etc.) -->
     <slot name="head" />

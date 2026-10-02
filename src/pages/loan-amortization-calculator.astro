@@ -399,6 +399,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcAmortization } from '../lib/finance/amortization';
@@ -409,14 +410,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initAmortCalc() {
-    if ((window as any).__cmAmortBound) return;
-    (window as any).__cmAmortBound = true;
-
     const pInput = document.getElementById('amort-principal') as HTMLInputElement | null;
     const rInput = document.getElementById('amort-rate') as HTMLInputElement | null;
     const yInput = document.getElementById('amort-years') as HTMLInputElement | null;
@@ -435,6 +433,22 @@ const jsonld = {
     const errMsg = document.getElementById('amort-error-msg');
 
     if (!pInput || !rInput || !yInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
 
     const DEFAULTS = { principal: 1000000, rate: 9.5, years: 5 };
     let timer: ReturnType<typeof setTimeout>;
@@ -448,13 +462,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
-      const rawY = yInput!.value.replace(/[^0-9.]/g, '');
+      const numP = parseSmartInput(pInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vP = validate(rawP, { required: true, min: 1000, label: 'Principal' });
-      const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
-      const vY = validate(rawY, { required: true, min: 1, max: 40, integer: true, label: 'Loan Tenure' });
+      const vP = validate(numP ?? '', { required: true, min: 1000, label: 'Principal' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
+      const vY = validate(numY ?? '', { required: true, min: 1, max: 40, integer: true, label: 'Loan Tenure' });
 
       if (!vP.valid) { showError(vP.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -516,15 +530,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -564,19 +585,30 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('amort-copy-btn')?.addEventListener('click', async () => {
-      const rawP = pInput.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput.value.replace(/[^0-9.]/g, '');
-      const rawY = yInput.value.replace(/[^0-9.]/g, '');
+      const numP = parseSmartInput(pInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vP = validate(rawP, { required: true, min: 1000, label: 'Principal' });
-      const vR = validate(rawR, { required: true, min: 0.1, label: 'Rate' });
-      const vY = validate(rawY, { required: true, min: 1, label: 'Years' });
+      const vP = validate(numP ?? '', { required: true, min: 1000, label: 'Principal' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'Rate' });
+      const vY = validate(numY ?? '', { required: true, min: 1, label: 'Years' });
 
       if (!vP.valid || !vR.valid || !vY.valid) return;
 
       const res = calcAmortization(vP.value!, vR.value!, vY.value!);
       const text = `Loan Amortization: Principal ${fmtVal(vP.value!)} at ${vR.value}% for ${vY.value} years => Monthly EMI: ${fmtVal(res.emi)} (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('amort-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -586,7 +618,18 @@ const jsonld = {
     });
 
     document.getElementById('amort-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('amort-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -614,16 +657,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initAmortCalc();

@@ -130,7 +130,7 @@ const jsonld = {
 
       <!-- Surcharge Disclaimer (§18) -->
       <div class="mb-5 p-3 rounded-card bg-amber-500/10 border border-amber-500/20 text-xs text-text-muted leading-relaxed">
-        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">⚠️ Surcharge Disclaimer:</strong>
+        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">Surcharge Disclaimer:</strong>
         Computations calculate base New Regime tax, ₹75k standard deduction, and 4% Cess. <strong>Surcharge on taxable income exceeding ₹50 Lakh (10% to 25%) is not modeled.</strong>
       </div>
 
@@ -399,14 +399,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initSalaryCTCCalc() {
-    if ((window as any).__cmCtcBound) return;
-    (window as any).__cmCtcBound = true;
-
     const ctcInput = document.getElementById('ctc-amount') as HTMLInputElement | null;
     const ctcSlider = document.getElementById('ctc-amount-slider') as HTMLInputElement | null;
 
@@ -423,6 +420,12 @@ const jsonld = {
 
     if (!ctcInput) return;
 
+    if (ctcInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    ctcInput.dataset.bound = 'true';
+
     const DEFAULTS = { ctc: 1200000 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -435,8 +438,8 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawCTC = ctcInput!.value.replace(/[^0-9.]/g, '');
-      const vCTC = validate(rawCTC, { required: true, min: 100000, label: 'Annual CTC' });
+      const numCTC = parseSmartInput(ctcInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vCTC = validate(numCTC ?? '', { required: true, min: 100000, label: 'Annual CTC' });
 
       if (!vCTC.valid) { showError(vCTC.error!.message); return; }
       clearError();
@@ -521,12 +524,23 @@ const jsonld = {
     });
 
     document.getElementById('ctc-copy-btn')?.addEventListener('click', async () => {
-      const rawCTC = ctcInput.value.replace(/[^0-9.]/g, '');
-      const vCTC = validate(rawCTC, { required: true, min: 100000, label: 'CTC' });
+      const numCTC = parseSmartInput(ctcInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vCTC = validate(numCTC ?? '', { required: true, min: 100000, label: 'CTC' });
       if (!vCTC.valid) return;
       const res = calcSalaryCTC(vCTC.value!);
       const text = `Salary Breakdown for ${fmtVal(res.ctc)} CTC: Net In-Hand: ${fmtVal(res.netMonthlySalary)}/mo (Gross: ${fmtVal(res.grossMonthlySalary)}/mo, Basic: ${fmtVal(res.basic)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ctc-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -536,7 +550,18 @@ const jsonld = {
     });
 
     document.getElementById('ctc-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('ctc-share-btn');
       if (btn) {
         const orig = btn.textContent;

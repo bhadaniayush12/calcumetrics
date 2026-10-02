@@ -404,6 +404,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
@@ -427,12 +428,12 @@ const jsonld = {
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
-  function fmtIndianInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+  function fmtIndianInput(raw: string) {
+    const n = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return n === null || isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
 
   function initPV() {
-    if ((window as any).__cmPVBound) return;
-    (window as any).__cmPVBound = true;
-
     const futurEl = document.getElementById('pv-future') as HTMLInputElement | null;
     const rateEl  = document.getElementById('pv-rate') as HTMLInputElement | null;
     const yearsEl = document.getElementById('pv-years') as HTMLInputElement | null;
@@ -443,6 +444,22 @@ const jsonld = {
     const errAlert  = document.getElementById('pv-error-alert');
     const errMsg    = document.getElementById('pv-error-msg');
     if (!futurEl || !rateEl || !yearsEl) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (futurEl.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    futurEl.dataset.bound = 'true';
 
     const DEFAULTS = { fv: 100000, rate: 8, years: 10 };
     let timer: ReturnType<typeof setTimeout>;
@@ -451,8 +468,8 @@ const jsonld = {
     function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
 
     function recalc() {
-      const rawFv = futurEl!.value.replace(/[^0-9.]/g, '');
-      const vFv = validate(rawFv, pvSchema.fv);
+      const numFv = parseSmartInput(futurEl!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vFv = validate(numFv ?? '', pvSchema.fv);
       const vR  = validate(rateEl!.value, pvSchema.r);
       const vY  = validate(yearsEl!.value, pvSchema.y);
 
@@ -545,20 +562,43 @@ const jsonld = {
     [futurEl, rateEl, yearsEl].forEach(el => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
 
     document.getElementById('pv-copy-btn')?.addEventListener('click', async () => {
-      const rawFv = futurEl.value.replace(/[^0-9.]/g, '');
-      const vFv = validate(rawFv, pvSchema.fv);
+      const numFv = parseSmartInput(futurEl.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vFv = validate(numFv ?? '', pvSchema.fv);
       const vR  = validate(rateEl.value, pvSchema.r);
       const vY  = validate(yearsEl.value, pvSchema.y);
       if (!vFv.valid || !vR.valid || !vY.valid) return;
       const n = FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1;
       const res = calcPVClient(vFv.value!, vR.value!, vY.value!, n);
-      await navigator.clipboard.writeText(`Present Value: ${fmt(res.pv)} (FV: ${fmt(vFv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`);
+      const textToCopy = `Present Value: ${fmt(res.pv)} (FV: ${fmt(vFv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('pv-copy-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
     });
 
     document.getElementById('pv-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('pv-share-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
     });
@@ -578,16 +618,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initPV();

@@ -423,6 +423,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcAmortization } from '../lib/finance/amortization';
@@ -433,14 +434,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initMortgageCalc() {
-    if ((window as any).__cmMortBound) return;
-    (window as any).__cmMortBound = true;
-
     const priceInput = document.getElementById('mort-price') as HTMLInputElement | null;
     const downInput = document.getElementById('mort-down') as HTMLInputElement | null;
     const rateInput = document.getElementById('mort-rate') as HTMLInputElement | null;
@@ -461,6 +459,22 @@ const jsonld = {
     const errMsg = document.getElementById('mort-error-msg');
 
     if (!priceInput || !downInput || !rateInput || !yearsInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved && !saved.includes('USD')) {
+        currSym = saved.includes('€') ? '€' : saved.includes('£') ? '£' : saved.includes('₹') ? '₹' : '$';
+        currLocale = saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : saved.includes('INR') ? 'en-IN' : 'en-US';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (priceInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    priceInput.dataset.bound = 'true';
 
     const DEFAULTS = { homePrice: 400000, downPaymentPct: 20, rate: 6.75, years: 30 };
     let timer: ReturnType<typeof setTimeout>;
@@ -474,15 +488,15 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawPrice = priceInput!.value.replace(/[^0-9.]/g, '');
-      const rawDown = downInput!.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+      const numPrice = parseSmartInput(priceInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numDown = parseSmartInput(downInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vPrice = validate(rawPrice, { required: true, min: 10000, label: 'Home Price' });
-      const vDown = validate(rawDown, { required: true, min: 0, max: 99, decimal: true, label: 'Down Payment %' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, max: 50, integer: true, label: 'Loan Term' });
+      const vPrice = validate(numPrice ?? '', { required: true, min: 10000, label: 'Home Price' });
+      const vDown = validate(numDown ?? '', { required: true, min: 0, max: 99, decimal: true, label: 'Down Payment %' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
+      const vYears = validate(numYears ?? '', { required: true, min: 1, max: 50, integer: true, label: 'Loan Term' });
 
       if (!vPrice.valid) { showError(vPrice.error!.message); return; }
       if (!vDown.valid) { showError(vDown.error!.message); return; }
@@ -544,15 +558,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -598,22 +619,33 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('mort-copy-btn')?.addEventListener('click', async () => {
-      const rawPrice = priceInput.value.replace(/[^0-9.]/g, '');
-      const rawDown = downInput.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+      const numPrice = parseSmartInput(priceInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numDown = parseSmartInput(downInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vPrice = validate(rawPrice, { required: true, min: 10000, label: 'Price' });
-      const vDown = validate(rawDown, { required: true, min: 0, max: 99, label: 'Down' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, label: 'Years' });
+      const vPrice = validate(numPrice ?? '', { required: true, min: 10000, label: 'Price' });
+      const vDown = validate(numDown ?? '', { required: true, min: 0, max: 99, label: 'Down' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0.1, label: 'Rate' });
+      const vYears = validate(numYears ?? '', { required: true, min: 1, label: 'Years' });
 
       if (!vPrice.valid || !vDown.valid || !vRate.valid || !vYears.valid) return;
 
       const p = vPrice.value! * (1 - vDown.value! / 100);
       const res = calcAmortization(p, vRate.value!, vYears.value!);
       const text = `Mortgage: ${fmtVal(vPrice.value!)} home (${vDown.value}% down) at ${vRate.value}% for ${vYears.value} years => Monthly Payment: ${fmtVal(res.emi)} (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('mort-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -623,7 +655,18 @@ const jsonld = {
     });
 
     document.getElementById('mort-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('mort-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -653,17 +696,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      // Only override the default USD if the user has explicitly saved a different currency
-      if (saved && !saved.includes('USD')) {
-        currSym = saved.includes('€') ? '€' : saved.includes('£') ? '£' : saved.includes('₹') ? '₹' : '$';
-        currLocale = saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : saved.includes('INR') ? 'en-IN' : 'en-US';
-      }
-    } catch (e) {}
   }
 
   initMortgageCalc();

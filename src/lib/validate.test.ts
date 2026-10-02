@@ -401,6 +401,13 @@ describe('Phase 4.3 — Centralized Validation Engine', () => {
         // Whitespace trimming with formatted numbers
         expect(validate('   10,00,000   ').value).toBe(1000000);
         expect(validate('   $1,000.50   ').value).toBe(1000.5);
+
+        // Shorthand inputs (Item 17)
+        expect(validate('55k').value).toBe(55000);
+        expect(validate('1.5M').value).toBe(1500000);
+        expect(validate('10L').value).toBe(1000000);
+        expect(validate('1.5Cr').value).toBe(15000000);
+        expect(validate('4,5%').value).toBe(4.5);
       });
     });
 

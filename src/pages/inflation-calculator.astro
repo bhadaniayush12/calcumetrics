@@ -381,6 +381,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcInflation } from '../lib/finance/time-value';
@@ -391,14 +392,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initInflationCalc() {
-    if ((window as any).__cmInfBound) return;
-    (window as any).__cmInfBound = true;
-
     const amtInput = document.getElementById('inf-amount') as HTMLInputElement | null;
     const rateInput = document.getElementById('inf-rate') as HTMLInputElement | null;
     const yearsInput = document.getElementById('inf-years') as HTMLInputElement | null;
@@ -417,6 +415,22 @@ const jsonld = {
     const errMsg = document.getElementById('inf-error-msg');
 
     if (!amtInput || !rateInput || !yearsInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (amtInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    amtInput.dataset.bound = 'true';
 
     const DEFAULTS = { amount: 100000, rate: 6, years: 10 };
     let timer: ReturnType<typeof setTimeout>;
@@ -430,13 +444,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawAmt = amtInput!.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput!.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput!.value.replace(/[^0-9.]/g, '');
+      const numAmt = parseSmartInput(amtInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vAmt = validate(rawAmt, { required: true, min: 1, label: 'Current Amount' });
-      const vRate = validate(rawRate, { required: true, min: 0, max: 100, decimal: true, label: 'Inflation Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, max: 100, integer: true, label: 'Years' });
+      const vAmt = validate(numAmt ?? '', { required: true, min: 1, label: 'Current Amount' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Inflation Rate' });
+      const vYears = validate(numYears ?? '', { required: true, min: 1, max: 100, integer: true, label: 'Years' });
 
       if (!vAmt.valid) { showError(vAmt.error!.message); return; }
       if (!vRate.valid) { showError(vRate.error!.message); return; }
@@ -496,15 +510,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -544,19 +565,30 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('inf-copy-btn')?.addEventListener('click', async () => {
-      const rawAmt = amtInput.value.replace(/[^0-9.]/g, '');
-      const rawRate = rateInput.value.replace(/[^0-9.]/g, '');
-      const rawYears = yearsInput.value.replace(/[^0-9.]/g, '');
+      const numAmt = parseSmartInput(amtInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vAmt = validate(rawAmt, { required: true, min: 1, label: 'Amount' });
-      const vRate = validate(rawRate, { required: true, min: 0, max: 100, label: 'Rate' });
-      const vYears = validate(rawYears, { required: true, min: 1, max: 100, label: 'Years' });
+      const vAmt = validate(numAmt ?? '', { required: true, min: 1, label: 'Amount' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0, max: 100, label: 'Rate' });
+      const vYears = validate(numYears ?? '', { required: true, min: 1, max: 100, label: 'Years' });
 
       if (!vAmt.valid || !vRate.valid || !vYears.valid) return;
 
       const res = calcInflation(vAmt.value!, vRate.value!, vYears.value!);
       const text = `Inflation Impact: Today's ${fmtVal(vAmt.value!)} will cost ${fmtVal(res.futureCost)} in ${vYears.value} years at ${vRate.value}% annual inflation (Purchasing power drops to ${fmtVal(res.futurePurchasingPower)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('inf-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -566,7 +598,18 @@ const jsonld = {
     });
 
     document.getElementById('inf-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('inf-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -594,16 +637,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initInflationCalc();

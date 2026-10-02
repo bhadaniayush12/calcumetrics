@@ -14,7 +14,7 @@ import Input from '../../components/ui/Input.astro';
 import Dropdown from '../../components/ui/Dropdown.astro';
 import Alert from '../../components/ui/Alert.astro';
 import { calcGST } from '../../lib/calculators/taxes';
-import { formatIndian, formatIndianCompact } from '../../lib/formatters';
+import { formatIndian, formatIndianCompact, parseSmartInput } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
 
 const DEFAULT = { amount: 10000, slab: 18, isInterState: false, direction: 'add' as const };
@@ -569,6 +569,12 @@ const jsonld = {
 
     if (!amtInput) return;
 
+    if (amtInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    amtInput.dataset.bound = 'true';
+
     const DEFAULTS = { amount: 10000, slab: 18, direction: 'add' as const, supply: 'intra' };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -581,12 +587,12 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawAmt = amtInput!.value.replace(/[^0-9.]/g, '');
+      const numAmt = parseSmartInput(amtInput!.value);
       const slab = parseFloat(slabSelect ? slabSelect.value : '18') || 0;
       const direction = (dirSelect ? dirSelect.value : 'add') as 'add' | 'remove';
       const isInter = supplySelect ? supplySelect.value === 'inter' : false;
 
-      const vAmt = validate(rawAmt, { required: true, min: 1, label: 'Amount' });
+      const vAmt = validate(numAmt ?? amtInput!.value, { required: true, min: 1, label: 'Amount' });
       if (!vAmt.valid) { showError(vAmt.error!.message); return; }
       clearError();
 
@@ -691,15 +697,20 @@ const jsonld = {
       });
     }
     amtInput.addEventListener('input', () => {
-      const raw = amtInput.value.replace(/[^0-9.]/g, '');
-      const num = parseFloat(raw);
-      if (amtSlider && !isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
+      const num = parseSmartInput(amtInput.value);
+      if (amtSlider && num !== null && !isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
         amtSlider.value = String(num);
         const pct = ((num - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
         amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
       }
-      amtInput.value = fmtLiveInput(raw);
       debounce();
+    });
+    amtInput.addEventListener('blur', () => {
+      const num = parseSmartInput(amtInput.value);
+      if (num !== null && !isNaN(num)) {
+        amtInput.value = fmtLiveInput(String(num));
+        recalc();
+      }
     });
 
     slabSelect?.addEventListener('change', recalc);
@@ -759,7 +770,18 @@ const jsonld = {
 
       const res = calcGST(vAmt.value!, slab, isInter, dir);
       const text = `GST Calculation: Amount ${fmtVal(vAmt.value!)} at ${slab}% (${dir}) = GST ${fmtVal(res.gstAmount)}, Total ${fmtVal(res.totalAmount)}. Calculated on Calcumetrics: ${location.href}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       if (copyBtn) {
         const orig = copyBtn.textContent;
         copyBtn.textContent = 'Copied!';
@@ -768,7 +790,18 @@ const jsonld = {
     });
 
     shareBtn?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       if (shareBtn) {
         const orig = shareBtn.textContent;
         shareBtn.textContent = 'Copied Link!';

@@ -320,7 +320,7 @@ const totalToolsCount = getToolCount();
         <!-- Privacy Status Badge -->
         <div class="bg-accent/10 border border-accent/20 rounded p-2 flex items-center gap-2 text-[11px] text-text-primary">
           <div class="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-          <span>100% Client-Side • Zero Trackers</span>
+          <span>100% Client-Side Calculations</span>
         </div>
       </div>
     </div>
@@ -473,7 +473,88 @@ const totalToolsCount = getToolCount();
 </header>
 
 <script>
-  import { CURRENCY_CONFIG, normalizeCurrency } from '../lib/currency';
+  import { CURRENCY_CONFIG, normalizeCurrency, detectUserCurrency, isJurisdictionLocked } from '../lib/currency';
+
+  function applyCurrency(val: string, broadcast = true) {
+    const code = normalizeCurrency(val);
+    const config = CURRENCY_CONFIG[code];
+    const normalizedLabel = config.label;
+
+    const currencyLabel = document.getElementById('current-currency-label');
+    const mobileCurrencySelect = document.getElementById('mobile-currency-select') as HTMLSelectElement | null;
+    const currencyMenu = document.getElementById('header-currency-menu');
+
+    if (currencyLabel) currencyLabel.textContent = normalizedLabel;
+    if (mobileCurrencySelect) mobileCurrencySelect.value = normalizedLabel;
+
+    currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-check]').forEach((el) => {
+      const checkVal = el.getAttribute('data-currency-check');
+      el.classList.toggle('hidden', checkVal !== normalizedLabel);
+    });
+
+    currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-val]').forEach((btn) => {
+      const btnVal = btn.getAttribute('data-currency-val');
+      if (btnVal === normalizedLabel) {
+        btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
+        btn.classList.remove('text-text-primary');
+      } else {
+        btn.classList.remove('bg-canvas', 'text-accent', 'font-semibold');
+        btn.classList.add('text-text-primary');
+      }
+    });
+
+    try {
+      localStorage.setItem('cm_currency', normalizedLabel);
+    } catch (e) {}
+
+    if (!isJurisdictionLocked(window.location.pathname)) {
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = config.symbol;
+      });
+    }
+
+    if (broadcast) {
+      const detail = { label: normalizedLabel, code: config.code, symbol: config.symbol, format: config.grouping };
+      window.dispatchEvent(new CustomEvent('cm:currency-change', { detail }));
+    }
+  }
+
+  function syncThemeUI(isDark: boolean) {
+    const iconMoon = document.getElementById('theme-icon-moon');
+    const iconSun = document.getElementById('theme-icon-sun');
+    const mobileIconMoon = document.getElementById('mobile-theme-icon-moon');
+    const mobileIconSun = document.getElementById('mobile-theme-icon-sun');
+    const metaTheme = document.getElementById('meta-theme-color');
+
+    if (iconMoon) iconMoon.classList.toggle('hidden', isDark);
+    if (iconSun) iconSun.classList.toggle('hidden', !isDark);
+    if (mobileIconMoon) mobileIconMoon.classList.toggle('hidden', isDark);
+    if (mobileIconSun) mobileIconSun.classList.toggle('hidden', !isDark);
+    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0F1211' : '#F7F7F4');
+  }
+
+  function syncControlCenterThemeUI(isDark: boolean) {
+    const ccPopover = document.getElementById('control-center-popover');
+    ccPopover?.querySelectorAll<HTMLButtonElement>('[data-cc-theme]').forEach((btn) => {
+      const mode = btn.getAttribute('data-cc-theme');
+      const active = (mode === 'dark' && isDark) || (mode === 'light' && !isDark);
+      if (active) {
+        btn.className = 'cc-theme-btn py-1 px-2 rounded-control font-semibold bg-surface shadow-sm text-accent text-center transition-standard cursor-pointer flex items-center justify-center gap-1.5';
+      } else {
+        btn.className = 'cc-theme-btn py-1 px-2 rounded-control font-medium text-text-muted hover:text-text-primary text-center transition-standard cursor-pointer flex items-center justify-center gap-1.5';
+      }
+    });
+  }
+
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    try {
+      localStorage.setItem('cm_theme', isDark ? 'dark' : 'light');
+    } catch (e) {}
+    syncThemeUI(isDark);
+    syncControlCenterThemeUI(isDark);
+  }
 
   function initHeaderScripts() {
     // ── 1. Desktop Tools dropdown ───────────────────────────────────────────
@@ -500,19 +581,6 @@ const totalToolsCount = getToolCount();
         e.stopPropagation();
         toggleTools();
       });
-
-      document.addEventListener('click', (e) => {
-        if (!toolsDropdown.contains(e.target as Node) && !toolsBtn.contains(e.target as Node)) {
-          toggleTools(false);
-        }
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !toolsDropdown.classList.contains('hidden')) {
-          toggleTools(false);
-          toolsBtn.focus();
-        }
-      });
     }
 
     // ── 2. Search Buttons (Desktop & Mobile) ─────────────────────────────────
@@ -537,42 +605,7 @@ const totalToolsCount = getToolCount();
     // ── 3. Currency Selector with Persistence & Event Dispatch ──────────────
     const currencyBtn = document.getElementById('header-currency-btn');
     const currencyMenu = document.getElementById('header-currency-menu');
-    const currencyLabel = document.getElementById('current-currency-label');
     const mobileCurrencySelect = document.getElementById('mobile-currency-select') as HTMLSelectElement | null;
-
-    function applyCurrency(val: string, broadcast = true) {
-      const code = normalizeCurrency(val);
-      const config = CURRENCY_CONFIG[code];
-      const normalizedLabel = config.label;
-
-      if (currencyLabel) currencyLabel.textContent = normalizedLabel;
-      if (mobileCurrencySelect) mobileCurrencySelect.value = normalizedLabel;
-
-      currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-check]').forEach((el) => {
-        const checkVal = el.getAttribute('data-currency-check');
-        el.classList.toggle('hidden', checkVal !== normalizedLabel);
-      });
-
-      currencyMenu?.querySelectorAll<HTMLElement>('[data-currency-val]').forEach((btn) => {
-        const btnVal = btn.getAttribute('data-currency-val');
-        if (btnVal === normalizedLabel) {
-          btn.classList.add('bg-canvas', 'text-accent', 'font-semibold');
-          btn.classList.remove('text-text-primary');
-        } else {
-          btn.classList.remove('bg-canvas', 'text-accent', 'font-semibold');
-          btn.classList.add('text-text-primary');
-        }
-      });
-
-      try {
-        localStorage.setItem('cm_currency', normalizedLabel);
-      } catch (e) {}
-
-      if (broadcast) {
-        const detail = { label: normalizedLabel, code: config.code, symbol: config.symbol, format: config.grouping };
-        window.dispatchEvent(new CustomEvent('cm:currency-change', { detail }));
-      }
-    }
 
     // ── Auto-Switch Currency by Regional Route Context ──────────────────────
     const pathname = window.location.pathname;
@@ -593,7 +626,8 @@ const totalToolsCount = getToolCount();
           const normalized = normalizeCurrency(savedCur);
           applyCurrency(CURRENCY_CONFIG[normalized].label, false);
         } else {
-          applyCurrency('₹ INR', false);
+          const detected = detectUserCurrency();
+          applyCurrency(CURRENCY_CONFIG[detected].label, false);
         }
       } catch (e) {}
     }
@@ -620,23 +654,6 @@ const totalToolsCount = getToolCount();
             currencyBtn.focus();
           });
         });
-
-        document.addEventListener('click', (e) => {
-          if (!currencyMenu.contains(e.target as Node) && !currencyBtn.contains(e.target as Node)) {
-            currencyMenu.classList.add('hidden');
-            currencyMenu.classList.remove('flex');
-            currencyBtn.setAttribute('aria-expanded', 'false');
-          }
-        });
-
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && currencyMenu.classList.contains('flex')) {
-            currencyMenu.classList.add('hidden');
-            currencyMenu.classList.remove('flex');
-            currencyBtn.setAttribute('aria-expanded', 'false');
-            currencyBtn.focus();
-          }
-        });
       }
     }
 
@@ -650,28 +667,6 @@ const totalToolsCount = getToolCount();
     // ── 4. Dark Mode Toggle (Desktop & Mobile Sync) ──────────────────────────
     const themeBtn = document.getElementById('theme-toggle-button');
     const mobileThemeBtn = document.getElementById('mobile-theme-toggle');
-    const iconMoon = document.getElementById('theme-icon-moon');
-    const iconSun = document.getElementById('theme-icon-sun');
-    const mobileIconMoon = document.getElementById('mobile-theme-icon-moon');
-    const mobileIconSun = document.getElementById('mobile-theme-icon-sun');
-    const metaTheme = document.getElementById('meta-theme-color');
-
-    function syncThemeUI(isDark: boolean) {
-      if (iconMoon) iconMoon.classList.toggle('hidden', isDark);
-      if (iconSun) iconSun.classList.toggle('hidden', !isDark);
-      if (mobileIconMoon) mobileIconMoon.classList.toggle('hidden', isDark);
-      if (mobileIconSun) mobileIconSun.classList.toggle('hidden', !isDark);
-      if (metaTheme) metaTheme.setAttribute('content', isDark ? '#0F1211' : '#F7F7F4');
-    }
-
-    function toggleTheme() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-      try {
-        localStorage.setItem('cm_theme', isDark ? 'dark' : 'light');
-      } catch (e) {}
-      syncThemeUI(isDark);
-    }
 
     // Sync icons with initial class on <html>
     const isCurrentlyDark = document.documentElement.classList.contains('dark');
@@ -717,23 +712,6 @@ const totalToolsCount = getToolCount();
       mobileMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         toggleMobileMenu();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && mobileMenuBtn.getAttribute('aria-expanded') === 'true') {
-          toggleMobileMenu(false);
-          mobileMenuBtn.focus();
-        }
-      });
-
-      document.addEventListener('click', (e) => {
-        if (
-          mobileMenuBtn.getAttribute('aria-expanded') === 'true' &&
-          !mobileNavPanel.contains(e.target as Node) &&
-          !mobileMenuBtn.contains(e.target as Node)
-        ) {
-          toggleMobileMenu(false);
-        }
       });
     }
 
@@ -807,19 +785,6 @@ const totalToolsCount = getToolCount();
       });
     });
 
-    // Control Center appearance options
-    function syncControlCenterThemeUI(isDark: boolean) {
-      ccPopover?.querySelectorAll<HTMLButtonElement>('[data-cc-theme]').forEach((btn) => {
-        const mode = btn.getAttribute('data-cc-theme');
-        const active = (mode === 'dark' && isDark) || (mode === 'light' && !isDark);
-        if (active) {
-          btn.className = 'cc-theme-btn py-1 px-2 rounded-control font-semibold bg-surface shadow-sm text-accent text-center transition-standard cursor-pointer flex items-center justify-center gap-1.5';
-        } else {
-          btn.className = 'cc-theme-btn py-1 px-2 rounded-control font-medium text-text-muted hover:text-text-primary text-center transition-standard cursor-pointer flex items-center justify-center gap-1.5';
-        }
-      });
-    }
-
     syncControlCenterThemeUI(isCurrentlyDark);
 
     ccPopover?.querySelectorAll<HTMLButtonElement>('[data-cc-theme]').forEach((btn) => {
@@ -846,12 +811,6 @@ const totalToolsCount = getToolCount();
     }
     syncControlCenterUI();
 
-    document.addEventListener('click', (e) => {
-      if (ccPopover && !ccPopover.contains(e.target as Node) && ccBtn && !ccBtn.contains(e.target as Node)) {
-        toggleControlCenter(false);
-      }
-    });
-
     // ── 8. Mobile Tools Accordion ───────────────────────────────────────────
     const mobileToolsToggle = document.getElementById('mobile-tools-toggle');
     const mobileToolsSubpanel = document.getElementById('mobile-tools-subpanel');
@@ -874,8 +833,131 @@ const totalToolsCount = getToolCount();
         }
       });
     }
-    // ── 9. Cookie Settings Handler ───────────────────────────────────────────
-    // Handled by ConsentModal (CMP) which listens to 'calcumetrics:open-cookie-settings'
+
+    // ── Global document & window event listeners (Idempotent guard) ─────────
+    const _win = window as any;
+    if (!_win.__cmHeaderGlobalBound) {
+      _win.__cmHeaderGlobalBound = true;
+
+      // Close open popovers on outside click
+      document.addEventListener('click', (e) => {
+        const target = e.target as Node;
+
+        // 1. Desktop tools dropdown
+        const curToolsDropdown = document.getElementById('tools-menu-dropdown');
+        const curToolsBtn = document.getElementById('tools-menu-button');
+        if (curToolsDropdown && curToolsBtn && !curToolsDropdown.classList.contains('hidden')) {
+          if (!curToolsDropdown.contains(target) && !curToolsBtn.contains(target)) {
+            curToolsDropdown.classList.add('hidden');
+            curToolsDropdown.classList.remove('flex');
+            curToolsBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+
+        // 2. Currency dropdown
+        const curCurrencyMenu = document.getElementById('header-currency-menu');
+        const curCurrencyBtn = document.getElementById('header-currency-btn');
+        if (curCurrencyMenu && curCurrencyBtn && !curCurrencyMenu.classList.contains('hidden')) {
+          if (!curCurrencyMenu.contains(target) && !curCurrencyBtn.contains(target)) {
+            curCurrencyMenu.classList.add('hidden');
+            curCurrencyMenu.classList.remove('flex');
+            curCurrencyBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+
+        // 3. Mobile nav panel
+        const curMobileMenuBtn = document.getElementById('mobile-menu-button');
+        const curMobileNavPanel = document.getElementById('mobile-nav-panel');
+        if (curMobileMenuBtn && curMobileNavPanel && curMobileMenuBtn.getAttribute('aria-expanded') === 'true') {
+          if (!curMobileNavPanel.contains(target) && !curMobileMenuBtn.contains(target)) {
+            curMobileMenuBtn.setAttribute('aria-expanded', 'false');
+            curMobileNavPanel.classList.add('hidden');
+            curMobileNavPanel.classList.remove('flex');
+            const bars = document.getElementById('menu-icon-bars');
+            const close = document.getElementById('menu-icon-close');
+            bars?.classList.remove('hidden');
+            close?.classList.add('hidden');
+            document.body.style.overflow = '';
+          }
+        }
+
+        // 4. Control center popover
+        const curCcPopover = document.getElementById('control-center-popover');
+        const curCcBtn = document.getElementById('header-control-center-btn');
+        if (curCcPopover && curCcBtn && !curCcPopover.classList.contains('hidden')) {
+          if (!curCcPopover.contains(target) && !curCcBtn.contains(target)) {
+            curCcPopover.classList.add('hidden');
+            curCcPopover.classList.remove('flex');
+            curCcBtn.setAttribute('aria-expanded', 'false');
+          }
+        }
+      });
+
+      // Close open popovers on Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          // Tools dropdown
+          const curToolsDropdown = document.getElementById('tools-menu-dropdown');
+          const curToolsBtn = document.getElementById('tools-menu-button');
+          if (curToolsDropdown && !curToolsDropdown.classList.contains('hidden')) {
+            curToolsDropdown.classList.add('hidden');
+            curToolsDropdown.classList.remove('flex');
+            curToolsBtn?.setAttribute('aria-expanded', 'false');
+            curToolsBtn?.focus();
+          }
+
+          // Currency menu
+          const curCurrencyMenu = document.getElementById('header-currency-menu');
+          const curCurrencyBtn = document.getElementById('header-currency-btn');
+          if (curCurrencyMenu && !curCurrencyMenu.classList.contains('hidden')) {
+            curCurrencyMenu.classList.add('hidden');
+            curCurrencyMenu.classList.remove('flex');
+            curCurrencyBtn?.setAttribute('aria-expanded', 'false');
+            curCurrencyBtn?.focus();
+          }
+
+          // Mobile menu
+          const curMobileMenuBtn = document.getElementById('mobile-menu-button');
+          const curMobileNavPanel = document.getElementById('mobile-nav-panel');
+          if (curMobileMenuBtn && curMobileMenuBtn.getAttribute('aria-expanded') === 'true') {
+            curMobileMenuBtn.setAttribute('aria-expanded', 'false');
+            curMobileNavPanel?.classList.add('hidden');
+            curMobileNavPanel?.classList.remove('flex');
+            const bars = document.getElementById('menu-icon-bars');
+            const close = document.getElementById('menu-icon-close');
+            bars?.classList.remove('hidden');
+            close?.classList.add('hidden');
+            document.body.style.overflow = '';
+            curMobileMenuBtn.focus();
+          }
+
+          // Control Center
+          const curCcPopover = document.getElementById('control-center-popover');
+          const curCcBtn = document.getElementById('header-control-center-btn');
+          if (curCcPopover && !curCcPopover.classList.contains('hidden')) {
+            curCcPopover.classList.add('hidden');
+            curCcPopover.classList.remove('flex');
+            curCcBtn?.setAttribute('aria-expanded', 'false');
+            curCcBtn?.focus();
+          }
+        }
+      });
+
+      // Item 23: Multi-tab currency & theme synchronization
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'cm_currency' && e.newValue) {
+          applyCurrency(e.newValue, true);
+          syncControlCenterUI();
+        }
+        if (e.key === 'cm_theme' && e.newValue) {
+          const isDark = e.newValue === 'dark';
+          document.documentElement.classList.toggle('dark', isDark);
+          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+          syncThemeUI(isDark);
+          syncControlCenterThemeUI(isDark);
+        }
+      });
+    }
   }
 
   initHeaderScripts();

@@ -434,14 +434,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initLPCalc() {
-    if ((window as any).__cmLpBound) return;
-    (window as any).__cmLpBound = true;
-
     const pInput = document.getElementById('lp-principal') as HTMLInputElement | null;
     const rInput = document.getElementById('lp-rate') as HTMLInputElement | null;
     const mInput = document.getElementById('lp-months') as HTMLInputElement | null;
@@ -463,6 +460,22 @@ const jsonld = {
     const errMsg = document.getElementById('lp-error-msg');
 
     if (!pInput || !rInput || !mInput || !prepayInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (pInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    pInput.dataset.bound = 'true';
 
     const DEFAULTS = { principal: 3000000, rate: 8.5, months: 180, prepay: 300000, strategy: 'reduce-tenure' as const };
     let timer: ReturnType<typeof setTimeout>;
@@ -476,16 +489,16 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
-      const rawM = mInput!.value.replace(/[^0-9.]/g, '');
-      const rawPrepay = prepayInput!.value.replace(/[^0-9.]/g, '');
+      const numP = parseSmartInput(pInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numM = parseSmartInput(mInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numPrepay = parseSmartInput(prepayInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
 
-      const vP = validate(rawP, { required: true, min: 10000, label: 'Principal' });
-      const vR = validate(rawR, { required: true, min: 0.1, max: 30, decimal: true, label: 'Rate' });
-      const vM = validate(rawM, { required: true, min: 1, max: 480, integer: true, label: 'Months' });
-      const vPrepay = validate(rawPrepay, { required: true, min: 0, label: 'Prepayment' });
+      const vP = validate(numP ?? '', { required: true, min: 10000, label: 'Principal' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, max: 30, decimal: true, label: 'Rate' });
+      const vM = validate(numM ?? '', { required: true, min: 1, max: 480, integer: true, label: 'Months' });
+      const vPrepay = validate(numPrepay ?? '', { required: true, min: 0, label: 'Prepayment' });
 
       if (!vP.valid) { showError(vP.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -539,15 +552,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -592,23 +612,34 @@ const jsonld = {
     });
 
     document.getElementById('lp-copy-btn')?.addEventListener('click', async () => {
-      const rawP = pInput.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput.value.replace(/[^0-9.]/g, '');
-      const rawM = mInput.value.replace(/[^0-9.]/g, '');
-      const rawPrepay = prepayInput.value.replace(/[^0-9.]/g, '');
+      const numP = parseSmartInput(pInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numM = parseSmartInput(mInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numPrepay = parseSmartInput(prepayInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
 
-      const vP = validate(rawP, { required: true, min: 10000, label: 'Principal' });
-      const vR = validate(rawR, { required: true, min: 0.1, label: 'Rate' });
-      const vM = validate(rawM, { required: true, min: 1, label: 'Months' });
-      const vPrepay = validate(rawPrepay, { required: true, min: 0, label: 'Prepayment' });
+      const vP = validate(numP ?? '', { required: true, min: 10000, label: 'Principal' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'Rate' });
+      const vM = validate(numM ?? '', { required: true, min: 1, label: 'Months' });
+      const vPrepay = validate(numPrepay ?? '', { required: true, min: 0, label: 'Prepayment' });
 
       if (!vP.valid || !vR.valid || !vM.valid || !vPrepay.valid) return;
       if (vPrepay.value! >= vP.value!) return;
 
       const res = calcLoanPrepayment(vP.value!, vR.value!, vM.value!, vPrepay.value!, strat);
       const text = `Loan Prepayment: Prepaying ${fmtVal(vPrepay.value!)} on ${fmtVal(vP.value!)} balance saves ${fmtVal(res.interestSaved)} interest (${res.monthsSaved} months reduced). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('lp-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -618,7 +649,18 @@ const jsonld = {
     });
 
     document.getElementById('lp-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('lp-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -653,16 +695,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initLPCalc();

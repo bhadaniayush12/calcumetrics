@@ -444,14 +444,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initCOGSCalc() {
-    if ((window as any).__cmCogsBound) return;
-    (window as any).__cmCogsBound = true;
-
     const begInput = document.getElementById('cogs-beginning') as HTMLInputElement | null;
     const purchInput = document.getElementById('cogs-purchases') as HTMLInputElement | null;
     const labInput = document.getElementById('cogs-labor') as HTMLInputElement | null;
@@ -476,6 +473,22 @@ const jsonld = {
     const errMsg = document.getElementById('cogs-error-msg');
 
     if (!begInput || !purchInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (begInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    begInput.dataset.bound = 'true';
 
     const DEFAULTS = { beg: 150000, purch: 450000, lab: 100000, ovh: 50000, end: 120000, rev: 950000 };
     let timer: ReturnType<typeof setTimeout>;
@@ -489,19 +502,19 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawBeg = begInput!.value.replace(/[^0-9.]/g, '');
-      const rawPurch = purchInput!.value.replace(/[^0-9.]/g, '');
+      const numBeg = parseSmartInput(begInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numPurch = parseSmartInput(purchInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
 
-      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
-      const vPurch = validate(rawPurch, { required: true, min: 0, label: 'Purchases' });
-      const vLab = validate(rawLab, { required: true, min: 0, label: 'Direct Labor' });
-      const vOvh = validate(rawOvh, { required: true, min: 0, label: 'Overhead' });
-      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
-      const vRev = validate(rawRev, { required: true, min: 0, label: 'Revenue' });
+      const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
+      const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });
+      const vLab = validate(numLab ?? '', { required: true, min: 0, label: 'Direct Labor' });
+      const vOvh = validate(numOvh ?? '', { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(numEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(numRev ?? '', { required: true, min: 0, label: 'Revenue' });
 
       if (!vBeg.valid) { showError(vBeg.error!.message); return; }
       if (!vPurch.valid) { showError(vPurch.error!.message); return; }
@@ -567,15 +580,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     }
 
@@ -633,24 +653,35 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('cogs-copy-btn')?.addEventListener('click', async () => {
-      const rawBeg = begInput.value.replace(/[^0-9.]/g, '');
-      const rawPurch = purchInput.value.replace(/[^0-9.]/g, '');
+      const numBeg = parseSmartInput(begInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numPurch = parseSmartInput(purchInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
 
-      const vBeg = validate(rawBeg, { required: true, min: 0, label: 'Beginning Inventory' });
-      const vPurch = validate(rawPurch, { required: true, min: 0, label: 'Purchases' });
-      const vLab = validate(rawLab, { required: true, min: 0, label: 'Labor' });
-      const vOvh = validate(rawOvh, { required: true, min: 0, label: 'Overhead' });
-      const vEnd = validate(rawEnd, { required: true, min: 0, label: 'Ending Inventory' });
-      const vRev = validate(rawRev, { required: true, min: 0, label: 'Revenue' });
+      const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
+      const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });
+      const vLab = validate(numLab ?? '', { required: true, min: 0, label: 'Labor' });
+      const vOvh = validate(numOvh ?? '', { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(numEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(numRev ?? '', { required: true, min: 0, label: 'Revenue' });
       if (!vBeg.valid || !vPurch.valid || !vLab.valid || !vOvh.valid || !vEnd.valid || !vRev.valid) return;
 
       const res = calcCOGS(vBeg.value!, vPurch.value!, vLab.value!, vOvh.value!, vEnd.value!, vRev.value!);
       const text = `COGS Calculation: COGS ${fmtVal(res.cogs)}, Gross Profit: ${fmtVal(res.grossProfit)} (${res.grossMarginPct.toFixed(1)}% margin). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cogs-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -660,7 +691,18 @@ const jsonld = {
     });
 
     document.getElementById('cogs-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cogs-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -694,16 +736,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initCOGSCalc();

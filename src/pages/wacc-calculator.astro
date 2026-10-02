@@ -411,6 +411,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { serializeHash, restoreFromHash, updateHash, readCurrentHash } from '../lib/url-state';
   import { setResult } from '../lib/result-bus';
   import { calcWACCFromValues } from '../lib/calculators/corporate';
@@ -469,6 +470,23 @@ const jsonld = {
 
     if (!equityInput || !debtInput || !reInput || !rdInput || !tInput) return;
 
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (equityInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    equityInput.dataset.bound = 'true';
+
     const DEFAULTS = { equity: 7000000, debt: 3000000, re: 14.2, rd: 8.5, t: 25 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -486,11 +504,18 @@ const jsonld = {
     }
 
     function recalc() {
-      const valE = validate(equityInput.value, waccSchema.e);
-      const valD = validate(debtInput.value, waccSchema.d);
-      const valRe = validate(reInput.value, waccSchema.re);
-      const valRd = validate(rdInput.value, waccSchema.rd);
-      const valT = validate(tInput.value, waccSchema.t);
+      const isEur = currLocale === 'de-DE';
+      const numE = parseSmartInput(equityInput.value, isEur ? 'EUR' : undefined);
+      const numD = parseSmartInput(debtInput.value, isEur ? 'EUR' : undefined);
+      const numRe = parseSmartInput(reInput.value, isEur ? 'EUR' : undefined);
+      const numRd = parseSmartInput(rdInput.value, isEur ? 'EUR' : undefined);
+      const numT = parseSmartInput(tInput.value, isEur ? 'EUR' : undefined);
+
+      const valE = validate(numE ?? equityInput.value, waccSchema.e);
+      const valD = validate(numD ?? debtInput.value, waccSchema.d);
+      const valRe = validate(numRe ?? reInput.value, waccSchema.re);
+      const valRd = validate(numRd ?? rdInput.value, waccSchema.rd);
+      const valT = validate(numT ?? tInput.value, waccSchema.t);
 
       if (!valE.valid || !valD.valid || !valRe.valid || !valRd.valid || !valT.valid) {
         const firstErr = (!valE.valid && valE.error.message) ||
@@ -594,15 +619,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     }
 
@@ -615,13 +647,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const num = parseFloat(input.value);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = String(num);
+          recalc();
+        }
       });
     }
 
@@ -747,24 +788,16 @@ const jsonld = {
       }
     });
 
-    const win = window as any;
-    if (!win.__cmWACCCurrencyBound) {
-      win.__cmWACCCurrencyBound = true;
-      window.addEventListener('cm:currency-change', (e: any) => {
-        if (e.detail?.symbol) {
-          currSym = e.detail.symbol;
-          currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
-          recalc();
-        }
-      });
-    }
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+    window.addEventListener('cm:currency-change', (e: any) => {
+      if (e.detail?.symbol) {
+        currSym = e.detail.symbol;
+        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
+        recalc();
       }
-    } catch (e) {}
+    });
 
     // Phase 4.4 URL State Restoration
     const currentHash = readCurrentHash();

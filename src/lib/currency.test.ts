@@ -4,6 +4,7 @@ import {
   CURRENCY_STORAGE_KEY,
   DEFAULT_CURRENCY,
   DEFAULT_CURRENCY_LABEL,
+  detectUserCurrency,
   formatDisplayCurrency,
   getCurrencyConfig,
   getJurisdictionCurrency,
@@ -218,5 +219,37 @@ describe('Phase 9: Currency Display / Locale System', () => {
       (globalThis as any).window = origWindow;
       (globalThis as any).localStorage = origStorage;
     }
+  });
+
+  // ── 7. Timezone & Locale Currency Detection (Item 30) ────────────────────
+  it('detects user currency based on timezone and locale with safe fallback', () => {
+    // UK Timezone and locale -> GBP
+    expect(detectUserCurrency('Europe/London')).toBe('GBP');
+    expect(detectUserCurrency('', 'en-GB')).toBe('GBP');
+
+    // Eurozone Timezones and locales -> EUR
+    expect(detectUserCurrency('Europe/Berlin')).toBe('EUR');
+    expect(detectUserCurrency('Europe/Paris')).toBe('EUR');
+    expect(detectUserCurrency('Europe/Madrid')).toBe('EUR');
+    expect(detectUserCurrency('Europe/Rome')).toBe('EUR');
+    expect(detectUserCurrency('', 'de-DE')).toBe('EUR');
+    expect(detectUserCurrency('', 'fr-FR')).toBe('EUR');
+    expect(detectUserCurrency('', 'es-ES')).toBe('EUR');
+
+    // US Timezones and locale -> USD
+    expect(detectUserCurrency('America/New_York')).toBe('USD');
+    expect(detectUserCurrency('America/Chicago')).toBe('USD');
+    expect(detectUserCurrency('America/Los_Angeles')).toBe('USD');
+    expect(detectUserCurrency('', 'en-US')).toBe('USD');
+
+    // India Timezone and locale -> INR
+    expect(detectUserCurrency('Asia/Kolkata')).toBe('INR');
+    expect(detectUserCurrency('Asia/Calcutta')).toBe('INR');
+    expect(detectUserCurrency('', 'en-IN')).toBe('INR');
+    expect(detectUserCurrency('', 'hi')).toBe('INR');
+
+    // Unknown fallback -> INR
+    expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('INR');
+    expect(detectUserCurrency('', '')).toBe('INR');
   });
 });

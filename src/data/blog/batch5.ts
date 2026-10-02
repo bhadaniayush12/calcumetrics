@@ -12,7 +12,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
     dateModified: '2026-09-30',
     readTime: '9 min read',
     market: 'Global',
-    author: 'Dev',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'UK mortgage lenders primarily use a Loan-to-Income (LTI) multiple — typically capped at 4.5× annual income — rather than a US-style DTI percentage. However, lenders also run a full affordability assessment that functions similarly to DTI: monthly committed debt repayments ÷ monthly gross income. A ratio below 43% is the broad threshold most lenders are comfortable with.',
@@ -287,7 +287,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
     dateModified: '2026-09-30',
     readTime: '10 min read',
     market: 'Global',
-    author: 'Dev',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'Mortgage amortization spreads repayment of a fixed loan across equal monthly payments. Early payments are heavily weighted toward interest because the outstanding balance is high. As the principal slowly decreases, each subsequent payment carries less interest and more principal — until the final payment closes out the loan. The monthly payment never changes (on a fixed-rate mortgage); only the internal split shifts.',

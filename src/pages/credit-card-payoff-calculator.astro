@@ -395,6 +395,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcCreditCardPayoff } from '../lib/finance/amortization';
@@ -405,14 +406,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initCCCalc() {
-    if ((window as any).__cmCCBound) return;
-    (window as any).__cmCCBound = true;
-
     const bInput = document.getElementById('cc-balance') as HTMLInputElement | null;
     const rInput = document.getElementById('cc-apr') as HTMLInputElement | null;
     const pInput = document.getElementById('cc-payment') as HTMLInputElement | null;
@@ -431,6 +429,22 @@ const jsonld = {
     const errMsg = document.getElementById('cc-error-msg');
 
     if (!bInput || !rInput || !pInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (bInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    bInput.dataset.bound = 'true';
 
     const DEFAULTS = { balance: 150000, apr: 36.0, payment: 10000 };
     let timer: ReturnType<typeof setTimeout>;
@@ -444,13 +458,13 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawB = bInput!.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput!.value.replace(/[^0-9.]/g, '');
-      const rawP = pInput!.value.replace(/[^0-9.]/g, '');
+      const numB = parseSmartInput(bInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numP = parseSmartInput(pInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vB = validate(rawB, { required: true, min: 100, label: 'Balance' });
-      const vR = validate(rawR, { required: true, min: 0.1, max: 100, decimal: true, label: 'APR' });
-      const vP = validate(rawP, { required: true, min: 10, label: 'Monthly Payment' });
+      const vB = validate(numB ?? '', { required: true, min: 100, label: 'Balance' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, max: 100, decimal: true, label: 'APR' });
+      const vP = validate(numP ?? '', { required: true, min: 10, label: 'Monthly Payment' });
 
       if (!vB.valid) { showError(vB.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -519,15 +533,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -567,19 +588,30 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('cc-copy-btn')?.addEventListener('click', async () => {
-      const rawB = bInput.value.replace(/[^0-9.]/g, '');
-      const rawR = rInput.value.replace(/[^0-9.]/g, '');
-      const rawP = pInput.value.replace(/[^0-9.]/g, '');
+      const numB = parseSmartInput(bInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numP = parseSmartInput(pInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vB = validate(rawB, { required: true, min: 100, label: 'Balance' });
-      const vR = validate(rawR, { required: true, min: 0.1, label: 'APR' });
-      const vP = validate(rawP, { required: true, min: 10, label: 'Payment' });
+      const vB = validate(numB ?? '', { required: true, min: 100, label: 'Balance' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'APR' });
+      const vP = validate(numP ?? '', { required: true, min: 10, label: 'Payment' });
 
       if (!vB.valid || !vR.valid || !vP.valid) return;
 
       const res = calcCreditCardPayoff(vB.value!, vR.value!, vP.value!);
       const text = `Credit Card Payoff: Balance ${fmtVal(vB.value!)} at ${vR.value}% APR paying ${fmtVal(vP.value!)}/mo takes ${res.payoffMonths} months (Total Interest: ${fmtVal(res.totalInterest)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cc-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -589,7 +621,18 @@ const jsonld = {
     });
 
     document.getElementById('cc-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('cc-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -617,16 +660,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initCCCalc();

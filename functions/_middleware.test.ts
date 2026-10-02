@@ -20,7 +20,7 @@ describe('Cloudflare Pages _middleware', () => {
 
   it('adds X-Robots-Tag on branch preview pages.dev subdomains', async () => {
     const context = {
-      request: new Request('https://8703423f.calcumetrics.pages.dev/sip-calculator/'),
+      request: new Request('https://8703423f.calcumetrics.pages.dev/sip-calculator'),
       next: async () => new Response('OK'),
     };
 
@@ -30,7 +30,7 @@ describe('Cloudflare Pages _middleware', () => {
 
   it('does NOT add X-Robots-Tag on custom production domain calcumetrics.com', async () => {
     const context = {
-      request: new Request('https://calcumetrics.com/sip-calculator/'),
+      request: new Request('https://calcumetrics.com/sip-calculator'),
       next: async () => new Response('OK', {
         headers: { 'X-Content-Type-Options': 'nosniff' },
       }),
@@ -41,6 +41,49 @@ describe('Cloudflare Pages _middleware', () => {
     expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
     expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
     expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
+  });
+
+  it('permanently redirects (301) URLs with trailing slash (except root /)', async () => {
+    let nextCalled = false;
+    const context = {
+      request: new Request('https://calcumetrics.com/sip-calculator/'),
+      next: async () => {
+        nextCalled = true;
+        return new Response('OK');
+      },
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.statusText).toBe('Moved Permanently');
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/sip-calculator');
+    expect(nextCalled).toBe(false);
+  });
+
+  it('preserves query parameters when redirecting trailing slash (301)', async () => {
+    const context = {
+      request: new Request('https://calcumetrics.com/sip-calculator/?p=5000&r=12'),
+      next: async () => new Response('OK'),
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/sip-calculator?p=5000&r=12');
+  });
+
+  it('does NOT redirect root path /', async () => {
+    let nextCalled = false;
+    const context = {
+      request: new Request('https://calcumetrics.com/'),
+      next: async () => {
+        nextCalled = true;
+        return new Response('OK');
+      },
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(200);
+    expect(nextCalled).toBe(true);
   });
 
   it('permanently redirects (301) www.calcumetrics.com to https://calcumetrics.com/', async () => {

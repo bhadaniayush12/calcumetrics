@@ -224,6 +224,8 @@ const UNFORMATTED_INTEGER_PATTERN = /^\d+$/;
  * - Rejects any strings with extra dots, letters, or invalid characters with NaN.
  * - Preserves leading minus sign for signed parsing.
  */
+import { parseSmartInput } from './formatters';
+
 function parseStringInput(trimmed: string): number | null {
   if (trimmed === '') return null;
 
@@ -231,6 +233,15 @@ function parseStringInput(trimmed: string): number | null {
   const lower = trimmed.toLowerCase();
   if (lower === 'infinity' || lower === '+infinity') return Infinity;
   if (lower === '-infinity') return -Infinity;
+
+  // If input contains shorthand units (k, m, b, l, cr, etc.) or percent symbol, delegate to smart parser
+  if (/[a-zA-Z%]/.test(trimmed)) {
+    const smart = parseSmartInput(trimmed);
+    if (smart !== null && !isNaN(smart)) {
+      return smart;
+    }
+    return NaN;
+  }
 
   let s = trimmed;
 

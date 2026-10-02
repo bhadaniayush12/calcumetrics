@@ -469,14 +469,11 @@ const jsonld = {
     return sign + currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.abs(Math.round(n)));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initLRCalc() {
-    if ((window as any).__cmLrBound) return;
-    (window as any).__cmLrBound = true;
-
     const cashInput = document.getElementById('lr-cash') as HTMLInputElement | null;
     const secInput = document.getElementById('lr-securities') as HTMLInputElement | null;
     const arInput = document.getElementById('lr-receivables') as HTMLInputElement | null;
@@ -500,6 +497,22 @@ const jsonld = {
     const errMsg = document.getElementById('lr-error-msg');
 
     if (!cashInput || !clInput) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (cashInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    cashInput.dataset.bound = 'true';
 
     const DEFAULTS = { cash: 300000, sec: 100000, ar: 400000, inv: 450000, cl: 500000 };
     let timer: ReturnType<typeof setTimeout>;
@@ -517,17 +530,17 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawCash = cashInput!.value.replace(/[^0-9.]/g, '');
+      const numCash = parseSmartInput(cashInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawCl = clInput!.value.replace(/[^0-9.]/g, '');
+      const numCl = parseSmartInput(clInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash & Bank Balances' });
-      const vSec = validate(rawSec, { required: true, min: 0, label: 'Marketable Securities' });
-      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
-      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
-      const vCl = validate(rawCl, { required: true, min: 1, label: 'Current Liabilities' });
+      const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash & Bank Balances' });
+      const vSec = validate(numSec ?? '', { required: true, min: 0, label: 'Marketable Securities' });
+      const vAr = validate(numAr ?? '', { required: true, min: 0, label: 'Accounts Receivable' });
+      const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inventory' });
+      const vCl = validate(numCl ?? '', { required: true, min: 1, label: 'Current Liabilities' });
 
       if (!vCash.valid) { showError(vCash.error!.message); return; }
       if (!vSec.valid) { showError(vSec.error!.message); return; }
@@ -609,15 +622,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = fmtLiveInput(String(num));
+          recalc();
+        }
       });
     }
 
@@ -669,22 +689,33 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('lr-copy-btn')?.addEventListener('click', async () => {
-      const rawCash = cashInput.value.replace(/[^0-9.]/g, '');
+      const numCash = parseSmartInput(cashInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
       const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawCl = clInput.value.replace(/[^0-9.]/g, '');
+      const numCl = parseSmartInput(clInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vCash = validate(rawCash, { required: true, min: 0, label: 'Cash & Bank Balances' });
-      const vSec = validate(rawSec, { required: true, min: 0, label: 'Marketable Securities' });
-      const vAr = validate(rawAr, { required: true, min: 0, label: 'Accounts Receivable' });
-      const vInv = validate(rawInv, { required: true, min: 0, label: 'Inventory' });
-      const vCl = validate(rawCl, { required: true, min: 1, label: 'Current Liabilities' });
+      const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash & Bank Balances' });
+      const vSec = validate(numSec ?? '', { required: true, min: 0, label: 'Marketable Securities' });
+      const vAr = validate(numAr ?? '', { required: true, min: 0, label: 'Accounts Receivable' });
+      const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inventory' });
+      const vCl = validate(numCl ?? '', { required: true, min: 1, label: 'Current Liabilities' });
       if (!vCash.valid || !vSec.valid || !vAr.valid || !vInv.valid || !vCl.valid) return;
 
       const res = calcLiquidityRatios(vCash.value!, vSec.value!, vAr.value!, vInv.value!, 0, vCl.value!);
       const text = `Liquidity Ratios: Current Ratio: ${res.currentRatio.toFixed(2)}x, Quick Ratio: ${res.quickRatio.toFixed(2)}x, Cash Ratio: ${res.cashRatio.toFixed(2)}x (NWC: ${fmtVal(res.netWorkingCapital)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('lr-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -694,7 +725,18 @@ const jsonld = {
     });
 
     document.getElementById('lr-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('lr-share-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -737,16 +779,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initLRCalc();

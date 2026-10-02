@@ -77,7 +77,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
         ? 'border-border bg-disabled-bg text-disabled-text cursor-not-allowed'
         : readonly
         ? 'border-border bg-canvas text-text-primary cursor-default'
-        : 'border-border hover:border-text-muted focus-within:border-accent focus-within:outline-2 focus-within:outline-accent focus-within:outline-offset-2',
+        : 'border-border hover:border-text-muted focus-within:border-accent focus-within:ring-1 focus-within:ring-accent',
     ]}
   >
     {prefix && (
@@ -144,6 +144,41 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 </div>
 
 <script>
+  import { parseSmartInput, formatIndian, formatIntl } from '../../lib/formatters';
+
+  function applyCurrencyGrouping(code?: string) {
+    const pathname = window.location.pathname;
+    if (pathname.startsWith('/in/') || pathname === '/in' || pathname.startsWith('/us/') || pathname === '/us') {
+      return;
+    }
+
+    const targetGrouping = code === 'INR' ? 'indian' : 'international';
+    const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"]');
+
+    inputs.forEach((input) => {
+      const prevGrouping = input.getAttribute('data-digit-grouping');
+      if (prevGrouping !== targetGrouping) {
+        input.setAttribute('data-digit-grouping', targetGrouping);
+      }
+
+      const raw = input.value.trim();
+      if (raw) {
+        const parsed = parseSmartInput(raw, code === 'EUR' ? 'EUR' : undefined);
+        if (parsed !== null && !isNaN(parsed)) {
+          if (Number.isInteger(parsed)) {
+            input.value = targetGrouping === 'indian' ? formatIndian(parsed) : formatIntl(parsed);
+          } else {
+            const intVal = Math.floor(parsed);
+            const decStr = String(parsed).split('.')[1] || '00';
+            input.value = targetGrouping === 'indian'
+              ? `${formatIndian(intVal)}.${decStr}`
+              : formatIntl(parsed, 2);
+          }
+        }
+      }
+    });
+  }
+
   // Section 5: Live digit grouping while typing (not on blur), locale-aware
   function initDigitGrouping() {
     const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"]');
@@ -152,11 +187,25 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
       if (input.dataset.digitGroupingBound) return;
       input.dataset.digitGroupingBound = 'true';
 
-      const mode = input.getAttribute('data-digit-grouping');
-
       input.addEventListener('input', (e) => {
         const target = e.target as HTMLInputElement;
         const rawValue = target.value;
+        const mode = (target.getAttribute('data-digit-grouping') || 'international') as 'indian' | 'international';
+
+        // If user is typing shorthand notation (contains letters e.g. k, m, l, cr), do not strip letters or re-group live
+        if (/[a-zA-Z]/.test(rawValue)) {
+          return;
+        }
+
+        // If single comma exists with no dot and <= 2 digits after comma (European decimal), allow typing without destroying comma
+        const commaCount = (rawValue.match(/,/g) || []).length;
+        if (!rawValue.includes('.') && commaCount === 1) {
+          const parts = rawValue.split(',');
+          if (parts[1].length < 3) {
+            return;
+          }
+        }
+
         const cursorPosition = target.selectionStart || 0;
 
         // Count commas before cursor in raw input
@@ -199,6 +248,48 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
         const newCursorPos = Math.max(0, Math.min(newValue.length, cursorPosition + diff));
         target.setSelectionRange(newCursorPos, newCursorPos);
       });
+
+      // Expand shorthand on blur (e.g. "55k" -> "55,000")
+      input.addEventListener('blur', () => {
+        const val = input.value.trim();
+        if (!val) return;
+        const mode = (input.getAttribute('data-digit-grouping') || 'international') as 'indian' | 'international';
+        const parsed = parseSmartInput(val);
+        if (parsed !== null && !isNaN(parsed)) {
+          if (Number.isInteger(parsed)) {
+            input.value = mode === 'indian' ? formatIndian(parsed) : formatIntl(parsed);
+          } else {
+            const intVal = Math.floor(parsed);
+            const decStr = String(parsed).split('.')[1] || '00';
+            input.value = mode === 'indian'
+              ? `${formatIndian(intVal)}.${decStr}`
+              : formatIntl(parsed, 2);
+          }
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+    });
+
+    // Sync grouping with stored currency on load if not default INR
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        const code = saved.includes('USD') || saved.includes('$') ? 'USD'
+          : saved.includes('EUR') || saved.includes('€') ? 'EUR'
+          : saved.includes('GBP') || saved.includes('£') ? 'GBP' : 'INR';
+        if (code !== 'INR') {
+          applyCurrencyGrouping(code);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Global listener for currency change (Item 31)
+  const _win = window as any;
+  if (!_win.__cmInputCurrencyBound) {
+    _win.__cmInputCurrencyBound = true;
+    window.addEventListener('cm:currency-change', (e: any) => {
+      applyCurrencyGrouping(e.detail?.code);
     });
   }
 

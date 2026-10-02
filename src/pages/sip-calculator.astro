@@ -297,8 +297,13 @@ const jsonld = {
       </div>
 
       <!-- Friendly rate reality-check alert -->
-      <div id="sip-rate-warning" class="hidden text-xs text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-control p-2.5 mb-4" role="alert">
-        💡 <strong>Reality check:</strong> 12% se zyada expected return historically aggressive lagta hai. Diversified equity mutual funds long term mein ~11–13% CAGR dete hain. Realistic planning ke liye 12% consider karo.
+      <div id="sip-rate-warning" class="hidden text-xs text-amber-800 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-control p-2.5 mb-4 flex items-start gap-2" role="alert">
+        <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span><strong>Reality check:</strong> Expected returns above 12%–15% p.a. are historically aggressive. Broad-market equity mutual funds typically deliver ~11%–13% long-term CAGR. For prudent financial planning, consider using 10%–12%.</span>
       </div>
 
       <!-- Validation alert -->
@@ -387,7 +392,7 @@ const jsonld = {
           Investing for just 2 more years (17 yrs) adds <strong>+{extraGainWords}</strong> to your corpus!
         </p>
         <p id="sip-insight-delay" class="text-[11px] text-amber-400/90 leading-relaxed pt-1 border-t border-dark-border/40">
-          ⏳ <strong>Cost of Delay:</strong> 5 saal late shuru kiya toh corpus lagbhag ₹54 Lakh kam banega.
+          <strong>Cost of Delay:</strong> Delaying by 5 years reduces your estimated maturity corpus by over ₹54 Lakh due to lost compounding.
         </p>
       </div>
 
@@ -664,7 +669,7 @@ const jsonld = {
   import { setResult } from '../lib/result-bus';
   import { validate } from '../lib/validate';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
-  import { formatIndian, formatIndianCompact, formatIndianWords, formatCompactCurrency } from '../lib/formatters';
+  import { formatIndian, formatIndianCompact, formatIndianWords, formatCompactCurrency, parseSmartInput } from '../lib/formatters';
   import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
 
   const sipSchema = {
@@ -728,6 +733,42 @@ const jsonld = {
 
     if (!monthlyInput || !rateInput || !yearsInput) return;
 
+    if (monthlyInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    monthlyInput.dataset.bound = 'true';
+
+    // Item 1: Sync stored currency before initial recalc & update input prefixes
+    currentCurrencyCode = getStoredCurrency();
+    currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
+    currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
+    if (currencyDropdown && currencyDropdown.value !== currentCurrencyCode) {
+      currencyDropdown.value = currentCurrencyCode;
+    }
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currentCurrencySymbol;
+    });
+    updateMonthlyChips(currentCurrencySymbol, currentCurrencyCode);
+
+    function updateMonthlyChips(sym: string, code: CurrencyCode) {
+      document.querySelectorAll<HTMLButtonElement>('[data-chip-monthly]').forEach((btn) => {
+        const val = btn.getAttribute('data-chip-monthly');
+        if (!val) return;
+        const num = parseInt(val, 10);
+        if (code === 'INR') {
+          if (num === 100000) btn.textContent = `${sym}1L`;
+          else btn.textContent = `${sym}${num / 1000}k`;
+        } else {
+          if (num >= 1000) {
+            btn.textContent = `${sym}${num / 1000}k`;
+          } else {
+            btn.textContent = `${sym}${num}`;
+          }
+        }
+      });
+    }
+
     const DEFAULTS = { monthly: 25000, rate: 12, years: 15 };
     let debounceTimer: ReturnType<typeof setTimeout>;
 
@@ -773,9 +814,14 @@ const jsonld = {
 
     function recalc() {
       if (!monthlyInput || !rateInput || !yearsInput) return;
-      const vMonthly = validate(monthlyInput.value, sipSchema.monthly);
-      const vRate = validate(rateInput.value, sipSchema.rate);
-      const vYears = validate(yearsInput.value, sipSchema.years);
+      const isEur = currentNumberLocale === 'de-DE';
+      const numMonthly = parseSmartInput(monthlyInput.value, isEur ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined);
+
+      const vMonthly = validate(numMonthly ?? monthlyInput.value, sipSchema.monthly);
+      const vRate = validate(numRate ?? rateInput.value, sipSchema.rate);
+      const vYears = validate(numYears ?? yearsInput.value, sipSchema.years);
 
       if (!vMonthly.valid) {
         showValidationFeedback(vMonthly.error.message);
@@ -846,7 +892,7 @@ const jsonld = {
         if (years > 5) {
           const delayed = calcSIP(monthly, rate, years - 5);
           const loss = r.maturity - delayed.maturity;
-          insightDelay.innerHTML = `⏳ <strong>Cost of Delay:</strong> 5 saal late shuru kiya toh compounding loss se corpus <strong>~${fmtCompact(loss)} kam</strong> banega.`;
+          insightDelay.innerHTML = `<strong>Cost of Delay:</strong> Delaying by 5 years reduces your corpus by <strong>~${fmtCompact(loss)}</strong> due to lost compounding.`;
           insightDelay.classList.remove('hidden');
         } else {
           insightDelay.classList.add('hidden');
@@ -925,24 +971,22 @@ const jsonld = {
       });
 
       input.addEventListener('input', () => {
-        const v = validate(input.value, { decimal: true, negativeAllowed: false });
-        if (v.valid && v.value !== undefined) {
-          const num = v.value;
-          if (num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
-            slider.value = String(num);
-            const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-            slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
-          }
+        const isEur = currentNumberLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
         debounceRecalc();
       });
 
       input.addEventListener('blur', () => {
-        if (isFormatted) {
-          const v = validate(input.value, { integerOnly: true });
-          if (v.valid && v.value !== undefined) {
-            input.value = fmtLiveIndian(String(v.value));
-          }
+        const isEur = currentNumberLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveIndian(String(num)) : String(num);
+          recalc();
         }
       });
     }
@@ -1134,6 +1178,10 @@ const jsonld = {
       if (currencyDropdown && currencyDropdown.value !== code) {
         currencyDropdown.value = code;
       }
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = symbol;
+      });
+      updateMonthlyChips(symbol, code);
       recalc();
     }
 

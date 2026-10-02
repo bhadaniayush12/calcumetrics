@@ -26,7 +26,7 @@ const jsonld = {
 ---
 <Layout
   title="Privacy Policy | Calcumetrics"
-  description="Learn how Calcumetrics protects your privacy. Transparent overview of client-side computing, zero personal data harvesting, and cookieless analytics."
+  description="Learn how Calcumetrics protects your privacy. Complete overview of client-side calculations, local storage, analytics disclosure, and advertising privacy choices."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -38,10 +38,10 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Privacy Policy</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 24 September 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 2 October 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Privacy Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Effective date: 24 September 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
+      Effective date: 2 October 2026. This policy describes how Calcumetrics collects, uses, and shares information when you use our website at calcumetrics.com.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">1. Who we are and how to contact us</h2>
@@ -49,36 +49,49 @@ const jsonld = {
       Calcumetrics is an independent financial calculator website. For any privacy-related query or to exercise your rights, contact us at: <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. What we collect</h2>
-    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Calculator inputs:</strong> All calculator inputs are processed entirely in your browser. They are not transmitted to our servers, not stored, and not sent to any third party. Calculator state may be saved to your browser's URL hash (for share links) or <code>localStorage</code> (for remembered currency preference — key: <code>cm_currency</code>). This data stays on your device only.</p>
-    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Self-hosted typography:</strong> All fonts (Inter and Playfair Display) are self-hosted directly on our origin servers. We do not load fonts, scripts, or styles from Google Fonts, Google CDN, or other third-party font networks, guaranteeing that no IP address or browser telemetry is shared with external font providers.</p>
-    <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Cookieless web analytics:</strong> We use Cloudflare Web Analytics to monitor aggregate traffic, page views, and performance. Cloudflare Web Analytics is privacy-first, 100% cookieless, and does not use <code>localStorage</code> or fingerprinting. It does not track you across other websites, does not collect personal identifiers, and does not retain IP addresses.</p>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">2. What we collect and how we calculate</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Private calculator inputs:</strong> All financial calculations run entirely within your client-side browser. Your monetary inputs, interest rates, salary figures, and loan details are never transmitted to our servers, never saved to our databases, and never sold to third parties. Inputs never leave your device.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Self-hosted typography:</strong> All fonts (Inter and Playfair Display) are self-hosted directly on our origin servers. We do not load fonts, scripts, or styles from external font CDNs, ensuring that your IP address and browser telemetry are not shared with third-party font networks.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-2"><strong>Cookieless web analytics (Cloudflare):</strong> We use Cloudflare Web Analytics to monitor aggregate traffic volume, page views, and edge performance. Cloudflare Web Analytics is privacy-first, 100% cookieless, and does not use local storage or device fingerprinting. It does not track you across other websites, does not collect personal identifiers, and does not log IP addresses.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4"><strong>Website analytics &amp; performance metrics (Google Analytics 4):</strong> We use Google Analytics 4 (GA4, Measurement ID <code>G-BGJDT7C82V</code>) to understand aggregate site traffic patterns, popular calculators, and technical platform reliability. GA4 is configured with Google Consent Mode v2, defaulting advertising storage, ad user data, and personalization to denied. Calculator inputs, financial figures, and loan values are strictly excluded from all analytics telemetry; only high-level aggregate interaction events (such as calculation completion) and standard non-identifying telemetry (e.g., browser type, approximate country/region, referral source) are recorded.</p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Cookies and browser storage</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics does <strong>not</strong> set any tracking cookies or third-party advertising cookies. We only use functional browser storage (<code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">localStorage</code>) to preserve your explicit user interface choices:
+      Calcumetrics uses browser storage and standard analytics cookies to provide functionality and understand site usage:
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
-      <li><code>cm_currency</code>: Remembers your selected currency symbol (e.g., INR, USD, EUR) across tools.</li>
-      <li><code>cm_theme</code>: Remembers your light/dark mode preference if toggled.</li>
+      <li><strong>Functional local storage (<code>localStorage</code>):</strong> We store your chosen user preferences locally on your device (e.g. <code>cm_currency</code> for active currency format and <code>cm_theme</code> for dark/light mode). This data resides exclusively in your browser and is never uploaded to our servers.</li>
+      <li><strong>First-party analytics cookies (Google Analytics):</strong> When enabled, Google Analytics sets first-party cookies (such as <code>_ga</code> and <code>_ga_*</code>) to distinguish anonymous visitor sessions and compile aggregate usage reports. These cookies do not store personal financial data or track identity across unrelated domains.</li>
     </ul>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      This data resides exclusively on your local device and is never sent to our servers. You can clear this data at any time via your browser settings. For full details, see our <a href="/cookie-policy" class="text-accent hover:underline focus-visible:outline-accent">Cookie Policy</a>.
+      You can clear or disable cookies and local storage at any time through your browser settings. For detailed information on each storage key, see our <a href="/cookie-policy" class="text-accent hover:underline focus-visible:outline-accent">Cookie Policy</a>.
     </p>
 
-    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Advertising and future consent</h2>
+    <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">4. Advertising and third-party cookies (Google AdSense)</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-3">
+      Calcumetrics displays or plans to display third-party advertisements served by Google AdSense and certified advertising networks to keep our calculation tools 100% free for everyone.
+    </p>
+    <p class="text-sm text-text-muted leading-relaxed mb-3">
+      <strong>Third-party vendor cookie disclosure:</strong>
+    </p>
+    <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
+      <li>Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on a user's prior visits to this website or other websites on the Internet.</li>
+      <li>Google's use of advertising cookies enables it and its partners to serve ads to our users based on their visit to our sites and/or other sites across the Web.</li>
+      <li>Users may opt out of personalized advertising by visiting <a href="https://adssettings.google.com/" rel="noopener noreferrer" target="_blank" class="text-accent hover:underline focus-visible:outline-accent">Google Ad Settings</a>.</li>
+      <li>Alternatively, users can opt out of third-party vendor use of cookies for personalized advertising by visiting <a href="https://optout.aboutads.info/" rel="noopener noreferrer" target="_blank" class="text-accent hover:underline focus-visible:outline-accent">www.aboutads.info</a>.</li>
+    </ul>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Third-party advertising (such as Google AdSense) is not currently active on this site. If we introduce advertising or cookie-based services in the future, we will deploy a certified Consent Management Platform (CMP) and update this policy prior to activation. No ad network or tracking scripts will execute without appropriate user consent.
+      For visitors residing in the European Economic Area (EEA), United Kingdom, or Switzerland, interactive consent management is implemented in accordance with Google's EU User Consent Policy and IAB Europe Transparency and Consent Framework (TCF).
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. Legal bases and your rights</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Depending on your location, you may have rights under GDPR/UK GDPR (access, correction, deletion, restriction, portability, objection, withdrawal of consent), India's Digital Personal Data Protection Act 2023, or applicable US state privacy laws (CCPA/CPRA and others). To exercise any right, contact us at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
+      Depending on your jurisdiction, you may have rights under GDPR/UK GDPR (access, correction, deletion, restriction, portability, objection, withdrawal of consent), India's Digital Personal Data Protection Act 2023, or applicable US state privacy laws (CCPA/CPRA and others). To exercise any right, contact us at <a href={`mailto:${SITE_EMAIL}`} class="text-accent hover:underline focus-visible:outline-accent">{SITE_EMAIL}</a>.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Data retention and security</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      We do not store calculator inputs on any server. Aggregate analytics data from Cloudflare Web Analytics is retained per Cloudflare's privacy guidelines. We enforce HTTPS, HSTS, and strict security headers.
+      We do not retain or store any user financial inputs on any server. Aggregate analytics data from Cloudflare and Google Analytics is retained in accordance with industry-standard retention windows and strict privacy policies. All connections enforce modern HTTPS, HSTS, and strict security headers.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">7. Children</h2>

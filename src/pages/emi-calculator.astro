@@ -600,7 +600,7 @@ const jsonld = {
   import { setResult } from '../lib/result-bus';
   import { validate } from '../lib/validate';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
-  import { formatIndian, formatIndianCompact, formatCompactCurrency } from '../lib/formatters';
+  import { formatIndian, formatIndianCompact, formatCompactCurrency, parseSmartInput } from '../lib/formatters';
   import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
 
   const emiSchema = {
@@ -662,6 +662,23 @@ const jsonld = {
 
     if (!principalInput || !rateInput || !yearsInput) return;
 
+    if (principalInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    principalInput.dataset.bound = 'true';
+
+    // Item 1: Sync stored currency before initial recalc & update input prefixes
+    currentCurrencyCode = getStoredCurrency();
+    currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
+    currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
+    if (currencyDropdown && currencyDropdown.value !== currentCurrencyCode) {
+      currencyDropdown.value = currentCurrencyCode;
+    }
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currentCurrencySymbol;
+    });
+
     const DEFAULTS = { principal: 1000000, rate: 8.5, years: 20 };
     let debounceTimer: ReturnType<typeof setTimeout>;
 
@@ -705,9 +722,14 @@ const jsonld = {
     }
 
     function recalc() {
-      const vPrincipal = validate(principalInput.value, emiSchema.principal);
-      const vRate = validate(rateInput.value, emiSchema.rate);
-      const vYears = validate(yearsInput.value, emiSchema.years);
+      const isEur = currentNumberLocale === 'de-DE';
+      const numPrincipal = parseSmartInput(principalInput.value, isEur ? 'EUR' : undefined);
+      const numRate = parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined);
+      const numYears = parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined);
+
+      const vPrincipal = validate(numPrincipal ?? principalInput.value, emiSchema.principal);
+      const vRate = validate(numRate ?? rateInput.value, emiSchema.rate);
+      const vYears = validate(numYears ?? yearsInput.value, emiSchema.years);
 
       if (!vPrincipal.valid) {
         showValidationFeedback(vPrincipal.error.message);
@@ -812,24 +834,22 @@ const jsonld = {
       });
 
       input.addEventListener('input', () => {
-        const v = validate(input.value, { decimal: true, negativeAllowed: false });
-        if (v.valid && v.value !== undefined) {
-          const num = v.value;
-          if (num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
-            slider.value = String(num);
-            const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
-            slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
-          }
+        const isEur = currentNumberLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+          slider.value = String(num);
+          const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
+          slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
         debounceRecalc();
       });
 
       input.addEventListener('blur', () => {
-        if (isFormatted) {
-          const v = validate(input.value, { integerOnly: true });
-          if (v.valid && v.value !== undefined) {
-            input.value = fmtLiveIndian(String(v.value));
-          }
+        const isEur = currentNumberLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveIndian(String(num)) : String(num);
+          recalc();
         }
       });
     }
@@ -1019,6 +1039,9 @@ const jsonld = {
       if (currencyDropdown && currencyDropdown.value !== code) {
         currencyDropdown.value = code;
       }
+      document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+        el.textContent = symbol;
+      });
       recalc();
     }
 

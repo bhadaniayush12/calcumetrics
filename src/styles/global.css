@@ -159,21 +159,29 @@ html[data-theme="dark"] .bg-accent.text-surface {
     line-height: 1.5;
   }
 
-  /* Accessible Focus Rings */
-  :focus-visible {
+  /* Accessible Focus Rings (scoped to non-input interactive elements) */
+  :focus-visible:not(input):not(select):not(textarea) {
     outline: 2px solid var(--color-accent) !important;
     outline-offset: 2px !important;
     box-shadow: 0 0 0 3px rgba(23, 107, 91, 0.22) !important;
   }
 
   /* Focus on dark surfaces */
-  .dark-surface :focus-visible,
-  [data-surface="dark"] :focus-visible,
-  html.dark :focus-visible,
-  html[data-theme="dark"] :focus-visible {
+  .dark-surface :focus-visible:not(input):not(select):not(textarea),
+  [data-surface="dark"] :focus-visible:not(input):not(select):not(textarea),
+  html.dark :focus-visible:not(input):not(select):not(textarea),
+  html[data-theme="dark"] :focus-visible:not(input):not(select):not(textarea) {
     outline: 2px solid var(--color-dark-accent) !important;
     outline-offset: 2px !important;
     box-shadow: 0 0 0 3px rgba(95, 205, 182, 0.28) !important;
+  }
+
+  /* Inputs handle focus state through container borders/rings */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
   }
 
   /* Section 2: Universal Tabular Numbers for zero-jitter alignment */

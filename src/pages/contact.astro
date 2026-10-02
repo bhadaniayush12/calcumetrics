@@ -52,18 +52,23 @@ const jsonld = {
     <!-- Page Header -->
     <header class="mb-10">
       <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-chip border border-accent/20 bg-accent/5 text-xs font-semibold text-accent mb-3">
-        📬 Get in Touch
+        Get in Touch
       </div>
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-3">Contact Us</h1>
       <p class="text-base text-text-muted leading-relaxed max-w-xl">
-        This inbox is monitored. We respond to every message — typically within 2–3 business days.
+        This inbox is monitored. We respond to every message: typically within 2–3 business days.
       </p>
     </header>
 
     <!-- Contact Card -->
     <div class="bg-surface border border-border rounded-card p-6 sm:p-8 mb-8">
       <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center text-lg shrink-0">✉️</div>
+        <div class="w-10 h-10 rounded-xl bg-accent/10 text-accent flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+        </div>
         <div>
           <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">Email us at</p>
           <a
@@ -87,7 +92,21 @@ const jsonld = {
       <!-- Category 1: Error Report -->
       <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-error-section">
         <div class="flex items-center gap-2.5 mb-3">
-          <span class="text-xl">🐞</span>
+          <div class="w-7 h-7 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0" aria-hidden="true">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m8 2 1.88 1.88"></path>
+              <path d="M14.12 3.88 16 2"></path>
+              <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"></path>
+              <path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"></path>
+              <path d="M12 20v-9"></path>
+              <path d="M6.53 9C4.6 8.8 3 7.1 3 5"></path>
+              <path d="M6 13H2"></path>
+              <path d="M3 21c0-2.1 1.7-3.9 3.8-4"></path>
+              <path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"></path>
+              <path d="M22 13h-4"></path>
+              <path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"></path>
+            </svg>
+          </div>
           <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">Report a Calculation Error</h3>
         </div>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
@@ -113,7 +132,13 @@ const jsonld = {
       <!-- Category 2: Suggest a Calculator -->
       <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-suggest-section">
         <div class="flex items-center gap-2.5 mb-3">
-          <span class="text-xl">💡</span>
+          <div class="w-7 h-7 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0" aria-hidden="true">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+              <path d="M9 18h6"></path>
+              <path d="M10 22h4"></path>
+            </svg>
+          </div>
           <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">Suggest a New Calculator</h3>
         </div>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
@@ -131,18 +156,27 @@ const jsonld = {
       <!-- Category 3: General Feedback -->
       <div class="bg-canvas border border-border rounded-card p-5 hover:border-accent transition-standard group" id="contact-feedback-section">
         <div class="flex items-center gap-2.5 mb-3">
-          <span class="text-xl">💬</span>
+          <div class="w-7 h-7 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0" aria-hidden="true">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
+            </svg>
+          </div>
           <h3 class="font-bold text-base text-text-primary group-hover:text-accent transition-standard">General Feedback</h3>
         </div>
         <p class="text-sm text-text-muted leading-relaxed">
-          Anything else — UI issues, content improvements, a kind word, or a tough question. Use the same email address.
+          Anything else: UI issues, content improvements, a kind word, or a tough question. Use the same email address.
         </p>
       </div>
     </div>
 
     <!-- Response Time -->
     <div class="flex items-start gap-3 p-4 bg-accent/5 border border-accent/20 rounded-card mb-8">
-      <span class="text-accent text-lg shrink-0">⏱️</span>
+      <div class="w-6 h-6 rounded-md bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5" aria-hidden="true">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      </div>
       <div>
         <p class="text-sm font-semibold text-text-primary mb-0.5">Response time</p>
         <p class="text-xs text-text-muted leading-relaxed">

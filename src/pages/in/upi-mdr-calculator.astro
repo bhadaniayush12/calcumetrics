@@ -142,7 +142,7 @@ const jsonld = {
       <!-- Upcoming 15 October Regulation Notice -->
       <div class="mb-5 p-3.5 rounded-card bg-amber-500/10 border border-amber-500/30 text-xs text-text-primary">
         <strong class="font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400 mb-1">
-          <span>⚠️</span> Upcoming NPCI Rule Update (Effective 15 October 2026):
+          Upcoming NPCI Rule Update (Effective 15 October 2026):
         </strong>
         <p class="text-text-muted leading-relaxed">
           NPCI has revised the merchant interchange framework taking effect <strong>15 October 2026</strong>: a standard <strong>0.4% MDR</strong> applies to commercial P2M transactions above ₹2,000 (capped at ₹300), flat ₹5 on essential utilities/fuel, while transactions up to ₹2,000 and small merchants (up to ₹1L/month) remain <strong>100% free (0% MDR)</strong>.
@@ -413,14 +413,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function initMDRCalc() {
-    if ((window as any).__cmMdrBound) return;
-    (window as any).__cmMdrBound = true;
-
     const volInput = document.getElementById('mdr-volume') as HTMLInputElement | null;
     const shareInput = document.getElementById('mdr-share') as HTMLInputElement | null;
     const rateInput = document.getElementById('mdr-rate') as HTMLInputElement | null;
@@ -441,6 +438,12 @@ const jsonld = {
 
     if (!volInput || !shareInput) return;
 
+    if (volInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    volInput.dataset.bound = 'true';
+
     const DEFAULTS = { vol: 500000, share: 20, rate: 1.1, gst: 18 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -453,15 +456,15 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawVol = volInput!.value.replace(/[^0-9.]/g, '');
-      const rawShare = shareInput!.value.replace(/[^0-9.]/g, '');
+      const numVol = parseSmartInput(volInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numShare = parseSmartInput(shareInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
       const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
 
-      const vVol = validate(rawVol, { required: true, min: 1000, label: 'Monthly Volume' });
-      const vShare = validate(rawShare, { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
-      const vGst = validate(rawGst, { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
+      const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Monthly Volume' });
+      const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
+      const vGst = validate(numGst ?? '', { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
 
       if (!vVol.valid) { showError(vVol.error!.message); return; }
       if (!vShare.valid) { showError(vShare.error!.message); return; }
@@ -520,15 +523,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -569,21 +579,32 @@ const jsonld = {
 
     // Copy & Share
     document.getElementById('mdr-copy-btn')?.addEventListener('click', async () => {
-      const rawVol = volInput.value.replace(/[^0-9.]/g, '');
-      const rawShare = shareInput.value.replace(/[^0-9.]/g, '');
+      const numVol = parseSmartInput(volInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numShare = parseSmartInput(shareInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
       const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
 
-      const vVol = validate(rawVol, { required: true, min: 1000, label: 'Volume' });
-      const vShare = validate(rawShare, { required: true, min: 0, max: 100, label: 'Share' });
-      const vRate = validate(rawRate, { required: true, min: 0.1, label: 'Rate' });
-      const vGst = validate(rawGst, { required: true, min: 0, label: 'GST' });
+      const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Volume' });
+      const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, label: 'Share' });
+      const vRate = validate(numRate ?? '', { required: true, min: 0.1, label: 'Rate' });
+      const vGst = validate(numGst ?? '', { required: true, min: 0, label: 'GST' });
 
       if (!vVol.valid || !vShare.valid || !vRate.valid || !vGst.valid) return;
 
       const res = calcUPIMDR(vVol.value!, 1500, vShare.value!, vRate.value!, vGst.value!);
       const text = `UPI MDR: Volume ${fmtVal(vVol.value!)} (${vShare.value}% chargeable at ${vRate.value}%) => Fee+GST: ${fmtVal(res.totalDeductions)}, Net Settlement: ${fmtVal(res.netSettlement)}. ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('mdr-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -593,7 +614,18 @@ const jsonld = {
     });
 
     document.getElementById('mdr-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('mdr-share-btn');
       if (btn) {
         const orig = btn.textContent;

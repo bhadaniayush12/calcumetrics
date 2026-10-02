@@ -12,7 +12,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     dateModified: '2026-09-23',
     readTime: '8 min read',
     market: 'India-Only',
-    author: 'Yuvraj',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'TDS is tax deducted at source by the payer; Advance Tax is tax paid directly by you in 4 quarterly installments on income where TDS was insufficient.',
     sources: [
@@ -207,7 +207,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Dev',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Break-even Point = Fixed Costs / (Selling Price - Variable Cost per Unit). Every unit sold beyond this point contributes directly to net profit.',
     sources: [
@@ -430,7 +430,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Dev',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'EOQ finds the exact batch order size where annual order placement costs exactly equal annual inventory holding costs.',
     sources: [
@@ -663,7 +663,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Yuvraj',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Straight-Line depreciates an asset evenly each year; Reducing Balance charges higher depreciation in early years, reducing early taxable income.',
     sources: [
@@ -873,7 +873,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     dateModified: '2026-09-22',
     readTime: '8 min read',
     market: 'Global',
-    author: 'Dev',
+    author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'DSCR = Net Operating Income / Total Debt Service. Lenders require a minimum DSCR of 1.25x to 1.50x to approve commercial borrowing.',
     sources: [

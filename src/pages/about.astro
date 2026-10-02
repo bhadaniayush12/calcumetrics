@@ -13,7 +13,7 @@ const jsonld = {
       '@type': 'AboutPage',
       name: 'About Calcumetrics',
       url: canonicalUrl,
-      description: 'Learn about Calcumetrics — our story, formula accuracy, client-side privacy, public corrections log, and test-case verification architecture.',
+      description: 'Learn about Calcumetrics — our story, formula accuracy, client-side calculations, public corrections log, and test-case verification architecture.',
       mainEntity: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -35,7 +35,7 @@ const jsonld = {
 
 <Layout
   title="About Calcumetrics | Our Story, Testing & Mission"
-  description="Learn about Calcumetrics — built by two commerce graduates who needed reliable financial calculators without the noise. 100% client-side privacy."
+  description="Learn about Calcumetrics — built by two commerce graduates who needed reliable financial calculators without the noise. 100% client-side calculations."
   canonical={canonicalUrl}
   slimFooter={true}
 >
@@ -54,8 +54,7 @@ const jsonld = {
     <!-- Page Title & Intro -->
     <header class="mb-8">
       <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold text-accent mb-3">
-        <span>🛡️</span>
-        <span>100% Free · No Sign-Up · 100% Client-Side Privacy</span>
+        <span>100% Free · No Sign-Up · 100% Client-Side Calculations</span>
       </div>
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-2.5">
         About Calcumetrics
@@ -65,97 +64,41 @@ const jsonld = {
       </p>
     </header>
 
-    <!-- macOS Interactive System Settings Window -->
-    <section class="bg-surface border border-border rounded-card shadow-mac overflow-hidden mb-12" aria-label="Calcumetrics Preferences Window">
-      <!-- Window Title Bar with Functional Traffic Lights -->
-      <div class="bg-canvas/90 border-b border-border px-4 py-3 flex items-center justify-between select-none">
-        <div class="flex items-center gap-2">
-          <!-- Red: Close / Reset -->
+    <!-- Editorial Layout & Interactive Section Tabs -->
+    <section class="bg-surface border border-border rounded-card shadow-mac overflow-hidden mb-12" aria-label="About Calcumetrics">
+      <!-- Section Navigation Bar -->
+      <div class="bg-canvas/60 border-b border-border px-4 py-3 flex items-center justify-between gap-4 flex-wrap">
+        <nav aria-label="About sections" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
           <button
             type="button"
-            id="traffic-dot-red"
-            class="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E] hover:opacity-80 transition-standard cursor-pointer relative group"
-            aria-label="Reset tabs"
-            title="Reset to Overview tab"
+            data-about-tab="overview"
+            class="about-tab-btn px-3.5 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer whitespace-nowrap"
           >
-            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
-              Reset view
-            </span>
+            Overview &amp; Story
           </button>
-          <!-- Yellow: Minimize -->
           <button
             type="button"
-            id="traffic-dot-yellow"
-            class="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123] hover:opacity-80 transition-standard cursor-pointer relative group"
-            aria-label="Minimize preview"
-            title="Minimize"
+            data-about-tab="testing"
+            class="about-tab-btn px-3.5 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer whitespace-nowrap"
           >
-            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
-              Minimize
-            </span>
+            How We Test (Worked Proofs)
           </button>
-          <!-- Green: Zoom / Expand -->
           <button
             type="button"
-            id="traffic-dot-green"
-            class="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29] hover:opacity-80 transition-standard cursor-pointer relative group"
-            aria-label="Expand view"
-            title="Zoom"
+            data-about-tab="money"
+            class="about-tab-btn px-3.5 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer whitespace-nowrap"
           >
-            <span class="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 bg-dark-bg text-dark-text text-[10px] font-medium px-1.5 py-0.5 rounded shadow pointer-events-none whitespace-nowrap transition-standard">
-              Zoom
-            </span>
+            Money &amp; Ethics
           </button>
-        </div>
-
-        <div class="text-xs font-semibold text-text-muted flex items-center gap-1.5">
-          <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-            <line x1="8" y1="21" x2="16" y2="21"/>
-            <line x1="12" y1="17" x2="12" y2="21"/>
-          </svg>
-          <span>Calcumetrics — System Settings</span>
-        </div>
-
-        <div class="text-[11px] text-text-muted font-mono hidden sm:block">
-          v2.4 · Sep 2026
-        </div>
-      </div>
-
-      <!-- System Settings Tab Bar -->
-      <div class="bg-canvas/50 border-b border-border px-3 py-2 flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
-        <button
-          type="button"
-          data-about-tab="overview"
-          class="about-tab-btn px-3 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <span>👤</span>
-          <span>Overview &amp; Story</span>
-        </button>
-        <button
-          type="button"
-          data-about-tab="testing"
-          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <span>📐</span>
-          <span>How We Test (Worked Proofs)</span>
-        </button>
-        <button
-          type="button"
-          data-about-tab="money"
-          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <span>🛡️</span>
-          <span>Money &amp; Ethics</span>
-        </button>
-        <button
-          type="button"
-          data-about-tab="corrections"
-          class="about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap"
-        >
-          <span>📝</span>
-          <span>Corrections Log</span>
-        </button>
+          <button
+            type="button"
+            data-about-tab="corrections"
+            class="about-tab-btn px-3.5 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer whitespace-nowrap"
+          >
+            Corrections Log
+          </button>
+        </nav>
+        <span class="text-xs text-text-muted font-medium hidden sm:inline">Calcumetrics Documentation</span>
       </div>
 
       <!-- Tab Content Area -->
@@ -165,18 +108,17 @@ const jsonld = {
         <div id="tab-panel-overview" class="space-y-8">
           <!-- Founder Origin Story Card (5-6 lines emotional connection) -->
           <div class="p-5 sm:p-6 bg-canvas/70 border border-border rounded-card">
-            <div class="flex items-center gap-2 text-xs font-semibold text-accent uppercase tracking-wider mb-2">
-              <span>💡</span>
-              <span>Why This Exists</span>
+            <div class="text-xs font-semibold text-accent uppercase tracking-wider mb-2">
+              Why This Exists
             </div>
             <h2 class="text-xl font-bold text-text-primary mb-3">
               The Origin: Two Commerce Friends &amp; Broken Calculators
             </h2>
             <p class="text-[15px] text-text-primary leading-relaxed mb-3">
-              Calcumetrics started with two college friends — Dev and Yuvraj — who spent their commerce years jumping between ad-cluttered websites every time they needed a reliable formula. Each site had something wrong: hidden logic, outdated tax slabs, or a layout that broke on mobile the moment it mattered most.
+              Calcumetrics started with two college friends, Dev and Yuvraj, who spent their commerce years jumping between ad-cluttered websites every time they needed a reliable formula. Each site had something wrong: hidden logic, outdated tax slabs, or a layout that broke on mobile the moment it mattered most.
             </p>
             <p class="text-[15px] text-text-muted leading-relaxed">
-              One night, deep in semester projects, we hit a wall. <em>"Why doesn't a clean, honest calculator site exist?"</em> So we built one. Calcumetrics is that tool — a place where commerce students, CA aspirants, and everyday investors can get exact numbers instantly, without a lead form, a popup, or a paywall.
+              One night, deep in semester projects, we hit a wall. <em>"Why doesn't a clean, honest calculator site exist?"</em> So we built one. Calcumetrics is that tool: a place where commerce students, CA aspirants, and everyday investors can get exact numbers instantly, without a lead form, a popup, or a paywall.
             </p>
           </div>
 
@@ -191,8 +133,9 @@ const jsonld = {
                 <h3 class="text-base font-bold text-text-primary">Dev</h3>
                 <p class="text-xs text-text-muted mb-2">Co-founder &middot; Calcumetrics</p>
                 <p class="text-xs text-text-muted leading-relaxed">Commerce background. Focuses on formula architecture, statutory accuracy, and making financial math accessible to everyone.</p>
-                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1 text-xs mt-2 text-accent hover:underline">
-                  ✉️ {SITE_EMAIL}
+                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1.5 text-xs mt-2 text-accent hover:underline">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <span>{SITE_EMAIL}</span>
                 </a>
               </div>
             </div>
@@ -205,8 +148,9 @@ const jsonld = {
                 <h3 class="text-base font-bold text-text-primary">Yuvraj</h3>
                 <p class="text-xs text-text-muted mb-2">Co-founder &middot; Calcumetrics</p>
                 <p class="text-xs text-text-muted leading-relaxed">Commerce background. Leads UX, content strategy, and ensures every calculator solves a real user problem without friction.</p>
-                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1 text-xs mt-2 text-accent hover:underline">
-                  ✉️ {SITE_EMAIL}
+                <a href={`mailto:${SITE_EMAIL}`} class="inline-flex items-center gap-1.5 text-xs mt-2 text-accent hover:underline">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                  <span>{SITE_EMAIL}</span>
                 </a>
               </div>
             </div>
@@ -224,7 +168,7 @@ const jsonld = {
             </div>
             <div class="p-4 bg-canvas border border-border rounded-control text-center">
               <span class="text-2xl font-extrabold text-accent tabular-nums block">100%</span>
-              <span class="text-xs text-text-muted font-medium">Client-Side Privacy</span>
+              <span class="text-xs text-text-muted font-medium">Client-Side Calculations</span>
             </div>
             <div class="p-4 bg-canvas border border-border rounded-control text-center">
               <span class="text-2xl font-extrabold text-accent tabular-nums block">0</span>
@@ -341,19 +285,47 @@ const jsonld = {
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div class="p-4 bg-canvas border border-border rounded-control space-y-1.5">
-              <span class="font-bold text-text-primary text-sm block">What We Never Do</span>
-              <p class="text-text-muted">❌ Never store your financial numbers on a server</p>
-              <p class="text-text-muted">❌ Never require sign-up, email, or phone number</p>
-              <p class="text-text-muted">❌ Never run intrusive full-screen popups</p>
-              <p class="text-text-muted">❌ Never sell data to credit bureaus or loan brokers</p>
+            <div class="p-4 bg-canvas border border-border rounded-control space-y-2">
+              <span class="font-bold text-text-primary text-sm block mb-1">What We Never Do</span>
+              <ul class="space-y-1.5 text-text-muted">
+                <li class="flex items-start gap-2">
+                  <span class="text-error font-bold leading-tight">✕</span>
+                  <span>Never store your financial numbers on a server</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-error font-bold leading-tight">✕</span>
+                  <span>Never require sign-up, email, or phone number</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-error font-bold leading-tight">✕</span>
+                  <span>Never run intrusive full-screen popups</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-error font-bold leading-tight">✕</span>
+                  <span>Never sell data to credit bureaus or loan brokers</span>
+                </li>
+              </ul>
             </div>
-            <div class="p-4 bg-canvas border border-border rounded-control space-y-1.5">
-              <span class="font-bold text-text-primary text-sm block">What We Guarantee</span>
-              <p class="text-text-muted">✅ 100% in-browser JavaScript execution</p>
-              <p class="text-text-muted">✅ Fully documented formulas on every page</p>
-              <p class="text-text-muted">✅ Immediate calculation on slider/input change</p>
-              <p class="text-text-muted">✅ Public test fixtures and quarterly rate audits</p>
+            <div class="p-4 bg-canvas border border-border rounded-control space-y-2">
+              <span class="font-bold text-text-primary text-sm block mb-1">What We Guarantee</span>
+              <ul class="space-y-1.5 text-text-muted">
+                <li class="flex items-start gap-2">
+                  <span class="text-accent font-bold leading-tight">✓</span>
+                  <span>100% in-browser JavaScript execution</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-accent font-bold leading-tight">✓</span>
+                  <span>Fully documented formulas on every page</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-accent font-bold leading-tight">✓</span>
+                  <span>Immediate calculation on slider/input change</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-accent font-bold leading-tight">✓</span>
+                  <span>Public test fixtures and quarterly rate audits</span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
@@ -435,9 +407,8 @@ const jsonld = {
 
     <!-- "Also Built By Us" Section (Point 5) -->
     <section class="mb-12 p-6 bg-surface border border-border rounded-card" aria-label="Also Built By Us">
-      <div class="flex items-center gap-2 text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
-        <span>🛠️</span>
-        <span>Independent Operator Portfolio</span>
+      <div class="text-xs font-semibold text-text-muted uppercase tracking-wider mb-2">
+        Independent Operator Portfolio
       </div>
       <h2 class="text-lg font-bold text-text-primary mb-2">
         Also Built By Us
@@ -454,8 +425,8 @@ const jsonld = {
           rel="noopener noreferrer"
           class="p-4 bg-canvas hover:bg-surface border border-border hover:border-accent rounded-control transition-standard flex items-start gap-3.5 group cursor-pointer"
         >
-          <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0 text-xl font-bold group-hover:scale-105 transition-standard">
-            🔊
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0 group-hover:scale-105 transition-standard">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-1.5 font-bold text-sm text-text-primary group-hover:text-accent transition-standard">
@@ -482,7 +453,9 @@ const jsonld = {
           class="p-5 bg-surface hover:bg-canvas border border-border hover:border-accent rounded-card transition-standard flex items-center justify-between group cursor-pointer"
         >
           <div class="flex items-center gap-3">
-            <span class="text-2xl">📈</span>
+            <div class="w-9 h-9 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
             <div>
               <span class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard block">
                 Try the SIP Calculator
@@ -498,7 +471,9 @@ const jsonld = {
           class="p-5 bg-surface hover:bg-canvas border border-border hover:border-accent rounded-card transition-standard flex items-center justify-between group cursor-pointer"
         >
           <div class="flex items-center gap-3">
-            <span class="text-2xl">🐞</span>
+            <div class="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+            </div>
             <div>
               <span class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard block">
                 Report an Error / Suggest a Tool
@@ -527,9 +502,9 @@ const jsonld = {
         tabBtns.forEach((btn) => {
           const tab = btn.getAttribute('data-about-tab');
           if (tab === targetTab) {
-            btn.className = 'about-tab-btn px-3 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap';
+            btn.className = 'about-tab-btn px-3.5 py-1.5 rounded-control font-semibold bg-surface text-accent shadow-sm border border-border/80 transition-standard cursor-pointer whitespace-nowrap';
           } else {
-            btn.className = 'about-tab-btn px-3 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer flex items-center gap-1.5 whitespace-nowrap';
+            btn.className = 'about-tab-btn px-3.5 py-1.5 rounded-control font-medium text-text-muted hover:text-text-primary hover:bg-canvas transition-standard cursor-pointer whitespace-nowrap';
           }
         });
 
@@ -566,33 +541,6 @@ const jsonld = {
       }
       handleHash();
       window.addEventListener('hashchange', handleHash);
-
-      // Traffic Light buttons
-      const redBtn = document.getElementById('traffic-dot-red');
-      const yellowBtn = document.getElementById('traffic-dot-yellow');
-      const greenBtn = document.getElementById('traffic-dot-green');
-
-      redBtn?.addEventListener('click', () => {
-        switchTab('overview');
-        window.__cmShowToast?.({ title: 'System Settings', message: 'Tabs reset to Overview' });
-      });
-
-      yellowBtn?.addEventListener('click', () => {
-        const content = document.getElementById('about-tab-content');
-        if (content) {
-          content.classList.toggle('hidden');
-          const isHidden = content.classList.contains('hidden');
-          window.__cmShowToast?.({
-            title: 'System Settings',
-            message: isHidden ? 'Window minimized' : 'Window restored',
-          });
-        }
-      });
-
-      greenBtn?.addEventListener('click', () => {
-        switchTab('testing');
-        window.__cmShowToast?.({ title: 'System Settings', message: 'Expanded test fixtures' });
-      });
     }
 
     initAboutTabs();

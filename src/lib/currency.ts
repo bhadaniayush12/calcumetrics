@@ -111,18 +111,103 @@ export function getCurrencyConfig(code: unknown): CurrencyConfig {
 
 /**
  * Auto-detects the appropriate initial currency based on client locale / timezone.
- * Returns 'INR' by default or if timezone/locale indicates India.
+ * Rules:
+ *   - Europe/London or en-GB -> GBP
+ *   - Europe/Berlin, Europe/Paris, Europe/Madrid, Europe/Rome, or de/fr/es locales -> EUR
+ *   - America/New_York, America/Chicago, America/Los_Angeles or en-US -> USD
+ *   - Asia/Kolkata or en-IN or fallback -> INR
  */
-export function detectUserCurrency(): CurrencyCode {
-  if (typeof window === 'undefined') return DEFAULT_CURRENCY;
+export function detectUserCurrency(customTz?: string, customLocale?: string): CurrencyCode {
+  if (typeof window === 'undefined' && customTz === undefined && customLocale === undefined) return DEFAULT_CURRENCY;
   try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    if (tz.includes('Calcutta') || tz.includes('Kolkata') || tz === 'Asia/Kolkata') {
-      return 'INR';
+    let tz = customTz !== undefined
+      ? customTz
+      : (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : '');
+    tz = (tz || '').trim();
+
+    // 1. Timezone detection
+    if (tz) {
+      if (tz === 'Europe/London' || tz === 'Europe/Belfast' || tz === 'Europe/Jersey' || tz === 'Europe/Guernsey' || tz === 'Europe/Isle_of_Man' || tz.includes('London')) {
+        return 'GBP';
+      }
+      if (
+        tz === 'Europe/Berlin' ||
+        tz === 'Europe/Paris' ||
+        tz === 'Europe/Madrid' ||
+        tz === 'Europe/Rome' ||
+        tz === 'Europe/Amsterdam' ||
+        tz === 'Europe/Brussels' ||
+        tz === 'Europe/Vienna' ||
+        tz === 'Europe/Dublin' ||
+        tz === 'Europe/Lisbon' ||
+        tz === 'Europe/Helsinki' ||
+        tz === 'Europe/Athens' ||
+        tz.startsWith('Europe/')
+      ) {
+        return 'EUR';
+      }
+      if (
+        tz === 'America/New_York' ||
+        tz === 'America/Chicago' ||
+        tz === 'America/Los_Angeles' ||
+        tz === 'America/Denver' ||
+        tz === 'America/Phoenix' ||
+        tz === 'America/Anchorage' ||
+        tz === 'America/Honolulu' ||
+        tz === 'America/Detroit' ||
+        tz === 'America/Boise' ||
+        tz.startsWith('America/') ||
+        tz.startsWith('US/')
+      ) {
+        return 'USD';
+      }
+      if (tz === 'Asia/Kolkata' || tz === 'Asia/Calcutta' || tz.includes('Kolkata') || tz.includes('Calcutta')) {
+        return 'INR';
+      }
     }
-    const langs = navigator.languages || [navigator.language];
-    for (const lang of langs) {
-      if (lang && (lang.toLowerCase().includes('en-in') || lang.toLowerCase().includes('hi'))) {
+
+    // 2. Language/Locale detection
+    let langs: string[] = [];
+    if (customLocale !== undefined) {
+      langs = customLocale ? [customLocale] : [];
+    } else if (typeof navigator !== 'undefined') {
+      langs = navigator.languages ? Array.from(navigator.languages) : [navigator.language];
+    }
+
+    for (const rawLang of langs) {
+      if (!rawLang || typeof rawLang !== 'string') continue;
+      const lang = rawLang.toLowerCase().trim();
+      if (lang === 'en-gb' || lang.startsWith('en-gb')) {
+        return 'GBP';
+      }
+      if (
+        lang.startsWith('de') ||
+        lang.startsWith('fr') ||
+        lang.startsWith('es') ||
+        lang.startsWith('it') ||
+        lang.startsWith('nl') ||
+        lang.startsWith('pt') ||
+        lang.startsWith('el') ||
+        lang.startsWith('fi')
+      ) {
+        return 'EUR';
+      }
+      if (lang === 'en-us' || lang.startsWith('en-us')) {
+        return 'USD';
+      }
+      if (
+        lang === 'en-in' ||
+        lang.startsWith('en-in') ||
+        lang.startsWith('hi') ||
+        lang.startsWith('ta') ||
+        lang.startsWith('te') ||
+        lang.startsWith('bn') ||
+        lang.startsWith('gu') ||
+        lang.startsWith('mr') ||
+        lang.startsWith('kn') ||
+        lang.startsWith('ml') ||
+        lang.startsWith('pa')
+      ) {
         return 'INR';
       }
     }

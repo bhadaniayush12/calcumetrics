@@ -436,6 +436,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../../lib/validate';
+  import { parseSmartInput } from '../../lib/formatters';
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
   import { calc401K } from '../../lib/calculators/401k';
@@ -447,14 +448,11 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
 
   function init401KCalc() {
-    if ((window as any).__cm401KBound) return;
-    (window as any).__cm401KBound = true;
-
     const salaryInput = document.getElementById('k401-salary') as HTMLInputElement | null;
     const contribInput = document.getElementById('k401-contrib') as HTMLInputElement | null;
     const matchInput = document.getElementById('k401-match') as HTMLInputElement | null;
@@ -480,6 +478,12 @@ const jsonld = {
 
     if (!salaryInput || !contribInput || !matchInput || !matchLimitInput || !rateInput || !yearsInput) return;
 
+    if (salaryInput.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    salaryInput.dataset.bound = 'true';
+
     const DEFAULTS = { salary: 100000, contrib: 8, match: 50, matchLimit: 6, rate: 8, years: 30 };
     let timer: ReturnType<typeof setTimeout>;
 
@@ -492,19 +496,19 @@ const jsonld = {
     }
 
     function recalc() {
-      const rawSal = salaryInput!.value.replace(/[^0-9.]/g, '');
-      const rawCon = contribInput!.value.replace(/[^0-9.]/g, '');
+      const numSal = parseSmartInput(salaryInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numCon = parseSmartInput(contribInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
       const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
-      const rawR = rateInput!.value.replace(/[^0-9.]/g, '');
-      const rawY = yearsInput!.value.replace(/[^0-9.]/g, '');
+      const numR = parseSmartInput(rateInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yearsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vSal = validate(rawSal, { required: true, min: 1000, label: 'Annual Salary' });
-      const vCon = validate(rawCon, { required: true, min: 0, max: 100, decimal: true, label: 'Contribution %' });
-      const vMat = validate(rawMat, { required: true, min: 0, max: 200, decimal: true, label: 'Employer Match %' });
-      const vLim = validate(rawLim, { required: true, min: 0, max: 100, decimal: true, label: 'Match Cap %' });
-      const vR = validate(rawR, { required: true, min: 0.1, max: 25, decimal: true, label: 'Return Rate' });
-      const vY = validate(rawY, { required: true, min: 1, max: 50, integer: true, label: 'Years to Retirement' });
+      const vSal = validate(numSal ?? '', { required: true, min: 1000, label: 'Annual Salary' });
+      const vCon = validate(numCon ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Contribution %' });
+      const vMat = validate(numMat ?? '', { required: true, min: 0, max: 200, decimal: true, label: 'Employer Match %' });
+      const vLim = validate(numLim ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Match Cap %' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, max: 25, decimal: true, label: 'Return Rate' });
+      const vY = validate(numY ?? '', { required: true, min: 1, max: 50, integer: true, label: 'Years to Retirement' });
 
       if (!vSal.valid) { showError(vSal.error!.message); return; }
       if (!vCon.valid) { showError(vCon.error!.message); return; }
@@ -568,15 +572,22 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtLiveInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const isEur = currLocale === 'de-DE';
+        const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) {
+          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          recalc();
+        }
       });
     }
 
@@ -633,25 +644,36 @@ const jsonld = {
     });
 
     document.getElementById('k401-copy-btn')?.addEventListener('click', async () => {
-      const rawSal = salaryInput.value.replace(/[^0-9.]/g, '');
-      const rawCon = contribInput.value.replace(/[^0-9.]/g, '');
+      const numSal = parseSmartInput(salaryInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numCon = parseSmartInput(contribInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
       const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
-      const rawR = rateInput.value.replace(/[^0-9.]/g, '');
-      const rawY = yearsInput.value.replace(/[^0-9.]/g, '');
+      const numR = parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numY = parseSmartInput(yearsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vSal = validate(rawSal, { required: true, min: 1000, label: 'Salary' });
-      const vCon = validate(rawCon, { required: true, min: 0, max: 100, label: 'Contrib' });
-      const vMat = validate(rawMat, { required: true, min: 0, max: 200, label: 'Match' });
-      const vLim = validate(rawLim, { required: true, min: 0, max: 100, label: 'Limit' });
-      const vR = validate(rawR, { required: true, min: 0.1, label: 'R' });
-      const vY = validate(rawY, { required: true, min: 1, label: 'Y' });
+      const vSal = validate(numSal ?? '', { required: true, min: 1000, label: 'Salary' });
+      const vCon = validate(numCon ?? '', { required: true, min: 0, max: 100, label: 'Contrib' });
+      const vMat = validate(numMat ?? '', { required: true, min: 0, max: 200, label: 'Match' });
+      const vLim = validate(numLim ?? '', { required: true, min: 0, max: 100, label: 'Limit' });
+      const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'R' });
+      const vY = validate(numY ?? '', { required: true, min: 1, label: 'Y' });
 
       if (!vSal.valid || !vCon.valid || !vMat.valid || !vLim.valid || !vR.valid || !vY.valid) return;
 
       const res = calc401K(vSal.value!, vCon.value!, vMat.value!, vLim.value!, vR.value!, vY.value!);
       const text = `401(k) Projection: Salary ${fmtVal(vSal.value!)}, saving ${vCon.value}% with ${vMat.value}% match up to ${vLim.value}% at ${vR.value}% for ${vY.value} years => Retirement balance: ${fmtVal(res.maturity)} (gains: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
-      await navigator.clipboard.writeText(text);
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('k401-copy-btn');
       if (btn) {
         const orig = btn.textContent;
@@ -661,7 +683,18 @@ const jsonld = {
     });
 
     document.getElementById('k401-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('k401-share-btn');
       if (btn) {
         const orig = btn.textContent;

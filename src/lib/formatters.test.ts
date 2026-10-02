@@ -5,6 +5,7 @@ import {
   formatPercent,
   formatLiveInput,
   parseFormattedNumber,
+  parseSmartInput,
   formatIndianCompact,
   formatIndianWords,
   formatCompactCurrency,
@@ -86,6 +87,110 @@ describe('formatters', () => {
     it('gracefully handles empty or malformed strings', () => {
       expect(formatDisplayDate('')).toBe('');
       expect(formatDisplayDate('invalid')).toBe('invalid');
+    });
+  });
+
+  describe('parseSmartInput (Item 17 & Item 21)', () => {
+    describe('Item 17 — Shorthand Multipliers', () => {
+      it('parses k/K as thousands (x1,000)', () => {
+        expect(parseSmartInput('55k')).toBe(55000);
+        expect(parseSmartInput('55K')).toBe(55000);
+        expect(parseSmartInput('1.5k')).toBe(1500);
+        expect(parseSmartInput('500 k')).toBe(500000);
+      });
+
+      it('parses m/M as millions (x1,000,000)', () => {
+        expect(parseSmartInput('1.5m')).toBe(1500000);
+        expect(parseSmartInput('10M')).toBe(10000000);
+        expect(parseSmartInput('0.5m')).toBe(500000);
+      });
+
+      it('parses b/B as billions (x1,000,000,000)', () => {
+        expect(parseSmartInput('2b')).toBe(2000000000);
+        expect(parseSmartInput('1.5B')).toBe(1500000000);
+      });
+
+      it('parses l/L/lakh/lac as lakhs (x100,000)', () => {
+        expect(parseSmartInput('10l')).toBe(1000000);
+        expect(parseSmartInput('10L')).toBe(1000000);
+        expect(parseSmartInput('50 lakh')).toBe(5000000);
+        expect(parseSmartInput('50lakh')).toBe(5000000);
+        expect(parseSmartInput('50 lakhs')).toBe(5000000);
+        expect(parseSmartInput('2.5 lac')).toBe(250000);
+        expect(parseSmartInput('2.5 lacs')).toBe(250000);
+      });
+
+      it('parses cr/Cr/crore as crores (x10,000,000)', () => {
+        expect(parseSmartInput('1.5cr')).toBe(15000000);
+        expect(parseSmartInput('1.5Cr')).toBe(15000000);
+        expect(parseSmartInput('2 crore')).toBe(20000000);
+        expect(parseSmartInput('2.5 crores')).toBe(25000000);
+      });
+
+      it('handles currency symbols and signs with shorthand', () => {
+        expect(parseSmartInput('₹55k')).toBe(55000);
+        expect(parseSmartInput('$1.5M')).toBe(1500000);
+        expect(parseSmartInput('€500k')).toBe(500000);
+        expect(parseSmartInput('£2m')).toBe(2000000);
+        expect(parseSmartInput('-55k')).toBe(-55000);
+        expect(parseSmartInput('-$1.5M')).toBe(-1500000);
+        expect(parseSmartInput('-₹10L')).toBe(-1000000);
+      });
+    });
+
+    describe('Item 21 — European Decimal Notation', () => {
+      it('treats single comma with no dot as decimal point', () => {
+        expect(parseSmartInput('4,5')).toBe(4.5);
+        expect(parseSmartInput('4,5%')).toBe(4.5);
+        expect(parseSmartInput('12,75')).toBe(12.75);
+        expect(parseSmartInput('0,25')).toBe(0.25);
+        expect(parseSmartInput('8,5%')).toBe(8.5);
+      });
+
+      it('parses European dot-thousand and comma-decimal (1.000,50 -> 1000.50)', () => {
+        expect(parseSmartInput('1.000,50')).toBe(1000.5);
+        expect(parseSmartInput('1.234.567,89')).toBe(1234567.89);
+        expect(parseSmartInput('€1.000,50')).toBe(1000.5);
+      });
+
+      it('parses single comma as decimal when activeCurrency is EUR', () => {
+        expect(parseSmartInput('1000,50', 'EUR')).toBe(1000.5);
+        expect(parseSmartInput('50,000', 'EUR')).toBe(50);
+      });
+
+      it('parses standard thousand comma in non-EUR mode', () => {
+        expect(parseSmartInput('50,000')).toBe(50000);
+        expect(parseSmartInput('1,000.50')).toBe(1000.5);
+        expect(parseSmartInput('10,00,000')).toBe(1000000);
+      });
+
+      it('combines European decimal comma with shorthand multipliers', () => {
+        expect(parseSmartInput('1,5k')).toBe(1500);
+        expect(parseSmartInput('1,5m')).toBe(1500000);
+        expect(parseSmartInput('1,5cr')).toBe(15000000);
+      });
+    });
+
+    describe('Edge cases & Fallbacks', () => {
+      it('returns null for empty, whitespace, or invalid strings', () => {
+        expect(parseSmartInput('')).toBeNull();
+        expect(parseSmartInput('   ')).toBeNull();
+        expect(parseSmartInput('abc')).toBeNull();
+        expect(parseSmartInput('xyz123')).toBeNull();
+        expect(parseSmartInput('1.2.3.4')).toBeNull();
+      });
+
+      it('handles numeric input passthrough', () => {
+        expect(parseSmartInput(55000)).toBe(55000);
+        expect(parseSmartInput(0)).toBe(0);
+        expect(parseSmartInput(-0)).toBe(0);
+      });
+
+      it('handles zero correctly', () => {
+        expect(parseSmartInput('0')).toBe(0);
+        expect(parseSmartInput('0,0')).toBe(0);
+        expect(parseSmartInput('0.0')).toBe(0);
+      });
     });
   });
 });

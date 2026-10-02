@@ -402,6 +402,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
@@ -427,9 +428,6 @@ const jsonld = {
   function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
 
   function initFV() {
-    if ((window as any).__cmFVBound) return;
-    (window as any).__cmFVBound = true;
-
     const presEl = document.getElementById('fv-present') as HTMLInputElement | null;
     const rateEl = document.getElementById('fv-rate') as HTMLInputElement | null;
     const yearsEl = document.getElementById('fv-years') as HTMLInputElement | null;
@@ -440,6 +438,22 @@ const jsonld = {
     const errAlert = document.getElementById('fv-error-alert');
     const errMsg   = document.getElementById('fv-error-msg');
     if (!presEl || !rateEl || !yearsEl) return;
+    try {
+      const saved = localStorage.getItem('cm_currency');
+      if (saved) {
+        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
+        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
+      }
+    } catch (e) {}
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = currSym;
+    });
+
+    if (presEl.dataset.bound === 'true') {
+      recalc();
+      return;
+    }
+    presEl.dataset.bound = 'true';
 
     const DEFAULTS = { pv: 100000, rate: 8, years: 10 };
     let timer: ReturnType<typeof setTimeout>;
@@ -448,8 +462,8 @@ const jsonld = {
     function clearError() { if (errAlert) errAlert.classList.add('hidden'); }
 
     function recalc() {
-      const rawPv = presEl!.value.replace(/[^0-9.]/g, '');
-      const vPv = validate(rawPv, fvSchema.pv);
+      const numPv = parseSmartInput(presEl!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vPv = validate(numPv ?? '', fvSchema.pv);
       const vR  = validate(rateEl!.value, fvSchema.r);
       const vY  = validate(yearsEl!.value, fvSchema.y);
       if (!vPv.valid) { showError(vPv.error!.message); return; }
@@ -529,19 +543,42 @@ const jsonld = {
     [presEl, rateEl, yearsEl].forEach(el => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') recalc(); }));
 
     document.getElementById('fv-copy-btn')?.addEventListener('click', async () => {
-      const rawPv = presEl.value.replace(/[^0-9.]/g, '');
-      const vPv = validate(rawPv, fvSchema.pv);
+      const numPv = parseSmartInput(presEl.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const vPv = validate(numPv ?? '', fvSchema.pv);
       const vR  = validate(rateEl.value, fvSchema.r);
       const vY  = validate(yearsEl.value, fvSchema.y);
       if (!vPv.valid || !vR.valid || !vY.valid) return;
       const res = calcFVClient(vPv.value!, vR.value!, vY.value!, FREQ_MAP[freqEl?.value ?? 'annually'] ?? 1);
-      await navigator.clipboard.writeText(`Future Value: ${fmt(res.fv)} (PV: ${fmt(vPv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`);
+      const textToCopy = `Future Value: ${fmt(res.fv)} (PV: ${fmt(vPv.value!)}, rate: ${vR.value}%, ${vY.value} yrs). ${location.href.split('#')[0]}`;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = textToCopy;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('fv-copy-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = o, 2000); }
     });
 
     document.getElementById('fv-share-btn')?.addEventListener('click', async () => {
-      await navigator.clipboard.writeText(location.href);
+      try {
+        await navigator.clipboard.writeText(location.href);
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = location.href;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
       const btn = document.getElementById('fv-share-btn');
       if (btn) { const o = btn.textContent; btn.textContent = 'Copied Link!'; setTimeout(() => btn.textContent = o, 2000); }
     });
@@ -558,16 +595,12 @@ const jsonld = {
       if (e.detail?.symbol) {
         currSym = e.detail.symbol;
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+          el.textContent = currSym;
+        });
         recalc();
       }
     });
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
   }
 
   initFV();
