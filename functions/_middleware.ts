@@ -10,7 +10,7 @@ interface PagesContext {
 }
 
 const CSP_POLICY =
-  "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://*.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.googletagmanager.com https://cloudflareinsights.com https://*.cloudflareinsights.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net; frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;";
+  "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://*.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://www.google.com https://*.google.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://*.googletagmanager.com https://www.google.com https://*.google.com https://cloudflareinsights.com https://*.cloudflareinsights.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net; frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;";
 
 export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
@@ -62,9 +62,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (!newHeaders.has('Cross-Origin-Opener-Policy')) {
       newHeaders.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     }
-    if (!newHeaders.has('Content-Security-Policy')) {
-      newHeaders.set('Content-Security-Policy', CSP_POLICY);
-    }
+    newHeaders.set('Content-Security-Policy', CSP_POLICY);
     if (!newHeaders.has('X-Content-Type-Options')) {
       newHeaders.set('X-Content-Type-Options', 'nosniff');
     }

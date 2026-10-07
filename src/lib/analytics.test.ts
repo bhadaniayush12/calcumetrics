@@ -48,6 +48,11 @@ describe('analytics module', () => {
     it('handles query parameters and hashes', () => {
       expect(getCalculatorType('/sip-calculator?p=25000&r=12#results')).toBe('sip');
     });
+
+    it('handles .html static output filenames', () => {
+      expect(getCalculatorType('/sip-calculator.html')).toBe('sip');
+      expect(getCalculatorType('/in/income-tax-calculator.html')).toBe('income_tax');
+    });
   });
 
   describe('hasAnalyticsConsent & Consent Mode v2', () => {

@@ -67,7 +67,8 @@ export function getCalculatorType(pathname: string): string {
   if (!pathname) return 'unknown';
   const clean = pathname.split('?')[0].split('#')[0].replace(/\/+$/, '');
   const segment = clean.split('/').pop() || '';
-  const type = segment.replace(/-calculator$/, '').replace(/-/g, '_');
+  const noExt = segment.replace(/\.html$/, '');
+  const type = noExt.replace(/-calculator$/, '').replace(/-/g, '_');
   return type || 'unknown';
 }
 
