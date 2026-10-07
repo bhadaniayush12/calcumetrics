@@ -428,6 +428,7 @@ const jsonld = {
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcAmortization } from '../lib/finance/amortization';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '$';
   let currLocale = 'en-US';
   function fmtVal(n: number) {
@@ -541,7 +542,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.totalInterest);
       }
 
-      history.replaceState(null, '', serializeHash({ p: price, d: downPct, r: rate, y: years }));
+      currentHashState = { p: price, d: downPct, r: rate, y: years };
     }
 
     function debounce() {
@@ -655,11 +656,12 @@ const jsonld = {
     });
 
     document.getElementById('mort-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

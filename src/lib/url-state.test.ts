@@ -5,6 +5,7 @@ import {
   restoreFromHash,
   readCurrentHash,
   updateHash,
+  buildShareUrl,
   type HashState,
 } from './url-state';
 import type { ValidationRules } from './validate';
@@ -368,6 +369,17 @@ describe('Phase 4.4 — Calculator URL State Architecture', () => {
 
       updateHash('#p=25000');
       expect(replaceStateMock).toHaveBeenCalledWith(null, '', '/sip-calculator#p=25000');
+    });
+
+    it('buildShareUrl generates complete URL with serialized hash state', () => {
+      const mockLocation = {
+        href: 'https://calcumetrics.com/future-value-calculator#old=1',
+      } as unknown as Location;
+
+      globalThis.window = { location: mockLocation } as any;
+
+      const shareUrl = buildShareUrl({ pv: 100000, r: 8, y: 10 });
+      expect(shareUrl).toBe('https://calcumetrics.com/future-value-calculator#pv=100000&r=8&y=10');
     });
   });
 });

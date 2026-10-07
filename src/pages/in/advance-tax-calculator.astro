@@ -364,6 +364,7 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../../lib/formatters';
   import { calcAdvanceTax } from '../../lib/tax/india';
   import { validate } from '../../lib/validate';
   import { setResult } from '../../lib/result-bus';
@@ -372,6 +373,7 @@ const jsonld = {
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
+    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -440,7 +442,7 @@ const jsonld = {
         if (instEls[idx]) instEls[idx]!.textContent = fmtVal(inst.instalment);
       });
 
-      serializeHash({ tax });
+      currentHashState = { tax };
     }
 
     function debounce() {
@@ -511,11 +513,12 @@ const jsonld = {
     });
 
     document.getElementById('at-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

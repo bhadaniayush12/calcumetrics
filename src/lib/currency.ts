@@ -301,3 +301,54 @@ export function formatDisplayCurrency(
 
   return `${config.symbol}${formattedNumber}`;
 }
+
+/**
+ * Formats a numeric preset chip value dynamically based on currency code and symbol.
+ * In INR:
+ *   >= 10,000,000 -> ₹1 Cr
+ *   >= 100,000    -> ₹1L (or ₹10L, ₹50L)
+ *   >= 1,000      -> ₹5k
+ * In International (USD/EUR/GBP):
+ *   >= 1,000,000,000 -> $1B
+ *   >= 1,000,000     -> $1M (or $2.5M, $10M)
+ *   >= 1,000         -> $5k (or $100k)
+ */
+export function formatPresetChip(num: number, code: CurrencyCode = DEFAULT_CURRENCY, customSymbol?: string): string {
+  const sym = customSymbol || CURRENCY_CONFIG[code]?.symbol || '₹';
+  if (code === 'INR') {
+    if (num >= 10000000) {
+      const cr = num / 10000000;
+      const str = cr % 1 === 0 ? String(cr) : cr.toFixed(1);
+      return `${sym}${str} Cr`;
+    }
+    if (num >= 100000) {
+      const l = num / 100000;
+      const str = l % 1 === 0 ? String(l) : l.toFixed(1);
+      return `${sym}${str}L`;
+    }
+    if (num >= 1000) {
+      const k = num / 1000;
+      const str = k % 1 === 0 ? String(k) : k.toFixed(1);
+      return `${sym}${str}k`;
+    }
+    return `${sym}${num}`;
+  } else {
+    if (num >= 1000000000) {
+      const b = num / 1000000000;
+      const str = b % 1 === 0 ? String(b) : b.toFixed(1);
+      return `${sym}${str}B`;
+    }
+    if (num >= 1000000) {
+      const m = num / 1000000;
+      const str = m % 1 === 0 ? String(m) : m.toFixed(1);
+      return `${sym}${str}M`;
+    }
+    if (num >= 1000) {
+      const k = num / 1000;
+      const str = k % 1 === 0 ? String(k) : k.toFixed(1);
+      return `${sym}${str}k`;
+    }
+    return `${sym}${num}`;
+  }
+}
+

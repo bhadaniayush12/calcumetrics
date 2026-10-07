@@ -445,6 +445,7 @@ const jsonld = {
   const currSym = '$';
   const currLocale = 'en-US';
   function fmtVal(n: number) {
+    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -505,8 +506,8 @@ const jsonld = {
 
       const vSal = validate(numSal ?? '', { required: true, min: 1000, label: 'Annual Salary' });
       const vCon = validate(numCon ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Contribution %' });
-      const vMat = validate(numMat ?? '', { required: true, min: 0, max: 200, decimal: true, label: 'Employer Match %' });
-      const vLim = validate(numLim ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Match Cap %' });
+      const vMat = validate(rawMat ?? '', { required: true, min: 0, max: 200, decimal: true, label: 'Employer Match %' });
+      const vLim = validate(rawLim ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Match Cap %' });
       const vR = validate(numR ?? '', { required: true, min: 0.1, max: 25, decimal: true, label: 'Return Rate' });
       const vY = validate(numY ?? '', { required: true, min: 1, max: 50, integer: true, label: 'Years to Retirement' });
 
@@ -555,7 +556,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', serializeHash({ s: sal, c: con, m: mat, l: lim, r, y }));
+      currentHashState = { s: sal, c: con, m: mat, l: lim, r, y };
     }
 
     function debounce() {
@@ -653,8 +654,8 @@ const jsonld = {
 
       const vSal = validate(numSal ?? '', { required: true, min: 1000, label: 'Salary' });
       const vCon = validate(numCon ?? '', { required: true, min: 0, max: 100, label: 'Contrib' });
-      const vMat = validate(numMat ?? '', { required: true, min: 0, max: 200, label: 'Match' });
-      const vLim = validate(numLim ?? '', { required: true, min: 0, max: 100, label: 'Limit' });
+      const vMat = validate(rawMat ?? '', { required: true, min: 0, max: 200, label: 'Match' });
+      const vLim = validate(rawLim ?? '', { required: true, min: 0, max: 100, label: 'Limit' });
       const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'R' });
       const vY = validate(numY ?? '', { required: true, min: 1, label: 'Y' });
 
@@ -683,11 +684,12 @@ const jsonld = {
     });
 
     document.getElementById('k401-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

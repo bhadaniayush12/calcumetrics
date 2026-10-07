@@ -405,6 +405,7 @@ const jsonld = {
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -517,7 +518,7 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(totalInt);
       }
 
-      serializeHash({ p: principal, emi, y: years });
+      currentHashState = { p: principal, emi, y: years };
     }
 
     function debounce() {
@@ -622,11 +623,12 @@ const jsonld = {
     });
 
     document.getElementById('ir-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

@@ -1,0 +1,255 @@
+{
+  "tools_benchmark": [
+    {
+      "tool_name": "SIP Calculator",
+      "your_url": "https://calcumetrics.com/sip-calculator",
+      "competitor_url": "https://www.groww.in/calculators/sip-calculator"
+    },
+    {
+      "tool_name": "Lump Sum Calculator",
+      "your_url": "https://calcumetrics.com/lump-sum-calculator",
+      "competitor_url": "https://www.groww.in/calculators/lump-sum-calculator"
+    },
+    {
+      "tool_name": "Compound Interest Calculator",
+      "your_url": "https://calcumetrics.com/compound-interest-calculator",
+      "competitor_url": "https://www.nerdwallet.com/banking/calculators/compound-interest-calculator"
+    },
+    {
+      "tool_name": "Simple Interest Calculator",
+      "your_url": "https://calcumetrics.com/simple-interest-calculator#p=100000&r=7.5&y=5",
+      "competitor_url": "https://www.calculator.net/simple-interest-calculator.html"
+    },
+    {
+      "tool_name": "CAGR Calculator",
+      "your_url": "https://calcumetrics.com/cagr-calculator#fv=250000&pv=100000&y=5",
+      "competitor_url": "https://cagrcalculator.net/"
+    },
+    {
+      "tool_name": "Xirr Calculator",
+      "your_url": "https://calcumetrics.com/xirr-calculator",
+      "competitor_url": "https://groww.in/calculators/xirr-calculator"
+    },
+    {
+      "tool_name": "FD Calculator",
+      "your_url": "https://calcumetrics.com/fd-calculator#p=100000&r=7.1&y=5",
+      "competitor_url": "https://groww.in/calculators/fd-calculator"
+    },
+    {
+      "tool_name": "RD Calculator",
+      "your_url": "https://calcumetrics.com/rd-calculator",
+      "competitor_url": "https://groww.in/calculators/rd-calculator"
+    },
+    {
+      "tool_name": "PPF Calculator",
+      "your_url": "https://calcumetrics.com/ppf-calculator",
+      "competitor_url": "https://groww.in/calculators/ppf-calculator"
+    },
+    {
+      "tool_name": "401K Calculator",
+      "your_url": "https://calcumetrics.com/401k-calculator",
+      "competitor_url": "https://www.calculator.net/401k-calculator.html"
+    },
+    {
+      "tool_name": "Inflation Calculator",
+      "your_url": "https://calcumetrics.com/inflation-calculator#a=100000&r=6&y=10",
+      "competitor_url": "https://www.calculator.net/inflation-calculator.html"
+    },
+    {
+      "tool_name": "Savings Goal Calculator",
+      "your_url": "https://calcumetrics.com/savings-goal-calculator#r=10&s=200000&t=2500000&y=5",
+      "competitor_url": "https://www.nerdwallet.com/finance/learn/savings-goal-calculator"
+    },
+    {
+      "tool_name": "EMI Calculator",
+      "your_url": "https://calcumetrics.com/emi-calculator#p=1000000&r=8.5&y=20",
+      "competitor_url": "https://groww.in/calculators/emi-calculator"
+    },
+    {
+      "tool_name": "Home Loan Calculator",
+      "your_url": "https://calcumetrics.com/home-loan-calculator",
+      "competitor_url": "https://capitalbankmd.com/homeloans/calculators/home-loan-calculator"
+    },
+    {
+      "tool_name": "Car Loan Calculator",
+      "your_url": "https://calcumetrics.com/car-loan-calculator",
+      "competitor_url": "https://www.calculator.net/auto-loan-calculator.html"
+    },
+    {
+      "tool_name": "Loan Prepayment Calculator",
+      "your_url": "https://calcumetrics.com/loan-prepayment-calculator",
+      "competitor_url": "https://www.savingforcollege.com/calculators/loan-prepayment-calculator"
+    },
+    {
+      "tool_name": "Mortgage Calculator",
+      "your_url": "https://calcumetrics.com/mortgage-calculator#d=20&p=400000&r=6.75&y=30",
+      "competitor_url": "http://calculator.net/mortgage-calculator.html"
+    },
+    {
+      "tool_name": "Loan Affordability Calculator",
+      "your_url": "https://calcumetrics.com/loan-affordability-calculator#b=40000&r=9&y=15",
+      "competitor_url": "https://www.zillow.com/mortgage-calculator/house-affordability/"
+    },
+    {
+      "tool_name": "Debt-to-Income Ratio Calculator",
+      "your_url": "https://calcumetrics.com/debt-to-income-ratio-calculator#d=30000&i=100000",
+      "competitor_url": "https://www.wellsfargo.com/goals-credit/debt-to-income-calculator/"
+    },
+    {
+      "tool_name": "Credit Card Payoff Calculator",
+      "your_url": "https://calcumetrics.com/credit-card-payoff-calculator#b=150000&p=10000&r=36",
+      "competitor_url": "https://www.experian.com/blogs/ask-experian/credit-card-payoff-calculator/"
+    },
+    {
+      "tool_name": "Loan Amortization Calculator",
+      "your_url": "https://calcumetrics.com/loan-amortization-calculator#p=1000000&r=9.5&y=5",
+      "competitor_url": "https://www.calculator.net/amortization-calculator.html"
+    },
+    {
+      "tool_name": "Interest Rate Calculator",
+      "your_url": "https://calcumetrics.com/interest-rate-calculator",
+      "competitor_url": "https://www.calculator.net/interest-rate-calculator.html"
+    },
+    {
+      "tool_name": "Income Tax Calculator",
+      "your_url": "https://calcumetrics.com/in/income-tax-calculator",
+      "competitor_url": "https://cleartax.in/paytax/taxcalculator"
+    },
+    {
+      "tool_name": "GST Calculator",
+      "your_url": "https://calcumetrics.com/gst-calculator",
+      "competitor_url": "https://www.zoho.com/in/books/free-gst-calculator/"
+    },
+    {
+      "tool_name": "HRA Calculator",
+      "your_url": "https://calcumetrics.com/in/hra-calculator",
+      "competitor_url": "https://taxspanner.com/tools-and-calculators/hra-calculator"
+    },
+    {
+      "tool_name": "TDS Calculator",
+      "your_url": "https://calcumetrics.com/in/tds-calculator",
+      "competitor_url": "https://www.omnicalculator.com/chemistry/tds"
+    },
+    {
+      "tool_name": "Capital Gains Tax Calculator",
+      "your_url": "https://calcumetrics.com/in/capital-gains-tax-calculator",
+      "competitor_url": "https://www.nerdwallet.com/taxes/calculators/capital-gains-tax-calculator"
+    },
+    {
+      "tool_name": "Advance Tax Calculator",
+      "your_url": "https://calcumetrics.com/in/advance-tax-calculator",
+      "competitor_url": "https://fincalculator.in/advance-tax-calculator"
+    },
+    {
+      "tool_name": "Salary and CTC Calculator",
+      "your_url": "https://calcumetrics.com/in/salary-ctc-calculator",
+      "competitor_url": "https://cleartax.in/s/salary-calculator"
+    },
+    {
+      "tool_name": "Break-Even Calculator",
+      "your_url": "https://calcumetrics.com/break-even-calculator#f=500000&p=500&v=300",
+      "competitor_url": "https://www.omnicalculator.com/finance/break-even"
+    },
+    {
+      "tool_name": "UPI MDR Calculator",
+      "your_url": "https://calcumetrics.com/in/upi-mdr-calculator",
+      "competitor_url": "https://withupi.com/tools/upi-charges-calculator"
+    },
+    {
+      "tool_name": "Profit Margin Calculator",
+      "your_url": "https://calcumetrics.com/profit-margin-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/margin/"
+    },
+    {
+      "tool_name": "Markup vs Margin Calculator",
+      "your_url": "https://calcumetrics.com/markup-vs-margin-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/margin-2-sets"
+    },
+    {
+      "tool_name": "ROI Calculator",
+      "your_url": "https://calcumetrics.com/roi-calculator",
+      "competitor_url": "https://www.calculator.net/roi-calculator.html"
+    },
+    {
+      "tool_name": "EOQ Calculator",
+      "your_url": "https://calcumetrics.com/eoq-calculator",
+      "competitor_url": "https://www.zoho.com/in/inventory/economic-order-quantity/"
+    },
+    {
+      "tool_name": "Depreciation Calculator",
+      "your_url": "https://calcumetrics.com/depreciation-calculator",
+      "competitor_url": "https://www.calculator.net/depreciation-calculator.html/"
+    },
+    {
+      "tool_name": "Working Capital Calculator",
+      "your_url": "https://calcumetrics.com/working-capital-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/working-capital"
+    },
+    {
+      "tool_name": "Cost of Goods Sold Calculator",
+      "your_url": "https://calcumetrics.com/cogs-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/cogs"
+    },
+    {
+      "tool_name": "Inventory Turnover Calculator",
+      "your_url": "https://calcumetrics.com/inventory-turnover-calculator",
+      "competitor_url": "https://quickbooks.intuit.com/global/tools-and-templates/inventory-turnover-calculator/"
+    },
+    {
+      "tool_name": "Liquidity Ratios Calculator",
+      "your_url": "https://calcumetrics.com/liquidity-ratios-calculator",
+      "competitor_url": "https://www.calculatorsoup.com/calculators/financial/liquidity-ratios-calculator.php"
+    },
+    {
+      "tool_name": "Cash Conversion Cycle Calculator",
+      "your_url": "https://calcumetrics.com/cash-conversion-cycle-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/cash-conversion-cycle"
+    },
+    {
+      "tool_name": "Debt Service Coverage Ratio Calculator",
+      "your_url": "https://calcumetrics.com/dscr-calculator",
+      "competitor_url": "https://www.omnicalculator.com/finance/dscr"
+    },
+    {
+      "tool_name": "WACC Calculator",
+      "your_url": "https://calcumetrics.com/wacc-calculator#d=3000000&e=7000000&rd=8.5&re=14.2&t=25",
+      "competitor_url": "https://www.calkoo.com/en/wacc-calculator"
+    },
+    {
+      "tool_name": "NPV Calculator",
+      "your_url": "https://calcumetrics.com/npv-calculator#c0=100000&c1=30000&c2=40000&c3=50000&c4=60000&r=10",
+      "competitor_url": "https://www.calculatestuff.com/financial/npv-calculator"
+    },
+    {
+      "tool_name": "IRR Calculator",
+      "your_url": "https://calcumetrics.com/irr-calculator#c0=100000&c1=30000&c2=40000&c3=50000&c4=60000&h=12",
+      "competitor_url": "https://www.calculator.net/irr-calculator.html"
+    },
+    {
+      "tool_name": "Payback Period Calculator",
+      "your_url": "https://calcumetrics.com/payback-period-calculator",
+      "competitor_url": "https://www.calculator.net/payback-period-calculator.html"
+    },
+    {
+      "tool_name": "DCF Calculator",
+      "your_url": "https://calcumetrics.com/dcf-calculator",
+      "competitor_url": "https://www.alphaspread.com/dcf-value-calculator"
+    },
+    {
+      "tool_name": "Discounted Payback Period Calculator",
+      "your_url": "https://calcumetrics.com/discounted-payback-period-calculator",
+      "competitor_url": "https://www.calculator.net/payback-period-calculator.html"
+    },
+    {
+      "tool_name": "Present Value Calculator",
+      "your_url": "https://calcumetrics.com/present-value-calculator#fv=100000&r=8&y=10",
+      "competitor_url": "https://www.calculator.net/present-value-calculator.html"
+    },
+    {
+      "tool_name": "Future Value Calculator",
+      "your_url": "https://calcumetrics.com/future-value-calculator#pv=100000&r=8&y=10",
+      "competitor_url": "https://www.calculator.net/future-value-calculator.html"
+    }
+
+  ]
+}

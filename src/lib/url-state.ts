@@ -271,3 +271,18 @@ export function updateHash(hash: string, replace = true): void {
     window.location.hash = normalized;
   }
 }
+
+/**
+ * Builds a shareable deep-link URL containing the serialized hash state.
+ * Keeps origin/pathname and appends the hash (e.g. "https://calcumetrics.com/future-value-calculator#pv=100000&r=8&y=10").
+ * Safe in browser and SSR/SSG environments.
+ *
+ * @param state - The calculator key-value state to serialize into the hash.
+ * @param baseUrl - Optional base URL (defaults to window.location.href without hash).
+ */
+export function buildShareUrl(state: HashState, baseUrl?: string): string {
+  const hash = serializeHash(state);
+  const base = baseUrl ?? (typeof window !== 'undefined' && window.location ? window.location.href.split('#')[0] : '');
+  return `${base}${hash}`;
+}
+

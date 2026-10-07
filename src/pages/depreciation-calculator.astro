@@ -436,11 +436,13 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { calcDepreciation } from '../lib/calculators/depreciation';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -507,7 +509,7 @@ const jsonld = {
       const method = (methodSelect ? methodSelect.value : 'SLM') as 'SLM' | 'WDV';
 
       const vCost = validate(numCost ?? '', { required: true, min: 1, label: 'Asset Cost' });
-      const vSalvage = validate(numSalvage ?? '', { required: true, min: 0, label: 'Salvage Value' });
+      const vSalvage = validate(rawSalvage ?? '', { required: true, min: 0, label: 'Salvage Value' });
       const vLife = validate(numLife ?? '', { required: true, min: 1, max: 100, label: 'Useful Life' });
 
       if (!vCost.valid) { showError(vCost.error!.message); return; }
@@ -563,7 +565,7 @@ const jsonld = {
         `).join('');
       }
 
-      serializeHash({ c: cost, s: salvage, l: life, m: method });
+      currentHashState = { c: cost, s: salvage, l: life, m: method };
     }
 
     function debounce() {
@@ -642,7 +644,7 @@ const jsonld = {
       const numLife = parseSmartInput(lifeInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const method = (methodSelect ? methodSelect.value : 'SLM') as any;
       const vCost = validate(numCost ?? '', { required: true, min: 1, label: 'Asset Cost' });
-      const vSalvage = validate(numSalvage ?? '', { required: true, min: 0, label: 'Salvage Value' });
+      const vSalvage = validate(rawSalvage ?? '', { required: true, min: 0, label: 'Salvage Value' });
       const vLife = validate(numLife ?? '', { required: true, min: 1, label: 'Life' });
       if (!vCost.valid || !vSalvage.valid || !vLife.valid) return;
 
@@ -672,11 +674,12 @@ const jsonld = {
     });
 
     document.getElementById('dep-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

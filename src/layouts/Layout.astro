@@ -44,7 +44,6 @@ const resolvedOgAlt = ogImageAlt || title;
     <!-- Google tag (gtag.js) with Google Consent Mode v2 (production only) -->
     {import.meta.env.PROD && (
       <>
-        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
         <script is:inline>
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -58,6 +57,7 @@ const resolvedOgAlt = ogImageAlt || title;
 
           gtag('config', 'G-BGJDT7C82V');
         </script>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
       </>
     )}
 

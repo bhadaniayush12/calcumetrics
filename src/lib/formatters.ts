@@ -178,12 +178,11 @@ export function parseSmartInput(
     } else {
       // Exactly one comma
       const parts = baseStr.split(',');
-      const isEur = activeCurrency?.toUpperCase() === 'EUR';
-      // In Europe or when digits after comma != 3 (e.g. "4,5", "12,75", "0,5"), treat as decimal point
-      if (isEur || parts[1].length !== 3) {
+      // When digits after comma != 3 (e.g. "4,5", "12,75", "1000,50", "0,5"), treat as decimal point
+      if (parts[1].length !== 3) {
         normalized = `${parts[0]}.${parts[1]}`;
       } else {
-        // e.g. "50,000" in USD/INR -> thousand separator
+        // e.g. "50,000", "25,000" in USD/EUR/INR -> thousand separator
         normalized = baseStr.replace(/,/g, '');
       }
     }

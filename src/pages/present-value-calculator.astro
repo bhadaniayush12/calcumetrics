@@ -407,6 +407,7 @@ const jsonld = {
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
+  import { getStoredCurrency, CURRENCY_CONFIG } from '../lib/currency';
 
   const pvSchema = {
     fv: { required: true, min: 1, max: 1e10, label: 'Future Amount' },
@@ -434,6 +435,8 @@ const jsonld = {
   }
 
   function initPV() {
+    let currentHashState: Record<string, any> = {};
+
     const futurEl = document.getElementById('pv-future') as HTMLInputElement | null;
     const rateEl  = document.getElementById('pv-rate') as HTMLInputElement | null;
     const yearsEl = document.getElementById('pv-years') as HTMLInputElement | null;
@@ -444,12 +447,12 @@ const jsonld = {
     const errAlert  = document.getElementById('pv-error-alert');
     const errMsg    = document.getElementById('pv-error-msg');
     if (!futurEl || !rateEl || !yearsEl) return;
+
     try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
+      const code = getStoredCurrency();
+      const cfg = CURRENCY_CONFIG[code] || CURRENCY_CONFIG.INR;
+      currSym = cfg.symbol;
+      currLocale = cfg.locale;
     } catch (e) {}
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
@@ -514,7 +517,7 @@ const jsonld = {
       if (legendEls[legendEls.length - 2]) (legendEls[legendEls.length - 2] as HTMLElement).textContent = fmt(res.pv);
       if (legendEls[legendEls.length - 1]) (legendEls[legendEls.length - 1] as HTMLElement).textContent = fmt(res.discount);
 
-      history.replaceState(null, '', serializeHash({ fv, r, y }));
+      currentHashState = { fv, r, y };
     }
 
     function debounce() { clearTimeout(timer); timer = setTimeout(recalc, 100); }
@@ -535,8 +538,14 @@ const jsonld = {
           const pct = ((num - +slider.min) / (+slider.max - +slider.min)) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtIndianInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        if (isFormatted && raw) {
+          input.value = fmtIndianInput(raw);
+          debounce();
+        }
       });
     }
 
@@ -587,11 +596,12 @@ const jsonld = {
     });
 
     document.getElementById('pv-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -621,6 +631,9 @@ const jsonld = {
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });
+        if (futurEl && futurEl.value) {
+          futurEl.value = fmtIndianInput(futurEl.value);
+        }
         recalc();
       }
     });

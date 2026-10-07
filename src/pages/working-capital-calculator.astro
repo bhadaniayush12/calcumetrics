@@ -408,11 +408,13 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { calcWorkingCapital } from '../lib/calculators/working-capital';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -486,8 +488,8 @@ const jsonld = {
       const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash & Bank Balances' });
       const vRec = validate(numRec ?? '', { required: true, min: 0, label: 'Accounts Receivable' });
       const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inventory' });
-      const vPay = validate(numPay ?? '', { required: true, min: 0, label: 'Accounts Payable' });
-      const vDebt = validate(numDebt ?? '', { required: true, min: 0, label: 'Short-Term Debt' });
+      const vPay = validate(rawPay ?? '', { required: true, min: 0, label: 'Accounts Payable' });
+      const vDebt = validate(rawDebt ?? '', { required: true, min: 0, label: 'Short-Term Debt' });
 
       if (!vCash.valid) { showError(vCash.error!.message); return; }
       if (!vRec.valid) { showError(vRec.error!.message); return; }
@@ -550,7 +552,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.netWorkingCapital);
       }
 
-      serializeHash({ c: cash, r: rec, i: inv, p: pay, d: debt });
+      currentHashState = { c: cash, r: rec, i: inv, p: pay, d: debt };
     }
 
     function debounce() {
@@ -643,8 +645,8 @@ const jsonld = {
       const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash' });
       const vRec = validate(numRec ?? '', { required: true, min: 0, label: 'Receivables' });
       const vInv = validate(numInv ?? '', { required: true, min: 0, label: 'Inventory' });
-      const vPay = validate(numPay ?? '', { required: true, min: 0, label: 'Payables' });
-      const vDebt = validate(numDebt ?? '', { required: true, min: 0, label: 'Debt' });
+      const vPay = validate(rawPay ?? '', { required: true, min: 0, label: 'Payables' });
+      const vDebt = validate(rawDebt ?? '', { required: true, min: 0, label: 'Debt' });
       if (!vCash.valid || !vRec.valid || !vInv.valid || !vPay.valid || !vDebt.valid) return;
 
       const res = calcWorkingCapital(vCash.value!, vRec.value!, vInv.value!, 0, vPay.value!, vDebt.value!, 0);
@@ -670,11 +672,12 @@ const jsonld = {
     });
 
     document.getElementById('wc-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

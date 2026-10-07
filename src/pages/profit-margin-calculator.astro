@@ -416,11 +416,13 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { calcProfitMargin } from '../lib/calculators/business';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -488,8 +490,8 @@ const jsonld = {
 
       const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Revenue' });
       const vCogs = validate(numCogs ?? '', { required: true, min: 0, label: 'COGS' });
-      const vOpex = validate(numOpex ?? '', { required: true, min: 0, label: 'OpEx' });
-      const vTaxes = validate(numTaxes ?? '', { required: true, min: 0, label: 'Taxes' });
+      const vOpex = validate(rawOpex ?? '', { required: true, min: 0, label: 'OpEx' });
+      const vTaxes = validate(rawTaxes ?? '', { required: true, min: 0, label: 'Taxes' });
 
       if (!vRev.valid) { showError(vRev.error!.message); return; }
       if (!vCogs.valid) { showError(vCogs.error!.message); return; }
@@ -532,7 +534,7 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(res.netProfit);
       }
 
-      serializeHash({ r: rev, c: cogs, o: opex, t: taxes });
+      currentHashState = { r: rev, c: cogs, o: opex, t: taxes };
     }
 
     function debounce() {
@@ -616,8 +618,8 @@ const jsonld = {
 
       const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Revenue' });
       const vCogs = validate(numCogs ?? '', { required: true, min: 0, label: 'COGS' });
-      const vOpex = validate(numOpex ?? '', { required: true, min: 0, label: 'OpEx' });
-      const vTaxes = validate(numTaxes ?? '', { required: true, min: 0, label: 'Taxes' });
+      const vOpex = validate(rawOpex ?? '', { required: true, min: 0, label: 'OpEx' });
+      const vTaxes = validate(rawTaxes ?? '', { required: true, min: 0, label: 'Taxes' });
 
       if (!vRev.valid || !vCogs.valid || !vOpex.valid || !vTaxes.valid) return;
 
@@ -644,11 +646,12 @@ const jsonld = {
     });
 
     document.getElementById('pm-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

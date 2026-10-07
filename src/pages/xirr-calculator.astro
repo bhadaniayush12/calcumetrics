@@ -452,7 +452,7 @@ const jsonld = {
     });
 
     if (container.dataset.bound === 'true') {
-      recalculateXIRR();
+      recalc();
       return;
     }
     container.dataset.bound = 'true';
@@ -557,9 +557,9 @@ const jsonld = {
       const newRow = document.createElement('div');
       newRow.className = 'flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row';
       newRow.innerHTML = `
-        <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${today}" required />
+        <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${today}" aria-label="Transaction date" required />
         <div class="relative flex-1">
-          <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" placeholder="e.g. 50000" required />
+          <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" placeholder="e.g. 50000" aria-label="Transaction amount" required />
         </div>
         <button type="button" class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer" title="Remove cash flow" aria-label="Remove cash flow">✕</button>
       `;
@@ -577,9 +577,9 @@ const jsonld = {
         row.className = 'flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row';
         row.setAttribute('data-index', String(idx));
         row.innerHTML = `
-          <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${cf.date}" required />
+          <input type="date" class="xirr-date text-xs h-9 px-2 rounded border border-border bg-canvas text-text-primary focus:outline-accent" value="${cf.date}" aria-label="Transaction date" required />
           <div class="relative flex-1">
-            <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" value="${cf.amount}" placeholder="e.g. -50000" required />
+            <input type="text" class="xirr-amount text-sm h-9 w-full px-2.5 rounded border border-border bg-canvas text-text-primary tabular-nums text-right focus:outline-accent" value="${cf.amount}" placeholder="e.g. -50000" aria-label="Transaction amount" required />
           </div>
           <button type="button" class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer" title="Remove cash flow" aria-label="Remove cash flow">✕</button>
         `;

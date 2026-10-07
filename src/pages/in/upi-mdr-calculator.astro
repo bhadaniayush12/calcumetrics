@@ -402,6 +402,7 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../../lib/formatters';
   import { calcUPIMDR } from '../../lib/calculators/upi-mdr';
   import { validate } from '../../lib/validate';
   import { setResult } from '../../lib/result-bus';
@@ -410,6 +411,7 @@ const jsonld = {
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
+    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -463,8 +465,8 @@ const jsonld = {
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Monthly Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
-      const vRate = validate(numRate ?? '', { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
-      const vGst = validate(numGst ?? '', { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
+      const vRate = validate(rawRate ?? '', { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
+      const vGst = validate(rawGst ?? '', { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
 
       if (!vVol.valid) { showError(vVol.error!.message); return; }
       if (!vShare.valid) { showError(vShare.error!.message); return; }
@@ -506,7 +508,7 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(res.totalDeductions);
       }
 
-      serializeHash({ v: vol, s: share, r: rate, g: gst });
+      currentHashState = { v: vol, s: share, r: rate, g: gst };
     }
 
     function debounce() {
@@ -586,8 +588,8 @@ const jsonld = {
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, label: 'Share' });
-      const vRate = validate(numRate ?? '', { required: true, min: 0.1, label: 'Rate' });
-      const vGst = validate(numGst ?? '', { required: true, min: 0, label: 'GST' });
+      const vRate = validate(rawRate ?? '', { required: true, min: 0.1, label: 'Rate' });
+      const vGst = validate(rawGst ?? '', { required: true, min: 0, label: 'GST' });
 
       if (!vVol.valid || !vShare.valid || !vRate.valid || !vGst.valid) return;
 
@@ -614,11 +616,12 @@ const jsonld = {
     });
 
     document.getElementById('mdr-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

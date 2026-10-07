@@ -601,7 +601,7 @@ const jsonld = {
   import { validate } from '../lib/validate';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
   import { formatIndian, formatIndianCompact, formatCompactCurrency, parseSmartInput } from '../lib/formatters';
-  import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
+  import { getStoredCurrency, CURRENCY_CONFIG, formatPresetChip, type CurrencyCode } from '../lib/currency';
 
   const emiSchema = {
     principal: { required: true, min: 10000, max: 100000000, integerOnly: true, label: 'Loan Amount' },
@@ -668,16 +668,11 @@ const jsonld = {
     }
     principalInput.dataset.bound = 'true';
 
-    // Item 1: Sync stored currency before initial recalc & update input prefixes
+    // Item 1: Sync stored currency before initial recalc & update input prefixes and preset chips
     currentCurrencyCode = getStoredCurrency();
     currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
     currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
-    if (currencyDropdown && currencyDropdown.value !== currentCurrencyCode) {
-      currencyDropdown.value = currentCurrencyCode;
-    }
-    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-      el.textContent = currentCurrencySymbol;
-    });
+    setEMICurrency(currentCurrencyCode, currentCurrencySymbol);
 
     const DEFAULTS = { principal: 1000000, rate: 8.5, years: 20 };
     let debounceTimer: ReturnType<typeof setTimeout>;
@@ -815,8 +810,7 @@ const jsonld = {
       }
       window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
-      const hash = serializeHash({ p: principal, r: rate, y: years });
-      updateHash(hash, true);
+// Option B: hash updated on Share click only
     }
 
     function debounceRecalc() {
@@ -940,7 +934,6 @@ const jsonld = {
       principalInput.focus();
     });
 
-    // ── Restore from URL Hash ────────────────────────────────────────────────
     const restored = restoreFromHash(location.hash, {
       p: emiSchema.principal,
       r: emiSchema.rate,
@@ -1041,6 +1034,13 @@ const jsonld = {
       }
       document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
         el.textContent = symbol;
+      });
+      document.querySelectorAll<HTMLButtonElement>('[data-chip-principal]').forEach((btn) => {
+        const val = btn.getAttribute('data-chip-principal');
+        if (val) {
+          const num = parseInt(val, 10);
+          btn.textContent = formatPresetChip(num, code, symbol);
+        }
       });
       recalc();
     }

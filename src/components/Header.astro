@@ -474,6 +474,7 @@ const totalToolsCount = getToolCount();
 
 <script>
   import { CURRENCY_CONFIG, normalizeCurrency, detectUserCurrency, isJurisdictionLocked } from '../lib/currency';
+  import { initDOMCurrencyText, updateAllCurrencySpans } from '../lib/dynamic-currency-text';
 
   function applyCurrency(val: string, broadcast = true) {
     const code = normalizeCurrency(val);
@@ -511,6 +512,7 @@ const totalToolsCount = getToolCount();
       document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
         el.textContent = config.symbol;
       });
+      initDOMCurrencyText(config.code);
     }
 
     if (broadcast) {
@@ -624,10 +626,10 @@ const totalToolsCount = getToolCount();
         const savedCur = localStorage.getItem('cm_currency');
         if (savedCur) {
           const normalized = normalizeCurrency(savedCur);
-          applyCurrency(CURRENCY_CONFIG[normalized].label, false);
+          applyCurrency(CURRENCY_CONFIG[normalized].label, true);
         } else {
           const detected = detectUserCurrency();
-          applyCurrency(CURRENCY_CONFIG[detected].label, false);
+          applyCurrency(CURRENCY_CONFIG[detected].label, true);
         }
       } catch (e) {}
     }
@@ -799,7 +801,10 @@ const totalToolsCount = getToolCount();
     });
 
     function syncControlCenterUI() {
-      const cur = localStorage.getItem('cm_currency') || '₹ INR';
+      let cur = '₹ INR';
+      try {
+        cur = localStorage.getItem('cm_currency') || '₹ INR';
+      } catch (e) {}
       ccPopover?.querySelectorAll<HTMLButtonElement>('[data-cc-curr]').forEach((btn) => {
         const val = btn.getAttribute('data-cc-curr');
         if (val === cur) {
@@ -957,6 +962,15 @@ const totalToolsCount = getToolCount();
           syncControlCenterThemeUI(isDark);
         }
       });
+
+      if (!(window as any).__cmCurrencyTextBound) {
+        (window as any).__cmCurrencyTextBound = true;
+        window.addEventListener('cm:currency-change', (e: any) => {
+          if (e.detail?.code && !isJurisdictionLocked(window.location.pathname)) {
+            updateAllCurrencySpans(e.detail.code);
+          }
+        });
+      }
     }
   }
 

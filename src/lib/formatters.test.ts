@@ -155,7 +155,8 @@ describe('formatters', () => {
 
       it('parses single comma as decimal when activeCurrency is EUR', () => {
         expect(parseSmartInput('1000,50', 'EUR')).toBe(1000.5);
-        expect(parseSmartInput('50,000', 'EUR')).toBe(50);
+        expect(parseSmartInput('50,00', 'EUR')).toBe(50);
+        expect(parseSmartInput('50,000', 'EUR')).toBe(50000);
       });
 
       it('parses standard thousand comma in non-EUR mode', () => {

@@ -459,6 +459,7 @@ const ASSET_OPTIONS = [
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../../lib/formatters';
   import { calcCapitalGains, type AssetType } from '../../lib/tax/india';
   import { validate } from '../../lib/validate';
   import { setResult } from '../../lib/result-bus';
@@ -467,6 +468,7 @@ const ASSET_OPTIONS = [
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
+    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -566,7 +568,7 @@ const ASSET_OPTIONS = [
         if (valEls[1]) valEls[1].textContent = fmtVal(res.totalTax);
       }
 
-      serializeHash({ s: sale, p: purchase, m: months, a: asset });
+      currentHashState = { s: sale, p: purchase, m: months, a: asset };
     }
 
     function debounce() {
@@ -671,11 +673,12 @@ const ASSET_OPTIONS = [
     });
 
     document.getElementById('cgt-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

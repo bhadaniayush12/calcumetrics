@@ -344,7 +344,7 @@ const jsonld = {
         <span class="text-xs font-semibold uppercase tracking-wider text-dark-muted block mb-1">
           Recommended Tax Regime
         </span>
-        <div id="it-result-rec" class="text-2xl sm:text-3xl font-extrabold tabular-nums text-dark-accent tracking-tight" aria-live="polite">
+        <div id="it-result-rec" class="text-xl sm:text-2xl md:text-3xl font-extrabold tabular-nums text-dark-accent tracking-tight break-words" aria-live="polite">
           {result.recommendedRegime === 'Equal' ? 'Both Regimes Equal' : `${result.recommendedRegime} (Save ${savingsCompact})`}
         </div>
       </div>
@@ -444,10 +444,10 @@ const jsonld = {
       </div>
 
       <!-- 2. Current Slabs Comparison Table -->
-      <section aria-labelledby="tax-slabs-comparison" class="mb-10">
+      <section aria-labelledby="tax-slabs-comparison" class="mb-10 max-w-full">
         <h2 id="tax-slabs-comparison" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">New vs Old Tax Regime Slabs (FY 2025-26 & FY 2026-27)</h2>
-        <div class="relative overflow-hidden rounded-card border border-border bg-surface">
-          <div class="overflow-x-auto scrollbar-thin">
+        <div class="relative overflow-hidden rounded-card border border-border bg-surface max-w-full">
+          <div class="overflow-x-auto scrollbar-thin max-w-full">
             <table class="w-full text-xs sm:text-sm border-collapse min-w-[500px]">
               <thead class="bg-surface border-b border-border text-text-primary font-semibold">
                 <tr>
@@ -605,7 +605,7 @@ const jsonld = {
   import { calcIncomeTax } from '../../lib/calculators/income-tax';
   import { setResult } from '../../lib/result-bus';
   import { validate } from '../../lib/validate';
-  import { formatIndian, formatIndianCompact } from '../../lib/formatters';
+  import { formatIndian, formatIndianCompact, parseSmartInput } from '../../lib/formatters';
 
   function fmtVal(n: number) {
     return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));

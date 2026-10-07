@@ -950,9 +950,7 @@ const jsonld = {
       }
       window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
 
-      // URL Hash persistence
-      const hash = serializeHash({ p: monthly, r: rate, y: years });
-      updateHash(hash, true);
+// Option B: hash updated on Share click only
     }
 
     function debounceRecalc() {
@@ -1077,7 +1075,6 @@ const jsonld = {
       monthlyInput.focus();
     });
 
-    // ── Restore from URL Hash ────────────────────────────────────────────────
     const restored = restoreFromHash(location.hash, {
       p: sipSchema.monthly,
       r: sipSchema.rate,

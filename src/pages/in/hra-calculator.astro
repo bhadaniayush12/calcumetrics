@@ -373,6 +373,7 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../../lib/formatters';
   import { calcHRA } from '../../lib/calculators/taxes';
   import { validate } from '../../lib/validate';
   import { setResult } from '../../lib/result-bus';
@@ -381,6 +382,7 @@ const jsonld = {
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
+    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -474,7 +476,7 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(res.taxableHRA);
       }
 
-      serializeHash({ b: basic, h: hra, r: rent, c: isMetro ? 'metro' : 'non-metro' });
+      currentHashState = { b: basic, h: hra, r: rent, c: isMetro ? 'metro' : 'non-metro' };
     }
 
     function debounce() {
@@ -579,11 +581,12 @@ const jsonld = {
     });
 
     document.getElementById('hra-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

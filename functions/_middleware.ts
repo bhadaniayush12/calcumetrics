@@ -65,6 +65,18 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (!newHeaders.has('Content-Security-Policy')) {
       newHeaders.set('Content-Security-Policy', CSP_POLICY);
     }
+    if (!newHeaders.has('X-Content-Type-Options')) {
+      newHeaders.set('X-Content-Type-Options', 'nosniff');
+    }
+    if (!newHeaders.has('Referrer-Policy')) {
+      newHeaders.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    }
+    if (!newHeaders.has('Permissions-Policy')) {
+      newHeaders.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
+    }
+    if (!newHeaders.has('X-Frame-Options')) {
+      newHeaders.set('X-Frame-Options', 'SAMEORIGIN');
+    }
 
     // If request is on a pages.dev hostname (preview/staging), add noindex, nofollow
     if (url.hostname.includes('pages.dev')) {
@@ -82,6 +94,10 @@ export async function onRequest(context: PagesContext): Promise<Response> {
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
       'Content-Security-Policy': CSP_POLICY,
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), browsing-topics=()',
+      'X-Frame-Options': 'SAMEORIGIN',
     });
 
     if (context.env?.ASSETS) {

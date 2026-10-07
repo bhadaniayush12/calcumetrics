@@ -391,6 +391,7 @@ const jsonld = {
   import { serializeHash, restoreFromHash, readCurrentHash, updateHash } from '../lib/url-state';
   import { setResult } from '../lib/result-bus';
   import { calcLumpSum, type CompoundFrequency } from '../lib/calculators/lumpsum';
+  import { getStoredCurrency, CURRENCY_CONFIG } from '../lib/currency';
 
   // ── Currency state ──────────────────────────────────────────────────────────
   let currSym = '₹';
@@ -412,7 +413,6 @@ const jsonld = {
     years: { required: true, min: 1, max: 50, integerOnly: true, negativeAllowed: false, label: 'Tenure' },
   };
 
-  // URL Hash state schema mapping (Phase 4.4 URL State Engine)
   const HASH_SCHEMA: Record<'p' | 'r' | 'y', ValidationRules> = {
     p: CI_RULES.principal,
     r: CI_RULES.rate,
@@ -469,11 +469,10 @@ const jsonld = {
     if (!pInput || !rInput || !yInput) return;
 
     try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
+      const code = getStoredCurrency();
+      const cfg = CURRENCY_CONFIG[code] || CURRENCY_CONFIG.INR;
+      currSym = cfg.symbol;
+      currLocale = cfg.locale;
     } catch (e) {}
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
@@ -534,20 +533,30 @@ const jsonld = {
         },
       });
 
+      const resMatEl = document.getElementById('ci-result-maturity');
+      if (resMatEl) resMatEl.textContent = fmtVal(res.maturity);
+      const resPrincEl = document.getElementById('ci-result-principal');
+      if (resPrincEl) resPrincEl.textContent = fmtVal(p);
+      const resGainEl = document.getElementById('ci-result-gain');
+      if (resGainEl) resGainEl.textContent = fmtVal(res.gain);
+      const resGainPctEl = document.getElementById('ci-result-gainpct');
+      if (resGainPctEl) resGainPctEl.textContent = res.gainPct.toFixed(1) + '%';
+
       // ── Composition bar update (visual sub-component) ──────────────────
       const wrapper = document.getElementById('ci-composition-wrapper');
       if (wrapper) {
-        const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
-        const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
+        const bar = (wrapper.querySelector('[data-comp-bar="principal"]') || wrapper.querySelector('[class*="bg-dark-muted"]')) as HTMLElement | null;
+        const gainBar = (wrapper.querySelector('[data-comp-bar="gain"]') || wrapper.querySelector('[class*="bg-dark-accent"]')) as HTMLElement | null;
         if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
         if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
-        const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
-        if (legendEls[0]) legendEls[0].textContent = fmtVal(p);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+        const legP = wrapper.querySelector<HTMLElement>('[data-comp-legend="principal"]') || wrapper.querySelectorAll('[class*="tabular-nums"]')[0];
+        const legG = wrapper.querySelector<HTMLElement>('[data-comp-legend="gain"]') || wrapper.querySelectorAll('[class*="tabular-nums"]')[1];
+        if (legP) legP.textContent = fmtVal(p);
+        if (legG) legG.textContent = fmtVal(res.gain);
       }
 
       // ── Phase 4.4: URL hash state via shared utility ───────────────────
-      updateHash(serializeHash({ f, p, r, y }));
+// Option B: hash updated on Share click only
     }
 
     function debounce() {
@@ -618,7 +627,7 @@ const jsonld = {
         ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1)) * 100}%`);
       }
       // Clear hash on reset via shared url-state utility
-      updateHash('');
+
       recalc();
       pInput.focus();
     });
@@ -667,9 +676,9 @@ const jsonld = {
         fSelect.value = rawFreq;
         hashRestored = true;
       }
-
-      if (hashRestored) recalc();
     }
+
+    recalc();
 
     // ── Copy & Share ────────────────────────────────────────────────────────
     async function flashBtn(btn: HTMLElement, label: string) {
@@ -741,6 +750,9 @@ const jsonld = {
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });
+        if (pInput && pInput.value) {
+          pInput.value = fmtLiveInput(pInput.value);
+        }
         recalc();
       }
     });

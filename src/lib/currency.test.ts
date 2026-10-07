@@ -6,6 +6,7 @@ import {
   DEFAULT_CURRENCY_LABEL,
   detectUserCurrency,
   formatDisplayCurrency,
+  formatPresetChip,
   getCurrencyConfig,
   getJurisdictionCurrency,
   getStoredCurrency,
@@ -248,8 +249,33 @@ describe('Phase 9: Currency Display / Locale System', () => {
     expect(detectUserCurrency('', 'en-IN')).toBe('INR');
     expect(detectUserCurrency('', 'hi')).toBe('INR');
 
-    // Unknown fallback -> INR
     expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('INR');
     expect(detectUserCurrency('', '')).toBe('INR');
   });
+
+  // ── 8. Preset Chip Dynamic Localization ────────────────────────────────────
+  it('formats preset chip amounts correctly for Indian vs International currencies', () => {
+    // INR formatting
+    expect(formatPresetChip(5000, 'INR')).toBe('₹5k');
+    expect(formatPresetChip(25000, 'INR')).toBe('₹25k');
+    expect(formatPresetChip(100000, 'INR')).toBe('₹1L');
+    expect(formatPresetChip(1000000, 'INR')).toBe('₹10L');
+    expect(formatPresetChip(2500000, 'INR')).toBe('₹25L');
+    expect(formatPresetChip(10000000, 'INR')).toBe('₹1 Cr');
+
+    // USD formatting
+    expect(formatPresetChip(5000, 'USD')).toBe('$5k');
+    expect(formatPresetChip(25000, 'USD')).toBe('$25k');
+    expect(formatPresetChip(100000, 'USD')).toBe('$100k');
+    expect(formatPresetChip(500000, 'USD')).toBe('$500k');
+    expect(formatPresetChip(1000000, 'USD')).toBe('$1M');
+    expect(formatPresetChip(2500000, 'USD')).toBe('$2.5M');
+    expect(formatPresetChip(10000000, 'USD')).toBe('$10M');
+
+    // EUR formatting
+    expect(formatPresetChip(1000000, 'EUR')).toBe('€1M');
+    // GBP formatting
+    expect(formatPresetChip(1000000, 'GBP')).toBe('£1M');
+  });
 });
+

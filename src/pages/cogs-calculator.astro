@@ -433,11 +433,13 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { calcCOGS } from '../lib/calculators/cogs';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -511,10 +513,10 @@ const jsonld = {
 
       const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
       const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });
-      const vLab = validate(numLab ?? '', { required: true, min: 0, label: 'Direct Labor' });
-      const vOvh = validate(numOvh ?? '', { required: true, min: 0, label: 'Overhead' });
-      const vEnd = validate(numEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
-      const vRev = validate(numRev ?? '', { required: true, min: 0, label: 'Revenue' });
+      const vLab = validate(rawLab ?? '', { required: true, min: 0, label: 'Direct Labor' });
+      const vOvh = validate(rawOvh ?? '', { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(rawEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(rawRev ?? '', { required: true, min: 0, label: 'Revenue' });
 
       if (!vBeg.valid) { showError(vBeg.error!.message); return; }
       if (!vPurch.valid) { showError(vPurch.error!.message); return; }
@@ -563,7 +565,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.grossProfit);
       }
 
-      serializeHash({ b: beg, p: purch, l: lab, o: ovh, e: end, r: rev });
+      currentHashState = { b: beg, p: purch, l: lab, o: ovh, e: end, r: rev };
     }
 
     function debounce() {
@@ -662,10 +664,10 @@ const jsonld = {
 
       const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
       const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });
-      const vLab = validate(numLab ?? '', { required: true, min: 0, label: 'Labor' });
-      const vOvh = validate(numOvh ?? '', { required: true, min: 0, label: 'Overhead' });
-      const vEnd = validate(numEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
-      const vRev = validate(numRev ?? '', { required: true, min: 0, label: 'Revenue' });
+      const vLab = validate(rawLab ?? '', { required: true, min: 0, label: 'Labor' });
+      const vOvh = validate(rawOvh ?? '', { required: true, min: 0, label: 'Overhead' });
+      const vEnd = validate(rawEnd ?? '', { required: true, min: 0, label: 'Ending Inventory' });
+      const vRev = validate(rawRev ?? '', { required: true, min: 0, label: 'Revenue' });
       if (!vBeg.valid || !vPurch.valid || !vLab.valid || !vOvh.valid || !vEnd.valid || !vRev.valid) return;
 
       const res = calcCOGS(vBeg.value!, vPurch.value!, vLab.value!, vOvh.value!, vEnd.value!, vRev.value!);
@@ -691,11 +693,12 @@ const jsonld = {
     });
 
     document.getElementById('cogs-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

@@ -351,11 +351,13 @@ const jsonld = {
 </Layout>
 
 <script>
+  import { parseSmartInput } from '../lib/formatters';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcLumpSum } from '../lib/calculators/lumpsum';
 
+  let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
   function fmtVal(n: number) {
@@ -461,7 +463,7 @@ const jsonld = {
         if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
       }
 
-      history.replaceState(null, '', serializeHash({ p, r, y }));
+      currentHashState = { p, r, y };
     }
 
     function debounce() {
@@ -568,11 +570,12 @@ const jsonld = {
     });
 
     document.getElementById('ls-share-btn')?.addEventListener('click', async () => {
+      const shareUrl = `${location.href.split('#')[0]}${serializeHash(currentHashState)}`;
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);

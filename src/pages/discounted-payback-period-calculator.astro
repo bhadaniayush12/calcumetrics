@@ -385,6 +385,7 @@ const jsonld = {
   import { parseSmartInput } from '../lib/formatters';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
+  import { getStoredCurrency, CURRENCY_CONFIG } from '../lib/currency';
 
   function dppCalcClient(invest: number, flows: number[], ratePct: number) {
     const r = ratePct / 100;
@@ -432,11 +433,10 @@ const jsonld = {
     const errMsg       = document.getElementById('dpp-error-msg');
     if (!investEl || !rateEl || !container) return;
     try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
+      const code = getStoredCurrency();
+      const cfg = CURRENCY_CONFIG[code] || CURRENCY_CONFIG.INR;
+      currSym = cfg.symbol;
+      currLocale = cfg.locale;
     } catch (e) {}
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
@@ -522,8 +522,14 @@ const jsonld = {
           slider.value = String(num);
           slider.style.setProperty('--slider-pct', `${((num - +slider.min) / (+slider.max - +slider.min) * 100).toFixed(2)}%`);
         }
-        if (isFormatted) input.value = fmtInput(raw);
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const raw = input.value.replace(/[^0-9.]/g, '');
+        if (isFormatted && raw) {
+          input.value = fmtInput(raw);
+          debounce();
+        }
       });
     }
 
@@ -531,9 +537,9 @@ const jsonld = {
     syncSlider(rateSlider, rateEl, false);
 
     container.addEventListener('input', debounce);
-    container.querySelectorAll('input').forEach(el => el.addEventListener('input', () => {
+    container.querySelectorAll('input').forEach(el => el.addEventListener('blur', () => {
       const raw = el.value.replace(/[^0-9]/g, '');
-      el.value = fmtInput(raw);
+      if (raw) el.value = fmtInput(raw);
     }));
 
     document.getElementById('dpp-add-year')?.addEventListener('click', () => {
@@ -542,11 +548,18 @@ const jsonld = {
       div.className = 'flex gap-3 items-center';
       div.innerHTML = `<span class="text-xs text-text-muted w-12 shrink-0">Year ${yearCount + 1}</span>
         <div class="flex-1 relative">
-          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10">₹</span>
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10" data-currency-prefix="true">${currSym}</span>
           <input id="dpp-flow-${yearCount}" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="0" />
         </div>`;
       container.appendChild(div);
       yearCount++;
+      const newInput = div.querySelector('input');
+      if (newInput) {
+        newInput.addEventListener('blur', () => {
+          const raw = newInput.value.replace(/[^0-9]/g, '');
+          if (raw) newInput.value = fmtInput(raw);
+        });
+      }
       document.getElementById('dpp-remove-year')?.removeAttribute('disabled');
       debounce();
     });
@@ -624,6 +637,12 @@ const jsonld = {
         currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
+        });
+        if (investEl && investEl.value) {
+          investEl.value = fmtInput(investEl.value);
+        }
+        container.querySelectorAll('input').forEach((el) => {
+          if (el.value) el.value = fmtInput(el.value);
         });
         recalc();
       }

@@ -522,7 +522,7 @@ const jsonld = {
   import { calcGST } from '../../lib/calculators/taxes';
   import { setResult } from '../../lib/result-bus';
   import { validate } from '../../lib/validate';
-  import { formatIndian, formatIndianCompact } from '../../lib/formatters';
+  import { formatIndian, formatIndianCompact, parseSmartInput } from '../../lib/formatters';
 
   function fmtVal(n: number) {
     return '₹' + new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(Math.round(n));

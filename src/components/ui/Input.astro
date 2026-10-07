@@ -48,7 +48,9 @@ const {
   ...rest
 } = Astro.props;
 
-const resolvedInputMode = inputmode || (isNumeric || localeFormat !== 'none' || type === 'number' ? 'decimal' : undefined);
+const isCurrencyPrefix = Boolean(prefix && ['₹', '$', '€', '£'].includes(prefix));
+const resolvedGrouping = localeFormat !== 'none' ? localeFormat : (isCurrencyPrefix ? 'indian' : 'none');
+const resolvedInputMode = inputmode || (isNumeric || resolvedGrouping !== 'none' || type === 'number' ? 'decimal' : undefined);
 
 const isError = Boolean(errorMessage);
 const helperId = helperText ? `${id}-helper` : undefined;
@@ -86,7 +88,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
           'text-[14px] select-none pr-1.5 shrink-0 font-medium',
           isError ? 'text-error-text' : disabled ? 'text-disabled-text' : 'text-text-muted',
         ]}
-        data-currency-prefix={['₹', '$', '€', '£'].includes(prefix) ? 'true' : undefined}
+        data-currency-prefix={isCurrencyPrefix ? 'true' : undefined}
       >
         {prefix}
       </span>
@@ -108,11 +110,11 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
       aria-invalid={isError ? 'true' : undefined}
       aria-describedby={describedBy}
       aria-label={!label ? ariaLabel || placeholder || id : undefined}
-      data-numeric={isNumeric ? 'true' : undefined}
-      data-digit-grouping={localeFormat}
+      data-numeric={isNumeric || isCurrencyPrefix ? 'true' : undefined}
+      data-digit-grouping={resolvedGrouping !== 'none' ? resolvedGrouping : undefined}
       class:list={[
         'w-full bg-transparent border-0 p-0 text-[15px] leading-none focus:outline-none placeholder:text-text-muted/60',
-        isNumeric || localeFormat !== 'none' ? 'text-right tabular-nums font-normal' : 'text-left',
+        isNumeric || resolvedGrouping !== 'none' ? 'text-right tabular-nums font-normal' : 'text-left',
         isError ? 'text-error-text' : disabled ? 'text-disabled-text cursor-not-allowed' : 'text-text-primary',
       ]}
       {...rest}
@@ -145,6 +147,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 
 <script>
   import { parseSmartInput, formatIndian, formatIntl } from '../../lib/formatters';
+  import { getStoredCurrency, CURRENCY_CONFIG, formatPresetChip, type CurrencyCode } from '../../lib/currency';
 
   function applyCurrencyGrouping(code?: string) {
     const pathname = window.location.pathname;
@@ -152,8 +155,10 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
       return;
     }
 
-    const targetGrouping = code === 'INR' ? 'indian' : 'international';
-    const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"]');
+    const activeCode: CurrencyCode = (code as CurrencyCode) || getStoredCurrency();
+    const config = CURRENCY_CONFIG[activeCode] || CURRENCY_CONFIG.INR;
+    const targetGrouping = activeCode === 'INR' ? 'indian' : 'international';
+    const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"], input[data-numeric="true"]');
 
     inputs.forEach((input) => {
       const prevGrouping = input.getAttribute('data-digit-grouping');
@@ -163,17 +168,38 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 
       const raw = input.value.trim();
       if (raw) {
-        const parsed = parseSmartInput(raw, code === 'EUR' ? 'EUR' : undefined);
+        const parsed = parseSmartInput(raw);
         if (parsed !== null && !isNaN(parsed)) {
+          let newVal = '';
           if (Number.isInteger(parsed)) {
-            input.value = targetGrouping === 'indian' ? formatIndian(parsed) : formatIntl(parsed);
+            newVal = targetGrouping === 'indian' ? formatIndian(parsed) : formatIntl(parsed);
           } else {
             const intVal = Math.floor(parsed);
             const decStr = String(parsed).split('.')[1] || '00';
-            input.value = targetGrouping === 'indian'
+            newVal = targetGrouping === 'indian'
               ? `${formatIndian(intVal)}.${decStr}`
               : formatIntl(parsed, 2);
           }
+          if (input.value !== newVal) {
+            input.value = newVal;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+      }
+    });
+
+    // Update prefix spans next to inputs
+    document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
+      el.textContent = config.symbol;
+    });
+
+    // Update preset chips across calculators (SIP, EMI, FD, etc.)
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-monthly], [data-chip-principal], [data-chip-amount]').forEach((btn) => {
+      const valStr = btn.getAttribute('data-chip-monthly') || btn.getAttribute('data-chip-principal') || btn.getAttribute('data-chip-amount');
+      if (valStr) {
+        const num = parseFloat(valStr);
+        if (!isNaN(num)) {
+          btn.textContent = formatPresetChip(num, activeCode, config.symbol);
         }
       }
     });
@@ -270,17 +296,10 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
       });
     });
 
-    // Sync grouping with stored currency on load if not default INR
+    // Sync grouping with stored currency on load
     try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        const code = saved.includes('USD') || saved.includes('$') ? 'USD'
-          : saved.includes('EUR') || saved.includes('€') ? 'EUR'
-          : saved.includes('GBP') || saved.includes('£') ? 'GBP' : 'INR';
-        if (code !== 'INR') {
-          applyCurrencyGrouping(code);
-        }
-      }
+      const stored = getStoredCurrency();
+      applyCurrencyGrouping(stored);
     } catch (e) {}
   }
 
