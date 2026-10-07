@@ -34,8 +34,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     });
   }
 
-  // Canonical domain enforcement: 301 permanent redirect www.calcumetrics.com -> calcumetrics.com
-  if (url.hostname === 'www.calcumetrics.com') {
+  // Canonical domain enforcement: 301 permanent redirect www.calcumetrics.com or calcumetrics.pages.dev -> calcumetrics.com
+  if (url.hostname === 'www.calcumetrics.com' || url.hostname === 'calcumetrics.pages.dev') {
     const canonicalTarget = new URL(context.request.url);
     canonicalTarget.hostname = 'calcumetrics.com';
     canonicalTarget.protocol = 'https:';

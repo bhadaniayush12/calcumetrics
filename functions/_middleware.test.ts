@@ -2,20 +2,21 @@ import { describe, expect, it } from 'vitest';
 import { onRequest } from './_middleware';
 
 describe('Cloudflare Pages _middleware', () => {
-  it('adds X-Robots-Tag: noindex, nofollow on pages.dev hostname', async () => {
+  it('permanently redirects (301) root calcumetrics.pages.dev to canonical calcumetrics.com', async () => {
+    let nextCalled = false;
     const context = {
-      request: new Request('https://calcumetrics.pages.dev/'),
-      next: async () => new Response('OK', {
-        headers: { 'X-Content-Type-Options': 'nosniff' },
-      }),
+      request: new Request('https://calcumetrics.pages.dev/sip-calculator'),
+      next: async () => {
+        nextCalled = true;
+        return new Response('OK');
+      },
     };
 
     const response = await onRequest(context);
-    expect(response.headers.get('X-Robots-Tag')).toBe('noindex, nofollow');
-    expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
-    expect(response.headers.get('Strict-Transport-Security')).toBe('max-age=31536000; includeSubDomains');
-    expect(response.headers.get('Cross-Origin-Opener-Policy')).toBe('same-origin-allow-popups');
-    expect(response.headers.get('Content-Security-Policy')).toContain("default-src 'self'");
+    expect(response.status).toBe(301);
+    expect(response.statusText).toBe('Moved Permanently');
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/sip-calculator');
+    expect(nextCalled).toBe(false);
   });
 
   it('adds X-Robots-Tag on branch preview pages.dev subdomains', async () => {
@@ -128,7 +129,7 @@ describe('Cloudflare Pages _middleware', () => {
 
   it('handles 304 Not Modified without throwing', async () => {
     const context = {
-      request: new Request('https://calcumetrics.pages.dev/asset.js'),
+      request: new Request('https://preview.calcumetrics.pages.dev/asset.js'),
       next: async () => new Response(null, { status: 304, statusText: 'Not Modified' }),
     };
 
