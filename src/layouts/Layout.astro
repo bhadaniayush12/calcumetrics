@@ -117,11 +117,6 @@ const resolvedOgAlt = ogImageAlt || title;
     <link rel="preload" href="/fonts/inter/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/inter/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
 
-    <!-- Cloudflare Web Analytics (Cookieless, privacy-preserving, production only) -->
-    {import.meta.env.PROD && (
-      <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "01d0a5f7cefa40f4b360b031d279cf43"}'></script>
-    )}
-
     <!-- Page-specific head content (JSON-LD, extra meta, etc.) -->
     <slot name="head" />
   </head>
