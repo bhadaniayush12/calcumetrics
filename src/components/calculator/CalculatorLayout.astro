@@ -231,9 +231,11 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
     getJurisdictionCurrency,
     getCurrencyConfig,
     normalizeCurrency,
+    getStoredCurrency,
   } from '../../lib/currency';
   import { animateValue } from '../../lib/animate-number';
   import { trackCalculatorCompletion, trackCalculateComplete, getCalculatorType } from '../../lib/analytics';
+  import { applyMarketDefaults } from '../../lib/market-defaults-runner';
 
   /**
    * Phase 4.2 — Canonical result store bootstrapped on window.__cmResultStore.
@@ -327,50 +329,50 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
     // Ensure body scroll is unlocked on page load or client transition
     document.body.style.overflow = '';
 
-    if (!detailsBtn || !sheet || !closeBtn) return;
-    if (detailsBtn.dataset.shellBound === 'true') return;
-    detailsBtn.dataset.shellBound = 'true';
+    if (detailsBtn && sheet && closeBtn && detailsBtn.dataset.shellBound !== 'true') {
+      detailsBtn.dataset.shellBound = 'true';
 
-    const openSheet = () => {
-      sheet.dataset.open = 'true';
-      sheet.setAttribute('role', 'dialog');
-      sheet.setAttribute('aria-modal', 'true');
-      detailsBtn.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-      closeBtn.focus();
-    };
+      const openSheet = () => {
+        sheet.dataset.open = 'true';
+        sheet.setAttribute('role', 'dialog');
+        sheet.setAttribute('aria-modal', 'true');
+        detailsBtn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+      };
 
-    const closeSheet = () => {
-      sheet.dataset.open = 'false';
-      sheet.removeAttribute('role');
-      sheet.removeAttribute('aria-modal');
-      detailsBtn.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-      detailsBtn.focus();
-    };
+      const closeSheet = () => {
+        sheet.dataset.open = 'false';
+        sheet.removeAttribute('role');
+        sheet.removeAttribute('aria-modal');
+        detailsBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+        detailsBtn.focus();
+      };
 
-    detailsBtn.addEventListener('click', openSheet);
-    closeBtn.addEventListener('click', closeSheet);
+      detailsBtn.addEventListener('click', openSheet);
+      closeBtn.addEventListener('click', closeSheet);
 
-    // Focus trap within sheet
-    sheet.addEventListener('keydown', (e) => {
-      if (e.key !== 'Tab') return;
-      const focusable = Array.from(
-        sheet.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter((el) => !el.hasAttribute('disabled'));
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    });
+      // Focus trap within sheet
+      sheet.addEventListener('keydown', (e) => {
+        if (e.key !== 'Tab') return;
+        const focusable = Array.from(
+          sheet.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.hasAttribute('disabled'));
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      });
+    }
 
     // Helper to render/update DOM from canonical result state with smooth count-up animation
     const applyCanonicalResult = (result: CalcResult) => {
@@ -458,8 +460,32 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
       const markInteracted = () => {
         userHasInteracted = true;
       };
-      inputsArea.addEventListener('input', markInteracted, { passive: true });
-      inputsArea.addEventListener('change', markInteracted, { passive: true });
+      const markInputModified = (target: HTMLElement | null) => {
+        if (!target) return;
+        if (target.tagName === 'INPUT') {
+          target.dataset.userModified = 'true';
+          if (target.id.endsWith('-slider')) {
+            const pairedId = target.id.replace(/-slider$/, '');
+            const paired = document.getElementById(pairedId) as HTMLInputElement | null;
+            if (paired) paired.dataset.userModified = 'true';
+          } else {
+            const pairedSlider = document.getElementById(`${target.id}-slider`) as HTMLInputElement | null;
+            if (pairedSlider) pairedSlider.dataset.userModified = 'true';
+          }
+        }
+      };
+      inputsArea.addEventListener('input', (e) => {
+        markInteracted();
+        if (e.isTrusted) {
+          markInputModified(e.target as HTMLElement | null);
+        }
+      }, { passive: true });
+      inputsArea.addEventListener('change', (e) => {
+        markInteracted();
+        if (e.isTrusted) {
+          markInputModified(e.target as HTMLElement | null);
+        }
+      }, { passive: true });
       inputsArea.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null;
         if (target && (target.closest('button, [data-chip], [data-chip-monthly], [data-chip-principal], [data-chip-rate], [data-chip-years], [data-chip-gross]') || target.tagName === 'INPUT' || target.tagName === 'SELECT')) {
@@ -468,7 +494,7 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
       }, { passive: true });
     }
 
-    // 3. Reset button handling (resets interaction flag to avoid firing on reset)
+    // 3. Reset button handling (resets interaction flag and restores market defaults for active currency)
     const resetBtn = document.querySelector<HTMLButtonElement>('button[id$="-reset"]');
     if (resetBtn && resetBtn.dataset.analyticsResetBound !== 'true') {
       resetBtn.dataset.analyticsResetBound = 'true';
@@ -478,20 +504,44 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
           clearTimeout(completionDebounceTimer);
           completionDebounceTimer = null;
         }
+        // Defer to next tick so synchronous page-level click handlers reset state first, then active market defaults win
+        setTimeout(() => {
+          try {
+            const curCode = getStoredCurrency();
+            applyMarketDefaults(resolvedCalcType, curCode, { forceReset: true });
+          } catch {}
+        }, 0);
       });
     }
 
     // 4. Trigger on completed calculation result after user interaction
-    if ((detailsBtn as any)._analyticsUnsub) {
+    if (detailsBtn && (detailsBtn as any)._analyticsUnsub) {
       (detailsBtn as any)._analyticsUnsub();
     }
-    (detailsBtn as any)._analyticsUnsub = _store.subscribeResult(() => {
+    const unsubAnalytics = _store.subscribeResult(() => {
       if (!userHasInteracted) return;
       if (completionDebounceTimer) clearTimeout(completionDebounceTimer);
       completionDebounceTimer = setTimeout(() => {
         fireCompletionEvent();
       }, 750);
     });
+    if (detailsBtn) {
+      (detailsBtn as any)._analyticsUnsub = unsubAnalytics;
+    }
+
+    // Initial load: if user has not provided custom hash params, apply market defaults for active currency
+    try {
+      const curCode = getStoredCurrency();
+      if (!window.location.hash || window.location.hash.length <= 2) {
+        applyMarketDefaults(resolvedCalcType, curCode);
+      }
+    } catch {}
+
+    // Initialize number system preference from localStorage
+    try {
+      const numSys = localStorage.getItem('cm_number_system') || 'indian';
+      document.documentElement.dataset.numberSystem = numSys;
+    } catch {}
 
     // Global listeners — registered only once across app lifetime
     if (!_win.__calcShellGlobalBound) {
@@ -531,13 +581,25 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
         }
       });
 
-      // Generic currency prefix updater — registered only once (bypassed for region-locked tools)
+      // Generic currency prefix updater & market defaults — registered only once (bypassed for region-locked tools)
       window.addEventListener('cm:currency-change', (e: any) => {
         if (isJurisdictionLocked(window.location.pathname)) return;
         if (e.detail?.symbol) {
           document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
             el.textContent = e.detail.symbol;
           });
+        }
+        if (e.detail?.code) {
+          const currentType = document.querySelector<HTMLElement>('[data-calculator-type]')?.dataset.calculatorType || getCalculatorType(window.location.pathname);
+          applyMarketDefaults(currentType, e.detail.code);
+        }
+      });
+
+      // Number format toggle: propagate system preference to DOM and trigger recalculation
+      window.addEventListener('cm:number-format-change', (e: any) => {
+        const sys = e.detail?.system;
+        if (sys === 'indian' || sys === 'international') {
+          document.documentElement.dataset.numberSystem = sys;
         }
       });
 
@@ -602,6 +664,11 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
       document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
         el.textContent = config.symbol;
       });
+
+      if (normalized !== 'INR' && !isJurisdictionLocked(window.location.pathname)) {
+        const currentType = document.querySelector<HTMLElement>('[data-calculator-type]')?.dataset.calculatorType || getCalculatorType(window.location.pathname);
+        applyMarketDefaults(currentType, normalized);
+      }
     } catch (e) {}
   }
 

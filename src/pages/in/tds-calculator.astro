@@ -396,10 +396,11 @@ const SECTION_OPTIONS = [
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -575,20 +576,23 @@ const SECTION_OPTIONS = [
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      amt: { required: true, min: 100, label: 'amt' },
-    });
-    if (restored.valid && restored.values.amt) {
-      amtInput.value = fmtLiveInput(String(restored.values.amt));
-      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
-      const sec = hashParams.get('sec');
-      if (sec && ['194J', '194C', '194I', '194A', '194H', '194', '194Q'].includes(sec)) {
-        secSelect.value = sec;
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        amt: { required: true, min: 100, label: 'amt' },
+      });
+      if (restored.valid && restored.values.amt) {
+        amtInput.value = fmtLiveInput(String(restored.values.amt));
+        const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+        const sec = hashParams.get('sec');
+        if (sec && ['194J', '194C', '194I', '194A', '194H', '194', '194Q'].includes(sec)) {
+          secSelect.value = sec;
+        }
       }
       recalc();
-    } else {
-      recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initTDSCalc();

@@ -442,10 +442,10 @@ const jsonld = {
   import { calc401K } from '../../lib/calculators/401k';
 
   // Strict USD jurisdiction lock
+  let currentHashState: Record<string, any> = {};
   const currSym = '$';
   const currLocale = 'en-US';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -706,25 +706,28 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      s: { required: true, min: 1000, label: 's' },
-      c: { required: true, min: 0, max: 100, decimal: true, label: 'c' },
-      m: { required: true, min: 0, max: 200, decimal: true, label: 'm' },
-      l: { required: true, min: 0, max: 100, decimal: true, label: 'l' },
-      r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
-      y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
-    });
-    if (restored.valid && restored.values.s && restored.values.c !== undefined && restored.values.r !== undefined && restored.values.y) {
-      salaryInput.value = fmtLiveInput(String(restored.values.s));
-      contribInput.value = String(restored.values.c);
-      if (matchInput && restored.values.m !== undefined) matchInput.value = String(restored.values.m);
-      if (matchLimitInput && restored.values.l !== undefined) matchLimitInput.value = String(restored.values.l);
-      rateInput.value = String(restored.values.r);
-      yearsInput.value = String(restored.values.y);
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        s: { required: true, min: 1000, label: 's' },
+        c: { required: true, min: 0, max: 100, decimal: true, label: 'c' },
+        m: { required: true, min: 0, max: 200, decimal: true, label: 'm' },
+        l: { required: true, min: 0, max: 100, decimal: true, label: 'l' },
+        r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
+        y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
+      });
+      if (restored.valid && restored.values.s && restored.values.c !== undefined && restored.values.r !== undefined && restored.values.y) {
+        salaryInput.value = fmtLiveInput(String(restored.values.s));
+        contribInput.value = String(restored.values.c);
+        if (matchInput && restored.values.m !== undefined) matchInput.value = String(restored.values.m);
+        if (matchLimitInput && restored.values.l !== undefined) matchLimitInput.value = String(restored.values.l);
+        rateInput.value = String(restored.values.r);
+        yearsInput.value = String(restored.values.y);
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   init401KCalc();

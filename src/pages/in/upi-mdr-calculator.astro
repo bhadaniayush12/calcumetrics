@@ -408,10 +408,11 @@ const jsonld = {
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -638,21 +639,24 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      v: { required: true, min: 1000, label: 'v' },
-      s: { required: true, min: 0, max: 100, decimal: true, label: 's' },
-      r: { required: true, min: 0.1, max: 5, decimal: true, label: 'r' },
-      g: { required: true, min: 0, max: 28, decimal: true, label: 'g' },
-    });
-    if (restored.valid && restored.values.v && restored.values.s !== undefined && restored.values.r !== undefined && restored.values.g !== undefined) {
-      volInput.value = fmtLiveInput(String(restored.values.v));
-      shareInput.value = String(restored.values.s);
-      if (rateInput) rateInput.value = String(restored.values.r);
-      if (gstInput) gstInput.value = String(restored.values.g);
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        v: { required: true, min: 1000, label: 'v' },
+        s: { required: true, min: 0, max: 100, decimal: true, label: 's' },
+        r: { required: true, min: 0.1, max: 5, decimal: true, label: 'r' },
+        g: { required: true, min: 0, max: 28, decimal: true, label: 'g' },
+      });
+      if (restored.valid && restored.values.v && restored.values.s !== undefined && restored.values.r !== undefined && restored.values.g !== undefined) {
+        volInput.value = fmtLiveInput(String(restored.values.v));
+        shareInput.value = String(restored.values.s);
+        if (rateInput) rateInput.value = String(restored.values.r);
+        if (gstInput) gstInput.value = String(restored.values.g);
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initMDRCalc();

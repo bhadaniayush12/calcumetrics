@@ -379,10 +379,11 @@ const jsonld = {
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -603,22 +604,25 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      b: { required: true, min: 10000, label: 'b' },
-      h: { required: true, min: 0, label: 'h' },
-      r: { required: true, min: 0, label: 'r' },
-    });
-    if (restored.valid && restored.values.b && restored.values.h !== undefined && restored.values.r !== undefined) {
-      basicInput.value = fmtLiveInput(String(restored.values.b));
-      hraInput.value = fmtLiveInput(String(restored.values.h));
-      rentInput.value = fmtLiveInput(String(restored.values.r));
-      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
-      const c = hashParams.get('c');
-      if (c && citySelect) citySelect.value = c;
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        b: { required: true, min: 10000, label: 'b' },
+        h: { required: true, min: 0, label: 'h' },
+        r: { required: true, min: 0, label: 'r' },
+      });
+      if (restored.valid && restored.values.b && restored.values.h !== undefined && restored.values.r !== undefined) {
+        basicInput.value = fmtLiveInput(String(restored.values.b));
+        hraInput.value = fmtLiveInput(String(restored.values.h));
+        rentInput.value = fmtLiveInput(String(restored.values.r));
+        const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+        const c = hashParams.get('c');
+        if (c && citySelect) citySelect.value = c;
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initHRACalc();

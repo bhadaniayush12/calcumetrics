@@ -23,11 +23,12 @@ export interface CurrencyTokenData {
   numericValue: number;
   unit?: string;
   hasRupee: boolean;
+  hasDollar?: boolean;
   decLen: number;
 }
 
-// Matches rupee expressions like: ₹25,000, ₹1,26,14,400, ₹50 Lakh, ~₹52.6 Lakh, -₹1,00,000, +₹20,000
-export const RUPEE_TOKEN_REGEX = /([-+~–−]?)(₹)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K))?\b/gi;
+// Matches rupee and dollar expressions like: ₹25,000, $400,000, ₹1,26,14,400, ₹50 Lakh, ~₹52.6 Lakh, -₹1,00,000, +₹20,000
+export const RUPEE_TOKEN_REGEX = /([-+~–−]?)(₹|\$)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K|m|M|b|B))?\b/gi;
 
 // Matches standalone Indian grouping numbers (e.g. 10,00,000 or 1,00,000) not preceded by currency or word char
 export const INDIAN_NUM_TOKEN_REGEX = /(?<![₹$€£\w])\b(\d{1,2}(?:,\d{2})+(?:,\d{3})(?:\.\d+)?)\b/g;
@@ -39,6 +40,58 @@ export function formatConvertedToken(
   data: CurrencyTokenData,
   targetCode: CurrencyCode
 ): string {
+  if (data.hasDollar) {
+    if (targetCode === 'USD') {
+      return data.originalRaw;
+    }
+    const symMap: Record<CurrencyCode, string> = {
+      USD: '$',
+      EUR: '€',
+      GBP: '£',
+      INR: '₹',
+    };
+    const sym = symMap[targetCode] || '$';
+
+    if (data.unit) {
+      const u = data.unit.toLowerCase();
+      const mult = u.startsWith('b') ? 1e9 : (u.startsWith('m') ? 1e6 : (u.startsWith('k') ? 1e3 : 1));
+      const totalVal = data.numericValue * mult;
+      let formattedUnit = '';
+      if (targetCode === 'INR') {
+        if (totalVal >= 10_000_000) {
+          formattedUnit = `${sym}${(totalVal / 10_000_000).toFixed(2).replace(/\.?0+$/, '')} Cr`;
+        } else if (totalVal >= 100_000) {
+          formattedUnit = `${sym}${(totalVal / 100_000).toFixed(2).replace(/\.?0+$/, '')} Lakh`;
+        } else {
+          formattedUnit = `${sym}${new Intl.NumberFormat('en-IN').format(totalVal)}`;
+        }
+      } else {
+        if (totalVal >= 1_000_000) {
+          formattedUnit = `${sym}${(totalVal / 1_000_000).toFixed(2).replace(/\.?0+$/, '')}M`;
+        } else if (totalVal >= 1_000) {
+          formattedUnit = `${sym}${(totalVal / 1_000).toFixed(2).replace(/\.?0+$/, '')}k`;
+        } else {
+          formattedUnit = `${sym}${totalVal}`;
+        }
+      }
+      return data.sign ? `${data.sign}${formattedUnit}` : formattedUnit;
+    }
+
+    const rounded = data.decLen > 0 ? data.numericValue.toFixed(data.decLen) : Math.round(data.numericValue).toString();
+    const parts = rounded.split('.');
+    const intPart = targetCode === 'INR'
+      ? new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(parseInt(parts[0], 10))
+      : parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formattedNum = parts.length > 1 ? `${intPart}.${parts[1]}` : intPart;
+
+    if (data.sign === '-' || data.sign === '–' || data.sign === '−') {
+      return `-${sym}${formattedNum}`;
+    } else if (data.sign) {
+      return `${data.sign}${sym}${formattedNum}`;
+    }
+    return `${sym}${formattedNum}`;
+  }
+
   if (targetCode === 'INR') {
     return data.originalRaw;
   }
@@ -94,17 +147,17 @@ export function formatConvertedToken(
 }
 
 /**
- * Pure string converter: transforms all rupee tokens and Indian grouping numbers
+ * Pure string converter: transforms all rupee and dollar tokens and Indian grouping numbers
  * in a string into the target currency representation.
  */
 export function convertCurrencyString(text: string, targetCode: CurrencyCode): string {
   if (!text) return '';
-  if (targetCode === 'INR') return text;
+  if (targetCode === 'INR' && !text.includes('$')) return text;
 
-  const COMBINED_REGEX = /([-+~–−]?)(₹)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K))?\b|(?<![₹$€£\w])\b(\d{1,2}(?:,\d{2})+(?:,\d{3})(?:\.\d+)?)\b/gi;
+  const COMBINED_REGEX = /([-+~–−]?)(₹|\$)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K|m|M|b|B))?\b|(?<![₹$€£\w])\b(\d{1,2}(?:,\d{2})+(?:,\d{3})(?:\.\d+)?)\b/gi;
 
-  return text.replace(COMBINED_REGEX, (fullMatch, sign, rupee, rawNum, unit, indNum) => {
-    if (rupee === '₹') {
+  return text.replace(COMBINED_REGEX, (fullMatch, sign, currSym, rawNum, unit, indNum) => {
+    if (currSym === '₹' || currSym === '$') {
       const cleanNum = parseFloat(rawNum.replace(/,/g, ''));
       const decLen = rawNum.includes('.') ? rawNum.split('.')[1].length : 0;
       return formatConvertedToken(
@@ -113,7 +166,8 @@ export function convertCurrencyString(text: string, targetCode: CurrencyCode): s
           sign: sign || '',
           numericValue: cleanNum,
           unit,
-          hasRupee: true,
+          hasRupee: currSym === '₹',
+          hasDollar: currSym === '$',
           decLen,
         },
         targetCode
@@ -127,6 +181,7 @@ export function convertCurrencyString(text: string, targetCode: CurrencyCode): s
           sign: '',
           numericValue: cleanNum,
           hasRupee: false,
+          hasDollar: false,
           decLen,
         },
         targetCode
@@ -139,15 +194,24 @@ export function convertCurrencyString(text: string, targetCode: CurrencyCode): s
 /**
  * Checks whether an element should be skipped during DOM scanning.
  */
-function shouldSkipElement(el: Element): boolean {
+export function shouldSkipElement(el: Element): boolean {
   const tag = el.tagName;
   if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEXTAREA', 'INPUT', 'SELECT'].includes(tag)) {
     return true;
   }
-  if (el.closest('form, [data-calculator-form], #header-currency-menu, #current-currency-btn, #mobile-currency-select, #control-center-popover, #search-modal')) {
+  if (
+    el.closest(
+      'form, [data-calculator-form], #header-currency-menu, #current-currency-btn, #mobile-currency-select, #control-center-popover, #search-modal, [data-no-dynamic-currency], [data-preserve-currency], [data-jurisdiction-locked], [data-jurisdiction="IN"], [data-jurisdiction="US"], [data-jurisdiction="UK"]'
+    )
+  ) {
     return true;
   }
-  if (el.hasAttribute('data-currency-prefix') || el.hasAttribute('data-preset-chip') || el.hasAttribute('data-cm-currency-text')) {
+  if (
+    el.hasAttribute('data-currency-prefix') ||
+    el.hasAttribute('data-preset-chip') ||
+    el.hasAttribute('data-cm-currency-text') ||
+    el.hasAttribute('data-no-dynamic-currency')
+  ) {
     return true;
   }
   return false;
@@ -158,11 +222,11 @@ function shouldSkipElement(el: Element): boolean {
  */
 export function processTextNode(node: Text): Node[] | null {
   const text = node.nodeValue;
-  if (!text || (!text.includes('₹') && !/\d,\d{2},\d{3}/.test(text))) {
+  if (!text || (!text.includes('₹') && !text.includes('$') && !/\d,\d{2},\d{3}/.test(text))) {
     return null;
   }
 
-  const COMBINED_REGEX = /([-+~–−]?)(₹)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K))?\b|(?<![₹$€£\w])\b(\d{1,2}(?:,\d{2})+(?:,\d{3})(?:\.\d+)?)\b/gi;
+  const COMBINED_REGEX = /([-+~–−]?)(₹|\$)\s*([0-9]+(?:,[0-9]+)*(?:\.[0-9]+)?)(?:\s*(Crores?|Cr|Lakhs?|L|k|K|m|M|b|B))?\b|(?<![₹$€£\w])\b(\d{1,2}(?:,\d{2})+(?:,\d{3})(?:\.\d+)?)\b/gi;
 
   const fragments: Node[] = [];
   let lastIndex = 0;
@@ -180,8 +244,8 @@ export function processTextNode(node: Text): Node[] | null {
     const fullMatch = match[0];
     let tokenData: CurrencyTokenData;
 
-    if (match[2] === '₹') {
-      // Rupee match
+    if (match[2] === '₹' || match[2] === '$') {
+      // Rupee or Dollar match
       const sign = match[1] || '';
       const rawNum = match[3];
       const unit = match[4];
@@ -193,7 +257,8 @@ export function processTextNode(node: Text): Node[] | null {
         sign,
         numericValue: cleanNum,
         unit,
-        hasRupee: true,
+        hasRupee: match[2] === '₹',
+        hasDollar: match[2] === '$',
         decLen,
       };
     } else {
@@ -207,6 +272,7 @@ export function processTextNode(node: Text): Node[] | null {
         sign: '',
         numericValue: cleanNum,
         hasRupee: false,
+        hasDollar: false,
         decLen,
       };
     }

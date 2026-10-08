@@ -370,10 +370,11 @@ const jsonld = {
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -535,15 +536,18 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      tax: { required: true, min: 0, label: 'tax' },
-    });
-    if (restored.valid && restored.values.tax !== undefined) {
-      taxInput.value = fmtLiveInput(String(restored.values.tax));
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        tax: { required: true, min: 0, label: 'tax' },
+      });
+      if (restored.valid && restored.values.tax !== undefined) {
+        taxInput.value = fmtLiveInput(String(restored.values.tax));
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initAdvanceTaxCalc();

@@ -18,7 +18,19 @@ const jsonld = {
   <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <nav aria-label="Breadcrumb" class="mb-6"><ol class="flex items-center gap-1.5 text-xs text-text-muted"><li><a href="/" class="hover:text-accent transition-standard">Home</a></li><li aria-hidden="true">›</li><li class="text-text-primary font-medium" aria-current="page">Taxes</li></ol></nav>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">Tax Calculators</h1>
-    <p class="text-sm text-text-muted mb-8 max-w-xl">Compute GST amounts and HRA tax exemption using current official rates. Rates are verified from official government sources and updated when they change.</p>
+    <p class="text-sm text-text-muted mb-6 max-w-xl">Compute GST amounts, income tax under New &amp; Old Regimes, and HRA tax exemption using current official statutory rates.</p>
+
+    <!-- Regional Scope Banner -->
+    <div class="mb-8 p-4 bg-surface border border-border rounded-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-2 py-0.5 rounded font-semibold bg-accent/10 text-accent">India 🇮🇳</span>
+        <span class="text-text-muted">Statutory direct &amp; indirect tax tools compliant with the Indian Income Tax Act (FY 2026-27 / AY 2027-28) &amp; GST Council norms.</span>
+      </div>
+      <div class="text-text-muted shrink-0">
+        Looking for US tools? Visit <a href="/us/401k-calculator" class="text-accent hover:underline font-medium">US Calculators &rarr;</a>
+      </div>
+    </div>
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {tools.map((tool) => (
         <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">

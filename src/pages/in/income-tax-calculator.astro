@@ -647,11 +647,46 @@ const jsonld = {
 
     if (!grossInput) return;
 
+    function applyHash() {
+      try {
+        const hash = window.location.hash;
+        if (hash) {
+          const match = hash.match(/(?:gross|g|p)=([0-9]+)/i);
+          if (match) {
+            const val = parseInt(match[1], 10);
+            if (!isNaN(val) && val >= 10000) {
+              grossInput.value = fmtLiveInput(String(val));
+              if (grossSlider) {
+                grossSlider.value = String(val);
+                grossSlider.style.setProperty('--slider-pct', `${((val - 300000) / (10000000 - 300000)) * 100}%`);
+              }
+            }
+          }
+          const c80Match = hash.match(/(?:c80|80c)=([0-9]+)/i);
+          if (c80Match && c80Input) {
+            const val = parseInt(c80Match[1], 10);
+            if (!isNaN(val)) {
+              c80Input.value = fmtLiveInput(String(val));
+              if (c80Slider) {
+                c80Slider.value = String(val);
+                c80Slider.style.setProperty('--slider-pct', `${(val / 150000) * 100}%`);
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
     if (grossInput.dataset.bound === 'true') {
+      applyHash();
       recalc();
       return;
     }
     grossInput.dataset.bound = 'true';
+    window.addEventListener('hashchange', () => {
+      applyHash();
+      recalc();
+    });
 
     const DEFAULTS = { gross: 1500000, c80: 150000, d80: 25000, other: 50000 };
     let timer: ReturnType<typeof setTimeout>;
@@ -884,6 +919,7 @@ const jsonld = {
       }
     });
 
+    applyHash();
     recalc();
   }
 

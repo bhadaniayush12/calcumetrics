@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcSIP, calcSIPYearly, type SIPResult } from './sip';
+import { calcSIP, calcSIPYearly, calcStepUpSIP, calcStepUpSIPYearly, type SIPResult } from './sip';
 import { validate, type ValidationRules } from '../validate';
 import { serializeHash, restoreFromHash } from '../url-state';
 import type { CalcResult } from '../result-bus';
@@ -182,6 +182,42 @@ describe('SIP Calculator (Phase 5.1)', () => {
       expect(canonical.heroValue).toBe('₹1,26,14,400');
       expect(canonical.rows?.length).toBe(3);
       expect(canonical.fields?.['sip-result-maturity']).toBe('₹1,26,14,400');
+    });
+  });
+
+  describe('6. Step-Up (Top-Up) SIP Engine', () => {
+    it('accurately compounds 10% annual step-up: ₹25k/mo at 12% over 15 years', () => {
+      const res = calcStepUpSIP(25000, 12, 15, 'percentage', 10);
+      expect(Math.round(res.maturity)).toBe(21709624);
+      expect(Math.round(res.invested)).toBe(9531745);
+      expect(Math.round(res.gain)).toBe(12177879);
+      expect(res.principalFraction + res.gainFraction).toBeCloseTo(1.0, 5);
+    });
+
+    it('accurately calculates fixed annual step-up: ₹25k/mo + ₹2,500/year increase at 12% over 15 years', () => {
+      const res = calcStepUpSIP(25000, 12, 15, 'fixed', 2500);
+      expect(Math.round(res.maturity)).toBe(18773202);
+      expect(res.invested).toBe(7650000);
+      expect(Math.round(res.gain)).toBe(11123202);
+    });
+
+    it('generates yearly progression breakdown with stepping monthly installments', () => {
+      const schedule = calcStepUpSIPYearly(25000, 12, 5, 'percentage', 10);
+      expect(schedule.length).toBe(5);
+      expect(schedule[0].monthlyInvestment).toBe(25000);
+      expect(schedule[1].monthlyInvestment).toBe(27500); // Year 2: +10%
+      expect(schedule[2].monthlyInvestment).toBe(30250); // Year 3: +10%
+      expect(schedule[3].monthlyInvestment).toBe(33275); // Year 4: +10%
+      expect(schedule[4].monthlyInvestment).toBe(36603); // Year 5: +10%
+      expect(schedule[4].invested).toBe(calcStepUpSIP(25000, 12, 5, 'percentage', 10).invested);
+    });
+
+    it('gracefully handles 0% or negative step-up values by falling back to standard regular SIP', () => {
+      const standard = calcSIP(25000, 12, 15);
+      const zero = calcStepUpSIP(25000, 12, 15, 'percentage', 0);
+      const neg = calcStepUpSIP(25000, 12, 15, 'percentage', -5);
+      expect(Math.round(zero.maturity)).toBe(Math.round(standard.maturity));
+      expect(Math.round(neg.maturity)).toBe(Math.round(standard.maturity));
     });
   });
 });

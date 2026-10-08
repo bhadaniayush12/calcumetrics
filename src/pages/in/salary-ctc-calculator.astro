@@ -394,10 +394,11 @@ const jsonld = {
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -574,15 +575,18 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      ctc: { required: true, min: 100000, label: 'ctc' },
-    });
-    if (restored.valid && restored.values.ctc) {
-      ctcInput.value = fmtLiveInput(String(restored.values.ctc));
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        ctc: { required: true, min: 100000, label: 'ctc' },
+      });
+      if (restored.valid && restored.values.ctc) {
+        ctcInput.value = fmtLiveInput(String(restored.values.ctc));
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initSalaryCTCCalc();

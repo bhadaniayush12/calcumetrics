@@ -3,6 +3,7 @@ import {
   formatConvertedToken,
   convertCurrencyString,
   processTextNode,
+  shouldSkipElement,
   CurrencyTokenData,
 } from './dynamic-currency-text';
 
@@ -197,6 +198,20 @@ describe('convertCurrencyString', () => {
       'Outflow: -$100,000, Profit: +$20,000, Valuation: +$185,000'
     );
   });
+
+  it('converts dollar amounts on universal tools into EUR, GBP, and INR', () => {
+    const text = 'Consider a home purchased for $400,000 with a $80,000 down payment and $320,000 net loan';
+    expect(convertCurrencyString(text, 'EUR')).toBe(
+      'Consider a home purchased for €400,000 with a €80,000 down payment and €320,000 net loan'
+    );
+    expect(convertCurrencyString(text, 'GBP')).toBe(
+      'Consider a home purchased for £400,000 with a £80,000 down payment and £320,000 net loan'
+    );
+    expect(convertCurrencyString(text, 'INR')).toBe(
+      'Consider a home purchased for ₹4,00,000 with a ₹80,000 down payment and ₹3,20,000 net loan'
+    );
+    expect(convertCurrencyString(text, 'USD')).toBe(text);
+  });
 });
 
 describe('processTextNode with mock document', () => {
@@ -239,6 +254,63 @@ describe('processTextNode with mock document', () => {
     const data = JSON.parse(fragments[1].getAttribute('data-cm-data'));
     expect(data.numericValue).toBe(12614400);
     expect(data.hasRupee).toBe(true);
+  });
+});
+
+describe('shouldSkipElement', () => {
+  function createMockElement(tag: string, attrs: Record<string, string> = {}, parent: any = null) {
+    const el: any = {
+      tagName: tag.toUpperCase(),
+      attributes: attrs,
+      parent,
+      hasAttribute: (name: string) => Boolean(attrs[name]),
+      getAttribute: (name: string) => attrs[name] ?? null,
+      closest: (selector: string) => {
+        let cur: any = el;
+        while (cur) {
+          if (selector.includes('[data-no-dynamic-currency]') && cur.hasAttribute('data-no-dynamic-currency')) return cur;
+          if (selector.includes('[data-preserve-currency]') && cur.hasAttribute('data-preserve-currency')) return cur;
+          if (selector.includes('[data-jurisdiction-locked]') && cur.hasAttribute('data-jurisdiction-locked')) return cur;
+          if (selector.includes('[data-jurisdiction="IN"]') && cur.getAttribute('data-jurisdiction') === 'IN') return cur;
+          if (selector.includes('form') && cur.tagName === 'FORM') return cur;
+          cur = cur.parent;
+        }
+        return null;
+      },
+    };
+    return el as unknown as Element;
+  }
+
+  it('skips input, select, textarea, script, style tags', () => {
+    expect(shouldSkipElement(createMockElement('input'))).toBe(true);
+    expect(shouldSkipElement(createMockElement('select'))).toBe(true);
+    expect(shouldSkipElement(createMockElement('textarea'))).toBe(true);
+    expect(shouldSkipElement(createMockElement('script'))).toBe(true);
+    expect(shouldSkipElement(createMockElement('style'))).toBe(true);
+  });
+
+  it('skips elements directly marked with data-no-dynamic-currency', () => {
+    const el = createMockElement('tr', { 'data-no-dynamic-currency': 'true' });
+    expect(shouldSkipElement(el)).toBe(true);
+  });
+
+  it('skips child elements inside statutory containers marked with data-no-dynamic-currency', () => {
+    const tableRow = createMockElement('tr', { 'data-no-dynamic-currency': 'true' });
+    const tableCell = createMockElement('td', {}, tableRow);
+    const codeSpan = createMockElement('span', {}, tableCell);
+    expect(shouldSkipElement(codeSpan)).toBe(true);
+  });
+
+  it('skips elements inside jurisdiction locked containers (e.g. India statutory rules)', () => {
+    const section = createMockElement('section', { 'data-jurisdiction': 'IN' });
+    const paragraph = createMockElement('p', {}, section);
+    expect(shouldSkipElement(paragraph)).toBe(true);
+  });
+
+  it('does NOT skip regular content elements without skip markers', () => {
+    const div = createMockElement('div');
+    const p = createMockElement('p', {}, div);
+    expect(shouldSkipElement(p)).toBe(false);
   });
 });
 

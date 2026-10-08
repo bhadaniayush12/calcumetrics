@@ -147,17 +147,29 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 
 <script>
   import { parseSmartInput, formatIndian, formatIntl } from '../../lib/formatters';
-  import { getStoredCurrency, CURRENCY_CONFIG, formatPresetChip, type CurrencyCode } from '../../lib/currency';
+  import { getStoredCurrency, CURRENCY_CONFIG, formatPresetChip, isJurisdictionLocked, type CurrencyCode } from '../../lib/currency';
 
-  function applyCurrencyGrouping(code?: string) {
+  function applyCurrencyGrouping(code?: string, explicitSystem?: string) {
     const pathname = window.location.pathname;
-    if (pathname.startsWith('/in/') || pathname === '/in' || pathname.startsWith('/us/') || pathname === '/us') {
+    if (isJurisdictionLocked(pathname)) {
       return;
     }
 
     const activeCode: CurrencyCode = (code as CurrencyCode) || getStoredCurrency();
     const config = CURRENCY_CONFIG[activeCode] || CURRENCY_CONFIG.INR;
-    const targetGrouping = activeCode === 'INR' ? 'indian' : 'international';
+    let targetGrouping: 'indian' | 'international' = (explicitSystem as any);
+    if (!targetGrouping) {
+      try {
+        const storedSys = localStorage.getItem('cm_number_system');
+        if (storedSys === 'indian' || storedSys === 'international') {
+          targetGrouping = storedSys;
+        } else {
+          targetGrouping = activeCode === 'INR' ? 'indian' : 'international';
+        }
+      } catch {
+        targetGrouping = activeCode === 'INR' ? 'indian' : 'international';
+      }
+    }
     const inputs = document.querySelectorAll<HTMLInputElement>('input[data-digit-grouping="indian"], input[data-digit-grouping="international"], input[data-numeric="true"]');
 
     inputs.forEach((input) => {
@@ -168,7 +180,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 
       const raw = input.value.trim();
       if (raw) {
-        const parsed = parseSmartInput(raw);
+        const parsed = parseSmartInput(raw, activeCode);
         if (parsed !== null && !isNaN(parsed)) {
           let newVal = '';
           if (Number.isInteger(parsed)) {
@@ -195,6 +207,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
 
     // Update preset chips across calculators (SIP, EMI, FD, etc.)
     document.querySelectorAll<HTMLButtonElement>('[data-chip-monthly], [data-chip-principal], [data-chip-amount]').forEach((btn) => {
+      if (btn.dataset.marketChipControlled === 'true') return;
       const valStr = btn.getAttribute('data-chip-monthly') || btn.getAttribute('data-chip-principal') || btn.getAttribute('data-chip-amount');
       if (valStr) {
         const num = parseFloat(valStr);
@@ -279,8 +292,9 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
       input.addEventListener('blur', () => {
         const val = input.value.trim();
         if (!val) return;
+        const activeCode = getStoredCurrency();
         const mode = (input.getAttribute('data-digit-grouping') || 'international') as 'indian' | 'international';
-        const parsed = parseSmartInput(val);
+        const parsed = parseSmartInput(val, activeCode);
         if (parsed !== null && !isNaN(parsed)) {
           if (Number.isInteger(parsed)) {
             input.value = mode === 'indian' ? formatIndian(parsed) : formatIntl(parsed);
@@ -303,12 +317,18 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
     } catch (e) {}
   }
 
-  // Global listener for currency change (Item 31)
+  // Global listener for currency change and number format toggle
   const _win = window as any;
   if (!_win.__cmInputCurrencyBound) {
     _win.__cmInputCurrencyBound = true;
     window.addEventListener('cm:currency-change', (e: any) => {
       applyCurrencyGrouping(e.detail?.code);
+    });
+    window.addEventListener('cm:number-format-change', (e: any) => {
+      const sys = e.detail?.system;
+      if (sys === 'indian' || sys === 'international') {
+        applyCurrencyGrouping(undefined, sys);
+      }
     });
   }
 

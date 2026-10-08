@@ -14,7 +14,7 @@ import Input from '../components/ui/Input.astro';
 import Dropdown from '../components/ui/Dropdown.astro';
 import Alert from '../components/ui/Alert.astro';
 import Tooltip from '../components/ui/Tooltip.astro';
-import { calcSIP, calcSIPYearly } from '../lib/calculators/sip';
+import { calcSIP, calcSIPYearly, calcStepUpSIP, calcStepUpSIPYearly } from '../lib/calculators/sip';
 import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords, formatPercent } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
@@ -221,6 +221,7 @@ const jsonld = {
             <button
               type="button"
               data-chip-monthly={chip.val}
+              data-market-chip-controlled="true"
               class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
             >
               {chip.label}
@@ -254,6 +255,7 @@ const jsonld = {
             <button
               type="button"
               data-chip-rate={chip.val}
+              data-market-chip-controlled="true"
               class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
             >
               {chip.label}
@@ -293,6 +295,115 @@ const jsonld = {
               {chip.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      <!-- Annual Step-Up (Top-Up) Feature Toggle & Inputs -->
+      <div class="mb-6 p-4 rounded-card border border-border bg-surface/50">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-semibold text-text-primary">Annual Step-Up (Top-Up)</span>
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent">Optional</span>
+            </div>
+            <span class="text-[11px] text-text-muted block mt-0.5">Increase your monthly SIP each year with salary hikes</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer select-none shrink-0" for="sip-stepup-toggle">
+            <input type="checkbox" id="sip-stepup-toggle" class="sr-only peer" />
+            <div class="w-10 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+          </label>
+        </div>
+
+        <div id="sip-stepup-panel" class="hidden mt-4 pt-4 border-t border-border/60 space-y-4">
+          <!-- Step-Up Type Selector: Percentage vs Fixed -->
+          <div class="flex items-center justify-between gap-2 flex-wrap">
+            <span class="text-xs font-medium text-text-muted">Increment Type:</span>
+            <div class="inline-flex rounded-control border border-border bg-canvas p-0.5" role="group" aria-label="Step-Up increment mode">
+              <button
+                type="button"
+                id="sip-stepup-mode-pct"
+                class="px-2.5 py-1 text-xs font-semibold rounded-control transition-standard cursor-pointer bg-surface text-accent shadow-xs"
+                aria-pressed="true"
+              >
+                Percentage (%)
+              </button>
+              <button
+                type="button"
+                id="sip-stepup-mode-fixed"
+                class="px-2.5 py-1 text-xs font-semibold rounded-control transition-standard cursor-pointer text-text-muted hover:text-text-primary"
+                aria-pressed="false"
+              >
+                Fixed Amount (<span data-currency-prefix>₹</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Step-Up Percentage Input & Slider -->
+          <div id="sip-stepup-pct-group">
+            <Input
+              id="sip-stepup-pct"
+              label="Annual Increase Rate"
+              suffix="%"
+              value="10"
+              isNumeric={true}
+              helperText="Typical increment: 5% to 15% with annual salary appraisal"
+              inputmode="decimal"
+            />
+            <div class="mt-2">
+              <Slider id="sip-stepup-pct-slider" min={1} max={50} step={1} value={10} ariaLabel="Annual step-up percentage slider" />
+            </div>
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Step-up percentage presets">
+              <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+              {[
+                { val: 5, label: '5%' },
+                { val: 10, label: '10% (Common)' },
+                { val: 15, label: '15%' },
+                { val: 20, label: '20%' },
+              ].map((chip) => (
+                <button
+                  type="button"
+                  data-chip-stepup-pct={chip.val}
+                  class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <!-- Step-Up Fixed Amount Input & Slider -->
+          <div id="sip-stepup-fixed-group" class="hidden">
+            <Input
+              id="sip-stepup-fixed"
+              label="Annual Increase Amount"
+              prefix="₹"
+              value="2,500"
+              isNumeric={true}
+              localeFormat="indian"
+              helperText="Fixed amount added to your monthly installment every 12 months"
+              inputmode="decimal"
+            />
+            <div class="mt-2">
+              <Slider id="sip-stepup-fixed-slider" min={500} max={50000} step={500} value={2500} ariaLabel="Annual step-up fixed amount slider" />
+            </div>
+            <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="Step-up fixed amount presets">
+              <span class="text-[11px] font-medium text-text-muted mr-1">Presets:</span>
+              {[
+                { val: 1000, label: '1,000' },
+                { val: 2500, label: '2,500' },
+                { val: 5000, label: '5,000' },
+                { val: 10000, label: '10,000' },
+              ].map((chip) => (
+                <button
+                  type="button"
+                  data-chip-stepup-fixed={chip.val}
+                  class="min-h-[44px] px-3.5 py-2 rounded-control text-xs font-semibold border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer inline-flex items-center justify-center select-none active:scale-95"
+                >
+                  <span data-currency-prefix>₹</span>{chip.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -368,6 +479,17 @@ const jsonld = {
             <Tooltip text="Cumulative gain as a percentage of total principal invested." />
           </span>
           <span id="sip-result-gain-pct" class="text-sm font-bold tabular-nums text-dark-accent">{gainPctFmt}</span>
+        </div>
+        <!-- Step-Up Advantage Row (visible only when Step-Up is enabled) -->
+        <div id="sip-stepup-advantage-row" class="hidden flex items-center justify-between py-2 border-t border-dark-border/60">
+          <span class="text-xs text-emerald-400 font-medium flex items-center gap-1">
+            Step-Up Extra Gain
+            <Tooltip text="Additional wealth accumulated compared to a flat (non-stepped) SIP with the same starting contribution." />
+          </span>
+          <div class="text-right">
+            <span id="sip-stepup-advantage-compact" class="text-xs font-bold tabular-nums text-emerald-400 mr-1">+₹0</span>
+            <span id="sip-stepup-advantage-pct" class="text-[11px] text-emerald-400/80 font-mono">(+0%)</span>
+          </div>
         </div>
       </div>
 
@@ -475,6 +597,14 @@ const jsonld = {
             <div><strong class="text-text-primary">n</strong> = Total installments = Tenure in Years × 12</div>
           </div>
         </div>
+
+        <!-- Step-Up SIP Compounding Callout -->
+        <div class="mt-4 p-4 rounded-card border border-accent/30 bg-accent/5">
+          <h3 class="text-xs font-bold text-accent uppercase tracking-wider mb-1.5">How Step-Up (Top-Up) SIP Accelerates Compounding</h3>
+          <p class="text-xs text-text-muted leading-relaxed">
+            While a standard SIP maintains a flat contribution over 15–25 years, a <strong>Step-Up SIP</strong> increases your monthly installment once every 12 months (by a fixed percentage such as 10%, or a fixed sum like ₹2,500). As your salary increases, stepping up your investment counters lifestyle inflation and compounds heavily into the later years, frequently yielding <strong>50% to 120% more wealth</strong> than a flat SIP with zero additional financial strain early in your career.
+          </p>
+        </div>
       </section>
 
       <!-- 3. Worked numerical example -->
@@ -542,6 +672,7 @@ const jsonld = {
               <thead>
                 <tr class="border-b border-border text-text-muted">
                   <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Year</th>
+                  <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Monthly Deposit</th>
                   <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Invested Amount</th>
                   <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Estimated Corpus</th>
                   <th class="text-right py-2.5 px-3 uppercase text-[11px] font-semibold">Compounded Gain</th>
@@ -551,6 +682,7 @@ const jsonld = {
                 {yearly.map((row) => (
                   <tr class="border-b border-border/50 hover:bg-canvas transition-standard">
                     <td class="py-2 px-3 font-medium text-text-primary">Year {row.year}</td>
+                    <td class="py-2 px-3 text-right tabular-nums text-text-muted">{fmt(DEFAULT.monthly)}</td>
                     <td class="py-2 px-3 text-right tabular-nums text-text-muted">{fmt(row.invested)}</td>
                     <td class="py-2 px-3 text-right tabular-nums text-text-primary font-semibold">{fmt(row.maturity)}</td>
                     <td class="py-2 px-3 text-right tabular-nums text-accent font-medium">+{fmt(row.gain)}</td>
@@ -665,7 +797,7 @@ const jsonld = {
 </Layout>
 
 <script>
-  import { calcSIP, calcSIPYearly } from '../lib/calculators/sip';
+  import { calcSIP, calcSIPYearly, calcStepUpSIP, calcStepUpSIPYearly } from '../lib/calculators/sip';
   import { setResult } from '../lib/result-bus';
   import { validate } from '../lib/validate';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
@@ -676,6 +808,8 @@ const jsonld = {
     monthly: { required: true, min: 500, max: 2000000, integerOnly: true, label: 'Monthly Investment' },
     rate: { required: true, min: 1, max: 30, decimal: true, label: 'Expected Return Rate' },
     years: { required: true, min: 1, max: 40, integerOnly: true, label: 'Time Period' },
+    stepUpPct: { required: false, min: 1, max: 50, decimal: true, label: 'Annual Step-Up Rate' },
+    stepUpFixed: { required: false, min: 100, max: 200000, integerOnly: true, label: 'Annual Step-Up Amount' },
   } as const;
 
   let currentCurrencyCode: CurrencyCode = getStoredCurrency();
@@ -710,6 +844,20 @@ const jsonld = {
     const yearsInput = document.getElementById('sip-years') as HTMLInputElement | null;
     const yearsSlider = document.getElementById('sip-years-slider') as HTMLInputElement | null;
 
+    const stepUpToggle = document.getElementById('sip-stepup-toggle') as HTMLInputElement | null;
+    const stepUpPanel = document.getElementById('sip-stepup-panel');
+    const modePctBtn = document.getElementById('sip-stepup-mode-pct');
+    const modeFixedBtn = document.getElementById('sip-stepup-mode-fixed');
+    const pctGroup = document.getElementById('sip-stepup-pct-group');
+    const fixedGroup = document.getElementById('sip-stepup-fixed-group');
+    const stepUpPctInput = document.getElementById('sip-stepup-pct') as HTMLInputElement | null;
+    const stepUpPctSlider = document.getElementById('sip-stepup-pct-slider') as HTMLInputElement | null;
+    const stepUpFixedInput = document.getElementById('sip-stepup-fixed') as HTMLInputElement | null;
+    const stepUpFixedSlider = document.getElementById('sip-stepup-fixed-slider') as HTMLInputElement | null;
+    const stepUpAdvantageRow = document.getElementById('sip-stepup-advantage-row');
+    const stepUpAdvantageCompact = document.getElementById('sip-stepup-advantage-compact');
+    const stepUpAdvantagePct = document.getElementById('sip-stepup-advantage-pct');
+
     const copyBtn = document.getElementById('sip-copy-btn');
     const shareBtn = document.getElementById('sip-share-btn');
     const whatsappBtn = document.getElementById('sip-whatsapp-btn') as HTMLAnchorElement | null;
@@ -739,7 +887,9 @@ const jsonld = {
     }
     monthlyInput.dataset.bound = 'true';
 
-    // Item 1: Sync stored currency before initial recalc & update input prefixes
+    let stepUpType: 'percentage' | 'fixed' = 'percentage';
+
+    // Sync stored currency before initial recalc & update input prefixes
     currentCurrencyCode = getStoredCurrency();
     currentCurrencySymbol = CURRENCY_CONFIG[currentCurrencyCode]?.symbol || '₹';
     currentNumberLocale = CURRENCY_CONFIG[currentCurrencyCode]?.locale || 'en-IN';
@@ -750,9 +900,11 @@ const jsonld = {
       el.textContent = currentCurrencySymbol;
     });
     updateMonthlyChips(currentCurrencySymbol, currentCurrencyCode);
+    updateStepUpFixedChips(currentCurrencySymbol, currentCurrencyCode);
 
     function updateMonthlyChips(sym: string, code: CurrencyCode) {
       document.querySelectorAll<HTMLButtonElement>('[data-chip-monthly]').forEach((btn) => {
+        if (btn.dataset.marketChipControlled === 'true') return;
         const val = btn.getAttribute('data-chip-monthly');
         if (!val) return;
         const num = parseInt(val, 10);
@@ -769,7 +921,17 @@ const jsonld = {
       });
     }
 
-    const DEFAULTS = { monthly: 25000, rate: 12, years: 15 };
+    function updateStepUpFixedChips(sym: string, code: CurrencyCode) {
+      document.querySelectorAll<HTMLButtonElement>('[data-chip-stepup-fixed]').forEach((btn) => {
+        const val = btn.getAttribute('data-chip-stepup-fixed');
+        if (!val) return;
+        const num = parseInt(val, 10);
+        const formatted = new Intl.NumberFormat(CURRENCY_CONFIG[code]?.locale || 'en-IN').format(num);
+        btn.innerHTML = `<span data-currency-prefix>${sym}</span>${formatted}`;
+      });
+    }
+
+    const DEFAULTS = { monthly: 25000, rate: 12, years: 15, stepUpPct: 10, stepUpFixed: 2500 };
     let debounceTimer: ReturnType<typeof setTimeout>;
 
     function updateCompositionBar(pFraction: number, gFraction: number, invested: number, gain: number) {
@@ -796,14 +958,17 @@ const jsonld = {
       }
     }
 
-    function updateYearlyTable(monthly: number, rate: number, years: number) {
+    function updateYearlyTable(monthly: number, rate: number, years: number, isStepUp: boolean, sType: 'percentage' | 'fixed', sVal: number) {
       if (!yearlyBody) return;
-      const schedule = calcSIPYearly(monthly, rate, years);
+      const schedule = isStepUp
+        ? calcStepUpSIPYearly(monthly, rate, years, sType, sVal)
+        : calcStepUpSIPYearly(monthly, rate, years, 'percentage', 0);
       yearlyBody.innerHTML = schedule
         .map(
           (row) => `
         <tr class="border-b border-border/50 hover:bg-canvas transition-standard">
           <td class="py-2 px-3 font-medium text-text-primary">Year ${row.year}</td>
+          <td class="py-2 px-3 text-right tabular-nums text-text-muted">${fmtCurrency(row.monthlyInvestment)}</td>
           <td class="py-2 px-3 text-right tabular-nums text-text-muted">${fmtCurrency(row.invested)}</td>
           <td class="py-2 px-3 text-right tabular-nums text-text-primary font-semibold">${fmtCurrency(row.maturity)}</td>
           <td class="py-2 px-3 text-right tabular-nums text-accent font-medium">+${fmtCurrency(row.gain)}</td>
@@ -844,6 +1009,32 @@ const jsonld = {
       }
       yearsInput.removeAttribute('aria-invalid');
 
+      const isStepUp = Boolean(stepUpToggle?.checked);
+      let stepUpVal = 0;
+      if (isStepUp) {
+        if (stepUpType === 'percentage') {
+          const numStepPct = parseSmartInput(stepUpPctInput?.value || '10', isEur ? 'EUR' : undefined);
+          const vStepPct = validate(numStepPct ?? stepUpPctInput?.value ?? 10, sipSchema.stepUpPct);
+          if (!vStepPct.valid) {
+            showValidationFeedback(vStepPct.error.message);
+            stepUpPctInput?.setAttribute('aria-invalid', 'true');
+            return;
+          }
+          stepUpPctInput?.removeAttribute('aria-invalid');
+          stepUpVal = vStepPct.value ?? 10;
+        } else {
+          const numStepFixed = parseSmartInput(stepUpFixedInput?.value || '2500', isEur ? 'EUR' : undefined);
+          const vStepFixed = validate(numStepFixed ?? stepUpFixedInput?.value ?? 2500, sipSchema.stepUpFixed);
+          if (!vStepFixed.valid) {
+            showValidationFeedback(vStepFixed.error.message);
+            stepUpFixedInput?.setAttribute('aria-invalid', 'true');
+            return;
+          }
+          stepUpFixedInput?.removeAttribute('aria-invalid');
+          stepUpVal = vStepFixed.value ?? 2500;
+        }
+      }
+
       showValidationFeedback();
 
       const monthly = vMonthly.value!;
@@ -851,10 +1042,13 @@ const jsonld = {
       const years = vYears.value!;
 
       // Run calculation
-      const r = calcSIP(monthly, rate, years);
+      const rFlat = calcSIP(monthly, rate, years);
+      const r = isStepUp ? calcStepUpSIP(monthly, rate, years, stepUpType, stepUpVal) : rFlat;
 
       // Extra 2 years curiosity calculation
-      const rExtra = calcSIP(monthly, rate, years + 2);
+      const rExtra = isStepUp
+        ? calcStepUpSIP(monthly, rate, years + 2, stepUpType, stepUpVal)
+        : calcSIP(monthly, rate, years + 2);
       const extraDiff = rExtra.maturity - r.maturity;
 
       const compMaturity = fmtCompact(r.maturity);
@@ -872,9 +1066,23 @@ const jsonld = {
       if (resGain) anim(resGain, `(+${fmtCurrency(r.gain)})`);
       if (resGainPct) anim(resGainPct, r.gainPct.toFixed(1) + '%');
 
+      // Update Step-Up Advantage Row
+      if (stepUpAdvantageRow) {
+        if (isStepUp && r.maturity > rFlat.maturity) {
+          const diffMaturity = r.maturity - rFlat.maturity;
+          const diffPct = ((r.maturity - rFlat.maturity) / rFlat.maturity) * 100;
+          if (stepUpAdvantageCompact) stepUpAdvantageCompact.textContent = `+${fmtCompact(diffMaturity)}`;
+          if (stepUpAdvantagePct) stepUpAdvantagePct.textContent = `(+${diffPct.toFixed(1)}%)`;
+          stepUpAdvantageRow.classList.remove('hidden');
+        } else {
+          stepUpAdvantageRow.classList.add('hidden');
+        }
+      }
+
       if (sipPlainEl && r.maturity > 0 && r.invested > 0) {
         const multiple = parseFloat((r.maturity / r.invested).toFixed(2));
-        sipPlainEl.innerHTML = `You invest <strong class="text-dark-text">${compInvested}</strong> and compounding adds <strong class="text-dark-accent">${compGain}</strong> more — your money grows <strong class="text-dark-text">${multiple}×</strong> its invested value`;
+        const stepUpLabel = isStepUp ? ' (with annual step-up)' : '';
+        sipPlainEl.innerHTML = `You invest <strong class="text-dark-text">${compInvested}</strong>${stepUpLabel} and compounding adds <strong class="text-dark-accent">${compGain}</strong> more — your money grows <strong class="text-dark-text">${multiple}×</strong> its invested value`;
       }
 
       // Update Composition Bar
@@ -882,7 +1090,14 @@ const jsonld = {
 
       // Update Insights
       if (insightCompounding) {
-        insightCompounding.innerHTML = `At ${fmtCurrency(monthly)}/mo over ${years} years, you invest <strong>${compInvested}</strong> and earn <strong class="text-dark-accent">${compGain}</strong> purely through compounding.`;
+        if (isStepUp) {
+          const finalYearMonthly = stepUpType === 'percentage'
+            ? monthly * Math.pow(1 + stepUpVal / 100, years - 1)
+            : monthly + stepUpVal * (years - 1);
+          insightCompounding.innerHTML = `Starting at ${fmtCurrency(monthly)}/mo with ${stepUpType === 'percentage' ? `${stepUpVal}%/yr` : `${fmtCurrency(stepUpVal)}/yr`} step-up over ${years} years (ending at ~${fmtCurrency(Math.round(finalYearMonthly))}/mo), you invest <strong>${compInvested}</strong> and earn <strong class="text-dark-accent">${compGain}</strong> through compounding.`;
+        } else {
+          insightCompounding.innerHTML = `At ${fmtCurrency(monthly)}/mo over ${years} years, you invest <strong>${compInvested}</strong> and earn <strong class="text-dark-accent">${compGain}</strong> purely through compounding.`;
+        }
       }
       if (insightCuriosity) {
         insightCuriosity.innerHTML = `Investing for just 2 more years (${years + 2} yrs) adds <strong>+${compExtra}</strong> to your corpus!`;
@@ -890,7 +1105,9 @@ const jsonld = {
       const insightDelay = document.getElementById('sip-insight-delay');
       if (insightDelay) {
         if (years > 5) {
-          const delayed = calcSIP(monthly, rate, years - 5);
+          const delayed = isStepUp
+            ? calcStepUpSIP(monthly, rate, years - 5, stepUpType, stepUpVal)
+            : calcSIP(monthly, rate, years - 5);
           const loss = r.maturity - delayed.maturity;
           insightDelay.innerHTML = `<strong>Cost of Delay:</strong> Delaying by 5 years reduces your corpus by <strong>~${fmtCompact(loss)}</strong> due to lost compounding.`;
           insightDelay.classList.remove('hidden');
@@ -907,16 +1124,32 @@ const jsonld = {
 
       // Update Featured Snippet Answer Box
       if (snippetAnswer) {
-        snippetAnswer.innerHTML = `A monthly investment of <strong>${fmtCurrency(monthly)}</strong> in an equity SIP at an expected <strong>${rate.toFixed(1)}% annual return</strong> over <strong>${years} years</strong> generates an estimated maturity corpus of <strong>${compMaturity}</strong> (${fmtCurrency(r.maturity)}). You invest a total of <strong>${compInvested}</strong> and earn <strong>${compGain}</strong> in compounding wealth gain.`;
+        if (isStepUp) {
+          const stepUpStr = stepUpType === 'percentage' ? `${stepUpVal}% annual increase` : `${fmtCurrency(stepUpVal)}/year increase`;
+          snippetAnswer.innerHTML = `A monthly investment starting at <strong>${fmtCurrency(monthly)}</strong> with an <strong>${stepUpStr}</strong> at an expected <strong>${rate.toFixed(1)}% annual return</strong> over <strong>${years} years</strong> generates an estimated maturity corpus of <strong>${compMaturity}</strong> (${fmtCurrency(r.maturity)}). You invest a total of <strong>${compInvested}</strong> and earn <strong>${compGain}</strong> in compounding wealth gain.`;
+        } else {
+          snippetAnswer.innerHTML = `A monthly investment of <strong>${fmtCurrency(monthly)}</strong> in an equity SIP at an expected <strong>${rate.toFixed(1)}% annual return</strong> over <strong>${years} years</strong> generates an estimated maturity corpus of <strong>${compMaturity}</strong> (${fmtCurrency(r.maturity)}). You invest a total of <strong>${compInvested}</strong> and earn <strong>${compGain}</strong> in compounding wealth gain.`;
+        }
       }
 
       // Update Year-by-Year schedule
-      updateYearlyTable(monthly, rate, years);
+      updateYearlyTable(monthly, rate, years, isStepUp, stepUpType, stepUpVal);
+
+      // Construct hash params
+      const hashObj: Record<string, any> = { p: monthly, r: rate, y: years };
+      if (isStepUp) {
+        hashObj.su = stepUpVal;
+        if (stepUpType === 'fixed') hashObj.sut = 'f';
+      }
+      const currentSerializedHash = serializeHash(hashObj);
 
       // Update WhatsApp Share Link
       if (whatsappBtn) {
+        const stepUpNote = isStepUp
+          ? `\nAnnual Step-Up: ${stepUpType === 'percentage' ? `${stepUpVal}%` : fmtCurrency(stepUpVal)}`
+          : '';
         const shareMsg = encodeURIComponent(
-          `Check out my SIP calculation:\nMonthly: ${fmtCurrency(monthly)}\nRate: ${rate}% p.a.\nTenure: ${years} years\nEstimated Corpus: ${compMaturity} (${fmtCurrency(r.maturity)})\nWealth Gain: +${compGain}\nCalculate on Calcumetrics: ${location.href.split('#')[0]}#p=${monthly}&r=${rate}&y=${years}`
+          `Check out my SIP calculation:\nMonthly: ${fmtCurrency(monthly)}${stepUpNote}\nRate: ${rate}% p.a.\nTenure: ${years} years\nEstimated Corpus: ${compMaturity} (${fmtCurrency(r.maturity)})\nWealth Gain: +${compGain}\nCalculate on Calcumetrics: ${location.href.split('#')[0]}${currentSerializedHash}`
         );
         whatsappBtn.href = `https://api.whatsapp.com/send?text=${shareMsg}`;
       }
@@ -924,7 +1157,7 @@ const jsonld = {
       // Canonical Result Bus for mobile sticky bar
       const canonicalResult = {
         heroValue: compMaturity,
-        heroLabel: 'Estimated Maturity',
+        heroLabel: isStepUp ? 'Step-Up Maturity' : 'Estimated Maturity',
         rows: [
           { label: 'Total Invested', value: compInvested },
           { label: 'Total Gain', value: compGain, variant: 'accent' as const },
@@ -941,6 +1174,9 @@ const jsonld = {
           invested: r.invested,
           gain: r.gain,
           maturity: r.maturity,
+          isStepUp,
+          stepUpType,
+          stepUpValue: stepUpVal,
         },
       };
 
@@ -949,14 +1185,46 @@ const jsonld = {
         (window as any).__cmResultStore.setResult(canonicalResult);
       }
       window.dispatchEvent(new CustomEvent('cm:result', { detail: canonicalResult }));
-
-// Option B: hash updated on Share click only
     }
 
     function debounceRecalc() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(recalc, 60);
     }
+
+    // ── Step-Up Mode & Toggle Handlers ──────────────────────────────────────
+    stepUpToggle?.addEventListener('change', () => {
+      if (stepUpPanel) {
+        stepUpPanel.classList.toggle('hidden', !stepUpToggle.checked);
+      }
+      recalc();
+    });
+
+    modePctBtn?.addEventListener('click', () => {
+      stepUpType = 'percentage';
+      modePctBtn.classList.add('bg-surface', 'text-accent', 'shadow-xs');
+      modePctBtn.classList.remove('text-text-muted');
+      modePctBtn.setAttribute('aria-pressed', 'true');
+      modeFixedBtn?.classList.remove('bg-surface', 'text-accent', 'shadow-xs');
+      modeFixedBtn?.classList.add('text-text-muted');
+      modeFixedBtn?.setAttribute('aria-pressed', 'false');
+      pctGroup?.classList.remove('hidden');
+      fixedGroup?.classList.add('hidden');
+      recalc();
+    });
+
+    modeFixedBtn?.addEventListener('click', () => {
+      stepUpType = 'fixed';
+      modeFixedBtn.classList.add('bg-surface', 'text-accent', 'shadow-xs');
+      modeFixedBtn.classList.remove('text-text-muted');
+      modeFixedBtn.setAttribute('aria-pressed', 'true');
+      modePctBtn?.classList.remove('bg-surface', 'text-accent', 'shadow-xs');
+      modePctBtn?.classList.add('text-text-muted');
+      modePctBtn?.setAttribute('aria-pressed', 'false');
+      fixedGroup?.classList.remove('hidden');
+      pctGroup?.classList.add('hidden');
+      recalc();
+    });
 
     // ── Sliders & Inputs sync ────────────────────────────────────────────────
     function syncSlider(slider: HTMLInputElement, input: HTMLInputElement, isFormatted: boolean) {
@@ -992,6 +1260,8 @@ const jsonld = {
     if (monthlySlider) syncSlider(monthlySlider, monthlyInput, true);
     if (rateSlider) syncSlider(rateSlider, rateInput, false);
     if (yearsSlider) syncSlider(yearsSlider, yearsInput, false);
+    if (stepUpPctSlider && stepUpPctInput) syncSlider(stepUpPctSlider, stepUpPctInput, false);
+    if (stepUpFixedSlider && stepUpFixedInput) syncSlider(stepUpFixedSlider, stepUpFixedInput, true);
 
     // Initial slider track percentages
     if (monthlySlider) {
@@ -1005,6 +1275,14 @@ const jsonld = {
     if (yearsSlider) {
       const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max), val = parseFloat(yearsSlider.value);
       yearsSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (stepUpPctSlider) {
+      const min = parseFloat(stepUpPctSlider.min), max = parseFloat(stepUpPctSlider.max), val = parseFloat(stepUpPctSlider.value);
+      stepUpPctSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
+    }
+    if (stepUpFixedSlider) {
+      const min = parseFloat(stepUpFixedSlider.min), max = parseFloat(stepUpFixedSlider.max), val = parseFloat(stepUpFixedSlider.value);
+      stepUpFixedSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min) * 100).toFixed(2)}%`);
     }
 
     // ── Preset Chips ─────────────────────────────────────────────────────────
@@ -1053,6 +1331,36 @@ const jsonld = {
       });
     });
 
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-stepup-pct]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-stepup-pct');
+        if (val && stepUpPctInput) {
+          stepUpPctInput.value = val;
+          if (stepUpPctSlider) {
+            stepUpPctSlider.value = val;
+            const min = parseFloat(stepUpPctSlider.min), max = parseFloat(stepUpPctSlider.max);
+            stepUpPctSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>('[data-chip-stepup-fixed]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-chip-stepup-fixed');
+        if (val && stepUpFixedInput) {
+          stepUpFixedInput.value = fmtLiveIndian(val);
+          if (stepUpFixedSlider) {
+            stepUpFixedSlider.value = val;
+            const min = parseFloat(stepUpFixedSlider.min), max = parseFloat(stepUpFixedSlider.max);
+            stepUpFixedSlider.style.setProperty('--slider-pct', `${((parseFloat(val) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+          debounceRecalc();
+        }
+      });
+    });
+
     // ── Reset button ─────────────────────────────────────────────────────────
     resetBtn?.addEventListener('click', () => {
       monthlyInput.value = fmtLiveIndian(String(DEFAULTS.monthly));
@@ -1070,43 +1378,91 @@ const jsonld = {
         yearsSlider.value = String(DEFAULTS.years);
         yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`);
       }
+
+      if (stepUpToggle) {
+        stepUpToggle.checked = false;
+        stepUpPanel?.classList.add('hidden');
+      }
+      modePctBtn?.click();
+      if (stepUpPctInput) stepUpPctInput.value = String(DEFAULTS.stepUpPct);
+      if (stepUpPctSlider) {
+        stepUpPctSlider.value = String(DEFAULTS.stepUpPct);
+        stepUpPctSlider.style.setProperty('--slider-pct', `${((DEFAULTS.stepUpPct - 1) / (50 - 1) * 100).toFixed(2)}%`);
+      }
+      if (stepUpFixedInput) stepUpFixedInput.value = fmtLiveIndian(String(DEFAULTS.stepUpFixed));
+      if (stepUpFixedSlider) {
+        stepUpFixedSlider.value = String(DEFAULTS.stepUpFixed);
+        stepUpFixedSlider.style.setProperty('--slider-pct', `${((DEFAULTS.stepUpFixed - 500) / (50000 - 500) * 100).toFixed(2)}%`);
+      }
+
       showValidationFeedback();
       recalc();
       monthlyInput.focus();
     });
 
-    const restored = restoreFromHash(location.hash, {
-      p: sipSchema.monthly,
-      r: sipSchema.rate,
-      y: sipSchema.years,
-    });
+    function applyHashParams() {
+      const restored = restoreFromHash(location.hash, {
+        p: sipSchema.monthly,
+        r: sipSchema.rate,
+        y: sipSchema.years,
+        su: { min: 1, max: 200000, required: false },
+        sut: { required: false },
+        stepup: { min: 1, max: 200000, required: false },
+      });
 
-    if (restored.values.p !== undefined) {
-      monthlyInput.value = fmtLiveIndian(String(restored.values.p));
-      if (monthlySlider) {
-        monthlySlider.value = String(Math.min(restored.values.p, 200000));
-        const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max);
-        monthlySlider.style.setProperty('--slider-pct', `${((parseFloat(monthlySlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.p !== undefined) {
+        monthlyInput.value = fmtLiveIndian(String(restored.values.p));
+        if (monthlySlider) {
+          monthlySlider.value = String(Math.min(restored.values.p, 200000));
+          const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max);
+          monthlySlider.style.setProperty('--slider-pct', `${((parseFloat(monthlySlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
-    }
-    if (restored.values.r !== undefined) {
-      rateInput.value = String(restored.values.r);
-      if (rateSlider) {
-        rateSlider.value = String(Math.min(restored.values.r, 30));
-        const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
-        rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.r !== undefined) {
+        rateInput.value = String(restored.values.r);
+        if (rateSlider) {
+          rateSlider.value = String(Math.min(restored.values.r, 30));
+          const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+          rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
-    }
-    if (restored.values.y !== undefined) {
-      yearsInput.value = String(restored.values.y);
-      if (yearsSlider) {
-        yearsSlider.value = String(Math.min(restored.values.y, 40));
-        const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
-        yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.y !== undefined) {
+        yearsInput.value = String(restored.values.y);
+        if (yearsSlider) {
+          yearsSlider.value = String(Math.min(restored.values.y, 40));
+          const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+          yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
+
+      const suVal = restored.values.su ?? restored.values.stepup;
+      if (suVal !== undefined && stepUpToggle) {
+        stepUpToggle.checked = true;
+        stepUpPanel?.classList.remove('hidden');
+        if (restored.values.sut === 'f' || restored.values.sut === 'fixed') {
+          modeFixedBtn?.click();
+          if (stepUpFixedInput) stepUpFixedInput.value = fmtLiveIndian(String(suVal));
+          if (stepUpFixedSlider) {
+            stepUpFixedSlider.value = String(Math.min(suVal, 50000));
+            const min = parseFloat(stepUpFixedSlider.min), max = parseFloat(stepUpFixedSlider.max);
+            stepUpFixedSlider.style.setProperty('--slider-pct', `${((parseFloat(stepUpFixedSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+        } else {
+          modePctBtn?.click();
+          if (stepUpPctInput) stepUpPctInput.value = String(suVal);
+          if (stepUpPctSlider) {
+            stepUpPctSlider.value = String(Math.min(suVal, 50));
+            const min = parseFloat(stepUpPctSlider.min), max = parseFloat(stepUpPctSlider.max);
+            stepUpPctSlider.style.setProperty('--slider-pct', `${((parseFloat(stepUpPctSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+          }
+        }
+      }
+
+      recalc();
     }
 
-    recalc();
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
 
     // ── Copy & Share ─────────────────────────────────────────────────────────
     async function flashBtn(btn: HTMLElement, label: string) {
@@ -1119,13 +1475,28 @@ const jsonld = {
     }
 
     copyBtn?.addEventListener('click', async () => {
-      const vM = validate(monthlyInput.value, sipSchema.monthly);
-      const vR = validate(rateInput.value, sipSchema.rate);
-      const vY = validate(yearsInput.value, sipSchema.years);
+      const isEur = currentNumberLocale === 'de-DE';
+      const vM = validate(parseSmartInput(monthlyInput.value, isEur ? 'EUR' : undefined) ?? monthlyInput.value, sipSchema.monthly);
+      const vR = validate(parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined) ?? rateInput.value, sipSchema.rate);
+      const vY = validate(parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined) ?? yearsInput.value, sipSchema.years);
       if (!vM.valid || !vR.valid || !vY.valid) return;
 
-      const r = calcSIP(vM.value!, vR.value!, vY.value!);
-      const text = `SIP Calculator: ${fmtCurrency(vM.value!)}/month at ${vR.value!}% p.a. for ${vY.value!} years gives ${fmtCompact(r.maturity)} (${fmtCurrency(r.maturity)}). ${location.href.split('#')[0]}${serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })}`;
+      const isStepUp = Boolean(stepUpToggle?.checked);
+      let stepUpVal = 0;
+      if (isStepUp) {
+        stepUpVal = stepUpType === 'percentage'
+          ? (parseSmartInput(stepUpPctInput?.value || '10', isEur ? 'EUR' : undefined) || 10)
+          : (parseSmartInput(stepUpFixedInput?.value || '2500', isEur ? 'EUR' : undefined) || 2500);
+      }
+      const r = isStepUp ? calcStepUpSIP(vM.value!, vR.value!, vY.value!, stepUpType, stepUpVal) : calcSIP(vM.value!, vR.value!, vY.value!);
+
+      const hashObj: Record<string, any> = { p: vM.value!, r: vR.value!, y: vY.value! };
+      if (isStepUp) {
+        hashObj.su = stepUpVal;
+        if (stepUpType === 'fixed') hashObj.sut = 'f';
+      }
+      const stepUpText = isStepUp ? ` with ${stepUpType === 'percentage' ? `${stepUpVal}%` : fmtCurrency(stepUpVal)} annual step-up` : '';
+      const text = `SIP Calculator: ${fmtCurrency(vM.value!)}/month${stepUpText} at ${vR.value!}% p.a. for ${vY.value!} years gives ${fmtCompact(r.maturity)} (${fmtCurrency(r.maturity)}). ${location.href.split('#')[0]}${serializeHash(hashObj)}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
@@ -1143,11 +1514,24 @@ const jsonld = {
     });
 
     shareBtn?.addEventListener('click', async () => {
-      const vM = validate(monthlyInput.value, sipSchema.monthly);
-      const vR = validate(rateInput.value, sipSchema.rate);
-      const vY = validate(yearsInput.value, sipSchema.years);
+      const isEur = currentNumberLocale === 'de-DE';
+      const vM = validate(parseSmartInput(monthlyInput.value, isEur ? 'EUR' : undefined) ?? monthlyInput.value, sipSchema.monthly);
+      const vR = validate(parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined) ?? rateInput.value, sipSchema.rate);
+      const vY = validate(parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined) ?? yearsInput.value, sipSchema.years);
+      const isStepUp = Boolean(stepUpToggle?.checked);
+      let stepUpVal = 0;
+      if (isStepUp) {
+        stepUpVal = stepUpType === 'percentage'
+          ? (parseSmartInput(stepUpPctInput?.value || '10', isEur ? 'EUR' : undefined) || 10)
+          : (parseSmartInput(stepUpFixedInput?.value || '2500', isEur ? 'EUR' : undefined) || 2500);
+      }
+      const hashObj: Record<string, any> = { p: vM.value!, r: vR.value!, y: vY.value! };
+      if (isStepUp) {
+        hashObj.su = stepUpVal;
+        if (stepUpType === 'fixed') hashObj.sut = 'f';
+      }
       const hash = vM.valid && vR.valid && vY.valid
-        ? serializeHash({ p: vM.value!, r: vR.value!, y: vY.value! })
+        ? serializeHash(hashObj)
         : location.hash;
       const url = `${location.href.split('#')[0]}${hash}`;
       try {
@@ -1179,6 +1563,7 @@ const jsonld = {
         el.textContent = symbol;
       });
       updateMonthlyChips(symbol, code);
+      updateStepUpFixedChips(symbol, code);
       recalc();
     }
 

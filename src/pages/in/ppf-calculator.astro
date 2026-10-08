@@ -368,8 +368,9 @@ const jsonld = {
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
   import { calcPPF } from '../../lib/calculators/ppf';
 
+  let currentHashState: Record<string, any> = {};
+
   function calcPPFClient(annual: number, rate: number, years: number) {
-    let currentHashState: Record<string, any> = {};
     const r = rate / 100;
     let balance = 0;
     for (let yr = 1; yr <= years; yr++) {
@@ -603,19 +604,22 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      a: { required: true, min: 500, max: 150000, label: 'a' },
-      r: { required: true, min: 1, max: 15, decimal: true, label: 'r' },
-      y: { required: true, min: 15, max: 50, integer: true, label: 'y' },
-    });
-    if (restored.valid && restored.values.a && restored.values.r !== undefined && restored.values.y) {
-      aInput.value = fmtLiveInput(String(restored.values.a));
-      rInput.value = String(restored.values.r);
-      yInput.value = String(restored.values.y);
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        a: { required: true, min: 500, max: 150000, label: 'a' },
+        r: { required: true, min: 1, max: 15, decimal: true, label: 'r' },
+        y: { required: true, min: 15, max: 50, integer: true, label: 'y' },
+      });
+      if (restored.valid && restored.values.a && restored.values.r !== undefined && restored.values.y) {
+        aInput.value = fmtLiveInput(String(restored.values.a));
+        rInput.value = String(restored.values.r);
+        yInput.value = String(restored.values.y);
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initPPFCalc();

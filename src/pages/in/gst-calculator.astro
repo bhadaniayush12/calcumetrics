@@ -569,11 +569,49 @@ const jsonld = {
 
     if (!amtInput) return;
 
+    function applyHash() {
+      try {
+        const hash = window.location.hash;
+        if (hash) {
+          const amtMatch = hash.match(/(?:amount|a|p)=([0-9]+)/i);
+          if (amtMatch) {
+            const val = parseInt(amtMatch[1], 10);
+            if (!isNaN(val) && val >= 1) {
+              amtInput.value = fmtLiveInput(String(val));
+              if (amtSlider) {
+                amtSlider.value = String(val);
+                const min = parseFloat(amtSlider.min), max = parseFloat(amtSlider.max);
+                amtSlider.style.setProperty('--slider-pct', `${((val - min) / (max - min)) * 100}%`);
+              }
+            }
+          }
+          const slabMatch = hash.match(/(?:slab|rate|s|r)=([0-9.]+)/i);
+          if (slabMatch && slabSelect) {
+            slabSelect.value = slabMatch[1];
+          }
+          const modeMatch = hash.match(/(?:mode|direction|type|d)=(add|remove|exclusive|inclusive)/i);
+          if (modeMatch && dirSelect) {
+            const m = modeMatch[1].toLowerCase();
+            dirSelect.value = m === 'exclusive' ? 'add' : m === 'inclusive' ? 'remove' : m;
+          }
+          const supplyMatch = hash.match(/(?:supply|nature)=(intra|inter)/i);
+          if (supplyMatch && supplySelect) {
+            supplySelect.value = supplyMatch[1].toLowerCase();
+          }
+        }
+      } catch {}
+    }
+
     if (amtInput.dataset.bound === 'true') {
+      applyHash();
       recalc();
       return;
     }
     amtInput.dataset.bound = 'true';
+    window.addEventListener('hashchange', () => {
+      applyHash();
+      recalc();
+    });
 
     const DEFAULTS = { amount: 10000, slab: 18, direction: 'add' as const, supply: 'intra' };
     let timer: ReturnType<typeof setTimeout>;
@@ -809,6 +847,7 @@ const jsonld = {
       }
     });
 
+    applyHash();
     recalc();
   }
 

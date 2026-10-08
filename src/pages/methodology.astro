@@ -371,7 +371,7 @@ const jsonld = {
           </article>
 
           <!-- Formula: GST 2.0 -->
-          <article id="gst" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+          <article id="gst" data-no-dynamic-currency="true" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
             <div class="flex items-start justify-between gap-3 flex-wrap">
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Taxation · Indirect Tax</span>
@@ -424,7 +424,7 @@ const jsonld = {
           </article>
 
           <!-- Formula: Income Tax 115BAC -->
-          <article id="income-tax" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
+          <article id="income-tax" data-no-dynamic-currency="true" class="scroll-mt-24 bg-surface border border-border rounded-card p-5 sm:p-6 space-y-4">
             <div class="flex items-start justify-between gap-3 flex-wrap">
               <div>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-accent">Taxation · Direct Tax</span>
@@ -550,25 +550,31 @@ const jsonld = {
                     </td>
                   </tr>
 
-                  <tr class="hover:bg-canvas/50 transition-standard">
-                    <td class="p-3 font-semibold text-text-primary">Income Tax 115BAC</td>
+                  <tr class="hover:bg-canvas/50 transition-standard" data-no-dynamic-currency="true">
+                    <td class="p-3 font-semibold text-text-primary">
+                      Income Tax 115BAC
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent ml-1.5">India · INR</span>
+                    </td>
                     <td class="p-3 font-mono">₹12,75,000 Salaried Gross</td>
                     <td class="p-3 font-mono font-bold text-emerald-700 dark:text-emerald-400">₹0 Total Tax</td>
                     <td class="p-3">Standard ded. ₹75k + Sec 87A rebate</td>
                     <td class="p-3 text-right">
-                      <a href="/in/income-tax-calculator" class="text-accent font-semibold hover:underline">
+                      <a href="/in/income-tax-calculator#gross=1275000" class="text-accent font-semibold hover:underline">
                         Test Fixture →
                       </a>
                     </td>
                   </tr>
 
-                  <tr class="hover:bg-canvas/50 transition-standard">
-                    <td class="p-3 font-semibold text-text-primary">GST 2.0 (Demerit)</td>
+                  <tr class="hover:bg-canvas/50 transition-standard" data-no-dynamic-currency="true">
+                    <td class="p-3 font-semibold text-text-primary">
+                      GST 2.0 (Demerit)
+                      <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent ml-1.5">India · INR</span>
+                    </td>
                     <td class="p-3 font-mono">₹50,000 base, 40% slab</td>
                     <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹20,000 GST (₹70k Invoice)</td>
                     <td class="p-3">CGST: ₹10,000 + SGST: ₹10,000</td>
                     <td class="p-3 text-right">
-                      <a href="/in/gst-calculator" class="text-accent font-semibold hover:underline">
+                      <a href="/in/gst-calculator#amount=50000&slab=40" class="text-accent font-semibold hover:underline">
                         Test Fixture →
                       </a>
                     </td>
@@ -580,7 +586,7 @@ const jsonld = {
                     <td class="p-3 font-mono font-bold text-dark-accent dark:text-accent">₹1,41,478</td>
                     <td class="p-3">Annualized Yield: 7.186% APY</td>
                     <td class="p-3 text-right">
-                      <a href="/fd-calculator" class="text-accent font-semibold hover:underline">
+                      <a href="/fd-calculator#p=100000&r=7&y=5" class="text-accent font-semibold hover:underline">
                         Test Fixture →
                       </a>
                     </td>

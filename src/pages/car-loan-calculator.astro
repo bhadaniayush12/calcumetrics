@@ -458,7 +458,7 @@ const jsonld = {
       const numRate = parseSmartInput(rateInput!.value, isEur ? 'EUR' : undefined);
       const numYears = parseSmartInput(yearsInput!.value, isEur ? 'EUR' : undefined);
 
-      const vPrice = validate(numPrice ?? priceInput!.value, { required: true, min: 50000, label: 'Vehicle Price' });
+      const vPrice = validate(numPrice ?? priceInput!.value, { required: true, min: 1000, label: 'Vehicle Price' });
       const vDown = validate(numDown ?? downInput!.value, { required: true, min: 0, label: 'Down Payment' });
       const vRate = validate(numRate ?? rateInput!.value, { required: true, min: 0.1, max: 30, decimal: true, label: 'Interest Rate' });
       const vYears = validate(numYears ?? yearsInput!.value, { required: true, min: 1, max: 15, integer: true, label: 'Tenure' });
@@ -589,7 +589,7 @@ const jsonld = {
       const numRate = parseSmartInput(rateInput.value, isEur ? 'EUR' : undefined);
       const numYears = parseSmartInput(yearsInput.value, isEur ? 'EUR' : undefined);
 
-      const vPrice = validate(numPrice ?? priceInput.value, { required: true, min: 50000, label: 'Vehicle Price' });
+      const vPrice = validate(numPrice ?? priceInput.value, { required: true, min: 1000, label: 'Vehicle Price' });
       const vDown = validate(numDown ?? downInput.value, { required: true, min: 0, label: 'Down Payment' });
       const vRate = validate(numRate ?? rateInput.value, { required: true, min: 0.1, label: 'Rate' });
       const vYears = validate(numYears ?? yearsInput.value, { required: true, min: 1, label: 'Tenure' });
@@ -643,21 +643,24 @@ const jsonld = {
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      p: { required: true, min: 50000, label: 'p' },
-      d: { required: true, min: 0, label: 'd' },
-      r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
-      y: { required: true, min: 1, max: 15, integer: true, label: 'y' },
-    });
-    if (restored.valid && restored.values.p && restored.values.d !== undefined && restored.values.r !== undefined && restored.values.y) {
-      priceInput.value = fmtLiveInput(String(restored.values.p));
-      downInput.value = fmtLiveInput(String(restored.values.d));
-      rateInput.value = String(restored.values.r);
-      yearsInput.value = String(restored.values.y);
-      recalc();
-    } else {
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        p: { required: true, min: 1000, label: 'p' },
+        d: { required: true, min: 0, label: 'd' },
+        r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
+        y: { required: true, min: 1, max: 15, integer: true, label: 'y' },
+      });
+      if (restored.valid && restored.values.p && restored.values.d !== undefined && restored.values.r !== undefined && restored.values.y) {
+        priceInput.value = fmtLiveInput(String(restored.values.p));
+        downInput.value = fmtLiveInput(String(restored.values.d));
+        rateInput.value = String(restored.values.r);
+        yearsInput.value = String(restored.values.y);
+      }
       recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

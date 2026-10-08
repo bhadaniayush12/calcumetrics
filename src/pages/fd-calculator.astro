@@ -195,6 +195,7 @@ const jsonld = {
             <button
               type="button"
               data-chip-principal={chip.val}
+              data-market-chip-controlled="true"
               class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
             >
               {chip.label}
@@ -228,6 +229,7 @@ const jsonld = {
             <button
               type="button"
               data-chip-rate={chip.val}
+              data-market-chip-controlled="true"
               class="px-2 py-0.5 rounded text-xs font-medium border border-border bg-surface hover:bg-canvas hover:border-accent text-text-primary hover:text-accent transition-standard cursor-pointer"
             >
               {chip.label}
@@ -861,38 +863,43 @@ const jsonld = {
       principalInput.focus();
     });
 
-    const restored = restoreFromHash(location.hash, {
-      p: fdSchema.principal,
-      r: fdSchema.rate,
-      y: fdSchema.years,
-    });
+    function applyHashParams() {
+      const restored = restoreFromHash(location.hash, {
+        p: fdSchema.principal,
+        r: fdSchema.rate,
+        y: fdSchema.years,
+      });
 
-    if (restored.values.p !== undefined) {
-      principalInput.value = fmtLiveIndian(String(restored.values.p));
-      if (principalSlider) {
-        principalSlider.value = String(Math.min(restored.values.p, 10000000));
-        const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max);
-        principalSlider.style.setProperty('--slider-pct', `${((parseFloat(principalSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.p !== undefined) {
+        principalInput.value = fmtLiveIndian(String(restored.values.p));
+        if (principalSlider) {
+          principalSlider.value = String(Math.min(restored.values.p, 10000000));
+          const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max);
+          principalSlider.style.setProperty('--slider-pct', `${((parseFloat(principalSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
-    }
-    if (restored.values.r !== undefined) {
-      rateInput.value = String(restored.values.r);
-      if (rateSlider) {
-        rateSlider.value = String(Math.min(restored.values.r, 12));
-        const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
-        rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.r !== undefined) {
+        rateInput.value = String(restored.values.r);
+        if (rateSlider) {
+          rateSlider.value = String(Math.min(restored.values.r, 12));
+          const min = parseFloat(rateSlider.min), max = parseFloat(rateSlider.max);
+          rateSlider.style.setProperty('--slider-pct', `${((parseFloat(rateSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
-    }
-    if (restored.values.y !== undefined) {
-      yearsInput.value = String(restored.values.y);
-      if (yearsSlider) {
-        yearsSlider.value = String(Math.min(restored.values.y, 10));
-        const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
-        yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+      if (restored.values.y !== undefined) {
+        yearsInput.value = String(restored.values.y);
+        if (yearsSlider) {
+          yearsSlider.value = String(Math.min(restored.values.y, 10));
+          const min = parseFloat(yearsSlider.min), max = parseFloat(yearsSlider.max);
+          yearsSlider.style.setProperty('--slider-pct', `${((parseFloat(yearsSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
+        }
       }
+
+      recalc();
     }
 
-    recalc();
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
 
     // ── Copy & Share ─────────────────────────────────────────────────────────
     async function flashBtn(btn: HTMLElement, label: string) {
@@ -963,6 +970,7 @@ const jsonld = {
         el.textContent = symbol;
       });
       document.querySelectorAll<HTMLButtonElement>('[data-chip-principal]').forEach((btn) => {
+        if (btn.dataset.marketChipControlled === 'true') return;
         const val = btn.getAttribute('data-chip-principal');
         if (val) {
           const num = parseInt(val, 10);

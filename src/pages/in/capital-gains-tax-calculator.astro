@@ -465,10 +465,11 @@ const ASSET_OPTIONS = [
   import { setResult } from '../../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../../lib/url-state';
 
+  let currentHashState: Record<string, any> = {};
+
   const currSym = '₹';
   const currLocale = 'en-IN';
   function fmtVal(n: number) {
-    let currentHashState: Record<string, any> = {};
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
   function fmtLiveInput(raw: string) {
@@ -695,24 +696,27 @@ const ASSET_OPTIONS = [
     });
 
     // Restore from hash
-    const restored = restoreFromHash(readCurrentHash(), {
-      s: { required: true, min: 0, label: 's' },
-      p: { required: true, min: 0, label: 'p' },
-      m: { required: true, min: 1, max: 600, integer: true, label: 'm' },
-    });
-    if (restored.valid && restored.values.s !== undefined && restored.values.p !== undefined && restored.values.m) {
-      saleInput.value = fmtLiveInput(String(restored.values.s));
-      purchaseInput.value = fmtLiveInput(String(restored.values.p));
-      monthsInput.value = String(restored.values.m);
-      const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
-      const a = hashParams.get('a');
-      if (a && ['equity', 'real-estate', 'gold', 'debt-fund'].includes(a)) {
-        assetSelect.value = a;
+    function applyHashParams() {
+      const restored = restoreFromHash(readCurrentHash(), {
+        s: { required: true, min: 0, label: 's' },
+        p: { required: true, min: 0, label: 'p' },
+        m: { required: true, min: 1, max: 600, integer: true, label: 'm' },
+      });
+      if (restored.valid && restored.values.s !== undefined && restored.values.p !== undefined && restored.values.m) {
+        saleInput.value = fmtLiveInput(String(restored.values.s));
+        purchaseInput.value = fmtLiveInput(String(restored.values.p));
+        monthsInput.value = String(restored.values.m);
+        const hashParams = new URLSearchParams(readCurrentHash().replace(/^#/, ''));
+        const a = hashParams.get('a');
+        if (a && ['equity', 'real-estate', 'gold', 'debt-fund'].includes(a)) {
+          assetSelect.value = a;
+        }
       }
       recalc();
-    } else {
-      recalc();
     }
+
+    applyHashParams();
+    window.addEventListener('hashchange', applyHashParams);
   }
 
   initCGTCalc();

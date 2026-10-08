@@ -66,6 +66,117 @@ export function calcSIPYearly(
   });
 }
 
+export type StepUpType = 'percentage' | 'fixed';
+
+/**
+ * Calculate Step-Up (Top-Up) SIP maturity value (annuity-due).
+ * Each year, the monthly contribution increases either by a percentage or a fixed amount.
+ *
+ * @param monthly - Initial monthly investment amount (P)
+ * @param ratePercent - Annual nominal interest rate (e.g. 12 for 12%)
+ * @param years - Investment duration in years
+ * @param stepUpType - 'percentage' (e.g. 10%) or 'fixed' (e.g. 2500)
+ * @param stepUpValue - Increase amount (if 0, falls back to regular SIP)
+ */
+export function calcStepUpSIP(
+  monthly: number,
+  ratePercent: number,
+  years: number,
+  stepUpType: StepUpType = 'percentage',
+  stepUpValue: number = 0
+): SIPResult {
+  if (stepUpValue <= 0) {
+    return calcSIP(monthly, ratePercent, years);
+  }
+
+  const i = ratePercent / (12 * 100);
+  let corpus = 0;
+  let totalInvested = 0;
+  let currentMonthly = monthly;
+
+  for (let y = 1; y <= years; y++) {
+    if (y > 1) {
+      if (stepUpType === 'percentage') {
+        currentMonthly = currentMonthly * (1 + stepUpValue / 100);
+      } else {
+        currentMonthly = currentMonthly + stepUpValue;
+      }
+    }
+    for (let m = 1; m <= 12; m++) {
+      if (i === 0) {
+        corpus += currentMonthly;
+      } else {
+        corpus = (corpus + currentMonthly) * (1 + i);
+      }
+      totalInvested += currentMonthly;
+    }
+  }
+
+  const gain = corpus - totalInvested;
+  const gainPct = totalInvested > 0 ? (gain / totalInvested) * 100 : 0;
+
+  return {
+    maturity: corpus,
+    invested: totalInvested,
+    gain,
+    gainPct,
+    principalFraction: corpus > 0 ? totalInvested / corpus : 0,
+    gainFraction: corpus > 0 ? gain / corpus : 0,
+  };
+}
+
+/**
+ * Year-by-year Step-Up SIP breakdown with monthly contribution tracking.
+ */
+export function calcStepUpSIPYearly(
+  monthly: number,
+  ratePercent: number,
+  totalYears: number,
+  stepUpType: StepUpType = 'percentage',
+  stepUpValue: number = 0
+): Array<{ year: number; monthlyInvestment: number; invested: number; maturity: number; gain: number }> {
+  if (stepUpValue <= 0) {
+    return Array.from({ length: totalYears }, (_, idx) => {
+      const year = idx + 1;
+      const r = calcSIP(monthly, ratePercent, year);
+      return { year, monthlyInvestment: monthly, invested: r.invested, maturity: r.maturity, gain: r.gain };
+    });
+  }
+
+  const i = ratePercent / (12 * 100);
+  let corpus = 0;
+  let totalInvested = 0;
+  let currentMonthly = monthly;
+  const yearly: Array<{ year: number; monthlyInvestment: number; invested: number; maturity: number; gain: number }> = [];
+
+  for (let y = 1; y <= totalYears; y++) {
+    if (y > 1) {
+      if (stepUpType === 'percentage') {
+        currentMonthly = currentMonthly * (1 + stepUpValue / 100);
+      } else {
+        currentMonthly = currentMonthly + stepUpValue;
+      }
+    }
+    for (let m = 1; m <= 12; m++) {
+      if (i === 0) {
+        corpus += currentMonthly;
+      } else {
+        corpus = (corpus + currentMonthly) * (1 + i);
+      }
+      totalInvested += currentMonthly;
+    }
+    yearly.push({
+      year: y,
+      monthlyInvestment: Math.round(currentMonthly),
+      invested: totalInvested,
+      maturity: corpus,
+      gain: corpus - totalInvested,
+    });
+  }
+
+  return yearly;
+}
+
 // Section 12 test fixtures — verified against handoff doc
 if (import.meta.vitest) {
   const { it, expect, describe } = import.meta.vitest;
@@ -89,6 +200,28 @@ if (import.meta.vitest) {
     it('₹25,000 / 12% / 20yr → ₹2,49,78,698', () => {
       const r = calcSIP(25000, 12, 20);
       expect(Math.round(r.maturity)).toBe(24978698);
+    });
+
+    describe('Step-Up SIP calculations', () => {
+      it('matches regular SIP when stepUpValue is 0', () => {
+        const regular = calcSIP(25000, 12, 15);
+        const stepUpZero = calcStepUpSIP(25000, 12, 15, 'percentage', 0);
+        expect(Math.round(stepUpZero.maturity)).toBe(Math.round(regular.maturity));
+        expect(stepUpZero.invested).toBe(regular.invested);
+      });
+
+      it('calculates 10% annual step-up correctly over 15 years at 12%', () => {
+        const res = calcStepUpSIP(25000, 12, 15, 'percentage', 10);
+        expect(Math.round(res.maturity)).toBe(21709624);
+        expect(Math.round(res.invested)).toBe(9531745);
+        expect(Math.round(res.gain)).toBe(12177879);
+      });
+
+      it('calculates fixed annual step-up correctly (e.g. ₹2,500/year increase)', () => {
+        const res = calcStepUpSIP(25000, 12, 15, 'fixed', 2500);
+        expect(res.maturity).toBeGreaterThan(calcSIP(25000, 12, 15).maturity);
+        expect(res.invested).toBe(7650000); // 25k*12 + 27.5k*12 + ... + 60k*12 = 12 * (15*25k + 2.5k*105) = 12*(375k + 262.5k) = 7,650,000
+      });
     });
   });
 }
