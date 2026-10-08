@@ -219,5 +219,28 @@ describe('SIP Calculator (Phase 5.1)', () => {
       expect(Math.round(zero.maturity)).toBe(Math.round(standard.maturity));
       expect(Math.round(neg.maturity)).toBe(Math.round(standard.maturity));
     });
+
+    it('creates accurate canonical result bus payload with Step-Up Extra Gain for mobile presentation', () => {
+      const standard = calcSIP(25000, 12, 15);
+      const stepUp = calcStepUpSIP(25000, 12, 15, 'percentage', 10);
+      const extraDiff = stepUp.maturity - standard.maturity;
+
+      const isStepUp = true;
+      const canonical = {
+        heroValue: '₹2.17 Cr',
+        heroLabel: isStepUp ? 'Step-Up Maturity (Top-Up)' : 'Estimated Maturity',
+        rows: [
+          ...(isStepUp && extraDiff > 0
+            ? [{ label: 'Step-Up Extra Gain', value: '+₹90.95 Lakh', variant: 'accent' as const }]
+            : []),
+          { label: 'Total Invested', value: '₹95.32 Lakh' },
+          { label: 'Total Gain', value: '+₹1.22 Cr', variant: 'accent' as const },
+        ],
+      };
+
+      expect(canonical.heroLabel).toBe('Step-Up Maturity (Top-Up)');
+      expect(canonical.rows[0].label).toBe('Step-Up Extra Gain');
+      expect(canonical.rows[0].value).toBe('+₹90.95 Lakh');
+    });
   });
 });

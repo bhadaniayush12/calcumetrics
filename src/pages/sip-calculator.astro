@@ -177,6 +177,36 @@ const jsonld = {
         Calculate your Systematic Investment Plan maturity value, invested amount, and wealth gain with monthly compounding.
       </p>
 
+      <!-- Calculator Mode Tabs: Regular SIP vs Step-Up SIP (Mobile-first Segmented Tab Switcher) -->
+      <div class="mb-5 p-1 rounded-control bg-canvas border border-border flex items-center gap-1.5" role="tablist" aria-label="SIP calculation mode">
+        <button
+          type="button"
+          id="sip-mode-tab-regular"
+          role="tab"
+          aria-selected="true"
+          class="flex-1 min-h-[44px] py-2 px-3 rounded-control text-xs sm:text-sm font-semibold transition-standard cursor-pointer text-center bg-surface text-accent shadow-xs border border-accent/25 flex items-center justify-center gap-1.5 active:scale-98"
+        >
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>Regular SIP</span>
+        </button>
+        <button
+          type="button"
+          id="sip-mode-tab-stepup"
+          role="tab"
+          aria-selected="false"
+          class="flex-1 min-h-[44px] py-2 px-3 rounded-control text-xs sm:text-sm font-semibold transition-standard cursor-pointer text-center text-text-muted hover:text-text-primary hover:bg-surface/50 border border-transparent flex items-center justify-center gap-1.5 active:scale-98"
+        >
+          <svg class="w-4 h-4 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+          <span>Step-Up SIP</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-accent/15 text-accent uppercase tracking-wider">Top-Up</span>
+        </button>
+      </div>
+
       <!-- Currency selector -->
       <div class="mb-5">
         <Dropdown
@@ -299,19 +329,41 @@ const jsonld = {
       </div>
 
       <!-- Annual Step-Up (Top-Up) Feature Toggle & Inputs -->
-      <div class="mb-6 p-4 rounded-card border border-border bg-surface/50">
-        <div class="flex items-center justify-between gap-3">
-          <div>
+      <div id="sip-stepup-card" class="mb-6 p-4 rounded-card border border-border bg-surface/50 transition-standard">
+        <button
+          type="button"
+          id="sip-stepup-toggle-trigger"
+          class="w-full flex items-center justify-between gap-3 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-control p-1 -m-1"
+          role="switch"
+          aria-checked="false"
+          aria-label="Toggle Annual Step-Up SIP"
+        >
+          <div class="flex-1">
             <div class="flex items-center gap-1.5">
-              <span class="text-xs font-semibold text-text-primary">Annual Step-Up (Top-Up)</span>
-              <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent">Optional</span>
+              <span class="text-xs sm:text-sm font-semibold text-text-primary group-hover:text-accent transition-standard">Annual Step-Up (Top-Up)</span>
+              <span id="sip-stepup-status-badge" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent">Optional</span>
             </div>
-            <span class="text-[11px] text-text-muted block mt-0.5">Increase your monthly SIP each year with salary hikes</span>
+            <span class="text-[11px] text-text-muted block mt-0.5">Increase monthly contribution each year in line with salary hikes</span>
           </div>
-          <label class="relative inline-flex items-center cursor-pointer select-none shrink-0" for="sip-stepup-toggle">
-            <input type="checkbox" id="sip-stepup-toggle" class="sr-only peer" />
-            <div class="w-10 h-6 bg-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
-          </label>
+          <!-- Switch visual container with min 44px touch area -->
+          <div class="relative inline-flex items-center justify-center w-12 h-11 shrink-0">
+            <input type="checkbox" id="sip-stepup-toggle" class="sr-only" tabindex="-1" />
+            <div id="sip-stepup-switch-track" class="w-11 h-6 bg-border rounded-full transition-colors duration-200 relative">
+              <div id="sip-stepup-switch-thumb" class="w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 left-0.5 transition-transform duration-200 pointer-events-none"></div>
+            </div>
+          </div>
+        </button>
+
+        <!-- Inline Live Comparison Badge (Instant mobile feedback) -->
+        <div id="sip-stepup-inline-badge" class="hidden mt-3 p-2.5 rounded-control bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between text-xs">
+          <div class="flex items-center gap-1.5 text-emerald-800 dark:text-emerald-300 font-medium">
+            <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+              <polyline points="17 6 23 6 23 12"></polyline>
+            </svg>
+            <span>Step-Up Extra Corpus:</span>
+          </div>
+          <span id="sip-stepup-inline-val" class="font-bold text-emerald-800 dark:text-emerald-300 tabular-nums">+₹0 (+0%)</span>
         </div>
 
         <div id="sip-stepup-panel" class="hidden mt-4 pt-4 border-t border-border/60 space-y-4">
@@ -322,7 +374,7 @@ const jsonld = {
               <button
                 type="button"
                 id="sip-stepup-mode-pct"
-                class="px-2.5 py-1 text-xs font-semibold rounded-control transition-standard cursor-pointer bg-surface text-accent shadow-xs"
+                class="min-h-[44px] px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-control transition-standard cursor-pointer bg-surface text-accent shadow-xs active:scale-95"
                 aria-pressed="true"
               >
                 Percentage (%)
@@ -330,7 +382,7 @@ const jsonld = {
               <button
                 type="button"
                 id="sip-stepup-mode-fixed"
-                class="px-2.5 py-1 text-xs font-semibold rounded-control transition-standard cursor-pointer text-text-muted hover:text-text-primary"
+                class="min-h-[44px] px-3.5 py-1.5 text-xs sm:text-sm font-semibold rounded-control transition-standard cursor-pointer text-text-muted hover:text-text-primary active:scale-95"
                 aria-pressed="false"
               >
                 Fixed Amount (<span data-currency-prefix>₹</span>)
@@ -846,6 +898,15 @@ const jsonld = {
 
     const stepUpToggle = document.getElementById('sip-stepup-toggle') as HTMLInputElement | null;
     const stepUpPanel = document.getElementById('sip-stepup-panel');
+    const tabRegular = document.getElementById('sip-mode-tab-regular');
+    const tabStepUp = document.getElementById('sip-mode-tab-stepup');
+    const stepUpCard = document.getElementById('sip-stepup-card');
+    const stepUpToggleTrigger = document.getElementById('sip-stepup-toggle-trigger');
+    const stepUpSwitchTrack = document.getElementById('sip-stepup-switch-track');
+    const stepUpSwitchThumb = document.getElementById('sip-stepup-switch-thumb');
+    const stepUpStatusBadge = document.getElementById('sip-stepup-status-badge');
+    const stepUpInlineBadge = document.getElementById('sip-stepup-inline-badge');
+    const stepUpInlineVal = document.getElementById('sip-stepup-inline-val');
     const modePctBtn = document.getElementById('sip-stepup-mode-pct');
     const modeFixedBtn = document.getElementById('sip-stepup-mode-fixed');
     const pctGroup = document.getElementById('sip-stepup-pct-group');
@@ -857,6 +918,66 @@ const jsonld = {
     const stepUpAdvantageRow = document.getElementById('sip-stepup-advantage-row');
     const stepUpAdvantageCompact = document.getElementById('sip-stepup-advantage-compact');
     const stepUpAdvantagePct = document.getElementById('sip-stepup-advantage-pct');
+
+    function setStepUpState(enabled: boolean, shouldRecalc = true) {
+      if (stepUpToggle) stepUpToggle.checked = enabled;
+      if (stepUpToggleTrigger) stepUpToggleTrigger.setAttribute('aria-checked', String(enabled));
+
+      if (stepUpSwitchTrack) {
+        if (enabled) {
+          stepUpSwitchTrack.classList.remove('bg-border');
+          stepUpSwitchTrack.classList.add('bg-accent');
+        } else {
+          stepUpSwitchTrack.classList.remove('bg-accent');
+          stepUpSwitchTrack.classList.add('bg-border');
+        }
+      }
+
+      if (stepUpSwitchThumb) {
+        if (enabled) {
+          stepUpSwitchThumb.classList.add('translate-x-5');
+        } else {
+          stepUpSwitchThumb.classList.remove('translate-x-5');
+        }
+      }
+
+      if (stepUpStatusBadge) {
+        stepUpStatusBadge.textContent = enabled ? 'Active' : 'Optional';
+        stepUpStatusBadge.className = enabled
+          ? 'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+          : 'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent';
+      }
+
+      if (tabRegular) {
+        tabRegular.setAttribute('aria-selected', String(!enabled));
+        if (!enabled) {
+          tabRegular.classList.add('bg-surface', 'text-accent', 'shadow-xs', 'border-accent/25');
+          tabRegular.classList.remove('text-text-muted', 'border-transparent');
+        } else {
+          tabRegular.classList.remove('bg-surface', 'text-accent', 'shadow-xs', 'border-accent/25');
+          tabRegular.classList.add('text-text-muted', 'border-transparent');
+        }
+      }
+
+      if (tabStepUp) {
+        tabStepUp.setAttribute('aria-selected', String(enabled));
+        if (enabled) {
+          tabStepUp.classList.add('bg-surface', 'text-accent', 'shadow-xs', 'border-accent/25');
+          tabStepUp.classList.remove('text-text-muted', 'border-transparent');
+        } else {
+          tabStepUp.classList.remove('bg-surface', 'text-accent', 'shadow-xs', 'border-accent/25');
+          tabStepUp.classList.add('text-text-muted', 'border-transparent');
+        }
+      }
+
+      if (stepUpPanel) {
+        stepUpPanel.classList.toggle('hidden', !enabled);
+      }
+
+      if (shouldRecalc) {
+        recalc();
+      }
+    }
 
     const copyBtn = document.getElementById('sip-copy-btn');
     const shareBtn = document.getElementById('sip-share-btn');
@@ -1066,16 +1187,25 @@ const jsonld = {
       if (resGain) anim(resGain, `(+${fmtCurrency(r.gain)})`);
       if (resGainPct) anim(resGainPct, r.gainPct.toFixed(1) + '%');
 
-      // Update Step-Up Advantage Row
+      // Update Step-Up Advantage Row & Inline Mobile Badge
+      const diffMaturity = r.maturity - rFlat.maturity;
+      const diffPct = rFlat.maturity > 0 ? ((r.maturity - rFlat.maturity) / rFlat.maturity) * 100 : 0;
       if (stepUpAdvantageRow) {
-        if (isStepUp && r.maturity > rFlat.maturity) {
-          const diffMaturity = r.maturity - rFlat.maturity;
-          const diffPct = ((r.maturity - rFlat.maturity) / rFlat.maturity) * 100;
+        if (isStepUp && diffMaturity > 0) {
           if (stepUpAdvantageCompact) stepUpAdvantageCompact.textContent = `+${fmtCompact(diffMaturity)}`;
           if (stepUpAdvantagePct) stepUpAdvantagePct.textContent = `(+${diffPct.toFixed(1)}%)`;
           stepUpAdvantageRow.classList.remove('hidden');
         } else {
           stepUpAdvantageRow.classList.add('hidden');
+        }
+      }
+
+      if (stepUpInlineBadge && stepUpInlineVal) {
+        if (isStepUp && diffMaturity > 0) {
+          stepUpInlineVal.textContent = `+${fmtCompact(diffMaturity)} (+${diffPct.toFixed(1)}%)`;
+          stepUpInlineBadge.classList.remove('hidden');
+        } else {
+          stepUpInlineBadge.classList.add('hidden');
         }
       }
 
@@ -1157,8 +1287,11 @@ const jsonld = {
       // Canonical Result Bus for mobile sticky bar
       const canonicalResult = {
         heroValue: compMaturity,
-        heroLabel: isStepUp ? 'Step-Up Maturity' : 'Estimated Maturity',
+        heroLabel: isStepUp ? 'Step-Up Maturity (Top-Up)' : 'Estimated Maturity',
         rows: [
+          ...(isStepUp && diffMaturity > 0
+            ? [{ label: 'Step-Up Extra Gain', value: `+${fmtCompact(diffMaturity)}`, variant: 'accent' as const }]
+            : []),
           { label: 'Total Invested', value: compInvested },
           { label: 'Total Gain', value: compGain, variant: 'accent' as const },
           { label: 'Gain %', value: r.gainPct.toFixed(1) + '%' },
@@ -1177,6 +1310,7 @@ const jsonld = {
           isStepUp,
           stepUpType,
           stepUpValue: stepUpVal,
+          stepUpExtraGain: diffMaturity,
         },
       };
 
@@ -1193,11 +1327,22 @@ const jsonld = {
     }
 
     // ── Step-Up Mode & Toggle Handlers ──────────────────────────────────────
+    tabRegular?.addEventListener('click', () => {
+      setStepUpState(false);
+    });
+
+    tabStepUp?.addEventListener('click', () => {
+      setStepUpState(true);
+      stepUpCard?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    stepUpToggleTrigger?.addEventListener('click', (e) => {
+      e.preventDefault();
+      setStepUpState(!stepUpToggle?.checked);
+    });
+
     stepUpToggle?.addEventListener('change', () => {
-      if (stepUpPanel) {
-        stepUpPanel.classList.toggle('hidden', !stepUpToggle.checked);
-      }
-      recalc();
+      setStepUpState(Boolean(stepUpToggle?.checked));
     });
 
     modePctBtn?.addEventListener('click', () => {
@@ -1379,10 +1524,7 @@ const jsonld = {
         yearsSlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (40 - 1) * 100).toFixed(2)}%`);
       }
 
-      if (stepUpToggle) {
-        stepUpToggle.checked = false;
-        stepUpPanel?.classList.add('hidden');
-      }
+      setStepUpState(false, false);
       modePctBtn?.click();
       if (stepUpPctInput) stepUpPctInput.value = String(DEFAULTS.stepUpPct);
       if (stepUpPctSlider) {
@@ -1401,6 +1543,16 @@ const jsonld = {
     });
 
     function applyHashParams() {
+      const hash = location.hash.toLowerCase();
+      const searchParams = new URLSearchParams(location.search);
+      const isStepUpQueryOrHash =
+        hash.includes('stepup') ||
+        hash.includes('step-up') ||
+        searchParams.get('type') === 'step-up' ||
+        searchParams.get('type') === 'stepup' ||
+        searchParams.get('mode') === 'step-up' ||
+        searchParams.get('mode') === 'stepup';
+
       const restored = restoreFromHash(location.hash, {
         p: sipSchema.monthly,
         r: sipSchema.rate,
@@ -1436,26 +1588,27 @@ const jsonld = {
       }
 
       const suVal = restored.values.su ?? restored.values.stepup;
-      if (suVal !== undefined && stepUpToggle) {
-        stepUpToggle.checked = true;
-        stepUpPanel?.classList.remove('hidden');
+      if (suVal !== undefined || isStepUpQueryOrHash) {
+        setStepUpState(true, false);
         if (restored.values.sut === 'f' || restored.values.sut === 'fixed') {
           modeFixedBtn?.click();
-          if (stepUpFixedInput) stepUpFixedInput.value = fmtLiveIndian(String(suVal));
-          if (stepUpFixedSlider) {
+          if (stepUpFixedInput && suVal !== undefined) stepUpFixedInput.value = fmtLiveIndian(String(suVal));
+          if (stepUpFixedSlider && suVal !== undefined) {
             stepUpFixedSlider.value = String(Math.min(suVal, 50000));
             const min = parseFloat(stepUpFixedSlider.min), max = parseFloat(stepUpFixedSlider.max);
             stepUpFixedSlider.style.setProperty('--slider-pct', `${((parseFloat(stepUpFixedSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
           }
         } else {
           modePctBtn?.click();
-          if (stepUpPctInput) stepUpPctInput.value = String(suVal);
-          if (stepUpPctSlider) {
+          if (stepUpPctInput && suVal !== undefined) stepUpPctInput.value = String(suVal);
+          if (stepUpPctSlider && suVal !== undefined) {
             stepUpPctSlider.value = String(Math.min(suVal, 50));
             const min = parseFloat(stepUpPctSlider.min), max = parseFloat(stepUpPctSlider.max);
             stepUpPctSlider.style.setProperty('--slider-pct', `${((parseFloat(stepUpPctSlider.value) - min) / (max - min) * 100).toFixed(2)}%`);
           }
         }
+      } else {
+        setStepUpState(false, false);
       }
 
       recalc();
