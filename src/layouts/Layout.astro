@@ -41,10 +41,14 @@ const resolvedOgAlt = ogImageAlt || title;
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Google tag (gtag.js) with Google Consent Mode v2 (production domain only) -->
+    <!-- Google tag (gtag.js) with Google Consent Mode v2 -->
     {import.meta.env.PROD && (
-      <script is:inline>
-        if (window.location.hostname === 'calcumetrics.com' || window.location.hostname === 'www.calcumetrics.com') {
+      <>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
+        <script is:inline>
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            window['ga-disable-G-BGJDT7C82V'] = true;
+          }
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('consent', 'default', {
@@ -54,15 +58,11 @@ const resolvedOgAlt = ogImageAlt || title;
             'analytics_storage': 'granted'
           });
           gtag('js', new Date());
-
-          gtag('config', 'G-BGJDT7C82V');
-
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V';
-          document.head.appendChild(s);
-        }
-      </script>
+          gtag('config', 'G-BGJDT7C82V', {
+            send_page_view: true
+          });
+        </script>
+      </>
     )}
 
     <meta charset="utf-8" />
