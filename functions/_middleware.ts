@@ -53,6 +53,24 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   try {
     const response = await context.next();
 
+    // Preserve direct static asset handling (avoid re-wrapping response body for assets)
+    if (
+      url.pathname.startsWith('/_astro/') ||
+      url.pathname.startsWith('/fonts/') ||
+      /\.(svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|css|js)$/i.test(url.pathname)
+    ) {
+      if (url.hostname.includes('pages.dev')) {
+        const h = new Headers(response.headers);
+        h.set('X-Robots-Tag', 'noindex, nofollow');
+        return new Response([204, 205, 304].includes(response.status) ? null : response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: h,
+        });
+      }
+      return response;
+    }
+
     const newHeaders = new Headers(response.headers);
 
     // Security headers for Best Practices / Lighthouse

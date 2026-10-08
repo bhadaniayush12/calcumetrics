@@ -171,4 +171,30 @@ describe('Cloudflare Pages _middleware', () => {
     const body = await response.text();
     expect(body).toContain('Custom 500 Page');
   });
+
+  it('passes through static asset responses untouched on custom domain', async () => {
+    const originalResponse = new Response('svg-content', {
+      headers: { 'Content-Type': 'image/svg+xml' },
+    });
+    const context = {
+      request: new Request('https://calcumetrics.com/_astro/chunk.123.js'),
+      next: async () => originalResponse,
+    };
+
+    const response = await onRequest(context);
+    expect(response).toBe(originalResponse);
+  });
+
+  it('passes through static images like logo.svg directly on custom domain', async () => {
+    const originalResponse = new Response('<svg></svg>', {
+      headers: { 'Content-Type': 'image/svg+xml' },
+    });
+    const context = {
+      request: new Request('https://calcumetrics.com/logo.svg'),
+      next: async () => originalResponse,
+    };
+
+    const response = await onRequest(context);
+    expect(response).toBe(originalResponse);
+  });
 });
