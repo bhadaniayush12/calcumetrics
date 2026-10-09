@@ -44,7 +44,6 @@ const resolvedOgAlt = ogImageAlt || title;
     <!-- Google tag (gtag.js) with Google Consent Mode v2 -->
     {import.meta.env.PROD && (
       <>
-        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
         <script is:inline>
           if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             window['ga-disable-G-BGJDT7C82V'] = true;
@@ -62,6 +61,7 @@ const resolvedOgAlt = ogImageAlt || title;
             send_page_view: true
           });
         </script>
+        <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-BGJDT7C82V"></script>
       </>
     )}
 

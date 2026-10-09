@@ -53,13 +53,16 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   try {
     const response = await context.next();
 
+    // Preview/branch deployments (e.g. abc123.calcumetrics.pages.dev) must never be indexed
+    const isPreviewHost = url.hostname.endsWith('.pages.dev');
+
     // Preserve direct static asset handling (avoid re-wrapping response body for assets)
     if (
       url.pathname.startsWith('/_astro/') ||
       url.pathname.startsWith('/fonts/') ||
       /\.(svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|css|js)$/i.test(url.pathname)
     ) {
-      if (url.hostname.includes('pages.dev')) {
+      if (isPreviewHost) {
         const h = new Headers(response.headers);
         h.set('X-Robots-Tag', 'noindex, nofollow');
         return new Response([204, 205, 304].includes(response.status) ? null : response.body, {
@@ -95,7 +98,7 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     }
 
     // If request is on a pages.dev hostname (preview/staging), add noindex, nofollow
-    if (url.hostname.includes('pages.dev')) {
+    if (isPreviewHost) {
       newHeaders.set('X-Robots-Tag', 'noindex, nofollow');
     }
 
