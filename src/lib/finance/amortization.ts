@@ -249,7 +249,16 @@ export function calcCreditCardPayoff(
     );
   }
 
-  const totalPaid = monthlyPayment * payoffMonths;
+  // The final payment only clears the remaining balance, so it is usually smaller
+  // than monthlyPayment. Balance after k full payments (closed form):
+  //   B_k = P(1+r)^k − EMI × ((1+r)^k − 1) / r
+  const fullPayments = payoffMonths - 1;
+  const balanceBeforeLast = monthlyRate === 0
+    ? balance - monthlyPayment * fullPayments
+    : balance * Math.pow(1 + monthlyRate, fullPayments) -
+      (monthlyPayment * (Math.pow(1 + monthlyRate, fullPayments) - 1)) / monthlyRate;
+  const finalPayment = Math.max(0, balanceBeforeLast) * (1 + monthlyRate);
+  const totalPaid = monthlyPayment * fullPayments + finalPayment;
   const totalInterest = totalPaid - balance;
 
   return {

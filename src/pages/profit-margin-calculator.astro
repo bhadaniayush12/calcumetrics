@@ -485,8 +485,8 @@ const jsonld = {
     function recalc() {
       const numRev = parseSmartInput(revInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numCogs = parseSmartInput(cogsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawOpex = opexInput ? opexInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawTaxes = taxesInput ? taxesInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawOpex = opexInput ? String(parseSmartInput(opexInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawTaxes = taxesInput ? String(parseSmartInput(taxesInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
 
       const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Revenue' });
       const vCogs = validate(numCogs ?? '', { required: true, min: 0, label: 'COGS' });
@@ -613,8 +613,8 @@ const jsonld = {
     document.getElementById('pm-copy-btn')?.addEventListener('click', async () => {
       const numRev = parseSmartInput(revInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numCogs = parseSmartInput(cogsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawOpex = opexInput ? opexInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawTaxes = taxesInput ? taxesInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawOpex = opexInput ? String(parseSmartInput(opexInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawTaxes = taxesInput ? String(parseSmartInput(taxesInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
 
       const vRev = validate(numRev ?? '', { required: true, min: 1, label: 'Revenue' });
       const vCogs = validate(numCogs ?? '', { required: true, min: 0, label: 'COGS' });

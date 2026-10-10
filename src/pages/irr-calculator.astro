@@ -394,9 +394,9 @@ const jsonld = {
     return n.toFixed(2) + '%';
   }
 
-  function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  function fmtLiveInput(raw: string | number) {
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 2 }).format(num);
   }
 
   const irrSchema = {
@@ -624,7 +624,7 @@ const jsonld = {
         const isEur = currLocale === 'de-DE';
         const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
         if (num !== null && !isNaN(num)) {
-          input.value = fmtLiveInput(String(num));
+          input.value = fmtLiveInput(num);
           recalc();
         }
       });
@@ -669,7 +669,7 @@ const jsonld = {
         const isEur = currLocale === 'de-DE';
         const num = parseSmartInput(el.value, isEur ? 'EUR' : undefined);
         if (num !== null && !isNaN(num)) {
-          el.value = fmtLiveInput(String(num));
+          el.value = fmtLiveInput(num);
           recalc();
         }
       });
@@ -677,12 +677,12 @@ const jsonld = {
 
     document.getElementById('irr-calculate')?.addEventListener('click', recalc);
     document.getElementById('irr-reset')?.addEventListener('click', () => {
-      initInput.value = fmtLiveInput(String(DEFAULTS.c0));
+      initInput.value = fmtLiveInput(DEFAULTS.c0);
       hInput.value = String(DEFAULTS.h);
-      cf1Input.value = fmtLiveInput(String(DEFAULTS.c1));
-      cf2Input.value = fmtLiveInput(String(DEFAULTS.c2));
-      cf3Input.value = fmtLiveInput(String(DEFAULTS.c3));
-      cf4Input.value = fmtLiveInput(String(DEFAULTS.c4));
+      cf1Input.value = fmtLiveInput(DEFAULTS.c1);
+      cf2Input.value = fmtLiveInput(DEFAULTS.c2);
+      cf3Input.value = fmtLiveInput(DEFAULTS.c3);
+      cf4Input.value = fmtLiveInput(DEFAULTS.c4);
 
       if (initSlider) {
         initSlider.value = String(DEFAULTS.c0);
@@ -805,7 +805,7 @@ const jsonld = {
       const restored = restoreFromHash(currentHash, irrSchema);
       if (restored.valid) {
         if (restored.values.c0 !== undefined) {
-          initInput.value = fmtLiveInput(String(restored.values.c0));
+          initInput.value = fmtLiveInput(restored.values.c0);
           if (initSlider) {
             initSlider.value = String(restored.values.c0);
             initSlider.style.setProperty('--slider-pct', `${((restored.values.c0 - 10000) / (2000000 - 10000)) * 100}%`);
@@ -818,10 +818,10 @@ const jsonld = {
             hSlider.style.setProperty('--slider-pct', `${(restored.values.h / 30) * 100}%`);
           }
         }
-        if (restored.values.c1 !== undefined) cf1Input.value = fmtLiveInput(String(restored.values.c1));
-        if (restored.values.c2 !== undefined) cf2Input.value = fmtLiveInput(String(restored.values.c2));
-        if (restored.values.c3 !== undefined) cf3Input.value = fmtLiveInput(String(restored.values.c3));
-        if (restored.values.c4 !== undefined) cf4Input.value = fmtLiveInput(String(restored.values.c4));
+        if (restored.values.c1 !== undefined) cf1Input.value = fmtLiveInput(restored.values.c1);
+        if (restored.values.c2 !== undefined) cf2Input.value = fmtLiveInput(restored.values.c2);
+        if (restored.values.c3 !== undefined) cf3Input.value = fmtLiveInput(restored.values.c3);
+        if (restored.values.c4 !== undefined) cf4Input.value = fmtLiveInput(restored.values.c4);
       }
     }
 

@@ -106,11 +106,21 @@ describe('calcCreditCardPayoff', () => {
     expect(res.payoffMonths).toBe(Infinity);
   });
 
-  it('totalPaid = monthlyPayment × payoffMonths when sufficient', () => {
+  it('totalPaid matches a month-by-month simulation (final payment is partial)', () => {
     const res = calcCreditCardPayoff(10000, 24, 500);
-    if (res.paymentSufficient) {
-      expect(res.totalPaid).toBeCloseTo(res.monthlyPayment * res.payoffMonths, 0);
+    let bal = 10000;
+    let paid = 0;
+    let months = 0;
+    while (bal > 1e-9) {
+      bal *= 1.02;
+      const pay = Math.min(500, bal);
+      bal -= pay;
+      paid += pay;
+      months++;
     }
+    expect(res.payoffMonths).toBe(months);
+    expect(res.totalPaid).toBeCloseTo(paid, 2);
+    expect(res.totalPaid).toBeLessThan(res.monthlyPayment * res.payoffMonths);
   });
 });
 

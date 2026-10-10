@@ -267,12 +267,13 @@ export interface CapitalGainsResult {
 }
 
 /** Minimum holding months for LTCG classification by asset type. */
+/** Holding must EXCEED this many months to qualify as long-term (Section 2(42A)). */
 const LTCG_THRESHOLD_MONTHS: Record<AssetType, number> = {
-  equity: 12,         // Listed equity / equity MF: 12 months
+  equity: 12,         // Listed equity / equity MF: more than 12 months
   'equity-fund': 12,
-  'debt-fund': 24,    // Budget 2024: debt funds LTCG at 24 months
-  'real-estate': 24,  // Immovable property: 24 months (Budget 2024 changed from 36)
-  gold: 24,           // Physical gold & SGBs: 24 months (Budget 2024)
+  'debt-fund': Infinity, // Section 50AA: deemed short-term regardless of holding period
+  'real-estate': 24,  // Immovable property: more than 24 months (Budget 2024 changed from 36)
+  gold: 24,           // Physical gold & SGBs: more than 24 months (Budget 2024)
   other: 24,
 };
 
@@ -298,7 +299,7 @@ export function calcCapitalGains(
 ): CapitalGainsResult {
   const gain = salePrice - purchasePrice;
   const ltcgThreshold = LTCG_THRESHOLD_MONTHS[assetType];
-  const gainType: 'LTCG' | 'STCG' = holdingMonths >= ltcgThreshold ? 'LTCG' : 'STCG';
+  const gainType: 'LTCG' | 'STCG' = holdingMonths > ltcgThreshold ? 'LTCG' : 'STCG';
 
   // Gains ≤ 0 — no tax
   if (gain <= 0) {
@@ -325,14 +326,14 @@ export function calcCapitalGains(
       section = '112A';
     }
   } else if (assetType === 'debt-fund') {
-    // Debt funds (purchased after April 2023): taxed at slab rate
+    // Debt funds (purchased on/after 1 April 2023): deemed STCG under Section 50AA, taxed at slab rate.
     // This tool does not know the user's slab, so we report 30% (highest slab) as a conservative estimate
     taxRatePct = 30;
-    section = '112 (slab rate — conservative estimate at 30%)';
+    section = '50AA (slab rate — conservative estimate at 30%)';
   } else if (assetType === 'real-estate') {
     if (gainType === 'STCG') {
       taxRatePct = 30; // Slab rate (conservative)
-      section = '115AD (slab)';
+      section = 'Slab rate';
     } else {
       // Budget 2024: 12.5% without indexation (removed indexation benefit)
       taxRatePct = 12.5;
@@ -347,7 +348,8 @@ export function calcCapitalGains(
       section = '112 (12.5%, Budget 2024)';
     }
   } else {
-    taxRatePct = gainType === 'STCG' ? 30 : 20;
+    // Budget 2024: LTCG under Section 112 is 12.5% without indexation for transfers on/after 23 July 2024
+    taxRatePct = gainType === 'STCG' ? 30 : 12.5;
     section = gainType === 'STCG' ? 'Slab rate' : '112';
   }
 

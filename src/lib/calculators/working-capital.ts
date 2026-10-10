@@ -24,9 +24,9 @@ export function calcWorkingCapital(
   const totalCurrentLiabilities = Math.max(0, payables) + Math.max(0, shortTermDebt) + Math.max(0, otherLiabilities);
 
   const netWorkingCapital = totalCurrentAssets - totalCurrentLiabilities;
-  const currentRatio = totalCurrentLiabilities > 0 ? totalCurrentAssets / totalCurrentLiabilities : totalCurrentAssets > 0 ? 99 : 0;
+  const currentRatio = totalCurrentLiabilities > 0 ? totalCurrentAssets / totalCurrentLiabilities : totalCurrentAssets > 0 ? Infinity : 0;
   const quickAssets = totalCurrentAssets - Math.max(0, inventory);
-  const quickRatio = totalCurrentLiabilities > 0 ? quickAssets / totalCurrentLiabilities : quickAssets > 0 ? 99 : 0;
+  const quickRatio = totalCurrentLiabilities > 0 ? quickAssets / totalCurrentLiabilities : quickAssets > 0 ? Infinity : 0;
 
   let status: 'Strong' | 'Adequate' | 'Deficit' = 'Adequate';
   if (currentRatio >= 1.5 && netWorkingCapital > 0) {

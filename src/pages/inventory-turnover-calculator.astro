@@ -450,7 +450,7 @@ const jsonld = {
     }
 
     function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+      return parseSmartInput(v, currLocale === 'de-DE' ? 'EUR' : undefined) ?? 0;
     }
 
     function recalc() {

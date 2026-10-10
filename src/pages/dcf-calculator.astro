@@ -525,9 +525,9 @@ const jsonld = {
 
     function recalc() {
       const numFcf = parseSmartInput(fcf1Input!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawGrowth = growthInput!.value.replace(/[^0-9.-]/g, '');
+      const rawGrowth = String(parseSmartInput(growthInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
       const numDiscount = parseSmartInput(discountInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawTerminal = terminalInput!.value.replace(/[^0-9.-]/g, '');
+      const rawTerminal = String(parseSmartInput(terminalInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
 
       const vFcf = validate(numFcf ?? '', { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
       const vGrowth = validate(rawGrowth ?? '', { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });
@@ -659,9 +659,9 @@ const jsonld = {
     // Copy & Share
     document.getElementById('dcf-copy-btn')?.addEventListener('click', async () => {
       const numFcf = parseSmartInput(fcf1Input.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawGrowth = growthInput.value.replace(/[^0-9.-]/g, '');
+      const rawGrowth = String(parseSmartInput(growthInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
       const numDiscount = parseSmartInput(discountInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawTerminal = terminalInput.value.replace(/[^0-9.-]/g, '');
+      const rawTerminal = String(parseSmartInput(terminalInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
 
       const vFcf = validate(numFcf ?? '', { required: true, min: 1, label: 'Year 1 Free Cash Flow' });
       const vGrowth = validate(rawGrowth ?? '', { required: true, min: -50, max: 100, decimal: true, label: '5-Year FCF Growth Rate' });

@@ -45,7 +45,7 @@ const resolvedOgAlt = ogImageAlt || title;
     {import.meta.env.PROD && (
       <>
         <script is:inline>
-          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          if (window.location.hostname !== 'calcumetrics.com' && window.location.hostname !== 'www.calcumetrics.com') {
             window['ga-disable-G-BGJDT7C82V'] = true;
           }
           window.dataLayer = window.dataLayer || [];

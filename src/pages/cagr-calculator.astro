@@ -303,9 +303,9 @@ const jsonld = {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
 
-  function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(num);
+  function fmtLiveInput(raw: string | number) {
+    const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 2 }).format(num);
   }
 
   function initCAGRCalc() {
@@ -487,7 +487,7 @@ const jsonld = {
         const isEur = currLocale === 'de-DE';
         const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
         if (num !== null && !isNaN(num)) {
-          input.value = isFormatted ? fmtLiveInput(String(num)) : String(num);
+          input.value = isFormatted ? fmtLiveInput(num) : String(num);
           recalc();
         }
       });
@@ -499,8 +499,8 @@ const jsonld = {
 
     document.getElementById('cagr-calculate')?.addEventListener('click', recalc);
     document.getElementById('cagr-reset')?.addEventListener('click', () => {
-      pvInput.value = fmtLiveInput(String(DEFAULTS.pv));
-      fvInput.value = fmtLiveInput(String(DEFAULTS.fv));
+      pvInput.value = fmtLiveInput(DEFAULTS.pv);
+      fvInput.value = fmtLiveInput(DEFAULTS.fv);
       yInput.value = String(DEFAULTS.years);
 
       if (pvSlider) {
@@ -610,14 +610,14 @@ const jsonld = {
       const restored = restoreFromHash(currentHash, cagrSchema);
       if (restored.valid) {
         if (restored.values.pv !== undefined) {
-          pvInput.value = fmtLiveInput(String(restored.values.pv));
+          pvInput.value = fmtLiveInput(restored.values.pv);
           if (pvSlider) {
             pvSlider.value = String(restored.values.pv);
             pvSlider.style.setProperty('--slider-pct', `${((restored.values.pv - 5000) / (10000000 - 5000)) * 100}%`);
           }
         }
         if (restored.values.fv !== undefined) {
-          fvInput.value = fmtLiveInput(String(restored.values.fv));
+          fvInput.value = fmtLiveInput(restored.values.fv);
           if (fvSlider) {
             fvSlider.value = String(restored.values.fv);
             fvSlider.style.setProperty('--slider-pct', `${((restored.values.fv - 5000) / (50000000 - 5000)) * 100}%`);

@@ -7,7 +7,7 @@ import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
 import { calcLiquidityRatios } from '../lib/calculators/liquidity-ratios';
-import { formatIndian } from '../lib/formatters';
+import { formatIndian, formatRatio } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = {
@@ -126,7 +126,7 @@ const jsonld = {
     toolName="Liquidity Ratios Suite"
     category="Business"
     categoryHref="/business"
-    heroValue={result.currentRatio.toFixed(2) + 'x'}
+    heroValue={formatRatio(result.currentRatio)}
     heroLabel="Current Ratio"
   >
     <Fragment slot="inputs">
@@ -237,18 +237,18 @@ const jsonld = {
       <div class="mb-5">
         <span class="text-xs font-medium uppercase tracking-wider text-dark-muted block mb-1">Current Ratio</span>
         <div id="lr-result-current" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
-          {result.currentRatio.toFixed(2)}x
+          {formatRatio(result.currentRatio)}
         </div>
       </div>
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Quick (Acid-Test) Ratio</span>
-          <span id="lr-result-quick" class="text-sm font-semibold tabular-nums text-dark-accent">{result.quickRatio.toFixed(2)}x</span>
+          <span id="lr-result-quick" class="text-sm font-semibold tabular-nums text-dark-accent">{formatRatio(result.quickRatio)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Cash Ratio (Immediate Coverage)</span>
-          <span id="lr-result-cash" class="text-sm font-semibold tabular-nums text-dark-text">{result.cashRatio.toFixed(2)}x</span>
+          <span id="lr-result-cash" class="text-sm font-semibold tabular-nums text-dark-text">{formatRatio(result.cashRatio)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Net Working Capital Cushion</span>
@@ -457,7 +457,7 @@ const jsonld = {
 </Layout>
 
 <script>
-  import { parseSmartInput } from '../lib/formatters';
+  import { parseSmartInput, formatRatio } from '../lib/formatters';
   import { calcLiquidityRatios } from '../lib/calculators/liquidity-ratios';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
@@ -528,14 +528,14 @@ const jsonld = {
     }
 
     function parse(v: string) {
-      return parseFloat(v.replace(/[^0-9.]/g, '')) || 0;
+      return parseSmartInput(v, currLocale === 'de-DE' ? 'EUR' : undefined) ?? 0;
     }
 
     function recalc() {
       const numCash = parseSmartInput(cashInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawSec = secInput ? String(parseSmartInput(secInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawAr = arInput ? String(parseSmartInput(arInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawInv = invInput ? String(parseSmartInput(invInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
       const numCl = parseSmartInput(clInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
       const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash & Bank Balances' });
@@ -560,11 +560,11 @@ const jsonld = {
       const res = calcLiquidityRatios(cash, sec, ar, inv, 0, cl);
 
       setResult({
-        heroValue: `${res.currentRatio.toFixed(2)}x`,
+        heroValue: formatRatio(res.currentRatio),
         heroLabel: 'Current Ratio',
         rows: [
-          { label: 'Quick (Acid-Test) Ratio', value: `${res.quickRatio.toFixed(2)}x` },
-          { label: 'Cash Ratio', value: `${res.cashRatio.toFixed(2)}x` },
+          { label: 'Quick (Acid-Test) Ratio', value: formatRatio(res.quickRatio) },
+          { label: 'Cash Ratio', value: formatRatio(res.cashRatio) },
           { label: 'Net Working Capital Cushion', value: fmtVal(res.netWorkingCapital) },
           { label: 'Current Ratio Status', value: res.currentRatioStatus },
           { label: 'Quick Ratio Status', value: res.quickRatioStatus },
@@ -572,11 +572,11 @@ const jsonld = {
         ],
       });
 
-      if (resCurrent) resCurrent.textContent = res.currentRatio.toFixed(2) + 'x';
-      if (resQuick) resQuick.textContent = res.quickRatio.toFixed(2) + 'x';
-      if (resCash) resCash.textContent = res.cashRatio.toFixed(2) + 'x';
+      if (resCurrent) resCurrent.textContent = formatRatio(res.currentRatio);
+      if (resQuick) resQuick.textContent = formatRatio(res.quickRatio);
+      if (resCash) resCash.textContent = formatRatio(res.cashRatio);
       if (resNwc) resNwc.textContent = fmtVal(res.netWorkingCapital);
-      if (mobileHero) mobileHero.textContent = res.currentRatio.toFixed(2) + 'x';
+      if (mobileHero) mobileHero.textContent = formatRatio(res.currentRatio);
 
       if (resStatus) {
         let statusText = 'Optimal Liquidity Profile';
@@ -692,9 +692,9 @@ const jsonld = {
     // Copy & Share
     document.getElementById('lr-copy-btn')?.addEventListener('click', async () => {
       const numCash = parseSmartInput(cashInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawSec = secInput ? secInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawAr = arInput ? arInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawInv = invInput ? invInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawSec = secInput ? String(parseSmartInput(secInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawAr = arInput ? String(parseSmartInput(arInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawInv = invInput ? String(parseSmartInput(invInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
       const numCl = parseSmartInput(clInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
       const vCash = validate(numCash ?? '', { required: true, min: 0, label: 'Cash & Bank Balances' });
@@ -705,7 +705,7 @@ const jsonld = {
       if (!vCash.valid || !vSec.valid || !vAr.valid || !vInv.valid || !vCl.valid) return;
 
       const res = calcLiquidityRatios(vCash.value!, vSec.value!, vAr.value!, vInv.value!, 0, vCl.value!);
-      const text = `Liquidity Ratios: Current Ratio: ${res.currentRatio.toFixed(2)}x, Quick Ratio: ${res.quickRatio.toFixed(2)}x, Cash Ratio: ${res.cashRatio.toFixed(2)}x (NWC: ${fmtVal(res.netWorkingCapital)}). ${location.href.split('#')[0]}`;
+      const text = `Liquidity Ratios: Current Ratio: ${formatRatio(res.currentRatio)}, Quick Ratio: ${formatRatio(res.quickRatio)}, Cash Ratio: ${formatRatio(res.cashRatio)} (NWC: ${fmtVal(res.netWorkingCapital)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {

@@ -443,13 +443,12 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
       trackCalculatorCompletion(resolvedCalcType);
     };
 
-    // 1. Explicit calculate button click (immediate completion event)
+    // 1. Explicit calculate button click (immediate completion event removed - relies on store)
     const calculateBtn = document.querySelector<HTMLButtonElement>('button[id$="-calculate"]');
     if (calculateBtn && calculateBtn.dataset.analyticsBound !== 'true') {
       calculateBtn.dataset.analyticsBound = 'true';
       calculateBtn.addEventListener('click', () => {
         userHasInteracted = true;
-        fireCompletionEvent();
       });
     }
 

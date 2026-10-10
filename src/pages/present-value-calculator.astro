@@ -531,7 +531,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         const num = parseFloat(raw);
         if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
           slider.value = String(num);
@@ -541,7 +541,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('blur', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         if (isFormatted && raw) {
           input.value = fmtIndianInput(raw);
           debounce();

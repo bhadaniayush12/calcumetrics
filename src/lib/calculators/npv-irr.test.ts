@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcNPV, calcNPVDetails, calcIRR } from './corporate';
+import { calcNPV, calcNPVDetails, calcIRR, calcDCF } from './corporate';
 import { validate } from '../validate';
 import { serializeHash, restoreFromHash } from '../url-state';
 
@@ -117,5 +117,17 @@ describe('5.9 NPV & IRR Calculators', () => {
       expect(restored.values.c1).toBe(30000);
       expect(restored.values.c4).toBe(60000);
     });
+  });
+});
+
+describe('calcDCF', () => {
+  it('flags terminal growth >= discount rate as invalid instead of silently zeroing TV', () => {
+    const res = calcDCF([100, 110], 5, 6);
+    expect(res.valid).toBe(false);
+    expect(res.error).toBeDefined();
+  });
+
+  it('is valid when discount rate exceeds terminal growth', () => {
+    expect(calcDCF([100, 110], 12, 3).valid).toBe(true);
   });
 });

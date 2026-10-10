@@ -303,7 +303,7 @@ export function calcSavingsGoal(
   if (monthlyRate === 0 || n === 0) {
     // Simple case: no interest
     const remaining = Math.max(0, targetAmount - currentSavings);
-    monthlyContribution = n > 0 ? remaining / n : Infinity;
+    monthlyContribution = remaining <= 0 ? 0 : n > 0 ? remaining / n : Infinity;
   } else {
     const fvFactor = Math.pow(1 + monthlyRate, n);
     const fvOfCurrentSavings = currentSavings * fvFactor;

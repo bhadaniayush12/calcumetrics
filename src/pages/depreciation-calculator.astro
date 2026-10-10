@@ -190,7 +190,7 @@ const jsonld = {
       </div>
 
       <Alert variant="info" title="Tax vs Book Accounting">
-        Indian Income Tax Act requires the <strong>Written Down Value (WDV)</strong> method for most block of assets, while Companies Act allows both SLM and WDV for financial reporting.
+        Indian Income Tax Act requires the <strong>Written Down Value (WDV)</strong> method for most block of assets, while Companies Act allows both SLM and WDV for financial reporting. With a ₹0 salvage value, WDV assumes the Schedule II residual of 5% of cost, since a declining balance never reaches zero.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -504,7 +504,7 @@ const jsonld = {
 
     function recalc() {
       const numCost = parseSmartInput(costInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawSalvage = salvageInput ? salvageInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawSalvage = salvageInput ? String(parseSmartInput(salvageInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
       const numLife = parseSmartInput(lifeInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const method = (methodSelect ? methodSelect.value : 'SLM') as 'SLM' | 'WDV';
 
@@ -640,7 +640,7 @@ const jsonld = {
     // Copy & Share
     document.getElementById('dep-copy-btn')?.addEventListener('click', async () => {
       const numCost = parseSmartInput(costInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawSalvage = salvageInput ? salvageInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawSalvage = salvageInput ? String(parseSmartInput(salvageInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
       const numLife = parseSmartInput(lifeInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const method = (methodSelect ? methodSelect.value : 'SLM') as any;
       const vCost = validate(numCost ?? '', { required: true, min: 1, label: 'Asset Cost' });

@@ -30,9 +30,9 @@ export function calcLiquidityRatios(
   const quickAssets = c + ms + ar;
   const cashAssets = c + ms;
 
-  const currentRatio = cl > 0 ? totalCurrentAssets / cl : totalCurrentAssets > 0 ? 99 : 0;
-  const quickRatio = cl > 0 ? quickAssets / cl : quickAssets > 0 ? 99 : 0;
-  const cashRatio = cl > 0 ? cashAssets / cl : cashAssets > 0 ? 99 : 0;
+  const currentRatio = cl > 0 ? totalCurrentAssets / cl : totalCurrentAssets > 0 ? Infinity : 0;
+  const quickRatio = cl > 0 ? quickAssets / cl : quickAssets > 0 ? Infinity : 0;
+  const cashRatio = cl > 0 ? cashAssets / cl : cashAssets > 0 ? Infinity : 0;
   const netWorkingCapital = totalCurrentAssets - cl;
 
   const currentRatioStatus: 'Optimal' | 'Caution' | 'Deficit' =

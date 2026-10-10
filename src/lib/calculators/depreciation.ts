@@ -76,8 +76,10 @@ export function calcDepreciation(
     };
   } else {
     // WDV formula: r = 1 - (salvage / cost)^(1 / n)
-    // If salvage is 0 or near 0, standard commercial benchmark uses 5% salvage rule:
-    const effectiveSalvage = salvage > 0 ? salvage : Math.max(1, cost * 0.05);
+    // A declining balance never reaches zero, so with no salvage we assume the
+    // Schedule II 5% residual and keep it as the floor. Writing it off in the
+    // final year instead would spike that year's charge far above the trend.
+    const effectiveSalvage = salvage > 0 ? salvage : Math.min(cost, Math.max(1, cost * 0.05));
     const rate = 1 - Math.pow(effectiveSalvage / cost, 1 / usefulLife);
     const ratePct = rate * 100;
     let opening = cost;
@@ -85,11 +87,12 @@ export function calcDepreciation(
 
     for (let yr = 1; yr <= usefulLife; yr++) {
       let dep = opening * rate;
-      if (yr === usefulLife || opening - dep < salvage) {
-        dep = Math.max(0, opening - salvage);
+      // Final year only absorbs floating-point drift down to the residual.
+      if (yr === usefulLife || opening - dep < effectiveSalvage) {
+        dep = Math.max(0, opening - effectiveSalvage);
       }
       accum += dep;
-      const closing = Math.max(salvage, opening - dep);
+      const closing = Math.max(effectiveSalvage, opening - dep);
       schedule.push({
         year: yr,
         openingValue: Math.round(opening),
@@ -103,7 +106,7 @@ export function calcDepreciation(
     return {
       method: 'WDV',
       cost,
-      salvageValue: salvage,
+      salvageValue: effectiveSalvage,
       usefulLife,
       annualDepreciation: schedule[0] ? schedule[0].depreciation : 0,
       depreciationRatePct: ratePct,

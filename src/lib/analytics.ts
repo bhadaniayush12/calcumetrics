@@ -124,17 +124,12 @@ export function trackCalculatorCompletion(calculatorType: string): boolean {
 
   if (typeof (window as any).gtag === 'function') {
     (window as any).gtag('event', 'calculate_complete', payload);
-    (window as any).gtag('event', 'calculate_click', payload);
     return true;
   }
 
   if (Array.isArray((window as any).dataLayer)) {
     (window as any).dataLayer.push({
       event: 'calculate_complete',
-      ...payload,
-    });
-    (window as any).dataLayer.push({
-      event: 'calculate_click',
       ...payload,
     });
     return true;

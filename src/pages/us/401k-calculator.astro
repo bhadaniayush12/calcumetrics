@@ -499,8 +499,8 @@ const jsonld = {
     function recalc() {
       const numSal = parseSmartInput(salaryInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numCon = parseSmartInput(contribInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
-      const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
+      const rawMat = matchInput ? String(parseSmartInput(matchInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '50';
+      const rawLim = matchLimitInput ? String(parseSmartInput(matchLimitInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '6';
       const numR = parseSmartInput(rateInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numY = parseSmartInput(yearsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
@@ -647,8 +647,8 @@ const jsonld = {
     document.getElementById('k401-copy-btn')?.addEventListener('click', async () => {
       const numSal = parseSmartInput(salaryInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numCon = parseSmartInput(contribInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawMat = matchInput ? matchInput.value.replace(/[^0-9.]/g, '') : '50';
-      const rawLim = matchLimitInput ? matchLimitInput.value.replace(/[^0-9.]/g, '') : '6';
+      const rawMat = matchInput ? String(parseSmartInput(matchInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '50';
+      const rawLim = matchLimitInput ? String(parseSmartInput(matchLimitInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '6';
       const numR = parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numY = parseSmartInput(yearsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 

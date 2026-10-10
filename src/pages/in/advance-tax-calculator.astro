@@ -377,7 +377,7 @@ const jsonld = {
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtLiveInput(raw: string) {
+  function fmtLiveInput(raw: string | number) {
     const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
     return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
@@ -459,15 +459,17 @@ const jsonld = {
         debounce();
       });
       taxInput.addEventListener('input', () => {
-        const raw = taxInput.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(taxSlider.min) && num <= parseFloat(taxSlider.max)) {
+        const num = parseSmartInput(taxInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(taxSlider.min) && num <= parseFloat(taxSlider.max)) {
           taxSlider.value = String(num);
           const pct = ((num - parseFloat(taxSlider.min)) / (parseFloat(taxSlider.max) - parseFloat(taxSlider.min))) * 100;
           taxSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        taxInput.value = fmtLiveInput(raw);
         debounce();
+      });
+      taxInput.addEventListener('blur', () => {
+        const num = parseSmartInput(taxInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) taxInput.value = fmtLiveInput(num);
       });
     }
 

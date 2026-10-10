@@ -426,7 +426,7 @@ const jsonld = {
 
   let currSym = '₹'; let currLocale = 'en-IN';
   function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
-  function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+  function fmtInput(raw: string | number) { const n = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined); return n === null || isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 2 }).format(n); }
 
   function initFV() {
     let currentHashState: Record<string, any> = {};
@@ -514,7 +514,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         const num = parseFloat(raw);
         if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
           slider.value = String(num);
@@ -523,7 +523,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('blur', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         if (isFormatted && raw) {
           input.value = fmtInput(raw);
           debounce();

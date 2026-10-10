@@ -197,4 +197,20 @@ describe('Cloudflare Pages _middleware', () => {
     const response = await onRequest(context);
     expect(response).toBe(originalResponse);
   });
+
+  it.each([
+    ['https://www.calcumetrics.com/gst-calculator/', 'https://calcumetrics.com/in/gst-calculator'],
+    ['https://calcumetrics.pages.dev/sip-calculator/?p=5000', 'https://calcumetrics.com/sip-calculator?p=5000'],
+    ['https://calcumetrics.com/tds-calculator/?a=1', 'https://calcumetrics.com/in/tds-calculator?a=1'],
+    ['https://calcumetrics.com/step-up-sip-calculator', 'https://calcumetrics.com/sip-calculator#stepup'],
+  ])('resolves %s to its final URL in a single 301', async (from, to) => {
+    const context = {
+      request: new Request(from),
+      next: async () => new Response('OK'),
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe(to);
+  });
 });

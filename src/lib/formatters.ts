@@ -64,6 +64,14 @@ export function formatPercent(value: number, decimals = 2): string {
 }
 
 /**
+ * Format a coverage ratio like "1.50x". A ratio against zero liabilities is
+ * Infinity, which has no meaningful multiple, so it is labelled instead.
+ */
+export function formatRatio(value: number, decimals = 2): string {
+  return Number.isFinite(value) ? `${value.toFixed(decimals)}x` : 'No liabilities';
+}
+
+/**
  * Live digit-grouping formatter for input fields.
  * Strips non-numeric chars (except decimal point), then re-groups.
  * Returns the formatted string and caret offset from the end.
@@ -100,6 +108,7 @@ export function formatLiveInput(raw: string, format: LocaleFormat): string {
  *   - "4,5%" -> 4.5
  *   - "1.000,50" -> 1000.50
  *   - When activeCurrency is EUR, single commas act as decimal points (e.g. "1000,50" -> 1000.50)
+ *   - When activeCurrency is EUR, dot-grouped integers are thousands (e.g. "12.345" -> 12345)
  * - Supports negative numbers, leading currency symbols (₹, $, €, £), percentage signs (%)
  * - Returns number | null
  */
@@ -186,6 +195,10 @@ export function parseSmartInput(
         normalized = baseStr.replace(/,/g, '');
       }
     }
+  } else if (activeCurrency === 'EUR' && /^\d{1,3}(?:\.\d{3})+$/.test(baseStr)) {
+    // de-DE groups thousands with dots: "12.345" / "1.234.567" are integers, not decimals.
+    // Without this, a value the field itself formatted re-parses as 12.345.
+    normalized = baseStr.replace(/\./g, '');
   } else {
     normalized = baseStr;
   }
@@ -215,44 +228,49 @@ export function parseFormattedNumber(value: string, activeCurrency?: string): nu
   return legacy;
 }
 
+/** Trim "1.50" → "1.5" and "2.00" → "2" in a fixed-decimal string. */
+function trimFixed(str: string): string {
+  return str.replace(/\.0+$/, '').replace(/(\.\d*?[1-9])0+$/, '$1');
+}
+
+/**
+ * Pick the Indian unit (Crore / Lakh / plain) AFTER rounding, so values that round
+ * up across a boundary (e.g. 99,99,999.6 → "100 Lakh") move to the larger unit.
+ */
+function indianUnitParts(
+  value: number,
+  decimals: number
+): { sign: string; unit: 'cr' | 'lakh' | 'plain'; str: string } {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+  const lakhStr = (abs / 100000).toFixed(decimals);
+  if (abs >= 10000000 || parseFloat(lakhStr) >= 100) {
+    return { sign, unit: 'cr', str: trimFixed((abs / 10000000).toFixed(decimals)) };
+  }
+  if (Math.round(abs) >= 100000) {
+    return { sign, unit: 'lakh', str: trimFixed(lakhStr) };
+  }
+  return { sign, unit: 'plain', str: formatIndian(abs) };
+}
+
 /**
  * Format a number into compact Indian notation (e.g. ₹1.26 Cr, ₹81.14 Lakh, ₹25,000).
  */
 export function formatIndianCompact(value: number, symbol = '₹', decimals = 2): string {
-  const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
-
-  if (abs >= 10000000) {
-    const cr = abs / 10000000;
-    const str = cr.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str} Cr`;
-  }
-  if (abs >= 100000) {
-    const lakh = abs / 100000;
-    const str = lakh.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str} Lakh`;
-  }
-  return `${sign}${symbol}${formatIndian(abs)}`;
+  const { sign, unit, str } = indianUnitParts(value, decimals);
+  if (unit === 'cr') return `${sign}${symbol}${str} Cr`;
+  if (unit === 'lakh') return `${sign}${symbol}${str} Lakh`;
+  return `${sign}${symbol}${str}`;
 }
 
 /**
  * Format a number into full Indian words (e.g. ₹1.26 Crore, ₹81.14 Lakh, ₹25,000).
  */
 export function formatIndianWords(value: number, symbol = '₹', decimals = 2): string {
-  const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
-
-  if (abs >= 10000000) {
-    const cr = abs / 10000000;
-    const str = cr.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str} Crore`;
-  }
-  if (abs >= 100000) {
-    const lakh = abs / 100000;
-    const str = lakh.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str} Lakh`;
-  }
-  return `${sign}${symbol}${formatIndian(abs)}`;
+  const { sign, unit, str } = indianUnitParts(value, decimals);
+  if (unit === 'cr') return `${sign}${symbol}${str} Crore`;
+  if (unit === 'lakh') return `${sign}${symbol}${str} Lakh`;
+  return `${sign}${symbol}${str}`;
 }
 
 /**

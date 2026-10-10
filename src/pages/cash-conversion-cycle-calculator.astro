@@ -417,7 +417,7 @@ const jsonld = {
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtLiveInput(raw: string) {
+  function fmtLiveInput(raw: string | number) {
     const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
     return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
@@ -515,10 +515,13 @@ const jsonld = {
     }
 
     [arInput, revInput, invInput, cogsInput, apInput].forEach((input) => {
+      // Parse as typed; reformat only on blur so the caret, decimals and shorthand (5L, 10k) survive
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        input.value = fmtLiveInput(raw);
         recalc();
+      });
+      input.addEventListener('blur', () => {
+        const num = parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) input.value = fmtLiveInput(num);
       });
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') recalc();

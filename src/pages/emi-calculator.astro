@@ -629,10 +629,10 @@ const jsonld = {
       : formatCompactCurrency(n, currentCurrencyCode);
   }
 
-  function fmtLiveIndian(raw: string): string {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    if (isNaN(num)) return '';
-    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(num);
+  function fmtLiveIndian(raw: string | number): string {
+    const num = parseSmartInput(raw, currentNumberLocale === 'de-DE' ? 'EUR' : undefined);
+    if (num === null || isNaN(num)) return '';
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 2 }).format(num);
   }
 
   function initEMICalc() {
@@ -844,7 +844,7 @@ const jsonld = {
         const isEur = currentNumberLocale === 'de-DE';
         const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
         if (num !== null && !isNaN(num)) {
-          input.value = isFormatted ? fmtLiveIndian(String(num)) : String(num);
+          input.value = isFormatted ? fmtLiveIndian(num) : String(num);
           recalc();
         }
       });
@@ -916,7 +916,7 @@ const jsonld = {
 
     // ── Reset ────────────────────────────────────────────────────────────────
     resetBtn?.addEventListener('click', () => {
-      principalInput.value = fmtLiveIndian(String(DEFAULTS.principal));
+      principalInput.value = fmtLiveIndian(DEFAULTS.principal);
       rateInput.value = String(DEFAULTS.rate);
       yearsInput.value = String(DEFAULTS.years);
       if (principalSlider) {
@@ -944,7 +944,7 @@ const jsonld = {
       });
 
       if (restored.values.p !== undefined) {
-        principalInput.value = fmtLiveIndian(String(restored.values.p));
+        principalInput.value = fmtLiveIndian(restored.values.p);
         if (principalSlider) {
           principalSlider.value = String(Math.min(restored.values.p, 20000000));
           const min = parseFloat(principalSlider.min), max = parseFloat(principalSlider.max);

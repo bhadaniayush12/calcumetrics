@@ -181,3 +181,11 @@ describe('5.6 EMI Calculator', () => {
     });
   });
 });
+
+describe('calcEMIAmortization final payment', () => {
+  it('schedule payments sum to the EMI total (last instalment not overcounted)', () => {
+    const rows = calcEMIAmortization(1000000, 8.5, 20);
+    const sum = rows.reduce((s, r) => s + r.payment, 0);
+    expect(sum).toBeCloseTo(calcEMI(1000000, 8.5, 20).totalPayment, 2);
+  });
+});

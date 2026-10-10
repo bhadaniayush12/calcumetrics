@@ -150,3 +150,9 @@ describe('calcSavingsGoal', () => {
     expect(res.annualContribution).toBeCloseTo(res.monthlyContribution * 12, 4);
   });
 });
+
+describe('calcSavingsGoal — goal already met', () => {
+  it('needs no contribution when savings already cover the target with zero years left', () => {
+    expect(calcSavingsGoal(100, 200, 0, 0).monthlyContribution).toBe(0);
+  });
+});

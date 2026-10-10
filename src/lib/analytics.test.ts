@@ -143,7 +143,7 @@ describe('analytics module', () => {
   });
 
   describe('trackCalculatorCompletion', () => {
-    it('fires calculate_complete and calculate_click events with calculator_type when consent is granted', () => {
+    it('fires calculate_complete event with calculator_type when consent is granted', () => {
       const gtagSpy = vi.fn();
       (globalThis as any).window.gtag = gtagSpy;
 
@@ -152,12 +152,10 @@ describe('analytics module', () => {
       expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_complete', {
         calculator_type: 'income_tax',
       });
-      expect(gtagSpy).toHaveBeenCalledWith('event', 'calculate_click', {
-        calculator_type: 'income_tax',
-      });
+      expect(gtagSpy).not.toHaveBeenCalledWith('event', 'calculate_click', expect.anything());
     });
 
-    it('does NOT fire gtag calculate_click when consent is denied (Consent Mode v2)', () => {
+    it('does NOT fire gtag calculate_complete when consent is denied (Consent Mode v2)', () => {
       const gtagSpy = vi.fn();
       (globalThis as any).window.gtag = gtagSpy;
       (globalThis as any).window.dataLayer = [
@@ -180,10 +178,9 @@ describe('analytics module', () => {
         event: 'calculate_complete',
         calculator_type: 'sip',
       });
-      expect(dl).toContainEqual({
+      expect(dl).not.toContainEqual(expect.objectContaining({
         event: 'calculate_click',
-        calculator_type: 'sip',
-      });
+      }));
     });
   });
 });

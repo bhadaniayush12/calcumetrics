@@ -378,37 +378,16 @@ const jsonld = {
 
 <script>
   import { parseSmartInput } from '../lib/formatters';
+  import { calcXIRR } from '../lib/calculators/xirr';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
 
-  function npvRate(flows: Array<{ amount: number; date: Date }>, rate: number): number {
-    const t0 = flows[0].date.getTime();
-    return flows.reduce((sum, cf) => {
-      const years = (cf.date.getTime() - t0) / (365.25 * 24 * 3600 * 1000);
-      return sum + cf.amount / Math.pow(1 + rate, years);
-    }, 0);
-  }
-
   function calcXIRRClient(flows: Array<{ amount: number; date: Date }>) {
-    const hasNeg = flows.some((c) => c.amount < 0);
-    const hasPos = flows.some((c) => c.amount > 0);
-    if (!hasNeg || !hasPos) {
-      return { xirrPct: 0, valid: false, error: 'XIRR requires at least one negative outflow (investment) and one positive inflow (return).' };
+    const res = calcXIRR(flows);
+    if (!res.valid && res.error?.startsWith('Need at least')) {
+      return { ...res, error: 'XIRR requires at least one negative outflow (investment) and one positive inflow (return).' };
     }
-
-    let rate = 0.1;
-    for (let i = 0; i < 1000; i++) {
-      const npv = npvRate(flows, rate);
-      const npvDelta = npvRate(flows, rate + 1e-6);
-      const derivative = (npvDelta - npv) / 1e-6;
-      if (Math.abs(derivative) < 1e-12) break;
-      const nextRate = rate - npv / derivative;
-      if (Math.abs(nextRate - rate) < 1e-7) {
-        return { xirrPct: nextRate * 100, valid: true };
-      }
-      rate = nextRate;
-    }
-    return { xirrPct: rate * 100, valid: true };
+    return res;
   }
 
   let currSym = '₹';

@@ -1,8 +1,6 @@
 /** RD (Recurring Deposit) Calculator
- * Formula: M = R × [(1 + i)^n − 1] / (1 − (1 + i)^(-1/3))
- * Simplified: M = R × n × (1 + i) — RBI uses quarterly compounding
- * Standard Indian RD formula: M = R × [(1+i)^n - 1] / i × (1+i)
- * where i = r/400 (quarterly) and n = quarters
+ * Quarterly compounding: M = Σ R × (1 + r/400)^(m/3)
+ * where m = months remaining for each instalment (fractional quarters).
  */
 export interface RDResult {
   maturity: number;
@@ -13,19 +11,18 @@ export interface RDResult {
 }
 
 export function calcRD(monthly: number, ratePercent: number, years: number): RDResult {
-  // Standard RD formula with quarterly compounding (n quarters)
-  const n = years * 4; // quarters
-  const i = ratePercent / 400; // quarterly rate
-  const monthsPerQ = 3;
+  // Quarterly compounding (i = r/400); each instalment compounds for its
+  // remaining tenure expressed in (fractional) quarters, as banks compute it.
+  const i = ratePercent / 400;
+  const totalMonths = Math.round(years * 12);
   let maturity = 0;
 
-  // Each monthly instalment compounds for its remaining quarters
-  for (let month = 1; month <= years * 12; month++) {
-    const quartersRemaining = Math.ceil((years * 12 - month + 1) / monthsPerQ);
-    maturity += monthly * Math.pow(1 + i, quartersRemaining);
+  for (let month = 1; month <= totalMonths; month++) {
+    const monthsRemaining = totalMonths - month + 1;
+    maturity += monthly * Math.pow(1 + i, monthsRemaining / 3);
   }
 
-  const invested = monthly * years * 12;
+  const invested = monthly * totalMonths;
   const interest = maturity - invested;
   return {
     maturity,

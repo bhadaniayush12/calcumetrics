@@ -333,7 +333,7 @@ const jsonld = {
         <button
           type="button"
           id="sip-stepup-toggle-trigger"
-          class="w-full flex items-center justify-between gap-3 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-control p-1 -m-1"
+          class="w-full flex items-center justify-between gap-3 text-left cursor-pointer group focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 rounded-control p-1 -m-1"
           role="switch"
           aria-checked="false"
           aria-label="Toggle Annual Step-Up SIP"
@@ -882,10 +882,10 @@ const jsonld = {
       : formatCompactCurrency(n, currentCurrencyCode);
   }
 
-  function fmtLiveIndian(raw: string): string {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    if (isNaN(num)) return '';
-    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 0 }).format(num);
+  function fmtLiveIndian(raw: string | number): string {
+    const num = parseSmartInput(raw, currentNumberLocale === 'de-DE' ? 'EUR' : undefined);
+    if (num === null || isNaN(num)) return '';
+    return new Intl.NumberFormat(currentNumberLocale, { maximumFractionDigits: 2 }).format(num);
   }
 
   function initSIPCalc() {
@@ -1396,7 +1396,7 @@ const jsonld = {
         const isEur = currentNumberLocale === 'de-DE';
         const num = parseSmartInput(input.value, isEur ? 'EUR' : undefined);
         if (num !== null && !isNaN(num)) {
-          input.value = isFormatted ? fmtLiveIndian(String(num)) : String(num);
+          input.value = isFormatted ? fmtLiveIndian(num) : String(num);
           recalc();
         }
       });
@@ -1508,7 +1508,7 @@ const jsonld = {
 
     // ── Reset button ─────────────────────────────────────────────────────────
     resetBtn?.addEventListener('click', () => {
-      monthlyInput.value = fmtLiveIndian(String(DEFAULTS.monthly));
+      monthlyInput.value = fmtLiveIndian(DEFAULTS.monthly);
       rateInput.value = String(DEFAULTS.rate);
       yearsInput.value = String(DEFAULTS.years);
       if (monthlySlider) {
@@ -1531,7 +1531,7 @@ const jsonld = {
         stepUpPctSlider.value = String(DEFAULTS.stepUpPct);
         stepUpPctSlider.style.setProperty('--slider-pct', `${((DEFAULTS.stepUpPct - 1) / (50 - 1) * 100).toFixed(2)}%`);
       }
-      if (stepUpFixedInput) stepUpFixedInput.value = fmtLiveIndian(String(DEFAULTS.stepUpFixed));
+      if (stepUpFixedInput) stepUpFixedInput.value = fmtLiveIndian(DEFAULTS.stepUpFixed);
       if (stepUpFixedSlider) {
         stepUpFixedSlider.value = String(DEFAULTS.stepUpFixed);
         stepUpFixedSlider.style.setProperty('--slider-pct', `${((DEFAULTS.stepUpFixed - 500) / (50000 - 500) * 100).toFixed(2)}%`);
@@ -1563,7 +1563,7 @@ const jsonld = {
       });
 
       if (restored.values.p !== undefined) {
-        monthlyInput.value = fmtLiveIndian(String(restored.values.p));
+        monthlyInput.value = fmtLiveIndian(restored.values.p);
         if (monthlySlider) {
           monthlySlider.value = String(Math.min(restored.values.p, 200000));
           const min = parseFloat(monthlySlider.min), max = parseFloat(monthlySlider.max);
@@ -1592,7 +1592,7 @@ const jsonld = {
         setStepUpState(true, false);
         if (restored.values.sut === 'f' || restored.values.sut === 'fixed') {
           modeFixedBtn?.click();
-          if (stepUpFixedInput && suVal !== undefined) stepUpFixedInput.value = fmtLiveIndian(String(suVal));
+          if (stepUpFixedInput && suVal !== undefined) stepUpFixedInput.value = fmtLiveIndian(suVal);
           if (stepUpFixedSlider && suVal !== undefined) {
             stepUpFixedSlider.value = String(Math.min(suVal, 50000));
             const min = parseFloat(stepUpFixedSlider.min), max = parseFloat(stepUpFixedSlider.max);

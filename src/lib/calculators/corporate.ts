@@ -240,6 +240,9 @@ export function calcPayback(initialInvestment: number, annualCashFlows: number[]
 
 // ── DCF ───────────────────────────────────────────────────────────────────────
 export interface DCFResult {
+  /** False when terminal growth ≥ discount rate (Gordon growth model undefined). */
+  valid: boolean;
+  error?: string;
   intrinsicValue: number;
   pvOfCashFlows: number;
   terminalValue: number;
@@ -255,9 +258,12 @@ export function calcDCF(
   const g = terminalGrowthRatePct / 100;
   const pvOfCashFlows = cashFlows.reduce((sum, cf, t) => sum + cf / Math.pow(1 + r, t + 1), 0);
   const lastCF = cashFlows[cashFlows.length - 1] ?? 0;
-  const terminalValue = r > g ? (lastCF * (1 + g)) / (r - g) : 0;
+  const valid = r > g;
+  const terminalValue = valid ? (lastCF * (1 + g)) / (r - g) : 0;
   const pvOfTerminalValue = terminalValue / Math.pow(1 + r, cashFlows.length);
   return {
+    valid,
+    ...(valid ? {} : { error: 'Terminal growth rate must be lower than the discount rate.' }),
     intrinsicValue: pvOfCashFlows + pvOfTerminalValue,
     pvOfCashFlows,
     terminalValue,

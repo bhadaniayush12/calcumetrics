@@ -461,8 +461,8 @@ const jsonld = {
     function recalc() {
       const numVol = parseSmartInput(volInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numShare = parseSmartInput(shareInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
-      const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
+      const rawRate = rateInput ? String(parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '1.1';
+      const rawGst = gstInput ? String(parseSmartInput(gstInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '18';
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Monthly Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
@@ -584,8 +584,8 @@ const jsonld = {
     document.getElementById('mdr-copy-btn')?.addEventListener('click', async () => {
       const numVol = parseSmartInput(volInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numShare = parseSmartInput(shareInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawRate = rateInput ? rateInput.value.replace(/[^0-9.]/g, '') : '1.1';
-      const rawGst = gstInput ? gstInput.value.replace(/[^0-9.]/g, '') : '18';
+      const rawRate = rateInput ? String(parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '1.1';
+      const rawGst = gstInput ? String(parseSmartInput(gstInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '18';
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, label: 'Share' });

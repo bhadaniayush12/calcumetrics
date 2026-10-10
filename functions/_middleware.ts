@@ -1,3 +1,5 @@
+import { LEGACY_REDIRECTS } from '../src/lib/redirects.mjs';
+
 interface PagesContext {
   request: Request;
   next: () => Promise<Response>;
@@ -15,36 +17,29 @@ const CSP_POLICY =
 export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
 
-  // Trailing slash normalization: 301 permanent redirect any URL ending in "/" (except root "/")
-  if (url.pathname !== '/' && url.pathname.endsWith('/')) {
-    const canonicalTarget = new URL(context.request.url);
-    if (canonicalTarget.hostname === 'www.calcumetrics.com') {
-      canonicalTarget.hostname = 'calcumetrics.com';
-      canonicalTarget.protocol = 'https:';
-    }
-    canonicalTarget.pathname = canonicalTarget.pathname.replace(/\/+$/, '');
-
-    return new Response(null, {
-      status: 301,
-      statusText: 'Moved Permanently',
-      headers: {
-        Location: canonicalTarget.toString(),
-        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      },
-    });
+  // Canonicalise host, trailing slash and legacy paths in a single 301 so that
+  // e.g. www.calcumetrics.com/gst-calculator/ needs one hop, not three.
+  const target = new URL(context.request.url);
+  if (url.hostname === 'www.calcumetrics.com' || url.hostname === 'calcumetrics.pages.dev') {
+    target.hostname = 'calcumetrics.com';
+    target.protocol = 'https:';
+  }
+  if (target.pathname !== '/') {
+    target.pathname = target.pathname.replace(/\/+$/, '') || '/';
+  }
+  const legacyTarget = LEGACY_REDIRECTS[target.pathname];
+  if (legacyTarget) {
+    const dest = new URL(legacyTarget, target);
+    target.pathname = dest.pathname;
+    target.hash = dest.hash;
   }
 
-  // Canonical domain enforcement: 301 permanent redirect www.calcumetrics.com or calcumetrics.pages.dev -> calcumetrics.com
-  if (url.hostname === 'www.calcumetrics.com' || url.hostname === 'calcumetrics.pages.dev') {
-    const canonicalTarget = new URL(context.request.url);
-    canonicalTarget.hostname = 'calcumetrics.com';
-    canonicalTarget.protocol = 'https:';
-
+  if (target.href !== url.href) {
     return new Response(null, {
       status: 301,
       statusText: 'Moved Permanently',
       headers: {
-        Location: canonicalTarget.toString(),
+        Location: target.toString(),
         'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
       },
     });

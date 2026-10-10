@@ -414,7 +414,7 @@ const jsonld = {
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtLiveInput(raw: string) {
+  function fmtLiveInput(raw: string | number) {
     const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
     return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
@@ -477,8 +477,8 @@ const jsonld = {
       const initial = vI.value!;
       const annual = vA.value!;
       const flows = yInputs.map((el) => {
-        const raw = el?.value.replace(/[^0-9.]/g, '') ?? '';
-        const v = validate(raw, { required: false, min: 0, decimal: true, label: 'Year' });
+        const num = el ? parseSmartInput(el.value, currLocale === 'de-DE' ? 'EUR' : undefined) : null;
+        const v = validate(num ?? '', { required: false, min: 0, decimal: true, label: 'Year' });
         return v.valid && v.value !== undefined ? v.value : annual;
       });
 
@@ -526,18 +526,24 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
+        const num = parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(slider.min) && num <= parseFloat(slider.max)) {
           slider.value = String(num);
           const pct = ((num - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * 100;
           slider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        input.value = fmtLiveInput(raw);
         if (input === annualInput) {
           yInputs.forEach((y) => { if (y) y.value = input.value; });
         }
         debounce();
+      });
+      input.addEventListener('blur', () => {
+        const num = parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num === null || isNaN(num)) return;
+        input.value = fmtLiveInput(num);
+        if (input === annualInput) {
+          yInputs.forEach((y) => { if (y) y.value = input.value; });
+        }
       });
     }
 
@@ -545,9 +551,10 @@ const jsonld = {
     sync(annualSlider, annualInput);
 
     yInputs.forEach((el) => {
-      el?.addEventListener('input', () => {
-        el.value = fmtLiveInput(el.value);
-        debounce();
+      el?.addEventListener('input', debounce);
+      el?.addEventListener('blur', () => {
+        const num = parseSmartInput(el.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) el.value = fmtLiveInput(num);
       });
     });
 
@@ -574,9 +581,9 @@ const jsonld = {
       const vI = validate(numI ?? '', { required: true, min: 1, label: 'Initial' });
       if (!vI.valid) return;
       const flows = yInputs.map((el) => {
-        const raw = el?.value.replace(/[^0-9.]/g, '') ?? '';
+        const raw = String(parseSmartInput(el?.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         const v = validate(raw, { required: false, min: 0, decimal: true, label: 'Y' });
-        const vA = validate(annualInput!.value.replace(/[^0-9.]/g, ''), { required: false, min: 0, label: 'A' });
+        const vA = validate(String(parseSmartInput(annualInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? ''), { required: false, min: 0, label: 'A' });
         return v.valid && v.value !== undefined ? v.value : (vA.value ?? 0);
       });
       const res = calcPaybackClient(vI.value!, flows);

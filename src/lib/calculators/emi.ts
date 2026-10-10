@@ -69,7 +69,7 @@ export function calcEMIAmortization(
       const intCharge = balance * r;
       const principalPart = Math.min(emi - intCharge, balance);
       balance -= principalPart;
-      yearPayment += emi;
+      yearPayment += principalPart + intCharge;
       yearPrincipal += principalPart;
       yearInterest += intCharge;
     }

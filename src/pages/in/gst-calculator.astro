@@ -530,9 +530,9 @@ const jsonld = {
   function fmtCompact(n: number) {
     return formatIndianCompact(n, '₹');
   }
-  function fmtLiveInput(raw: string) {
-    const num = parseInt(raw.replace(/[^0-9]/g, ''), 10);
-    return isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(num);
+  function fmtLiveInput(raw: string | number) {
+    const num = parseSmartInput(raw);
+    return num === null || isNaN(num) ? '' : new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(num);
   }
 
   function initGSTCalc() {
@@ -577,7 +577,7 @@ const jsonld = {
           if (amtMatch) {
             const val = parseInt(amtMatch[1], 10);
             if (!isNaN(val) && val >= 1) {
-              amtInput.value = fmtLiveInput(String(val));
+              amtInput.value = fmtLiveInput(val);
               if (amtSlider) {
                 amtSlider.value = String(val);
                 const min = parseFloat(amtSlider.min), max = parseFloat(amtSlider.max);
@@ -587,7 +587,12 @@ const jsonld = {
           }
           const slabMatch = hash.match(/(?:slab|rate|s|r)=([0-9.]+)/i);
           if (slabMatch && slabSelect) {
-            slabSelect.value = slabMatch[1];
+            // Only apply recognised slabs: assigning an unknown value empties the
+            // <select>, which recalc() would read as 0%. Normalise "18.0" → "18".
+            const slabVal = String(parseFloat(slabMatch[1]));
+            if (Array.from(slabSelect.options).some((o) => o.value === slabVal)) {
+              slabSelect.value = slabVal;
+            }
           }
           const modeMatch = hash.match(/(?:mode|direction|type|d)=(add|remove|exclusive|inclusive)/i);
           if (modeMatch && dirSelect) {
@@ -746,7 +751,7 @@ const jsonld = {
     amtInput.addEventListener('blur', () => {
       const num = parseSmartInput(amtInput.value);
       if (num !== null && !isNaN(num)) {
-        amtInput.value = fmtLiveInput(String(num));
+        amtInput.value = fmtLiveInput(num);
         recalc();
       }
     });
@@ -783,7 +788,7 @@ const jsonld = {
 
     // ── Reset ────────────────────────────────────────────────────────────────
     resetBtn?.addEventListener('click', () => {
-      amtInput.value = fmtLiveInput(String(DEFAULTS.amount));
+      amtInput.value = fmtLiveInput(DEFAULTS.amount);
       if (slabSelect) slabSelect.value = String(DEFAULTS.slab);
       if (dirSelect) dirSelect.value = DEFAULTS.direction;
       if (supplySelect) supplySelect.value = DEFAULTS.supply;
@@ -798,7 +803,7 @@ const jsonld = {
 
     // ── Copy & Share ─────────────────────────────────────────────────────────
     copyBtn?.addEventListener('click', async () => {
-      const rawAmt = amtInput.value.replace(/[^0-9.]/g, '');
+      const rawAmt = String(parseSmartInput(amtInput.value) ?? '');
       const slab = parseFloat(slabSelect ? slabSelect.value : '18') || 0;
       const dir = (dirSelect ? dirSelect.value : 'add') as 'add' | 'remove';
       const isInter = supplySelect ? supplySelect.value === 'inter' : false;

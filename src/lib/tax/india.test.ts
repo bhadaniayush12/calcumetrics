@@ -152,6 +152,26 @@ describe('calcCapitalGains', () => {
   });
 });
 
+describe('calcCapitalGains holding-period boundaries', () => {
+  it('treats exactly 12 months of equity as STCG (must exceed 12)', () => {
+    expect(calcCapitalGains(500000, 300000, 12, 'equity').gainType).toBe('STCG');
+    expect(calcCapitalGains(500000, 300000, 13, 'equity').gainType).toBe('LTCG');
+  });
+
+  it('treats exactly 24 months of real estate as STCG (must exceed 24)', () => {
+    expect(calcCapitalGains(500000, 300000, 24, 'real-estate').gainType).toBe('STCG');
+    expect(calcCapitalGains(500000, 300000, 25, 'real-estate').gainType).toBe('LTCG');
+  });
+
+  it('treats debt funds as deemed STCG regardless of holding (Section 50AA)', () => {
+    expect(calcCapitalGains(500000, 300000, 120, 'debt-fund').gainType).toBe('STCG');
+  });
+
+  it('applies 12.5% LTCG to other assets after Budget 2024', () => {
+    expect(calcCapitalGains(500000, 300000, 36, 'other').taxRatePct).toBe(12.5);
+  });
+});
+
 describe('calcAdvanceTax', () => {
   it('returns required=false when liability ≤ 10000', () => {
     const res = calcAdvanceTax(8000);

@@ -22,6 +22,11 @@ describe('formatters', () => {
   });
 
   describe('formatIndianCompact', () => {
+    it('moves to the larger unit when rounding crosses a boundary', () => {
+      expect(formatIndianCompact(9999999.6)).toBe('₹1 Cr');
+      expect(formatIndianCompact(99999.7)).toBe('₹1 Lakh');
+      expect(formatIndianCompact(9994999)).toBe('₹99.95 Lakh');
+    });
     it('formats Crores correctly', () => {
       expect(formatIndianCompact(12614400)).toBe('₹1.26 Cr');
       expect(formatIndianCompact(10000000)).toBe('₹1 Cr');
@@ -157,6 +162,14 @@ describe('formatters', () => {
         expect(parseSmartInput('1000,50', 'EUR')).toBe(1000.5);
         expect(parseSmartInput('50,00', 'EUR')).toBe(50);
         expect(parseSmartInput('50,000', 'EUR')).toBe(50000);
+      });
+
+      it('parses de-DE dot-grouped integers as thousands when activeCurrency is EUR', () => {
+        // Regression: a value the field itself formatted ("12.345") must not re-parse as 12.345
+        expect(parseSmartInput('12.345', 'EUR')).toBe(12345);
+        expect(parseSmartInput('1.234.567', 'EUR')).toBe(1234567);
+        expect(parseSmartInput('7.5', 'EUR')).toBe(7.5);
+        expect(parseSmartInput('12.345')).toBe(12.345);
       });
 
       it('parses standard thousand comma in non-EUR mode', () => {

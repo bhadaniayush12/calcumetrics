@@ -401,7 +401,7 @@ const jsonld = {
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtLiveInput(raw: string) {
+  function fmtLiveInput(raw: string | number) {
     const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
     return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
@@ -498,15 +498,17 @@ const jsonld = {
         debounce();
       });
       ctcInput.addEventListener('input', () => {
-        const raw = ctcInput.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(ctcSlider.min) && num <= parseFloat(ctcSlider.max)) {
+        const num = parseSmartInput(ctcInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(ctcSlider.min) && num <= parseFloat(ctcSlider.max)) {
           ctcSlider.value = String(num);
           const pct = ((num - parseFloat(ctcSlider.min)) / (parseFloat(ctcSlider.max) - parseFloat(ctcSlider.min))) * 100;
           ctcSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        ctcInput.value = fmtLiveInput(raw);
         debounce();
+      });
+      ctcInput.addEventListener('blur', () => {
+        const num = parseSmartInput(ctcInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) ctcInput.value = fmtLiveInput(num);
       });
     }
 

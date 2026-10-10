@@ -403,7 +403,7 @@ const SECTION_OPTIONS = [
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
-  function fmtLiveInput(raw: string) {
+  function fmtLiveInput(raw: string | number) {
     const num = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined);
     return num === null || isNaN(num) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(num));
   }
@@ -495,15 +495,17 @@ const SECTION_OPTIONS = [
         debounce();
       });
       amtInput.addEventListener('input', () => {
-        const raw = amtInput.value.replace(/[^0-9.]/g, '');
-        const num = parseFloat(raw);
-        if (!isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
+        const num = parseSmartInput(amtInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num) && num >= parseFloat(amtSlider.min) && num <= parseFloat(amtSlider.max)) {
           amtSlider.value = String(num);
           const pct = ((num - parseFloat(amtSlider.min)) / (parseFloat(amtSlider.max) - parseFloat(amtSlider.min))) * 100;
           amtSlider.style.setProperty('--slider-pct', `${pct.toFixed(2)}%`);
         }
-        amtInput.value = fmtLiveInput(raw);
         debounce();
+      });
+      amtInput.addEventListener('blur', () => {
+        const num = parseSmartInput(amtInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+        if (num !== null && !isNaN(num)) amtInput.value = fmtLiveInput(num);
       });
     }
 

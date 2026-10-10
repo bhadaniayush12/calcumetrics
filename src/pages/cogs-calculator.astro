@@ -506,10 +506,10 @@ const jsonld = {
     function recalc() {
       const numBeg = parseSmartInput(begInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numPurch = parseSmartInput(purchInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawLab = labInput ? String(parseSmartInput(labInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawOvh = ovhInput ? String(parseSmartInput(ovhInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawEnd = endInput ? String(parseSmartInput(endInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawRev = revInput ? String(parseSmartInput(revInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
 
       const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
       const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });
@@ -657,10 +657,10 @@ const jsonld = {
     document.getElementById('cogs-copy-btn')?.addEventListener('click', async () => {
       const numBeg = parseSmartInput(begInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numPurch = parseSmartInput(purchInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
-      const rawLab = labInput ? labInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawOvh = ovhInput ? ovhInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawEnd = endInput ? endInput.value.replace(/[^0-9.]/g, '') : '0';
-      const rawRev = revInput ? revInput.value.replace(/[^0-9.]/g, '') : '0';
+      const rawLab = labInput ? String(parseSmartInput(labInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawOvh = ovhInput ? String(parseSmartInput(ovhInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawEnd = endInput ? String(parseSmartInput(endInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
+      const rawRev = revInput ? String(parseSmartInput(revInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '0';
 
       const vBeg = validate(numBeg ?? '', { required: true, min: 0, label: 'Beginning Inventory' });
       const vPurch = validate(numPurch ?? '', { required: true, min: 0, label: 'Purchases' });

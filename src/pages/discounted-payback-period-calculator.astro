@@ -421,7 +421,7 @@ const jsonld = {
 
   let currSym = '₹'; let currLocale = 'en-IN';
   function fmt(n: number) { return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n)); }
-  function fmtInput(raw: string) { const n = parseInt(raw.replace(/[^0-9]/g, ''), 10); return isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(n); }
+  function fmtInput(raw: string | number) { const n = parseSmartInput(raw, currLocale === 'de-DE' ? 'EUR' : undefined); return n === null || isNaN(n) ? '' : new Intl.NumberFormat(currLocale, { maximumFractionDigits: 2 }).format(n); }
 
   function initDPP() {
     const investEl = document.getElementById('dpp-invest') as HTMLInputElement | null;
@@ -462,7 +462,7 @@ const jsonld = {
       for (let i = 0; i < yearCount; i++) {
         const el = document.getElementById(`dpp-flow-${i}`) as HTMLInputElement | null;
         if (!el) continue;
-        const raw = el.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(el.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         const v = validate(raw, { required: true, min: 0, decimal: true, label: `Year ${i + 1} Cash Flow` });
         if (!v.valid) { showError(v.error!.message); return { ok: false, flows: [] }; }
         flows.push(v.value!);
@@ -471,7 +471,7 @@ const jsonld = {
     }
 
     function recalc() {
-      const vI = validate(investEl!.value.replace(/[^0-9.]/g, ''), { required: true, min: 1, label: 'Initial Investment' });
+      const vI = validate(String(parseSmartInput(investEl!.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? ''), { required: true, min: 1, label: 'Initial Investment' });
       const vR = validate(rateEl!.value, { required: true, min: 0.01, max: 100, decimal: true, label: 'Discount Rate' });
       if (!vI.valid) { showError(vI.error!.message); return; }
       if (!vR.valid) { showError(vR.error!.message); return; }
@@ -516,7 +516,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('input', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         const num = parseFloat(raw);
         if (!isNaN(num) && num >= +slider.min && num <= +slider.max) {
           slider.value = String(num);
@@ -525,7 +525,7 @@ const jsonld = {
         debounce();
       });
       input.addEventListener('blur', () => {
-        const raw = input.value.replace(/[^0-9.]/g, '');
+        const raw = String(parseSmartInput(input.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
         if (isFormatted && raw) {
           input.value = fmtInput(raw);
           debounce();
@@ -538,7 +538,7 @@ const jsonld = {
 
     container.addEventListener('input', debounce);
     container.querySelectorAll('input').forEach(el => el.addEventListener('blur', () => {
-      const raw = el.value.replace(/[^0-9]/g, '');
+      const raw = String(parseSmartInput(el.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
       if (raw) el.value = fmtInput(raw);
     }));
 
@@ -556,7 +556,7 @@ const jsonld = {
       const newInput = div.querySelector('input');
       if (newInput) {
         newInput.addEventListener('blur', () => {
-          const raw = newInput.value.replace(/[^0-9]/g, '');
+          const raw = String(parseSmartInput(newInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '');
           if (raw) newInput.value = fmtInput(raw);
         });
       }
