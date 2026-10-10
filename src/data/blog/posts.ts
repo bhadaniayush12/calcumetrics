@@ -5,6 +5,7 @@ import { BATCH_2_POSTS } from './batch2';
 import { BATCH_3_POSTS } from './batch3';
 import { BATCH_4_POSTS } from './batch4';
 import { BATCH_5_POSTS } from './batch5';
+import { BATCH_6_POSTS } from './batch6';
 
 export const BLOG_POSTS: BlogPost[] = [
   ...PHASE_11_POSTS,
@@ -13,4 +14,5 @@ export const BLOG_POSTS: BlogPost[] = [
   ...BATCH_3_POSTS,
   ...BATCH_4_POSTS,
   ...BATCH_5_POSTS,
+  ...BATCH_6_POSTS,
 ];
