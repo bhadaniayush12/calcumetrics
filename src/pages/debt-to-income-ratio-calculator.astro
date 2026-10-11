@@ -381,6 +381,7 @@ const jsonld = {
 
 <script>
   import { validate } from '../lib/validate';
+  import { moneyRules } from '../lib/currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
@@ -446,7 +447,7 @@ const jsonld = {
       const numIncome = parseSmartInput(incomeInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
       const vDebt = validate(numDebt ?? '', { required: true, min: 0, label: 'Monthly Debt' });
-      const vIncome = validate(numIncome ?? '', { required: true, min: 100, label: 'Monthly Income' });
+      const vIncome = validate(numIncome ?? '', moneyRules({ required: true, min: 100, label: 'Monthly Income' }));
 
       if (!vDebt.valid) { showError(vDebt.error!.message); return; }
       if (!vIncome.valid) { showError(vIncome.error!.message); return; }
@@ -571,7 +572,7 @@ const jsonld = {
       const numIncome = parseSmartInput(incomeInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
       const vDebt = validate(numDebt ?? '', { required: true, min: 0, label: 'Debt' });
-      const vIncome = validate(numIncome ?? '', { required: true, min: 100, label: 'Income' });
+      const vIncome = validate(numIncome ?? '', moneyRules({ required: true, min: 100, label: 'Income' }));
 
       if (!vDebt.valid || !vIncome.valid) return;
 
@@ -622,7 +623,7 @@ const jsonld = {
     // Restore from hash
     const restored = restoreFromHash(readCurrentHash(), {
       d: { required: true, min: 0, label: 'd' },
-      i: { required: true, min: 100, label: 'i' },
+      i: moneyRules({ required: true, min: 100, label: 'i' }),
     });
     if (restored.valid && restored.values.d !== undefined && restored.values.i) {
       debtInput.value = fmtLiveInput(String(restored.values.d));

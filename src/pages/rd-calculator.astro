@@ -352,6 +352,7 @@ const jsonld = {
 <script>
   import { parseSmartInput } from '../lib/formatters';
   import { validate } from '../lib/validate';
+  import { moneyRules } from '../lib/currency';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcRD } from '../lib/calculators/rd';
@@ -437,7 +438,7 @@ const jsonld = {
       const numR = parseSmartInput(rInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numMo = parseSmartInput(yInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vM = validate(numM ?? '', { required: true, min: 100, label: 'Monthly Installment' });
+      const vM = validate(numM ?? '', moneyRules({ required: true, min: 100, label: 'Monthly Installment' }));
       const vR = validate(numR ?? '', { required: true, min: 0.1, max: 25, decimal: true, label: 'Interest Rate' });
       const vMo = validate(numMo ?? '', { required: true, min: 1, max: 240, integer: true, label: 'Tenure in Months' });
 
@@ -551,7 +552,7 @@ const jsonld = {
       const numR = parseSmartInput(rInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numMo = parseSmartInput(yInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vM = validate(numM ?? '', { required: true, min: 100, label: 'M' });
+      const vM = validate(numM ?? '', moneyRules({ required: true, min: 100, label: 'M' }));
       const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'R' });
       const vMo = validate(numMo ?? '', { required: true, min: 1, label: 'Mo' });
 
@@ -603,7 +604,7 @@ const jsonld = {
 
     // Restore from hash
     const restored = restoreFromHash(readCurrentHash(), {
-      m: { required: true, min: 100, label: 'm' },
+      m: moneyRules({ required: true, min: 100, label: 'm' }),
       r: { required: true, min: 0.1, max: 25, decimal: true, label: 'r' },
       mo: { required: true, min: 1, max: 240, integer: true, label: 'mo' },
     });

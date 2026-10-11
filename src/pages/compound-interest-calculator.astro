@@ -387,6 +387,8 @@ const jsonld = {
    */
 
   import { validate, type ValidationRules } from '../lib/validate';
+
+  import { moneyRules } from '../lib/currency';
   import { parseSmartInput } from '../lib/formatters';
   import { serializeHash, restoreFromHash, readCurrentHash, updateHash } from '../lib/url-state';
   import { setResult } from '../lib/result-bus';
@@ -408,7 +410,7 @@ const jsonld = {
 
   // ── Validation schema (Phase 4.3 Centralized Engine) ────────────────────────
   const CI_RULES: Record<'principal' | 'rate' | 'years', ValidationRules> = {
-    principal: { required: true, min: 100, max: 100_000_000, decimal: false, negativeAllowed: false, label: 'Principal' },
+    principal: moneyRules({ required: true, min: 100, max: 100_000_000, decimal: false, negativeAllowed: false, label: 'Principal' }),
     rate: { required: true, min: 0.01, max: 100, decimal: true, negativeAllowed: false, label: 'Interest Rate' },
     years: { required: true, min: 1, max: 50, integerOnly: true, negativeAllowed: false, label: 'Tenure' },
   };

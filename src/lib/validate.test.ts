@@ -521,3 +521,32 @@ describe('Phase 4.3 — Centralized Validation Engine', () => {
     });
   });
 });
+
+describe('amount rule (per-currency minimums)', () => {
+  const loan = { required: true, min: 10000, label: 'Loan Amount', amount: true } as const;
+
+  it('keeps the INR minimum and formats it with ₹ and Indian grouping', () => {
+    const res = validate('5000', { ...loan, currency: 'INR' });
+    expect(res.error?.code).toBe('BELOW_MIN');
+    expect(res.error?.message).toBe('Loan Amount must be at least ₹10,000.');
+    expect(validate('10000', { ...loan, currency: 'INR' }).valid).toBe(true);
+  });
+
+  it('scales the minimum 10x lower for USD / EUR / GBP', () => {
+    expect(validate('1000', { ...loan, currency: 'USD' }).valid).toBe(true);
+    expect(validate('1000', { ...loan, currency: 'EUR' }).valid).toBe(true);
+    const res = validate('999', { ...loan, currency: 'GBP' });
+    expect(res.error?.message).toBe('Loan Amount must be at least £1,000.');
+  });
+
+  it('never scales below 1 and never alters the parsed value', () => {
+    const res = validate('1', { required: true, min: 5, amount: true, currency: 'USD' });
+    expect(res.valid).toBe(true);
+    expect(res.value).toBe(1);
+  });
+
+  it('leaves non-amount rules unchanged', () => {
+    expect(validate('1000', { required: true, min: 10000, currency: 'USD' }).error?.message)
+      .toBe('Value must be at least 10000.');
+  });
+});

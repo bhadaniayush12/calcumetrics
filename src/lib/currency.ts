@@ -19,6 +19,7 @@
  *   - SSR safe: zero DOM/window/localStorage access during build time
  *   - Jurisdiction locking: /in/* is strictly locked to INR; /us/* is strictly locked to USD
  */
+import type { ValidationRules } from './validate';
 
 export type CurrencyCode = 'INR' | 'USD' | 'EUR' | 'GBP';
 export type CurrencyLabel = '₹ INR' | '$ USD' | '€ EUR' | '£ GBP';
@@ -352,3 +353,35 @@ export function formatPresetChip(num: number, code: CurrencyCode = DEFAULT_CURRE
   }
 }
 
+
+// ─── Active Currency & Money Validation Rules ────────────────────────────────
+
+/** Latest code from a `cm:currency-change` event (in-page dropdowns may not persist to storage). */
+let lastBroadcastCurrency: CurrencyCode | null = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('cm:currency-change', (e: Event) => {
+    const code = (e as CustomEvent<{ code?: unknown }>).detail?.code;
+    if (isSupportedCurrency(code)) lastBroadcastCurrency = code;
+  });
+}
+
+/**
+ * Currency currently in effect on this page: the jurisdiction currency on locked
+ * routes, otherwise the most recent selector change, otherwise the stored choice.
+ */
+export function getActiveCurrency(): CurrencyCode {
+  if (typeof window === 'undefined') return DEFAULT_CURRENCY;
+  return getJurisdictionCurrency(window.location.pathname) ?? lastBroadcastCurrency ?? getStoredCurrency();
+}
+
+/**
+ * Wraps validation rules for a money field whose `min` is set in INR.
+ * `currency` is a live getter, so long-lived schema objects follow selector changes
+ * and `validate()` scales the minimum for USD / EUR / GBP.
+ */
+export function moneyRules<R extends ValidationRules>(rules: R): R & { amount: true; readonly currency: CurrencyCode } {
+  return Object.defineProperty({ ...rules, amount: true as const }, 'currency', {
+    get: getActiveCurrency,
+    enumerable: true,
+  }) as R & { amount: true; readonly currency: CurrencyCode };
+}

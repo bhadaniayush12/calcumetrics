@@ -426,6 +426,7 @@ const jsonld = {
   import { parseSmartInput } from '../lib/formatters';
   import { calcLoanPrepayment } from '../lib/calculators/prepayment';
   import { validate } from '../lib/validate';
+  import { moneyRules } from '../lib/currency';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
@@ -497,7 +498,7 @@ const jsonld = {
       const numPrepay = parseSmartInput(prepayInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
 
-      const vP = validate(numP ?? '', { required: true, min: 10000, label: 'Principal' });
+      const vP = validate(numP ?? '', moneyRules({ required: true, min: 10000, label: 'Principal' }));
       const vR = validate(numR ?? '', { required: true, min: 0.1, max: 30, decimal: true, label: 'Rate' });
       const vM = validate(numM ?? '', { required: true, min: 1, max: 480, integer: true, label: 'Months' });
       const vPrepay = validate(numPrepay ?? '', { required: true, min: 0, label: 'Prepayment' });
@@ -620,7 +621,7 @@ const jsonld = {
       const numPrepay = parseSmartInput(prepayInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const strat = (stratSelect?.value === 'reduce-emi' ? 'reduce-emi' : 'reduce-tenure') as 'reduce-tenure' | 'reduce-emi';
 
-      const vP = validate(numP ?? '', { required: true, min: 10000, label: 'Principal' });
+      const vP = validate(numP ?? '', moneyRules({ required: true, min: 10000, label: 'Principal' }));
       const vR = validate(numR ?? '', { required: true, min: 0.1, label: 'Rate' });
       const vM = validate(numM ?? '', { required: true, min: 1, label: 'Months' });
       const vPrepay = validate(numPrepay ?? '', { required: true, min: 0, label: 'Prepayment' });
@@ -674,7 +675,7 @@ const jsonld = {
 
     // Restore from hash
     const restored = restoreFromHash(readCurrentHash(), {
-      p: { required: true, min: 10000, label: 'p' },
+      p: moneyRules({ required: true, min: 10000, label: 'p' }),
       r: { required: true, min: 0.1, max: 30, decimal: true, label: 'r' },
       m: { required: true, min: 1, max: 480, integer: true, label: 'm' },
       prep: { required: true, min: 0, label: 'prep' },

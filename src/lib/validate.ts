@@ -146,6 +146,15 @@ export interface ValidationRules {
   currency?: CurrencyCode | string;
 
   /**
+   * Marks a money field whose `min` is expressed in INR.
+   * For USD / EUR / GBP (via `currency`), the minimum is scaled down 10x
+   * (see `scaleAmountMin`) and error messages show the currency symbol.
+   * The parsed value itself is never converted.
+   * Default: false.
+   */
+  amount?: boolean;
+
+  /**
    * Human-readable label used as the subject in error messages.
    * Defaults to 'Value'.
    * @example 'Monthly Investment', 'Annual Interest Rate', 'Tenure'
@@ -185,6 +194,31 @@ export interface ValidationFailure {
 export type ValidationResult = ValidationSuccess | ValidationFailure;
 
 // ─── Internal Helpers ────────────────────────────────────────────────────────
+
+const AMOUNT_SYMBOLS: Record<CurrencyCode, string> = { INR: '₹', USD: '$', EUR: '€', GBP: '£' };
+
+/**
+ * Scales an INR-denominated minimum to the given market.
+ * USD / EUR / GBP floors are 10x lower (₹10,000 → $1,000), never below 1.
+ * Unknown or missing currency keeps the INR value.
+ */
+export function scaleAmountMin(inrMin: number, currency?: string): number {
+  if (!currency || currency === 'INR' || !VALID_CURRENCY_CODES.has(currency)) return inrMin;
+  return Math.max(1, inrMin / 10);
+}
+
+/**
+ * Formats a min/max boundary for error messages.
+ * Money fields get the currency symbol and market digit grouping.
+ */
+function formatLimit(n: number, rules: ValidationRules): string {
+  if (rules.amount !== true || !rules.currency || !VALID_CURRENCY_CODES.has(rules.currency)) {
+    return String(n);
+  }
+  const code = rules.currency as CurrencyCode;
+  const grouped = new Intl.NumberFormat(code === 'INR' ? 'en-IN' : 'en-US', { maximumFractionDigits: 2 }).format(n);
+  return AMOUNT_SYMBOLS[code] + grouped;
+}
 
 /**
  * Currency symbols stripped during input parsing (₹, $, €, £).
@@ -347,10 +381,10 @@ function buildMessage(
       return `${label} must be a whole number.`;
 
     case 'BELOW_MIN':
-      return `${label} must be at least ${rules.min}.`;
+      return `${label} must be at least ${formatLimit(rules.min!, rules)}.`;
 
     case 'ABOVE_MAX':
-      return `${label} must be at most ${rules.max}.`;
+      return `${label} must be at most ${formatLimit(rules.max!, rules)}.`;
 
     case 'INVALID_CURRENCY':
       return `Currency "${rules.currency}" is not a recognized currency code. Use INR, USD, EUR, or GBP.`;
@@ -457,8 +491,11 @@ export function validate(
   }
 
   // ── Step 5: Min Boundary Check ───────────────────────────────────────────
-  if (rules.min !== undefined && parsed < rules.min) {
-    return fail('BELOW_MIN', rules);
+  const min = rules.amount === true && rules.min !== undefined
+    ? scaleAmountMin(rules.min, rules.currency)
+    : rules.min;
+  if (min !== undefined && parsed < min) {
+    return fail('BELOW_MIN', { ...rules, min });
   }
 
   // ── Step 6: Max Boundary Check ───────────────────────────────────────────

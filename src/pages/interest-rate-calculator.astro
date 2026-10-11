@@ -401,6 +401,7 @@ const jsonld = {
 <script>
   import { calcImpliedRate } from '../lib/finance/amortization';
   import { validate } from '../lib/validate';
+  import { moneyRules } from '../lib/currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
@@ -468,8 +469,8 @@ const jsonld = {
       const numEmi = parseSmartInput(emiInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numYears = parseSmartInput(yearsInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vPrincipal = validate(numPrincipal ?? '', { required: true, min: 1000, label: 'Principal' });
-      const vEmi = validate(numEmi ?? '', { required: true, min: 100, label: 'Monthly EMI' });
+      const vPrincipal = validate(numPrincipal ?? '', moneyRules({ required: true, min: 1000, label: 'Principal' }));
+      const vEmi = validate(numEmi ?? '', moneyRules({ required: true, min: 100, label: 'Monthly EMI' }));
       const vYears = validate(numYears ?? '', { required: true, min: 1, max: 50, integer: true, label: 'Loan Term' });
 
       if (!vPrincipal.valid) { showError(vPrincipal.error!.message); return; }
@@ -592,8 +593,8 @@ const jsonld = {
       const numEmi = parseSmartInput(emiInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numYears = parseSmartInput(yearsInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
 
-      const vPrincipal = validate(numPrincipal ?? '', { required: true, min: 1000, label: 'Principal' });
-      const vEmi = validate(numEmi ?? '', { required: true, min: 100, label: 'Monthly EMI' });
+      const vPrincipal = validate(numPrincipal ?? '', moneyRules({ required: true, min: 1000, label: 'Principal' }));
+      const vEmi = validate(numEmi ?? '', moneyRules({ required: true, min: 100, label: 'Monthly EMI' }));
       const vYears = validate(numYears ?? '', { required: true, min: 1, label: 'Years' });
 
       if (!vPrincipal.valid || !vEmi.valid || !vYears.valid) return;
@@ -646,8 +647,8 @@ const jsonld = {
 
     // Restore from hash
     const restored = restoreFromHash(readCurrentHash(), {
-      p: { required: true, min: 1000, label: 'p' },
-      emi: { required: true, min: 100, label: 'emi' },
+      p: moneyRules({ required: true, min: 1000, label: 'p' }),
+      emi: moneyRules({ required: true, min: 100, label: 'emi' }),
       y: { required: true, min: 1, max: 50, integer: true, label: 'y' },
     });
     if (restored.valid && restored.values.p && restored.values.emi && restored.values.y) {

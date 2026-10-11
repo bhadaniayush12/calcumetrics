@@ -279,3 +279,13 @@ describe('Phase 9: Currency Display / Locale System', () => {
   });
 });
 
+
+describe('moneyRules', () => {
+  it('marks the rule as an amount and resolves currency at read time', async () => {
+    const { moneyRules } = await import('./currency');
+    const rules = moneyRules({ required: true, min: 10000, label: 'Loan Amount' });
+    expect(rules.amount).toBe(true);
+    expect(rules.min).toBe(10000);
+    expect(rules.currency).toBe('INR'); // SSR / no window → default currency
+  });
+});

@@ -852,16 +852,17 @@ const jsonld = {
   import { calcSIP, calcSIPYearly, calcStepUpSIP, calcStepUpSIPYearly } from '../lib/calculators/sip';
   import { setResult } from '../lib/result-bus';
   import { validate } from '../lib/validate';
+  import { moneyRules } from '../lib/currency';
   import { restoreFromHash, serializeHash, updateHash } from '../lib/url-state';
   import { formatIndian, formatIndianCompact, formatIndianWords, formatCompactCurrency, parseSmartInput } from '../lib/formatters';
   import { getStoredCurrency, CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
 
   const sipSchema = {
-    monthly: { required: true, min: 500, max: 2000000, integerOnly: true, label: 'Monthly Investment' },
+    monthly: moneyRules({ required: true, min: 500, max: 2000000, integerOnly: true, label: 'Monthly Investment' }),
     rate: { required: true, min: 1, max: 30, decimal: true, label: 'Expected Return Rate' },
     years: { required: true, min: 1, max: 40, integerOnly: true, label: 'Time Period' },
     stepUpPct: { required: false, min: 1, max: 50, decimal: true, label: 'Annual Step-Up Rate' },
-    stepUpFixed: { required: false, min: 100, max: 200000, integerOnly: true, label: 'Annual Step-Up Amount' },
+    stepUpFixed: moneyRules({ required: false, min: 100, max: 200000, integerOnly: true, label: 'Annual Step-Up Amount' }),
   } as const;
 
   let currentCurrencyCode: CurrencyCode = getStoredCurrency();
