@@ -126,7 +126,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Why the MPC Decided to Hike Rates Now</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        The MPC cited a combination of external macroeconomic headwinds and stubborn domestic price pressures behind its tightening decision. Foremost among external triggers has been persistent volatility in crude oil benchmarks driven by escalating geopolitical friction across West Asia. With India importing more than 85% of its crude requirements, elevated oil prices translate rapidly into domestic transportation costs and broader input price inflation.
+        The MPC cited a combination of external macroeconomic headwinds and stubborn domestic price pressures behind its tightening decision. Foremost among external triggers has been persistent volatility in crude oil benchmarks driven by persistent geopolitical tensions. With India importing more than 85% of its crude requirements, elevated oil prices translate rapidly into domestic transportation costs and broader input price inflation.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Compounding commodity pressures are firm global sovereign bond yields and extended "higher-for-longer" rate trajectories among major Western central banks. These global yield differentials exert depreciation pressure on emerging market currencies, creating imported inflation risks.
@@ -146,7 +146,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         Here is how transmission operates across the three major loan structures in India:
       </p>
       <ul class="text-xs text-text-muted space-y-2 list-disc pl-5 mb-6 leading-relaxed">
-        <li><strong>EBLR / RLLR Loans (Sanctioned Post-Oct 2019):</strong> Because the benchmark is tied directly to the repo rate, transmission is mechanical and rapid. If your bank’s reset date falls on the first day of the subsequent quarter (e.g., January 1 or November 1), your lending rate automatically jumps by 25 basis points on that scheduled date.</li>
+        <li><strong>EBLR / RLLR Loans (Sanctioned Post-Oct 2019):</strong> Because the benchmark is tied directly to the repo rate, transmission is mechanical and rapid. Your lending rate moves up by 25 basis points on your loan’s next scheduled reset date, which your sanction letter or loan statement specifies.</li>
         <li><strong>MCLR Loans (Sanctioned Between April 2016 and Sept 2019):</strong> Marginal Cost of Funds based Lending Rate loans move based on internal bank funding costs rather than repo rate moves directly. Transmission is delayed and occurs only on your contractual reset date (usually once every 12 months).</li>
         <li><strong>Base Rate / Fixed Loans:</strong> Older legacy base rate loans reset at the bank’s discretion. True fixed-rate loans remain unchanged throughout their contractual lock-in period, although such facilities represent a negligible fraction of Indian retail mortgages.</li>
       </ul>
@@ -219,7 +219,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         When interest rates rise, retail banks almost never raise your monthly debit amount automatically. Instead, standard banking practice across India is to extend your loan tenure while keeping your monthly EMI deduction identical. While this protects you from immediate cash flow shock, it quietly increases your lifetime interest cost by hundreds of thousands of rupees. We break down the exact mathematics of this trade-off in our detailed companion guide: <a href="/blog/increase-emi-or-extend-tenure-after-rate-hike" class="text-accent font-medium hover:underline">Rate Hike: Should You Increase Your EMI or Extend the Tenure?</a>.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        Furthermore, commercial banks face statutory age caps. If extending your loan tenure pushes your final repayment date beyond age 60 or 65 (or beyond the bank’s maximum 30-year aggregate tenor limit), the lender will be legally unable to extend tenure any further. In such cases, your bank will be forced to raise your monthly EMI abruptly. Being proactive ensures that you dictate repayment terms rather than reacting to automated administrative adjustments.
+        Tenure extension also has limits. Most banks cap the borrower’s age at final repayment (often around 60 to 70, depending on the lender) and set a maximum loan tenor. If an extension would breach those internal limits, the bank may raise your monthly EMI instead. Being proactive ensures that you dictate repayment terms rather than reacting to automated administrative adjustments.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">6. 4 Practical Steps Borrowers Can Take Right Now</h2>
@@ -249,7 +249,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         <div class="p-4 bg-surface border border-border rounded-card">
           <h3 class="text-sm font-bold text-text-primary mb-2">4. Review Balance Transfer Opportunities</h3>
           <p class="text-xs text-text-muted leading-relaxed">
-            Check whether your bank’s spread over the repo rate has expanded beyond prevailing market norms (typically 2.25% to 2.60% for salaried borrowers). If a competing lender offers an EBLR spread that is 35 to 50 bps lower, transferring your balance can generate substantial net interest savings even after accounting for administrative processing fees.
+            Compare your bank’s spread over the repo rate with what other lenders currently offer borrowers with your credit profile. If a competing lender offers a meaningfully lower EBLR spread, transferring your balance can generate substantial net interest savings even after accounting for administrative processing fees.
           </p>
         </div>
       </div>
@@ -402,7 +402,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
               <th class="p-3 text-accent font-semibold">Net Interest Impact</th>
             </tr>
           </thead>
-          <tbody class="divide-y border-b border-border text-text-muted">
+          <tbody class="divide-y divide-border text-text-muted">
             <tr>
               <td class="p-3 font-medium text-text-primary">Baseline (Before Hike)</td>
               <td class="p-3 font-mono">₹43,391</td>
@@ -415,7 +415,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
               <td class="p-3 font-mono">₹43,391</td>
               <td class="p-3 font-mono">~252.4 months (~21 yrs)</td>
               <td class="p-3 font-mono">₹59,53,414</td>
-              <td class="p-3 font-mono text-danger font-semibold">+₹5,39,535 vs baseline</td>
+              <td class="p-3 font-mono text-error font-semibold">+₹5,39,535 vs baseline</td>
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
               <td class="p-3 text-accent">Option 2: Increase EMI (Keep 20 Yrs)</td>
@@ -590,7 +590,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       {
         question: 'Why did 30-year mortgage rates climb to 7.4% in October 2026?',
         answer:
-          'Rates increased primarily due to a selloff in the sovereign bond market that drove 10-year Treasury yields upward. Strong economic data and persistent core inflation cemented "higher-for-longer" interest rate expectations across capital markets.',
+          'Rates increased primarily due to a bond-market selloff that drove 10-year Treasury yields upward, as markets priced in "higher-for-longer" interest rate expectations.',
       },
       {
         question: 'How much does a 7.4% mortgage cost per month on a $400,000 loan?',
@@ -631,10 +631,10 @@ export const BATCH_6_POSTS: BlogPost[] = [
         According to Freddie Mac’s Primary Mortgage Market Survey (PMMS) released on October 8, 2026, the 30-year fixed-rate mortgage averaged 7.40%, continuing a relentless seven-week upward climb from late summer. Just twelve months earlier in October 2025, the national 30-year average hovered around 6.30%.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        The primary catalyst has been a steady selloff in long-duration government paper. A resilient domestic labor market, persistent inflation readings, and heavy Treasury issuance have driven benchmark 10-year Treasury yields higher.
+        The primary catalyst has been a bond-market selloff. As investors priced in "higher-for-longer" interest rates, benchmark 10-year Treasury yields climbed.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        Historically, the spread between 10-year Treasury yields and 30-year fixed mortgage rates sits between 170 and 200 basis points. In recent months, that spread has remained unusually wide (often above 280 to 300 basis points) reflecting volatility in mortgage-backed securities (MBS) and secondary market liquidity premiums. Consequently, every tick upward in government bond yields exerts magnified pressure on retail mortgage quotes.
+        Lenders price 30-year fixed mortgages off longer-term bond yields rather than directly off the Federal Reserve’s policy rate, so a rise in the 10-year Treasury yield tends to flow through to the mortgage quotes buyers see.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Real Dollar Impact: Table C Loan Breakdown</h2>
@@ -725,7 +725,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       <ul class="text-xs text-text-muted space-y-2 list-disc pl-5 mb-6 leading-relaxed">
         <li><strong>Refinancing Is Not Free:</strong> Refinancing a $400,000 mortgage typically incurs $5,000 to $10,000 in loan origination, appraisal, title, and recording fees. You must remain in the home long enough for interest savings to overcome those upfront fees.</li>
         <li><strong>Rates May Stay Higher for Longer:</strong> Macroeconomic cycles can maintain elevated rate regimes for half a decade or longer. If rates remain near 7%, your temporary budget stretch becomes a permanent monthly drain.</li>
-        <li><strong>Property Valuation Drops:</strong> If home prices soften in your micro-market, your Loan-to-Value (LTV) ratio could rise above 80% or go underwater, making traditional mortgage refinancing legally impossible without bringing substantial cash to closing.</li>
+        <li><strong>Property Valuation Drops:</strong> If home prices soften in your micro-market, your Loan-to-Value (LTV) ratio could rise above 80% or go underwater, making a conventional refinance difficult or impossible without bringing substantial cash to closing.</li>
       </ul>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Affordability Check: Front-End and Back-End DTI Rules</h2>
@@ -776,7 +776,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
-      'Commercial banks do not increase retail fixed deposit (FD) interest rates immediately after an RBI repo rate hike. While the repo rate rose 25 bps to 5.50% on October 7, 2026, retail deposit rates adjust with a 1 to 3-month lag depending on individual bank liquidity needs. Depositors should avoid locking their entire corpus into a single long-term tenor today; instead, an FD laddering strategy protects liquidity while capturing rising rates.',
+      'Commercial banks do not increase retail fixed deposit (FD) interest rates immediately after an RBI repo rate hike. While the repo rate rose 25 bps to 5.50% on October 7, 2026, retail deposit rates usually adjust with a lag, and only if individual banks need deposits — it is not guaranteed. Rather than locking an entire corpus into a single long-term tenor today, depositors may consider an FD ladder, which preserves liquidity and lets part of the money be reinvested if rates rise.',
     type: 'Hybrid',
     summary:
       'Following the RBI Monetary Policy Committee’s 25 bps repo rate hike to 5.50%, fixed income savers are questioning whether to lock in current FD rates or wait for commercial banks to revise their card rates upwards. Historical transmission data reveals that while loan lending rates jump instantly via EBLR links, deposit rates adjust with a noticeable lag. Furthermore, the October 1, 2026 revised RBI bulk deposit guidelines specifically target large deposits of ₹3 crore and above, leaving retail rates entirely to bank discretion.',
@@ -831,7 +831,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       {
         question: 'How does the October 1, 2026 RBI bulk deposit rule change affect regular retail depositors?',
         answer:
-          'The revised guidelines define bulk deposits as single rupee term deposits of ₹3 crore and above (up from older lower thresholds) for Scheduled Commercial Banks and Small Finance Banks, mandating transparent daily web disclosures by 10:00 AM. This framework applies strictly to bulk corporate and HNI funds; retail card rates under ₹3 crore do not change automatically.',
+          'The revised framework gives banks more flexibility in pricing bulk deposits — single rupee term deposits of ₹3 crore and above for Scheduled Commercial Banks and Small Finance Banks — along with daily public disclosure of those rates. It targets large corporate and HNI deposits; retail FD rates below ₹3 crore do not change automatically and remain each bank’s decision.',
       },
       {
         question: 'How does FD laddering work with a ₹5 lakh corpus?',
@@ -846,7 +846,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     ],
     content: `
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
-        Following the Reserve Bank of India’s October 7, 2026 decision to raise the repo rate by 25 basis points to 5.50%, fixed income investors are evaluating whether to lock in fixed deposit (FD) rates immediately or wait for banks to announce higher returns. The short answer is to wait or ladder: commercial banks adjust retail FD rates with a typical lag of several weeks to a few months rather than moving in lockstep with the central bank. Locking your entire corpus into a single long-term deposit today risks missing peak card rates.
+        Following the Reserve Bank of India’s October 7, 2026 decision to raise the repo rate by 25 basis points to 5.50%, fixed income investors are evaluating whether to lock in fixed deposit (FD) rates immediately or wait for banks to announce higher returns. The short answer: consider laddering rather than locking everything in at once. Commercial banks typically adjust retail FD rates with a lag rather than moving in lockstep with the central bank, and increases are not guaranteed. Locking your entire corpus into a single long-term deposit today could mean missing any later rate increases.
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
@@ -870,7 +870,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         Retail deposit pricing is deregulated. Commercial banks evaluate whether they genuinely need fresh retail liabilities based on their current credit-deposit (CD) ratio, wholesale funding availability, and credit demand in corporate and retail sectors. If a bank already holds ample liquidity, it has little incentive to immediately increase retail FD card rates.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        Historically, full transmission to retail term deposits takes between 4 to 12 weeks, with banks rolling out rate revisions selectively across specific tenure buckets (such as 400-day or 2-year special tenors) rather than across all slabs. Committing long-term money in the immediate days following an MPC announcement often means locking in yesterday’s card rates before revised rate charts are uploaded by branch asset-liability committees (ALCOs).
+        When transmission to retail term deposits does happen, it tends to be gradual, with banks rolling out rate revisions selectively across specific tenure buckets (such as 400-day or 2-year special tenors) rather than across all slabs. Committing long-term money in the immediate days following an MPC announcement often means locking in yesterday’s card rates before revised rate charts are uploaded by branch asset-liability committees (ALCOs).
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Revised RBI Bulk Deposit Framework (Effective 1 Oct 2026)</h2>
@@ -878,7 +878,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         Adding to depositor questions is the revised RBI deposit-interest regulatory framework that took effect on October 1, 2026 (under the <em>Commercial Banks – Interest Rate on Deposits Second Amendment Directions, 2026</em>).
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Many savers mistakenly assumed this reform mandated higher FD rates across retail branches. In reality, the framework redefined bulk deposits for Scheduled Commercial Banks and Small Finance Banks as single rupee term deposits of <strong>₹3 crore and above</strong>. It mandates that banks maintain uniform pricing across branches and publish their bulk deposit rates publicly on their websites by 10:00 AM every business day.
+        Many savers mistakenly assumed this reform mandated higher FD rates across retail branches. In reality, it gives banks more flexibility in pricing bulk deposits — for Scheduled Commercial Banks and Small Finance Banks, single rupee term deposits of <strong>₹3 crore and above</strong>. It also requires that banks maintain uniform pricing across branches and publish their bulk deposit rates publicly on their websites by 10:00 AM every business day.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         This reform was designed to increase transparency for institutional treasuries and ultra-high-net-worth depositors who previously negotiated non-transparent bilateral deposit rates. For retail depositors investing under ₹3 crore, card rates remain entirely at the discretion of individual bank management. The bulk deposit rule creates no automatic rate increase for everyday household savings.
@@ -904,7 +904,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
               <th class="p-3 text-accent font-semibold">Real Rate of Return</th>
             </tr>
           </thead>
-          <tbody class="divide-y border-b border-border text-text-muted">
+          <tbody class="divide-y divide-border text-text-muted">
             <tr>
               <td class="p-3 font-medium text-text-primary">Zero Tax (Below ₹12.75L)</td>
               <td class="p-3 font-mono">7.20%</td>
@@ -922,12 +922,12 @@ export const BATCH_6_POSTS: BlogPost[] = [
               <td class="p-3 font-mono text-accent font-semibold">+0.88%</td>
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
-              <td class="p-3 text-danger">Top Bracket (30% Slab)</td>
+              <td class="p-3 text-error">Top Bracket (30% Slab)</td>
               <td class="p-3 font-mono">7.20%</td>
               <td class="p-3 font-mono">31.2% (inc cess)</td>
-              <td class="p-3 font-mono text-danger">4.95%</td>
+              <td class="p-3 font-mono text-error">4.95%</td>
               <td class="p-3 font-mono">5.20%</td>
-              <td class="p-3 font-mono text-danger font-bold">-0.25% (Losing Value)</td>
+              <td class="p-3 font-mono text-error font-bold">-0.25% (Losing Value)</td>
             </tr>
           </tbody>
         </table>
@@ -971,7 +971,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
               <td class="p-3 font-mono">₹1,50,000</td>
               <td class="p-3 font-mono">1 Year</td>
               <td class="p-3 font-mono">6.80% (illustrative)</td>
-              <td class="p-3">Matures in Oct 2027; roll into revised peak rates at maturity.</td>
+              <td class="p-3">Matures in Oct 2027; reinvest at whatever rates prevail then.</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">Bucket 2 (Medium-Term)</td>
@@ -996,7 +996,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       </p>
       <ul class="text-xs text-text-muted space-y-2 list-disc pl-5 mb-6 leading-relaxed">
         <li><strong>Continuous Liquidity:</strong> A significant portion of your capital unlocks every 12 months, eliminating the need to break a large deposit and suffer premature withdrawal penalty charges (typically 0.5% to 1%).</li>
-        <li><strong>Rate Capture:</strong> When Bucket 1 matures in late 2027, you can reinvest the principal and accumulated interest at whatever higher card rates banks have implemented.</li>
+        <li><strong>Rate Capture:</strong> When Bucket 1 matures in late 2027, you can reinvest the principal and accumulated interest at the card rates prevailing then — higher if banks have raised them.</li>
         <li><strong>Average Yield Optimization:</strong> You capture higher long-term yields on Bucket 3 while keeping financial flexibility on Buckets 1 and 2.</li>
       </ul>
 
@@ -1095,7 +1095,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       {
         question: 'Will customers ever be charged a fee for paying with UPI?',
         answer:
-          'No. Customers pay absolutely zero fees when using UPI. The Merchant Discount Rate (MDR) is exclusively an operational fee absorbed by businesses and payment service providers. Merchants are legally prohibited from passing this fee onto consumers or charging convenience surcharges for UPI payments.',
+          'No. Customers pay absolutely zero fees when using UPI. The Merchant Discount Rate (MDR) is a fee charged to the merchant, not the customer. Adding a surcharge for paying by UPI may also breach your payment provider’s merchant terms, so check your agreement before considering it.',
       },
       {
         question: 'What UPI transactions remain completely free under the framework?',
@@ -1136,7 +1136,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         Whenever payment reforms are introduced, consumer confusion quickly spreads on social media. It is vital to establish the core legal reality: <strong>consumers pay zero fees for UPI transactions</strong>.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Whether a shopper sends ₹100 for groceries or transfers ₹50,000 for electronic appliances, the customer is debited the exact checkout amount with zero markup. Regulatory guidelines explicitly bar merchants and payment aggregators from levying "convenience fees" or checkout surcharges on UPI payments.
+        Whether a shopper sends ₹100 for groceries or transfers ₹50,000 for electronic appliances, the customer is debited the exact checkout amount with zero markup. The MDR is deducted from the merchant’s settlement, not added to the customer’s bill.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         The Merchant Discount Rate (MDR) is strictly a business-to-business processing charge negotiated between merchants, payment service providers (PSPs), and acquiring banks. Its purpose is to compensate payment network participants — including National Payments Corporation of India (NPCI), issuing banks, acquiring banks, and application providers — for maintaining high-uptime infrastructure, cybersecurity protocols, and instantaneous settlement servers.
@@ -1149,7 +1149,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       <ul class="text-xs text-text-muted space-y-2 list-disc pl-5 mb-6 leading-relaxed">
         <li><strong>All Peer-to-Peer (P2P) Transfers:</strong> Money transfers between family members, friends, or roommates remain 100% free regardless of the amount. Sending ₹50,000 from your bank account to another individual incurs zero MDR.</li>
         <li><strong>Merchant Payments of ₹2,000 or Below:</strong> Every commercial transaction up to and including ₹2,000 carries zero MDR. The vast majority of daily retail purchases — chai stalls, neighborhood grocery kiranas, auto-rickshaw fares, and chemist bills — remain completely cost-free for both customer and shopkeeper.</li>
-        <li><strong>Small Merchant Protections:</strong> Eligible micro-merchants classified under person-to-person-merchant (P2PM) thresholds continue to enjoy zero merchant fees up to established monthly volume caps (such as ₹1 lakh per month).</li>
+        <li><strong>Small Merchant Protections:</strong> Reports indicate that very small merchants (with low monthly UPI receipts) may be exempt. Confirm whether you qualify with your PSP or bank.</li>
       </ul>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         By ring-fencing micro-transactions and everyday person-to-person transfers, the ecosystem ensures that routine household economic life operates without transaction friction, focusing fee structures strictly on high-ticket commercial merchant volume. Furthermore, the underlying payment rails automatically distinguish between personal Virtual Payment Addresses (VPAs) and verified Merchant Category Codes (MCCs), ensuring individual users are never accidentally flagged for merchant discount assessments.
@@ -1232,7 +1232,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Does MDR Attract 18% GST? Tax Treatment and Input Tax Credit</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Under Indian tax law, payment processing fees, interchange deductions, and gateway convenience charges are categorized as financial intermediary services (SAC code 997159) and attract statutory GST at 18%.
+        Under Indian tax law, payment processing fees such as MDR are generally treated as taxable financial services and attract GST at 18% on the fee (not on the sale amount). Confirm the exact treatment on your PSP’s tax invoice or with your chartered accountant.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Here is the critical distinction for merchants: <strong>if your business is GST-registered, the 18% GST charged on MDR is generally claimable as Input Tax Credit (ITC)</strong>. As we explain in our detailed reference on <a href="/blog/gst-input-tax-credit-rules" class="text-accent font-medium hover:underline">GST Input Tax Credit Rules</a>, payment processing is an expense incurred in the furtherance of business.
@@ -1263,9 +1263,9 @@ export const BATCH_6_POSTS: BlogPost[] = [
           </p>
         </div>
         <div class="p-4 bg-surface border border-border rounded-card">
-          <h3 class="text-sm font-bold text-text-primary mb-2">3. Optimize Cart Itemization</h3>
+          <h3 class="text-sm font-bold text-text-primary mb-2">3. Bill Genuinely Separate Purchases Separately</h3>
           <p class="text-xs text-text-muted leading-relaxed">
-            For retail stores selling modular items or multiple repair invoices, encourage separate purchases or smaller partial settlements under ₹2,000 where operationally appropriate and compliant with standard accounting and trade practices.
+            Where customers are genuinely buying separate items or services on separate occasions, separate invoices may naturally fall under ₹2,000. Do not artificially split a single sale to avoid MDR, which may breach your PSP’s merchant terms.
           </p>
         </div>
         <div class="p-4 bg-surface border border-border rounded-card">
@@ -1277,7 +1277,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
         <div class="p-4 bg-surface border border-border rounded-card md:col-span-2">
           <h3 class="text-sm font-bold text-text-primary mb-2">5. Review Settlement Timing and Batch Fees</h3>
           <p class="text-xs text-text-muted leading-relaxed">
-            Many payment gateways levy an additional convenience surcharge (often 0.10% to 0.25%) for instant real-time settlement (T+0). Opting for standard next-day batch settlement (T+1) eliminates unnecessary expedited processing charges and preserves hard-earned cash flow.
+            Some payment gateways charge extra for instant (T+0) settlement. If you do not need same-day funds, check whether standard settlement avoids that extra charge.
           </p>
         </div>
       </div>
