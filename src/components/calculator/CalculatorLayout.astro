@@ -473,17 +473,17 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
           }
         }
       };
+      // Only real user events count: applyMarketDefaults dispatches synthetic input/change
+      // events on load for non-INR currencies, which must not fire calculate_complete.
       inputsArea.addEventListener('input', (e) => {
+        if (!e.isTrusted) return;
         markInteracted();
-        if (e.isTrusted) {
-          markInputModified(e.target as HTMLElement | null);
-        }
+        markInputModified(e.target as HTMLElement | null);
       }, { passive: true });
       inputsArea.addEventListener('change', (e) => {
+        if (!e.isTrusted) return;
         markInteracted();
-        if (e.isTrusted) {
-          markInputModified(e.target as HTMLElement | null);
-        }
+        markInputModified(e.target as HTMLElement | null);
       }, { passive: true });
       inputsArea.addEventListener('click', (e) => {
         const target = e.target as HTMLElement | null;
