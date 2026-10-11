@@ -530,7 +530,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
   {
     slug: 'old-vs-new-tax-regime',
     title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
-    seoTitle: 'Flat vs Reducing Interest Rates: Conversion | Calcumetrics',
+    seoTitle: 'Old vs New Tax Regime: Breakeven Deduction Formula | Calcumetrics',
     description:
       'Breakeven deduction guide between Old and New Tax Regime for FY 2025-27, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',

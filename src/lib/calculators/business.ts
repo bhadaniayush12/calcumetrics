@@ -2,8 +2,15 @@
 
 // ── Profit Margin ────────────────────────────────────────────────────────────
 export interface ProfitMarginResult {
+  revenue: number;
+  cogs: number;
+  opex: number;
+  taxes: number;
   grossProfit: number;
   grossMarginPct: number;
+  /** EBIT: gross profit minus operating expenses */
+  operatingProfit: number;
+  operatingMarginPct: number;
   netProfit: number;
   netMarginPct: number;
 }
@@ -11,9 +18,22 @@ export interface ProfitMarginResult {
 export function calcProfitMargin(revenue: number, cogs: number, operatingExpenses: number = 0, taxes: number = 0): ProfitMarginResult {
   const grossProfit = revenue - cogs;
   const grossMarginPct = revenue > 0 ? (grossProfit / revenue) * 100 : 0;
-  const netProfit = grossProfit - operatingExpenses - taxes;
+  const operatingProfit = grossProfit - operatingExpenses;
+  const operatingMarginPct = revenue > 0 ? (operatingProfit / revenue) * 100 : 0;
+  const netProfit = operatingProfit - taxes;
   const netMarginPct = revenue > 0 ? (netProfit / revenue) * 100 : 0;
-  return { grossProfit, grossMarginPct, netProfit, netMarginPct };
+  return {
+    revenue,
+    cogs,
+    opex: operatingExpenses,
+    taxes,
+    grossProfit,
+    grossMarginPct,
+    operatingProfit,
+    operatingMarginPct,
+    netProfit,
+    netMarginPct,
+  };
 }
 
 // ── Markup vs Margin ──────────────────────────────────────────────────────────

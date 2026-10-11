@@ -417,7 +417,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
   {
     slug: 'fixed-vs-floating-rate-loans',
     title: 'Fixed vs. Floating Interest Rate Loans: How to Decide in Changing Rate Cycles',
-    seoTitle: 'Home Loan Prepayment vs SIP: Math Comparison | Calcumetrics',
+    seoTitle: 'Fixed vs Floating Rate Loans: How to Choose | Calcumetrics',
     description:
       'Compare fixed rate certainty against floating rate benchmark savings. Learn how rate cycles, reset spreads, and prepayment penalties dictate the best choice.',
     category: 'Loans',

@@ -19,6 +19,12 @@ describe('Blog SEO and Internal Linking Audit', () => {
     }
   });
 
+  it.each(['slug', 'seoTitle', 'description'] as const)('every post has a unique %s', (key) => {
+    const seen = new Map<string, string[]>();
+    for (const post of BLOG_POSTS) seen.set(post[key], [...(seen.get(post[key]) ?? []), post.slug]);
+    expect([...seen.entries()].filter(([, slugs]) => slugs.length > 1)).toEqual([]);
+  });
+
   it('reports meta description lengths', () => {
     for (const post of BLOG_POSTS) {
       if (post.description.length > 170 || post.description.length < 120) {

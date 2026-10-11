@@ -104,3 +104,15 @@ describe('Section 12 Calculation Test Fixtures', () => {
   });
 });
 
+
+describe('calcProfitMargin', () => {
+  it('returns operating profit (EBIT) and echoes inputs used by the page', async () => {
+    const { calcProfitMargin } = await import('./calculators/business');
+    const r = calcProfitMargin(1000000, 400000, 250000, 50000);
+    expect(r.grossProfit).toBe(600000);
+    expect(r.operatingProfit).toBe(350000);
+    expect(r.operatingMarginPct).toBeCloseTo(35, 10);
+    expect(r.netProfit).toBe(300000);
+    expect(r).toMatchObject({ revenue: 1000000, cogs: 400000, opex: 250000, taxes: 50000 });
+  });
+});

@@ -806,7 +806,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'debt-to-income-ratio-for-mortgage',
     title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
-    seoTitle: 'Home Loan Prepayment vs SIP: Math Comparison | Calcumetrics',
+    seoTitle: 'Debt-to-Income Ratio for Mortgages: Limits & Formula | Calcumetrics',
     description:
       'Master the debt-to-income ratio calculations lenders use for mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and steps to lower your ratio.',
     category: 'Loans',

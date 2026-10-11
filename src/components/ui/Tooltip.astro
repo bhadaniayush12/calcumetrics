@@ -31,11 +31,12 @@ const {
     </svg>
   </button>
 
-  <!-- Tooltip bubble per Section 5: #171A18 bg, #F7F7F4 text, 12px, 8px radius, max-width 240px, flat arrow. No blur, no shadow. -->
+  <!-- Closed bubbles use display:none (not visibility) so off-screen ones never widen the page on mobile.
+       Tooltip bubble per Section 5: #171A18 bg, #F7F7F4 text, 12px, 8px radius, max-width 240px, flat arrow. No blur, no shadow. -->
   <div
     id={id}
     role="tooltip"
-    class="pointer-events-none opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible group-focus-within/tooltip:opacity-100 group-focus-within/tooltip:visible transition-standard absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[240px] p-2.5 rounded-control bg-dark-bg text-dark-text text-[12px] leading-relaxed border border-dark-border z-30 select-none data-[open=true]:opacity-100 data-[open=true]:visible data-[open=true]:pointer-events-auto"
+    class="pointer-events-none hidden group-hover/tooltip:block group-focus-within/tooltip:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max max-w-[240px] p-2.5 rounded-control bg-dark-bg text-dark-text text-[12px] leading-relaxed border border-dark-border z-30 select-none data-[open=true]:block data-[open=true]:pointer-events-auto"
     data-tooltip-bubble
   >
     <span>{text}</span>

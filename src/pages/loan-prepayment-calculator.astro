@@ -239,12 +239,12 @@ const jsonld = {
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Revised Remaining Tenure</span>
           <span id="lp-result-newtenure" class="text-sm font-medium tabular-nums text-dark-text">
-            {initialResult.newMonths} months ({(initialResult.newMonths / 12).toFixed(1)} yrs)
+            {initialResult.newMonthsRemaining} months ({(initialResult.newMonthsRemaining / 12).toFixed(1)} yrs)
           </span>
         </div>
         <div class="flex items-center justify-between py-2.5">
           <span class="text-xs text-dark-muted">Revised Monthly EMI</span>
-          <span id="lp-result-newemi" class="text-sm font-bold tabular-nums text-dark-text">{fmt(initialResult.newEMI)}</span>
+          <span id="lp-result-newemi" class="text-sm font-bold tabular-nums text-dark-text">{fmt(initialResult.newEMI ?? initialResult.originalEMI)}</span>
         </div>
       </div>
 
@@ -527,16 +527,16 @@ const jsonld = {
         rows: [
           { label: 'Current Monthly EMI', value: fmtVal(res.originalEMI) },
           { label: 'Tenure Saved', value: `${res.monthsSaved} months (${(res.monthsSaved / 12).toFixed(1)} yrs)` },
-          { label: 'Revised Remaining Tenure', value: `${res.newMonths} months (${(res.newMonths / 12).toFixed(1)} yrs)` },
-          { label: 'Revised Monthly EMI', value: fmtVal(res.newEMI) },
+          { label: 'Revised Remaining Tenure', value: `${res.newMonthsRemaining} months (${(res.newMonthsRemaining / 12).toFixed(1)} yrs)` },
+          { label: 'Revised Monthly EMI', value: fmtVal(res.newEMI ?? res.originalEMI) },
         ],
       });
 
       if (resSaved) resSaved.textContent = fmtVal(res.interestSaved);
       if (resCurrEmi) resCurrEmi.textContent = fmtVal(res.originalEMI);
       if (resSavedMonths) resSavedMonths.textContent = `${res.monthsSaved} months (${(res.monthsSaved / 12).toFixed(1)} yrs)`;
-      if (resNewTenure) resNewTenure.textContent = `${res.newMonths} months (${(res.newMonths / 12).toFixed(1)} yrs)`;
-      if (resNewEmi) resNewEmi.textContent = fmtVal(res.newEMI);
+      if (resNewTenure) resNewTenure.textContent = `${res.newMonthsRemaining} months (${(res.newMonthsRemaining / 12).toFixed(1)} yrs)`;
+      if (resNewEmi) resNewEmi.textContent = fmtVal(res.newEMI ?? res.originalEMI);
 
       currentHashState = { p, r, m, prep: prepay, s: strat };
     }
