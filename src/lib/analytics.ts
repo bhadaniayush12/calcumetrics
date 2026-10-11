@@ -32,6 +32,8 @@ export function hasAnalyticsConsent(): boolean {
       const item = dl[i];
       if (item && (item[0] === 'consent' || item.event === 'consent')) {
         const settings = item[2] || item.consent_settings;
+        // Region-scoped defaults (EEA/UK/CH) only apply to some visitors; gtag resolves them via google_tag_data
+        if (settings?.region) continue;
         if (settings && typeof settings.analytics_storage === 'string') {
           if (settings.analytics_storage === 'denied') return false;
           if (settings.analytics_storage === 'granted') return true;

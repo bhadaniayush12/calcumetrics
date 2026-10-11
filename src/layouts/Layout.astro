@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Toast from '../components/ui/Toast.astro';
+import CookieConsent from '../components/ui/CookieConsent.astro';
 import MobileDock from '../components/ui/MobileDock.astro';
 import '../styles/global.css';
 
@@ -50,12 +51,27 @@ const resolvedOgAlt = ogImageAlt || title;
           }
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
+          // EEA, UK and Switzerland: analytics off until the visitor opts in (CookieConsent banner)
+          gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'region': ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']
+          });
           gtag('consent', 'default', {
             'ad_storage': 'denied',
             'ad_user_data': 'denied',
             'ad_personalization': 'denied',
             'analytics_storage': 'granted'
           });
+          // Apply a saved choice from Cookie settings before the tag loads
+          try {
+            var savedConsent = JSON.parse(localStorage.getItem('cm_consent') || 'null');
+            if (savedConsent && typeof savedConsent.analytics === 'boolean') {
+              gtag('consent', 'update', { 'analytics_storage': savedConsent.analytics ? 'granted' : 'denied' });
+            }
+          } catch (e) {}
           gtag('js', new Date());
           gtag('config', 'G-BGJDT7C82V', {
             send_page_view: true
@@ -132,5 +148,6 @@ const resolvedOgAlt = ogImageAlt || title;
     <Footer slim={slimFooter} />
     <MobileDock currentPath={currentPath} />
     <Toast />
+    <CookieConsent />
   </body>
 </html>

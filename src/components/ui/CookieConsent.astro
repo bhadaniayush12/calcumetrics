@@ -1,0 +1,122 @@
+---
+// src/components/ui/CookieConsent.astro
+// First-visit consent banner (EEA / UK / CH timezones) + "Cookie settings" dialog.
+// Opened from the footer via the `calcumetrics:open-cookie-settings` event.
+const btnBase = 'inline-flex items-center justify-center h-10 px-4 text-sm font-medium rounded-control cursor-pointer transition-standard focus-visible:outline-accent';
+const btnPrimary = `${btnBase} bg-accent text-surface border border-accent hover:bg-accent-hover active:bg-accent-pressed`;
+const btnSecondary = `${btnBase} bg-surface text-text-primary border border-border hover:bg-canvas active:bg-disabled-bg`;
+---
+
+<section
+  id="cookie-banner"
+  class="fixed inset-x-0 bottom-24 lg:bottom-4 z-[90] px-4 hidden"
+  role="region"
+  aria-label="Cookie consent"
+>
+  <div class="mx-auto max-w-3xl bg-surface border border-border rounded-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+    <p class="text-sm text-text-muted leading-relaxed flex-1">
+      We use Google Analytics cookies to understand which calculators are useful. Your calculator inputs never leave your device.{' '}
+      <a href="/cookie-policy" class="text-accent hover:underline focus-visible:outline-accent">Cookie Policy</a>
+    </p>
+    <div class="flex flex-wrap gap-2 shrink-0">
+      <button type="button" class={btnSecondary} data-consent-action="reject">Reject</button>
+      <button type="button" class={btnSecondary} data-consent-action="settings">Settings</button>
+      <button type="button" class={btnPrimary} data-consent-action="accept">Accept</button>
+    </div>
+  </div>
+</section>
+
+<dialog
+  id="cookie-settings-dialog"
+  class="m-auto w-[calc(100%-2rem)] max-w-lg bg-surface text-text-primary border border-border rounded-card p-0"
+  aria-labelledby="cookie-settings-title"
+>
+  <form method="dialog" class="flex flex-col">
+    <div class="px-5 pt-5 pb-3">
+      <h2 id="cookie-settings-title" class="text-lg font-bold">Cookie settings</h2>
+      <p class="mt-1 text-sm text-text-muted">Choose which optional cookies Calcumetrics may use. You can change this at any time from the footer.</p>
+    </div>
+
+    <ul class="px-5 flex flex-col divide-y divide-border border-y border-border">
+      <li class="py-4 flex items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold">Essential</p>
+          <p class="mt-0.5 text-xs text-text-muted">Remembers your theme, currency and this choice in your browser's local storage. Always on.</p>
+        </div>
+        <span class="text-xs font-medium text-text-muted shrink-0 pt-0.5">Always on</span>
+      </li>
+      <li class="py-4 flex items-start justify-between gap-4">
+        <label for="cookie-analytics-toggle" class="cursor-pointer">
+          <span class="block text-sm font-semibold">Analytics</span>
+          <span class="mt-0.5 block text-xs text-text-muted">Google Analytics cookies (<code>_ga</code>, <code>_ga_*</code>) to count visits and popular calculators. No calculator inputs are sent.</span>
+        </label>
+        <input
+          id="cookie-analytics-toggle"
+          type="checkbox"
+          role="switch"
+          class="mt-1 h-5 w-5 shrink-0 cursor-pointer accent-[var(--color-accent)] focus-visible:outline-accent"
+        />
+      </li>
+      <li class="py-4 flex items-start justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold">Advertising</p>
+          <p class="mt-0.5 text-xs text-text-muted">Calcumetrics does not set advertising cookies at the moment.</p>
+        </div>
+        <span class="text-xs font-medium text-text-muted shrink-0 pt-0.5">Off</span>
+      </li>
+    </ul>
+
+    <div class="px-5 py-4 flex flex-wrap justify-end gap-2">
+      <button type="submit" value="cancel" class={btnSecondary}>Cancel</button>
+      <button type="submit" value="save" class={btnPrimary}>Save choices</button>
+    </div>
+  </form>
+</dialog>
+
+<style>
+  #cookie-settings-dialog::backdrop {
+    background: rgb(0 0 0 / 0.6);
+  }
+</style>
+
+<script>
+  import { isAnalyticsAllowed, saveConsentChoice, shouldShowConsentBanner } from '../../lib/consent';
+
+  const banner = document.getElementById('cookie-banner');
+  const dialog = document.getElementById('cookie-settings-dialog') as HTMLDialogElement | null;
+  const toggle = document.getElementById('cookie-analytics-toggle') as HTMLInputElement | null;
+
+  const hideBanner = () => banner?.classList.add('hidden');
+
+  const openSettings = () => {
+    if (!dialog || !toggle) return;
+    toggle.checked = isAnalyticsAllowed();
+    dialog.returnValue = ''; // Esc keeps the previous returnValue; reset so it can't re-save
+    if (!dialog.open) dialog.showModal();
+  };
+
+  if (shouldShowConsentBanner()) banner?.classList.remove('hidden');
+
+  banner?.addEventListener('click', (e) => {
+    const action = (e.target as HTMLElement).closest<HTMLElement>('[data-consent-action]')?.dataset.consentAction;
+    if (action === 'accept' || action === 'reject') {
+      saveConsentChoice(action === 'accept');
+      hideBanner();
+    } else if (action === 'settings') {
+      openSettings();
+    }
+  });
+
+  dialog?.addEventListener('close', () => {
+    if (dialog.returnValue !== 'save' || !toggle) return;
+    saveConsentChoice(toggle.checked);
+    hideBanner();
+  });
+
+  // Light-dismiss: clicking the backdrop cancels
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close('cancel');
+  });
+
+  window.addEventListener('calcumetrics:open-cookie-settings', openSettings);
+</script>

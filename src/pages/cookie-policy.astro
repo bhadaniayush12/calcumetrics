@@ -26,7 +26,7 @@ const jsonld = {
 ---
 <Layout
   title="Cookie Policy | Calcumetrics"
-  description="Learn how Calcumetrics implements a cookieless architecture, privacy-preserving analytics, local browser storage preferences, and statutory data protections."
+  description="What cookies and browser storage Calcumetrics uses, why, and how to turn analytics cookies on or off with Cookie settings."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -38,7 +38,7 @@ const jsonld = {
         <li class="text-text-primary font-medium" aria-current="page">Cookie Policy</li>
       </ol>
     </nav>
-    <p class="text-xs text-text-muted mb-2">Last updated: 2 October 2026</p>
+    <p class="text-xs text-text-muted mb-2">Last updated: 11 October 2026</p>
     <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-6">Cookie Policy</h1>
     <p class="text-sm text-text-muted leading-relaxed mb-6">
       This policy explains how Calcumetrics (calcumetrics.com) uses cookies and browser local storage, their exact technical purposes, and how you can control your preferences.
@@ -51,6 +51,7 @@ const jsonld = {
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
       <li><code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">cm_currency</code>: Stores your preferred display currency symbol (e.g. INR, USD, EUR, GBP) for universal calculators.</li>
       <li><code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">cm_theme</code>: Stores your dark mode or light mode appearance preference.</li>
+      <li><code class="text-xs bg-disabled-bg px-1.5 py-0.5 rounded font-mono">cm_consent</code>: Stores your analytics cookie choice from the cookie banner or Cookie settings.</li>
     </ul>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
       This data stays strictly on your local device. It is never transmitted to our servers or accessible to third parties.
@@ -61,13 +62,13 @@ const jsonld = {
       We utilize two analytics layers to ensure platform stability and understand aggregate visitor usage:
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
-      <li><strong>Google Analytics 4 (First-party cookies):</strong> GA4 may set first-party cookies (such as <code>_ga</code> and <code>_ga_*</code>) to distinguish anonymous browser sessions. GA4 is configured with Google Consent Mode v2 (defaulting ad storage and personalization to denied). Calculator inputs, financial figures, and loan details are strictly excluded from all telemetry.</li>
+      <li><strong>Google Analytics 4 (First-party cookies):</strong> GA4 may set first-party cookies (such as <code>_ga</code> and <code>_ga_*</code>) to distinguish anonymous browser sessions. GA4 is configured with Google Consent Mode v2 (defaulting ad storage and personalization to denied). Visitors in the EEA, United Kingdom, and Switzerland are asked first: analytics cookies stay off until you accept them. Calculator inputs, financial figures, and loan details are strictly excluded from all telemetry.</li>
       <li><strong>Cloudflare Web Analytics (Cookieless):</strong> Provides aggregate, privacy-first pageview and performance measurements without using cookies, local storage, or device fingerprinting.</li>
     </ul>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">3. Advertising cookies (Google AdSense)</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      Calcumetrics displays or plans to display third-party advertisements served by Google AdSense and certified advertising networks to keep our tools free.
+      Calcumetrics plans to display third-party advertisements served by Google AdSense to keep our tools free. Advertising cookies are not set today; before ads are enabled, we will add a Google-certified consent platform for EEA, UK, and Swiss visitors and update this policy.
     </p>
     <ul class="list-disc list-inside space-y-2 text-sm text-text-muted mb-4 pl-2">
       <li>Third-party vendors, including Google, use cookies (such as the DoubleClick cookie) to serve ads based on prior visits to this website or other websites on the Internet.</li>
@@ -82,7 +83,7 @@ const jsonld = {
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">5. How to control and delete cookies and storage</h2>
     <p class="text-sm text-text-muted leading-relaxed mb-4">
-      You can clear your stored preferences (such as remembered currency) and delete cookies at any time by clearing your browser's local storage and cache in your browser settings. To opt out of interest-based advertising across participating networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
+      You can turn analytics cookies on or off at any time with <strong>Cookie settings</strong> in the site footer; turning them off also deletes existing <code>_ga</code> cookies. You can clear your stored preferences (such as remembered currency) and delete cookies at any time by clearing your browser's local storage and cache in your browser settings. To opt out of interest-based advertising across participating networks, you may visit the <a href="https://optout.aboutads.info/" rel="noopener noreferrer" class="text-accent hover:underline">Digital Advertising Alliance opt-out</a> or <a href="https://adssettings.google.com/" rel="noopener noreferrer" class="text-accent hover:underline">Google Ad Settings</a>.
     </p>
 
     <h2 class="text-xl font-bold text-text-primary mt-8 mb-3">6. Questions and updates</h2>
