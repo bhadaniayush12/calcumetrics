@@ -24,6 +24,7 @@ import type { HTMLAttributes } from 'astro/types';
 import AdSlot from '../ui/AdSlot.astro';
 import IndiaTaxSourceNotice from './IndiaTaxSourceNotice.astro';
 import { getCalculatorType } from '../../lib/analytics';
+import { getEmbedForPage } from '../../lib/embed';
 import { ADS_ENABLED } from '../../config/site';
 
 interface Props {
@@ -53,6 +54,7 @@ const {
 } = Astro.props;
 
 const calculatorType = getCalculatorType(Astro.url.pathname);
+const embedWidget = getEmbedForPage(Astro.url.pathname);
 ---
 
 <!-- Breadcrumb & Inspector Bar: Home › Category › Tool | [Get Info ⌘I] -->
@@ -80,19 +82,33 @@ const calculatorType = getCalculatorType(Astro.url.pathname);
     </ol>
   </nav>
 
-  <!-- Formulas & Methodology Link -->
-  <a
-    href="/methodology"
-    class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard shadow-mac-subtle select-none focus-visible:outline-accent"
-  >
-    <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="16" x2="12" y2="12" />
-      <line x1="12" y1="8" x2="12.01" y2="8" />
-    </svg>
-    <span class="font-medium">Formulas &amp; Methodology</span>
-    <span aria-hidden="true" class="text-accent">&rarr;</span>
-  </a>
+  <div class="flex items-center gap-2 flex-wrap">
+    {embedWidget && (
+      <a
+        href={`/widgets?calc=${embedWidget.slug}`}
+        class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard select-none focus-visible:outline-accent"
+      >
+        <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+        <span class="font-medium">Embed this calculator</span>
+      </a>
+    )}
+    <!-- Formulas & Methodology Link -->
+    <a
+      href="/methodology"
+      class="flex items-center gap-1.5 px-2.5 py-1 rounded-control bg-surface border border-border text-xs text-text-muted hover:text-accent hover:border-accent transition-standard shadow-mac-subtle select-none focus-visible:outline-accent"
+    >
+      <svg class="w-3.5 h-3.5 text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+      </svg>
+      <span class="font-medium">Formulas &amp; Methodology</span>
+      <span aria-hidden="true" class="text-accent">&rarr;</span>
+    </a>
+  </div>
 </div>
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->

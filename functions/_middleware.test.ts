@@ -213,4 +213,22 @@ describe('Cloudflare Pages _middleware', () => {
     expect(response.status).toBe(301);
     expect(response.headers.get('Location')).toBe(to);
   });
+
+  it('allows /embed/* widgets to be framed by any site', async () => {
+    const response = await onRequest({
+      request: new Request('https://calcumetrics.com/embed/emi'),
+      next: async () => new Response('OK', { headers: { 'X-Frame-Options': 'SAMEORIGIN' } }),
+    });
+    expect(response.headers.get('X-Frame-Options')).toBeNull();
+    expect(response.headers.get('Content-Security-Policy')).toContain('frame-ancestors *');
+  });
+
+  it('keeps same-origin framing on regular pages', async () => {
+    const response = await onRequest({
+      request: new Request('https://calcumetrics.com/emi-calculator'),
+      next: async () => new Response('OK'),
+    });
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+    expect(response.headers.get('Content-Security-Policy')).toContain("frame-ancestors 'self'");
+  });
 });

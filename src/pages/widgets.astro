@@ -1,0 +1,169 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { EMBED_CALCULATORS, EMBED_SLUGS, buildEmbedSnippet } from '../lib/embed';
+
+const canonicalUrl = 'https://calcumetrics.com/widgets';
+const first = EMBED_CALCULATORS[EMBED_SLUGS[0]];
+const initialSnippet = buildEmbedSnippet(first.slug, 'INR', 'light');
+
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      name: 'Free Financial Calculator Widgets',
+      url: canonicalUrl,
+      description: 'Add a free EMI, home loan, mortgage, SIP, lump sum, FD, PPF or GST calculator to your website or blog with one copy-paste embed code.',
+      publisher: { '@id': 'https://calcumetrics.com/#org' },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Calculator Widgets', item: canonicalUrl },
+      ],
+    },
+  ],
+};
+
+const selectClass = 'h-10 px-3 rounded-control border border-border bg-surface text-sm text-text-primary focus-visible:outline-accent cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed';
+---
+<Layout
+  title="Free EMI, SIP, GST & Loan Calculator Widgets for Your Website | Calcumetrics"
+  description="Add a free EMI, home loan, mortgage, SIP, lump sum, FD, PPF or GST calculator to your website or blog. Pick a currency and theme, copy one embed code, done. No sign-up, and the widget sets no cookies."
+  canonical={canonicalUrl}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center gap-1.5 text-xs text-text-muted">
+        <li><a href="/" class="hover:text-accent transition-standard">Home</a></li>
+        <li aria-hidden="true">›</li>
+        <li class="text-text-primary font-medium" aria-current="page">Calculator Widgets</li>
+      </ol>
+    </nav>
+
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-3">Free calculator widgets for your website</h1>
+    <p class="text-sm text-text-muted leading-relaxed mb-8 max-w-[680px]">
+      Give your readers a working calculator right inside your article: EMI, home loan, mortgage, SIP, lump sum, FD, PPF or GST. Choose the calculator, currency and theme, then paste the code into any page that accepts HTML (WordPress, Blogger, Ghost, Webflow and others). It's free, needs no sign-up and sets no cookies on your visitors.
+    </p>
+
+    <div class="grid gap-8 lg:grid-cols-[1fr_480px] items-start">
+      <section class="flex flex-col gap-5" aria-labelledby="widget-options-title">
+        <h2 id="widget-options-title" class="text-lg font-bold text-text-primary">1. Choose your widget</h2>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <label class="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
+            Calculator
+            <select id="widget-calc" class={selectClass}>
+              {EMBED_SLUGS.map((s) => <option value={s}>{EMBED_CALCULATORS[s].title}</option>)}
+            </select>
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
+            Currency
+            <select id="widget-currency" class={selectClass}>
+              <option value="INR">₹ INR</option>
+              <option value="USD">$ USD</option>
+              <option value="EUR">€ EUR</option>
+              <option value="GBP">£ GBP</option>
+            </select>
+          </label>
+          <label class="flex flex-col gap-1.5 text-xs font-medium text-text-muted">
+            Theme
+            <select id="widget-theme" class={selectClass}>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
+
+        <h2 class="text-lg font-bold text-text-primary mt-2">2. Copy the embed code</h2>
+        <textarea
+          id="widget-code"
+          readonly
+          rows="7"
+          aria-label="Embed code"
+          class="w-full p-3 rounded-control border border-border bg-canvas font-mono text-xs leading-relaxed text-text-primary resize-none focus-visible:outline-accent"
+        >{initialSnippet}</textarea>
+        <div class="flex items-center gap-3">
+          <button
+            id="widget-copy"
+            type="button"
+            class="inline-flex items-center justify-center h-10 px-4 text-sm font-medium rounded-control cursor-pointer transition-standard bg-accent text-surface border border-accent hover:bg-accent-hover active:bg-accent-pressed focus-visible:outline-accent"
+          >
+            Copy code
+          </button>
+          <span id="widget-copy-status" class="text-xs text-text-muted" role="status"></span>
+        </div>
+
+        <h2 class="text-lg font-bold text-text-primary mt-2">3. Paste it into your page</h2>
+        <ul class="list-disc list-inside space-y-1.5 text-sm text-text-muted">
+          <li><strong class="text-text-primary">WordPress:</strong> add a <em>Custom HTML</em> block and paste the code.</li>
+          <li><strong class="text-text-primary">Blogger:</strong> switch the post editor to <em>HTML view</em> and paste where the calculator should appear.</li>
+          <li><strong class="text-text-primary">Other sites:</strong> paste into any HTML or embed block.</li>
+        </ul>
+        <p class="text-xs text-text-muted leading-relaxed">
+          Please keep the small credit link under the calculator. It's what keeps these widgets free. Calculations run entirely in your reader's browser; nothing they type is sent anywhere.
+        </p>
+      </section>
+
+      <section aria-labelledby="widget-preview-title" class="flex flex-col gap-3">
+        <h2 id="widget-preview-title" class="text-lg font-bold text-text-primary">Live preview</h2>
+        <iframe
+          id="widget-preview"
+          src={`/embed/${first.slug}?currency=INR&theme=light`}
+          title="Calculator widget preview"
+          width="100%"
+          height={first.height}
+          class="w-full max-w-[480px] border-0"
+          loading="lazy"
+        ></iframe>
+      </section>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { EMBED_CALCULATORS, buildEmbedSnippet, resolveEmbedCurrency, type EmbedTheme } from '../lib/embed';
+  import { normalizeCurrency } from '../lib/currency';
+
+  const calcSel = document.getElementById('widget-calc') as HTMLSelectElement;
+  const curSel = document.getElementById('widget-currency') as HTMLSelectElement;
+  const themeSel = document.getElementById('widget-theme') as HTMLSelectElement;
+  const code = document.getElementById('widget-code') as HTMLTextAreaElement;
+  const preview = document.getElementById('widget-preview') as HTMLIFrameElement;
+  const copyBtn = document.getElementById('widget-copy') as HTMLButtonElement;
+  const status = document.getElementById('widget-copy-status')!;
+
+  // Preselect from ?calc= (used by the "Embed this calculator" link on calculator pages)
+  const requested = new URLSearchParams(location.search).get('calc');
+  if (requested && EMBED_CALCULATORS[requested]) calcSel.value = requested;
+
+  function update() {
+    const slug = calcSel.value;
+    const calc = EMBED_CALCULATORS[slug];
+    // India statutory widgets (GST, PPF) are INR-only: lock the currency picker
+    const locked = calc.currencies.length === 1;
+    if (locked) curSel.value = calc.currencies[0];
+    curSel.disabled = locked;
+    curSel.title = locked ? `${calc.title} is available in ₹ INR only` : '';
+    const currency = resolveEmbedCurrency(calc, normalizeCurrency(curSel.value));
+    const theme = (themeSel.value === 'dark' ? 'dark' : 'light') as EmbedTheme;
+    code.value = buildEmbedSnippet(slug, currency, theme);
+    preview.src = `/embed/${slug}?currency=${currency}&theme=${theme}`;
+    preview.height = String(EMBED_CALCULATORS[slug].height);
+    status.textContent = '';
+  }
+
+  [calcSel, curSel, themeSel].forEach((el) => el.addEventListener('change', update));
+  if (requested) update();
+
+  copyBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(code.value);
+    } catch {
+      code.select();
+      document.execCommand('copy');
+    }
+    status.textContent = 'Copied! Paste it into your page.';
+  });
+</script>

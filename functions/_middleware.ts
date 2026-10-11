@@ -14,6 +14,13 @@ interface PagesContext {
 const CSP_POLICY =
   "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://static.cloudflareinsights.com https://pagead2.googlesyndication.com https://*.googlesyndication.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://www.google.com https://*.google.com; font-src 'self' data:; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://*.googletagmanager.com https://www.google.com https://*.google.com https://cloudflareinsights.com https://*.cloudflareinsights.com https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://*.doubleclick.net; frame-src 'self' https://googleads.g.doubleclick.net https://*.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests;";
 
+// Embeddable widgets (/embed/*) may be framed by any site; everything else stays same-origin only.
+const EMBED_CSP_POLICY = CSP_POLICY.replace("frame-ancestors 'self'", 'frame-ancestors *');
+
+function isEmbedPath(pathname: string): boolean {
+  return pathname === '/embed' || pathname.startsWith('/embed/');
+}
+
 export async function onRequest(context: PagesContext): Promise<Response> {
   const url = new URL(context.request.url);
 
@@ -78,7 +85,8 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (!newHeaders.has('Cross-Origin-Opener-Policy')) {
       newHeaders.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     }
-    newHeaders.set('Content-Security-Policy', CSP_POLICY);
+    const isEmbed = isEmbedPath(url.pathname);
+    newHeaders.set('Content-Security-Policy', isEmbed ? EMBED_CSP_POLICY : CSP_POLICY);
     if (!newHeaders.has('X-Content-Type-Options')) {
       newHeaders.set('X-Content-Type-Options', 'nosniff');
     }
@@ -88,7 +96,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
     if (!newHeaders.has('Permissions-Policy')) {
       newHeaders.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), browsing-topics=()');
     }
-    if (!newHeaders.has('X-Frame-Options')) {
+    if (isEmbed) {
+      newHeaders.delete('X-Frame-Options');
+    } else if (!newHeaders.has('X-Frame-Options')) {
       newHeaders.set('X-Frame-Options', 'SAMEORIGIN');
     }
 

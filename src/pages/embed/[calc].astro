@@ -1,0 +1,187 @@
+---
+// Embeddable widget: framed on third-party sites (see functions/_middleware.ts for frame-ancestors).
+// No Google tag, no cookies, noindex. Options via query: ?currency=INR|USD|EUR|GBP&theme=light|dark
+import '../../styles/global.css';
+import { EMBED_CALCULATORS, EMBED_SLUGS, SITE_ORIGIN } from '../../lib/embed';
+
+export function getStaticPaths() {
+  return EMBED_SLUGS.map((calc) => ({ params: { calc } }));
+}
+
+const calc = EMBED_CALCULATORS[Astro.params.calc as string];
+const fullPageUrl = `${SITE_ORIGIN}${calc.pagePath}`;
+const trackedUrl = `${fullPageUrl}?utm_source=embed&utm_medium=widget&utm_campaign=${calc.slug}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{calc.title} | Calcumetrics</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href={fullPageUrl} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      (function () {
+        try {
+          if (new URLSearchParams(location.search).get('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
+          } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <!-- Override global body flex + mobile-dock padding: widgets have no dock -->
+  <body class="font-sans bg-surface text-text-primary antialiased" style="display:block;padding:0;min-height:0">
+    <main
+      id="embed-root"
+      data-calc={calc.slug}
+      class="w-full min-h-screen border border-border rounded-card bg-surface p-4 flex flex-col gap-4"
+    >
+      <header class="flex items-center justify-between gap-2">
+        <h1 class="text-base font-bold">{calc.title}</h1>
+        <a href={trackedUrl} target="_blank" rel="noopener" class="text-xs font-medium text-accent hover:underline focus-visible:outline-accent">
+          Open full calculator ↗
+        </a>
+      </header>
+
+      <form id="embed-form" class="flex flex-col gap-3" novalidate onsubmit="return false">
+        {calc.fields.map((f) => (
+          <label class="flex flex-col gap-1">
+            <span class="text-xs font-medium text-text-muted">{f.label}</span>
+            {f.kind === 'select' ? (
+              <select
+                id={f.id}
+                data-kind="select"
+                class="h-10 px-3 rounded-control border border-border bg-surface text-sm text-text-primary cursor-pointer focus-visible:outline-accent"
+              >
+                {f.options.map((o) => <option value={o.value} selected={o.value === f.value}>{o.label}</option>)}
+              </select>
+            ) : (
+              <span class="flex items-center h-10 px-3 rounded-control border border-border bg-surface focus-within:border-accent">
+                {f.kind === 'amount' && <span class="text-sm text-text-muted mr-1.5" data-embed-symbol>₹</span>}
+                <input
+                  id={f.id}
+                  data-kind={f.kind}
+                  type="text"
+                  inputmode="decimal"
+                  autocomplete="off"
+                  class="w-full bg-transparent text-sm tabular-nums text-right outline-none"
+                />
+                {f.kind === 'percent' && <span class="text-sm text-text-muted ml-1.5">%</span>}
+              </span>
+            )}
+          </label>
+        ))}
+        <p id="embed-error" class="hidden text-xs text-error-text" role="alert"></p>
+      </form>
+
+      <section class="rounded-control border border-border bg-canvas p-3 flex flex-col gap-2" aria-live="polite">
+        <div id="embed-results" class="flex flex-col gap-1.5"></div>
+        <div class="h-2 w-full rounded-full bg-disabled-bg overflow-hidden flex" aria-hidden="true">
+          <span id="embed-bar-base" class="h-full bg-text-muted/50" style="width:50%"></span>
+          <span id="embed-bar-growth" class="h-full bg-accent" style="width:50%"></span>
+        </div>
+        <div class="flex justify-between text-[11px] text-text-muted">
+          <span>{calc.barLabels[0]}</span>
+          <span>{calc.barLabels[1]}</span>
+        </div>
+      </section>
+
+      <footer class="mt-auto pt-1 text-[11px] text-text-muted flex items-center justify-between gap-2">
+        <span>Estimates only. Not financial advice.</span>
+        <a href={trackedUrl} target="_blank" rel="noopener" class="font-medium text-text-primary hover:text-accent focus-visible:outline-accent">
+          Powered by Calcumetrics
+        </a>
+      </footer>
+    </main>
+
+    <script>
+      import { EMBED_CALCULATORS, getEmbedDefault, parseEmbedOptions, resolveEmbedCurrency } from '../../lib/embed';
+      import { CURRENCY_CONFIG } from '../../lib/currency';
+      import { validate } from '../../lib/validate';
+      import { formatIndian, formatIntl } from '../../lib/formatters';
+
+      const root = document.getElementById('embed-root')!;
+      const calc = EMBED_CALCULATORS[root.dataset.calc!];
+      const currency = resolveEmbedCurrency(calc, parseEmbedOptions(location.search).currency);
+      const config = CURRENCY_CONFIG[currency];
+
+      const fmtNum = (n: number) => (currency === 'INR' ? formatIndian(Math.round(n)) : formatIntl(Math.round(n)));
+      const fmtMoney = (n: number) => config.symbol + fmtNum(n);
+
+      document.querySelectorAll('[data-embed-symbol]').forEach((el) => (el.textContent = config.symbol));
+
+      const inputs = calc.fields.map((f) => {
+        const el = document.getElementById(f.id) as HTMLInputElement | HTMLSelectElement;
+        if (f.kind !== 'select') {
+          const v = getEmbedDefault(calc, f, currency);
+          el.value = f.kind === 'amount' ? fmtNum(v) : String(v);
+        }
+        return { f, el };
+      });
+
+      const errorEl = document.getElementById('embed-error')!;
+      const resultsEl = document.getElementById('embed-results')!;
+      const barBase = document.getElementById('embed-bar-base')!;
+      const barGrowth = document.getElementById('embed-bar-growth')!;
+
+      function render() {
+        const values: Record<string, number> = {};
+        for (const { f, el } of inputs) {
+          if (f.kind === 'select') {
+            values[f.id] = Number(el.value);
+            continue;
+          }
+          const res = validate(el.value, {
+            required: true,
+            min: f.min,
+            max: f.max,
+            label: f.label,
+            decimal: f.kind === 'rate' || f.kind === 'percent',
+            ...(f.kind === 'amount' ? { amount: true, currency } : {}),
+          });
+          if (!res.valid) {
+            errorEl.textContent = res.error.message;
+            errorEl.classList.remove('hidden');
+            el.setAttribute('aria-invalid', 'true');
+            return;
+          }
+          el.removeAttribute('aria-invalid');
+          values[f.id] = res.value!;
+        }
+        errorEl.classList.add('hidden');
+
+        const { rows, base, growth } = calc.compute(values);
+        resultsEl.replaceChildren(
+          ...rows.map((r) => {
+            const row = document.createElement('div');
+            row.className = 'flex items-baseline justify-between gap-2';
+            const label = document.createElement('span');
+            label.className = r.hero ? 'text-sm font-medium' : 'text-xs text-text-muted';
+            label.textContent = r.label;
+            const value = document.createElement('span');
+            value.className = r.hero ? 'text-2xl font-bold tabular-nums text-accent' : 'text-sm font-medium tabular-nums';
+            value.textContent = fmtMoney(r.value);
+            row.append(label, value);
+            return row;
+          })
+        );
+        const total = base + growth;
+        const pct = total > 0 ? (base / total) * 100 : 50;
+        barBase.style.width = `${pct}%`;
+        barGrowth.style.width = `${100 - pct}%`;
+      }
+
+      inputs.forEach(({ el }) => {
+        el.addEventListener('input', render);
+        el.addEventListener('change', render);
+      });
+      render();
+    </script>
+  </body>
+</html>
