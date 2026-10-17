@@ -13,6 +13,8 @@ import { TOOLS } from '../config/site';
 const DEFAULT = { monthly: 5000, rate: 7.0, months: 60 };
 const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months / 12);
 const defaultGainPct = result.invested > 0 ? (result.interest / result.invested) * 100 : 0;
+// Worked example below is rendered from the same engine as the calculator (the defaults).
+const EXAMPLE = result;
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -272,8 +274,8 @@ const jsonld = {
           <p><strong class="text-text-primary">2. Number of installments (N):</strong> 60 months (5 years)</p>
           <p><strong class="text-text-primary">3. Cumulative principal invested:</strong> 60 &times; ₹5,000 = <strong class="text-text-primary">₹3,00,000</strong></p>
           <p><strong class="text-text-primary">4. Quarterly compounding mechanics:</strong> The 1st installment compounds across all 20 quarters; the 30th installment compounds for 10 quarters; the 60th installment compounds for 1 month.</p>
-          <p><strong class="text-text-primary">5. Total maturity corpus:</strong> <strong class="text-text-primary text-accent">₹3,61,746</strong></p>
-          <p><strong class="text-text-primary">6. Total interest earned:</strong> ₹3,61,746 &minus; ₹3,00,000 = <strong class="text-text-primary text-accent">₹61,746</strong> (an effective 20.6% total return on deposited capital)</p>
+          <p><strong class="text-text-primary">5. Total maturity corpus:</strong> <strong class="text-text-primary text-accent">{fmt(EXAMPLE.maturity)}</strong></p>
+          <p><strong class="text-text-primary">6. Total interest earned:</strong> {fmt(EXAMPLE.maturity)} &minus; {fmt(EXAMPLE.invested)} = <strong class="text-text-primary text-accent">{fmt(EXAMPLE.interest)}</strong> (an effective {defaultGainPct.toFixed(1)}% total return on deposited capital)</p>
         </div>
       </section>
 
@@ -357,25 +359,6 @@ const jsonld = {
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcRD } from '../lib/calculators/rd';
 
-  function calcRDClient(p: number, rate: number, months: number) {
-    const r = rate / 100;
-    let maturity = 0;
-    for (let i = 0; i < months; i++) {
-      const remainingMonths = months - i;
-      maturity += p * Math.pow(1 + r / 4, (remainingMonths / 12) * 4);
-    }
-    const invested = p * months;
-    const gain = maturity - invested;
-    return {
-      maturity,
-      invested,
-      gain,
-      gainPct: invested > 0 ? (gain / invested) * 100 : 0,
-      principalFraction: maturity > 0 ? invested / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
-
   let currentHashState: Record<string, any> = {};
   let currSym = '₹';
   let currLocale = 'en-IN';
@@ -451,32 +434,33 @@ const jsonld = {
       const r = vR.value!;
       const mo = vMo.value!;
 
-      const res = calcRDClient(m, r, mo);
+      const res = calcRD(m, r, mo / 12);
+      const gainPct = res.invested > 0 ? (res.interest / res.invested) * 100 : 0;
 
       setResult({
         heroValue: fmtVal(res.maturity),
         heroLabel: 'Maturity Value',
         rows: [
           { label: 'Total Invested', value: fmtVal(res.invested) },
-          { label: 'Interest Earned', value: fmtVal(res.gain) },
-          { label: 'Return on Investment', value: res.gainPct.toFixed(1) + '%' },
+          { label: 'Interest Earned', value: fmtVal(res.interest) },
+          { label: 'Return on Investment', value: gainPct.toFixed(1) + '%' },
         ],
       });
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resInvested) resInvested.textContent = fmtVal(res.invested);
-      if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
+      if (resGain) resGain.textContent = fmtVal(res.interest);
+      if (resGainPct) resGainPct.textContent = gainPct.toFixed(1) + '%';
 
       const wrapper = document.getElementById('rd-composition-wrapper');
       if (wrapper && res.maturity > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        if (bar) bar.style.width = `${(res.investedFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
         const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(res.invested);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.interest);
       }
 
       currentHashState = { m, r, mo };
@@ -558,8 +542,8 @@ const jsonld = {
 
       if (!vM.valid || !vR.valid || !vMo.valid) return;
 
-      const res = calcRDClient(vM.value!, vR.value!, vMo.value!);
-      const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      const res = calcRD(vM.value!, vR.value!, vMo.value! / 12);
+      const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {
