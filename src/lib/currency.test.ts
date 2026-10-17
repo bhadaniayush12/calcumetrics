@@ -249,8 +249,27 @@ describe('Phase 9: Currency Display / Locale System', () => {
     expect(detectUserCurrency('', 'en-IN')).toBe('INR');
     expect(detectUserCurrency('', 'hi')).toBe('INR');
 
-    expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('INR');
-    expect(detectUserCurrency('', '')).toBe('INR');
+    expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('USD');
+    expect(detectUserCurrency('', '')).toBe('USD');
+  });
+
+  it('falls back to USD (not INR) for unmapped regions; only India gets INR', () => {
+    // Australia / New Zealand
+    expect(detectUserCurrency('Australia/Sydney', 'en-AU')).toBe('USD');
+    expect(detectUserCurrency('Australia/Perth', '')).toBe('USD');
+    expect(detectUserCurrency('Pacific/Auckland', 'en-NZ')).toBe('USD');
+    // Gulf
+    expect(detectUserCurrency('Asia/Dubai', 'ar-AE')).toBe('USD');
+    expect(detectUserCurrency('Asia/Riyadh', 'ar-SA')).toBe('USD');
+    expect(detectUserCurrency('Asia/Qatar', 'en')).toBe('USD');
+    // Other Asia / Africa / generic English
+    expect(detectUserCurrency('Asia/Singapore', 'en-SG')).toBe('USD');
+    expect(detectUserCurrency('Asia/Tokyo', 'ja-JP')).toBe('USD');
+    expect(detectUserCurrency('Africa/Lagos', 'en-NG')).toBe('USD');
+    expect(detectUserCurrency('', 'en')).toBe('USD');
+    // India is still INR by timezone or locale
+    expect(detectUserCurrency('Asia/Kolkata', 'en-US')).toBe('INR');
+    expect(detectUserCurrency('', 'ta-IN')).toBe('INR');
   });
 
   // ── 8. Preset Chip Dynamic Localization ────────────────────────────────────

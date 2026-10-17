@@ -116,8 +116,13 @@ export function getCurrencyConfig(code: unknown): CurrencyConfig {
  *   - Europe/London or en-GB -> GBP
  *   - Europe/Berlin, Europe/Paris, Europe/Madrid, Europe/Rome, or de/fr/es locales -> EUR
  *   - America/New_York, America/Chicago, America/Los_Angeles or en-US -> USD
- *   - Asia/Kolkata or en-IN or fallback -> INR
+ *   - Asia/Kolkata / Asia/Calcutta, or en-IN and Indian-language locales -> INR
+ *   - Anything else (Australia, New Zealand, Gulf, Asia, Africa, unknown) -> USD
+ * Only an Indian timezone or locale yields INR. SSR without hints still returns DEFAULT_CURRENCY.
  */
+/** Currency for visitors whose timezone/locale maps to none of the supported markets. */
+export const DETECTION_FALLBACK_CURRENCY: CurrencyCode = 'USD';
+
 export function detectUserCurrency(customTz?: string, customLocale?: string): CurrencyCode {
   if (typeof window === 'undefined' && customTz === undefined && customLocale === undefined) return DEFAULT_CURRENCY;
   try {
@@ -213,7 +218,7 @@ export function detectUserCurrency(customTz?: string, customLocale?: string): Cu
       }
     }
   } catch {}
-  return DEFAULT_CURRENCY;
+  return DETECTION_FALLBACK_CURRENCY;
 }
 
 /**
