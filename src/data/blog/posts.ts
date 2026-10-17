@@ -9,7 +9,10 @@ import { BATCH_6_POSTS } from './batch6';
 
 import { JIO_IPO_POST } from './jio-platforms-ipo-listing-gains-tax';
 
+import { SBI_OCTOBER_POST } from './sbi-home-loan-rate-hike-october-2026-emi';
+
 export const BLOG_POSTS: BlogPost[] = [
+  SBI_OCTOBER_POST,
   JIO_IPO_POST,
   ...PHASE_11_POSTS,
   ...BATCH_1_POSTS,
