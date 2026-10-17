@@ -18,7 +18,8 @@ export interface XIRRResult {
 function npvAtRate(cashFlows: XIRRCashFlow[], rate: number): number {
   const t0 = cashFlows[0].date.getTime();
   return cashFlows.reduce((sum, cf) => {
-    const years = (cf.date.getTime() - t0) / (365.25 * 24 * 3600 * 1000);
+    // Excel XIRR convention: year fraction = days / 365
+    const years = (cf.date.getTime() - t0) / (365 * 24 * 3600 * 1000);
     return sum + cf.amount / Math.pow(1 + rate, years);
   }, 0);
 }
