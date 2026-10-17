@@ -35,37 +35,108 @@ export const JIO_IPO_POST: BlogPost = {
     { question: 'Is the exemption separate for every IPO?', answer: 'No. Eligible long-term gains share the annual exemption across the relevant equity investments. Do not claim the full allowance independently for each sale.' },
   ],
   content: `
-<p>Jio Platforms’ IPO is scheduled to open on <strong>21 October 2026</strong> and close on <strong>23 October 2026</strong>. Business Standard’s issue page lists a price band of <strong>₹1,065–₹1,119 per share</strong> and a minimum lot of <strong>12 shares</strong>. Those details describe the offer. They do not tell you what the shares will sell for once trading begins.</p>
-<p>For someone thinking through the arithmetic, the useful question is how much of a possible gain remains after tax. A headline percentage return leaves that out. This guide uses one lot and several hypothetical sale prices to make the distinction visible. It does not assess whether Jio is a suitable investment or recommend applying for the issue.</p>
-<h2>What price should you enter as your purchase cost?</h2>
-<p>Use the actual amount paid for the shares you receive. For the examples below, we assume allotment at the upper end of the band, ₹1,119, without a category-specific discount. One 12-share lot therefore has an assumed cost of <strong>${money(cost)}</strong>. If the final allotment price or your applicable purchase cost differs, replace that input before relying on the result.</p>
-<p>The lower end of a price band is not automatically the price an investor pays. Equally, an amount blocked during an application is not proof that shares have been allotted. Keep the allotment record and the eventual sale contract note together: they provide the inputs needed for a gain calculation.</p>
-<p>The issue dates, band and lot size were checked on the linked Business Standard page on 17 October. Any later official revision would take priority. No grey-market premium has been used as a forecast, and none of the sale prices in this article is a target price.</p>
-<h2>Short-term versus long-term capital gains on equity</h2>
-<p>For eligible listed equity sold through a transaction subject to the relevant securities transaction tax conditions, the short-term capital gains tax rate is <strong>20%</strong>. A holding period of 12 months or less is short-term. More than 12 months is long-term, with <strong>12.5%</strong> base tax on eligible annual long-term gains exceeding <strong>₹1.25 lakh</strong>.</p>
-<p>The Income Tax Department’s capital-gains FAQ explains the rate changes. For tax years governed by the Income-tax Act, 2025, the corresponding listed-equity provisions are sections 196 and 198. Older explanations refer to sections 111A and 112A. The familiar rate labels and the current statutory section labels should not be confused.</p>
-<p>These are base rates, not a promise that everyone pays exactly that percentage of their profit. Cess and, where applicable, surcharge affect the bill. The examples assume a resident individual whose basic exemption is already used, no surcharge, no loss adjustments and no transaction costs. They are isolated-sale estimates rather than complete return calculations.</p>
-<h2>One lot at four hypothetical sale prices</h2>
-<p>Each row below uses Calcumetrics’ capital-gains engine with the equity setting and a one-month holding-period input to represent the short-term category. The sale value is the assumed share price multiplied by the lot size. Tax includes the engine’s health and education cess calculation. Figures retain paise so that the columns can be reconciled.</p>
-<div class="overflow-x-auto"><table><caption>One 12-share lot, assumed allotment price ₹1,119; hypothetical short-term sale</caption><thead><tr><th>Sale price per share</th><th>Sale proceeds</th><th>Gain / loss</th><th>Base tax</th><th>Tax with cess</th><th>Gain / loss after tax</th></tr></thead><tbody>
-${scenarios.map(r => `<tr><td>${money(r.price)}</td><td>${money(r.salePrice)}</td><td>${money(r.gain)}</td><td>${money(r.taxAmount)}</td><td>${money(r.totalTax)}</td><td>${money(r.netGain)}</td></tr>`).join('')}
-</tbody></table></div>
-<p>Read the last column as profit or loss after the modelled tax, not as the total cash received on sale. Your original capital is separate. The broker’s eventual settlement amount can also reflect transaction charges, so it need not equal a simple sale-proceeds-minus-tax estimate.</p>
-<p>The loss row matters as much as the profitable rows. The engine shows no positive capital-gains tax when sale proceeds fall below cost, but that does not recover the money lost. It also does not decide how a loss interacts with other transactions in your return. Avoid treating a zero in the tax column as a favourable investment outcome.</p>
-<h2>Walk through the ₹1,400 scenario</h2>
-<p>At a hypothetical ₹1,400 sale price, proceeds are ${money(example.salePrice)}. Against the assumed purchase cost of ${money(cost)}, the engine calculates a gain of ${money(example.gain)}. Base tax is ${money(example.taxAmount)}, cess is ${money(example.cess)}, and total modelled tax is ${money(example.totalTax)}. That leaves ${money(example.netGain)} of the gain before trading costs.</p>
-<p>This calculation answers a narrow question: what is the estimated tax if those inputs become true? It says nothing about the likelihood of that price. A different execution price changes the gain immediately. Someone selling part of a holding should enter only the shares actually sold and their relevant acquisition cost, rather than treating the whole allotted holding as one completed sale.</p>
-<h2>What changes if the shares are held longer?</h2>
-<p>To isolate the tax category, keep the same purchase and hypothetical sale values but change the holding input to 13 months. With the full annual exemption still available, the engine gives <strong>${money(longTerm.totalTax)}</strong> tax on this isolated example. That is a conditional result, not a forecast of a future sale or future tax legislation.</p>
-<p>The exemption is shared across eligible long-term gains during the year. It is not a fresh allowance for each company, each broker account or each IPO. If other eligible sales have already absorbed it, a standalone result that assumes the whole allowance remains will understate your position. Review the annual portfolio total before estimating what remains available.</p>
-<p>Waiting for a different tax category also leaves the investment exposed to market movements. Comparing a lower tax percentage with a higher one is insufficient when the eventual sale price is unknown. A tax saving cannot be evaluated independently of a possible change in the value of the holding.</p>
-<h2>Use the calculator with records, not remembered prices</h2>
-<p>Open the <a href="/in/capital-gains-tax-calculator">capital gains tax calculator</a>, select equity, and enter purchase value, sale value and holding period. Keep the source documents alongside it. A quoted market price, a limit order that never executed and the price on the executed contract note are different things; the completed transaction is the useful starting point.</p>
-<p>Check the output labels before copying a number into a personal spreadsheet. Gross gain, taxable gain, tax and net gain answer different questions. If a result looks unexpectedly small, inspect the holding-period input and exemption assumption first. Re-running the same transaction with a mistaken category can produce a precise-looking but inappropriate answer.</p>
-<p>For salary and other ordinary income, the <a href="/in/income-tax-calculator">income tax calculator</a> offers a separate view. Do not assume a salary rebate estimate automatically settles the tax on special-rate gains. A combined return requires attention to the interaction between income categories and your personal circumstances.</p>
-<h2>Before treating the estimate as money available to spend</h2>
-<p>Keep a record of the allotment, actual sale, costs and the estimate you used. If the money is earmarked for a bill, allow for the fact that the calculator is not your broker’s settlement statement or a tax filing service. Revisiting the calculation after execution is more useful than saving a speculative profit figure before the issue opens.</p>
-<p>Our broader <a href="/blog/capital-gains-tax-rules">capital gains tax rules guide</a> covers other assets. This article stays with the IPO equity example because importing a property or debt-fund rule would change the answer. Non-resident treatment, business trading income, surcharge and portfolio loss adjustments are outside these worked examples.</p>
-<p><strong>Educational information only; not financial advice.</strong> This article does not recommend buying, applying for, holding or selling any security. Check the final offer documents and obtain qualified tax advice for your own return.</p>
+
+      <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
+        Jio Platforms' IPO is scheduled to open on <strong>21 October 2026</strong> and close on <strong>23 October 2026</strong>. Business Standard's issue page lists a price band of <strong>₹1,065–₹1,119 per share</strong> and a minimum lot of <strong>12 shares</strong>. Those details describe the offer. They do not tell you what the shares will sell for once trading begins.
+      </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        For someone thinking through the arithmetic, the useful question is how much of a possible gain remains after tax. A headline percentage return leaves that out. This guide uses one lot and several hypothetical sale prices to make the distinction visible. It does not assess whether Jio is a suitable investment or recommend applying for the issue.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">What price should you enter as your purchase cost?</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Use the actual amount paid for the shares you receive. For the examples below, we assume allotment at the upper end of the band, ₹1,119, without a category-specific discount. One 12-share lot therefore has an assumed cost of <strong>${money(cost)}</strong>. If the final allotment price or your applicable purchase cost differs, replace that input before relying on the result.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The lower end of a price band is not automatically the price an investor pays. Equally, an amount blocked during an application is not proof that shares have been allotted. Keep the allotment record and the eventual sale contract note together: they provide the inputs needed for a gain calculation.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        The issue dates, band and lot size were checked on the linked Business Standard page on 17 October. Any later official revision would take priority. No grey-market premium has been used as a forecast, and none of the sale prices in this article is a target price.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Short-term versus long-term capital gains on equity</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        For eligible listed equity sold through a transaction subject to the relevant securities transaction tax conditions, the short-term capital gains tax rate is <strong>20%</strong>. A holding period of 12 months or less is short-term. More than 12 months is long-term, with <strong>12.5%</strong> base tax on eligible annual long-term gains exceeding <strong>₹1.25 lakh</strong>.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The Income Tax Department's capital-gains FAQ explains the rate changes. For tax years governed by the Income-tax Act, 2025, the corresponding listed-equity provisions are sections 196 and 198. Older explanations refer to sections 111A and 112A. The familiar rate labels and the current statutory section labels should not be confused.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        These are base rates, not a promise that everyone pays exactly that percentage of their profit. Cess and, where applicable, surcharge affect the bill. The examples assume a resident individual whose basic exemption is already used, no surcharge, no loss adjustments and no transaction costs. They are isolated-sale estimates rather than complete return calculations.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">One lot at four hypothetical sale prices</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Each row below uses Calcumetrics' capital-gains engine with the equity setting and a one-month holding-period input to represent the short-term category. The sale value is the assumed share price multiplied by the lot size. Tax includes the engine's health and education cess calculation. Figures retain paise so that the columns can be reconciled.
+      </p>
+
+      <div class="overflow-x-auto mb-6">
+        <table class="w-full text-xs text-left border border-border rounded-card overflow-hidden">
+          <caption class="text-xs text-text-muted text-left p-3 bg-surface border-b border-border">One 12-share lot, assumed allotment price ₹1,119; hypothetical short-term sale</caption>
+          <thead class="bg-surface text-text-primary font-semibold border-b border-border">
+            <tr>
+              <th class="p-3">Sale price per share</th>
+              <th class="p-3">Sale proceeds</th>
+              <th class="p-3">Gain / loss</th>
+              <th class="p-3">Base tax</th>
+              <th class="p-3">Tax with cess</th>
+              <th class="p-3">Gain / loss after tax</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-border text-text-muted">
+            ${scenarios.map(r => `<tr><td class="p-3 font-medium text-text-primary">${money(r.price)}</td><td class="p-3 font-mono">${money(r.salePrice)}</td><td class="p-3 font-mono">${money(r.gain)}</td><td class="p-3 font-mono">${money(r.taxAmount)}</td><td class="p-3 font-mono">${money(r.totalTax)}</td><td class="p-3 font-mono">${money(r.netGain)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Read the last column as profit or loss after the modelled tax, not as the total cash received on sale. Your original capital is separate. The broker's eventual settlement amount can also reflect transaction charges, so it need not equal a simple sale-proceeds-minus-tax estimate.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        The loss row matters as much as the profitable rows. The engine shows no positive capital-gains tax when sale proceeds fall below cost, but that does not recover the money lost. It also does not decide how a loss interacts with other transactions in your return. Avoid treating a zero in the tax column as a favourable investment outcome.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Walk through the ₹1,400 scenario</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        At a hypothetical ₹1,400 sale price, proceeds are ${money(example.salePrice)}. Against the assumed purchase cost of ${money(cost)}, the engine calculates a gain of ${money(example.gain)}. Base tax is ${money(example.taxAmount)}, cess is ${money(example.cess)}, and total modelled tax is ${money(example.totalTax)}. That leaves ${money(example.netGain)} of the gain before trading costs.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        This calculation answers a narrow question: what is the estimated tax if those inputs become true? It says nothing about the likelihood of that price. A different execution price changes the gain immediately. Someone selling part of a holding should enter only the shares actually sold and their relevant acquisition cost, rather than treating the whole allotted holding as one completed sale.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">What changes if the shares are held longer?</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        To isolate the tax category, keep the same purchase and hypothetical sale values but change the holding input to 13 months. With the full annual exemption still available, the engine gives <strong>${money(longTerm.totalTax)}</strong> tax on this isolated example. That is a conditional result, not a forecast of a future sale or future tax legislation.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        The exemption is shared across eligible long-term gains during the year. It is not a fresh allowance for each company, each broker account or each IPO. If other eligible sales have already absorbed it, a standalone result that assumes the whole allowance remains will understate your position. Review the annual portfolio total before estimating what remains available.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        Waiting for a different tax category also leaves the investment exposed to market movements. Comparing a lower tax percentage with a higher one is insufficient when the eventual sale price is unknown. A tax saving cannot be evaluated independently of a possible change in the value of the holding.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Use the calculator with records, not remembered prices</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Open the <a href="/in/capital-gains-tax-calculator" class="text-accent font-medium hover:underline">capital gains tax calculator</a>, select equity, and enter purchase value, sale value and holding period. Keep the source documents alongside it. A quoted market price, a limit order that never executed and the price on the executed contract note are different things; the completed transaction is the useful starting point.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Check the output labels before copying a number into a personal spreadsheet. Gross gain, taxable gain, tax and net gain answer different questions. If a result looks unexpectedly small, inspect the holding-period input and exemption assumption first. Re-running the same transaction with a mistaken category can produce a precise-looking but inappropriate answer.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-6">
+        For salary and other ordinary income, the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">income tax calculator</a> offers a separate view. Do not assume a salary rebate estimate automatically settles the tax on special-rate gains. A combined return requires attention to the interaction between income categories and your personal circumstances.
+      </p>
+
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Before treating the estimate as money available to spend</h2>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Keep a record of the allotment, actual sale, costs and the estimate you used. If the money is earmarked for a bill, allow for the fact that the calculator is not your broker's settlement statement or a tax filing service. Revisiting the calculation after execution is more useful than saving a speculative profit figure before the issue opens.
+      </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">
+        Our broader <a href="/blog/capital-gains-tax-rules" class="text-accent font-medium hover:underline">capital gains tax rules guide</a> covers other assets. This article stays with the IPO equity example because importing a property or debt-fund rule would change the answer. Non-resident treatment, business trading income, surcharge and portfolio loss adjustments are outside these worked examples.
+      </p>
+      <p class="text-xs text-text-muted italic mt-6">
+        <strong>Educational information only; not financial advice.</strong> This article does not recommend buying, applying for, holding or selling any security. Check the final offer documents and obtain qualified tax advice for your own return.
+      </p>
+    
 `,
-};
+}
