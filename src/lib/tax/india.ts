@@ -20,6 +20,8 @@
  *   - INR-locked: these functions never perform currency conversion.
  */
 
+import capitalGainsFY2026_27 from '../../data/tax/india/capital-gains/FY-2026-27.json';
+
 // ── GST ──────────────────────────────────────────────────────────────────────
 
 /**
@@ -255,6 +257,55 @@ export function calcTDS(grossAmount: number, section: TDSSection, options: TDSOp
  */
 export type AssetType = 'equity' | 'equity-fund' | 'debt-fund' | 'real-estate' | 'gold' | 'other';
 
+/** Property-indexation comparison for land/buildings acquired before 23 July 2024. */
+export interface IndexationComparison {
+  acquisitionFY: string;
+  saleFY: string;
+  ciiAcquisition: number;
+  ciiSale: number;
+  indexedCost: number;
+  indexedGain: number;
+  /** 12.5% on the un-indexed gain. */
+  taxWithoutIndexation: number;
+  /** 20% on the indexed gain. */
+  taxWithIndexation: number;
+  /** Which computation gives the lower tax (and is applied). */
+  applied: 'with-indexation' | 'without-indexation';
+}
+
+export interface CapitalGainsOptions {
+  /** ISO date (YYYY-MM-DD) the property was acquired. Enables the pre-23 Jul 2024 indexation option. */
+  acquisitionDate?: string;
+  /** ISO date of sale. Defaults to acquisitionDate + holdingMonths. */
+  saleDate?: string;
+}
+
+/** CBDT Cost Inflation Index by financial year ("2026-27"), from the capital-gains tax data. */
+export const COST_INFLATION_INDEX: Record<string, number> =
+  capitalGainsFY2026_27.values.costInflationIndex.table;
+
+/** Land/buildings acquired before this date keep the 20%-with-indexation option (Finance (No.2) Act 2024). */
+export const INDEXATION_CUTOFF_DATE: string = capitalGainsFY2026_27.values.indexationCutoffDate;
+
+/** Financial year label ("2026-27") for an ISO date. */
+export function financialYearOf(isoDate: string): string {
+  const [y, m] = isoDate.split('-').map(Number);
+  const start = m >= 4 ? y : y - 1;
+  return `${start}-${String((start + 1) % 100).padStart(2, '0')}`;
+}
+
+/** CII for the FY containing isoDate; assets acquired before 1 April 2001 use the base year (100). */
+function ciiFor(isoDate: string): number | undefined {
+  if (isoDate < '2001-04-01') return COST_INFLATION_INDEX['2001-02'];
+  return COST_INFLATION_INDEX[financialYearOf(isoDate)];
+}
+
+function addMonthsISO(isoDate: string, months: number): string {
+  const d = new Date(isoDate + 'T00:00:00Z');
+  d.setUTCMonth(d.getUTCMonth() + months);
+  return d.toISOString().slice(0, 10);
+}
+
 export interface CapitalGainsResult {
   /** Sale price of asset. */
   salePrice: number;
@@ -278,6 +329,8 @@ export interface CapitalGainsResult {
   netGain: number;
   /** Section applied. */
   section: string;
+  /** Present when property acquired before 23 July 2024 is compared with and without indexation. */
+  indexation?: IndexationComparison;
 }
 
 /** Minimum holding months for LTCG classification by asset type. */
@@ -304,12 +357,14 @@ const LTCG_THRESHOLD_MONTHS: Record<AssetType, number> = {
  * @param purchasePrice  - Purchase price / cost of acquisition (₹).
  * @param holdingMonths  - Holding period in months.
  * @param assetType      - Type of asset.
+ * @param options        - Acquisition (and optional sale) date for the property indexation option.
  */
 export function calcCapitalGains(
   salePrice: number,
   purchasePrice: number,
   holdingMonths: number,
-  assetType: AssetType
+  assetType: AssetType,
+  options: CapitalGainsOptions = {}
 ): CapitalGainsResult {
   const gain = salePrice - purchasePrice;
   const ltcgThreshold = LTCG_THRESHOLD_MONTHS[assetType];
@@ -326,6 +381,7 @@ export function calcCapitalGains(
   let taxRatePct = 0;
   let section = '';
   let taxableGain = gain;
+  let indexation: IndexationComparison | undefined;
 
   if (assetType === 'equity' || assetType === 'equity-fund') {
     if (gainType === 'STCG') {
@@ -352,6 +408,40 @@ export function calcCapitalGains(
       // Budget 2024: 12.5% without indexation (removed indexation benefit)
       taxRatePct = 12.5;
       section = '112 (12.5% no indexation, Budget 2024)';
+
+      // Acquired before 23 July 2024 (resident individual/HUF): lower of 12.5% without
+      // indexation and 20% with indexation (Finance (No.2) Act 2024).
+      const { acquisitionDate } = options;
+      if (acquisitionDate && acquisitionDate < INDEXATION_CUTOFF_DATE) {
+        const saleDate = options.saleDate ?? addMonthsISO(acquisitionDate, holdingMonths);
+        const ciiAcquisition = ciiFor(acquisitionDate);
+        const ciiSale = ciiFor(saleDate);
+        if (ciiAcquisition && ciiSale) {
+          const indexedCost = (purchasePrice * ciiSale) / ciiAcquisition;
+          const indexedGain = Math.max(0, salePrice - indexedCost);
+          const taxWithoutIndexation = gain * 0.125;
+          const taxWithIndexation = indexedGain * 0.20;
+          const withIdx = taxWithIndexation < taxWithoutIndexation;
+          indexation = {
+            acquisitionFY: acquisitionDate < '2001-04-01' ? '2001-02' : financialYearOf(acquisitionDate),
+            saleFY: financialYearOf(saleDate),
+            ciiAcquisition,
+            ciiSale,
+            indexedCost,
+            indexedGain,
+            taxWithoutIndexation,
+            taxWithIndexation,
+            applied: withIdx ? 'with-indexation' : 'without-indexation',
+          };
+          if (withIdx) {
+            taxableGain = indexedGain;
+            taxRatePct = 20;
+            section = '112 (20% with indexation, acquired before 23 Jul 2024)';
+          } else {
+            section = '112 (12.5% no indexation; lower than 20% with indexation)';
+          }
+        }
+      }
     }
   } else if (assetType === 'gold') {
     if (gainType === 'STCG') {
@@ -382,6 +472,7 @@ export function calcCapitalGains(
     totalTax: taxAmount + cess,
     netGain: gain - taxAmount - cess,
     section,
+    ...(indexation ? { indexation } : {}),
   };
 }
 

@@ -213,6 +213,19 @@ const ASSET_OPTIONS = [
         </div>
       </div>
 
+      <!-- Acquisition date (property only): enables the pre-23 Jul 2024 indexation comparison -->
+      <div id="cgt-acq-wrap" class="mb-6 hidden">
+        <label for="cgt-acq-date" class="block text-sm font-medium text-text-primary mb-1.5">Property Acquisition Date</label>
+        <input
+          type="date"
+          id="cgt-acq-date"
+          min="1950-01-01"
+          class="w-full h-11 px-3 rounded-control border border-border bg-canvas text-text-primary text-sm focus:outline-accent"
+          aria-describedby="cgt-acq-help"
+        />
+        <p id="cgt-acq-help" class="text-xs text-text-muted mt-1.5">If acquired before 23 Jul 2024 (resident individual/HUF), we compute 12.5% without indexation and 20% with indexation (CBDT Cost Inflation Index) and apply the lower. Sale date is taken as acquisition date + holding period.</p>
+      </div>
+
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="cgt-calculate" type="button">Calculate Capital Gains Tax</Button>
         <Button variant="ghost" id="cgt-reset" type="button">Reset</Button>
@@ -247,6 +260,20 @@ const ASSET_OPTIONS = [
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Health & Education Cess (4%)</span>
           <span id="cgt-result-cess" class="text-sm font-medium tabular-nums text-dark-text">{fmt(initialResult.cess)}</span>
+        </div>
+        <div id="cgt-indexation" class="hidden border-b border-dark-border">
+          <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+            <span class="text-xs text-dark-muted">Tax at 12.5% without indexation</span>
+            <span id="cgt-idx-flat" class="text-sm font-medium tabular-nums text-dark-text"></span>
+          </div>
+          <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
+            <span id="cgt-idx-label" class="text-xs text-dark-muted">Tax at 20% with indexation</span>
+            <span id="cgt-idx-indexed" class="text-sm font-medium tabular-nums text-dark-text"></span>
+          </div>
+          <div class="flex items-center justify-between py-2.5">
+            <span class="text-xs text-dark-muted">Applied (lower of the two)</span>
+            <span id="cgt-idx-applied" class="text-sm font-semibold text-dark-accent"></span>
+          </div>
         </div>
         <div class="flex items-center justify-between py-2.5">
           <span class="text-xs text-dark-muted">Statutory Provision</span>
@@ -384,7 +411,7 @@ const ASSET_OPTIONS = [
             <h3 class="text-base font-bold text-text-primary mb-2">Asset Class Comparison (Post-July 23, 2024)</h3>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
               <li><strong>Listed Equity &amp; Equity Funds:</strong> STCG (&le;12 mos) taxed at <strong>20.00%</strong> (Sec 111A). LTCG (&gt;12 mos) taxed at <strong>12.50%</strong> above <strong>₹1.25 Lakh</strong> exemption (Sec 112A).</li>
-              <li><strong>Immovable Property (Real Estate):</strong> STCG (&le;24 mos) taxed at individual slab rates. LTCG (&gt;24 mos) taxed at <strong>12.50% without indexation</strong> for transfers post-July 23, 2024.</li>
+              <li><strong>Immovable Property (Real Estate):</strong> STCG (&le;24 mos) taxed at individual slab rates. LTCG (&gt;24 mos) taxed at <strong>12.50% without indexation</strong> for transfers post-July 23, 2024; for property acquired before 23 July 2024, resident individuals/HUFs pay the lower of that and <strong>20% with indexation</strong> (enter the acquisition date).</li>
               <li><strong>Physical Gold &amp; Gold ETFs:</strong> STCG (&le;24 mos) taxed at slab rate. LTCG (&gt;24 mos) taxed at <strong>12.50%</strong> without indexation.</li>
               <li><strong>Debt Mutual Funds (Sec 50AA):</strong> Funds with &le;35% equity acquired on/after April 1, 2023 are deemed STCG and taxed at marginal income tax slab rates regardless of holding period.</li>
             </ul>
@@ -482,6 +509,8 @@ const ASSET_OPTIONS = [
     const purchaseInput = document.getElementById('cgt-purchase') as HTMLInputElement | null;
     const monthsInput = document.getElementById('cgt-months') as HTMLInputElement | null;
     const assetSelect = document.getElementById('cgt-asset') as HTMLSelectElement | null;
+    const acqWrap = document.getElementById('cgt-acq-wrap');
+    const acqDate = document.getElementById('cgt-acq-date') as HTMLInputElement | null;
 
     const saleSlider = document.getElementById('cgt-sale-slider') as HTMLInputElement | null;
     const purchaseSlider = document.getElementById('cgt-purchase-slider') as HTMLInputElement | null;
@@ -536,7 +565,23 @@ const ASSET_OPTIONS = [
       const purchase = vPurchase.value!;
       const months = vMonths.value!;
 
-      const res = calcCapitalGains(sale, purchase, months, asset);
+      acqWrap?.classList.toggle('hidden', asset !== 'real-estate');
+      const acquisitionDate = asset === 'real-estate' && acqDate?.value ? acqDate.value : undefined;
+      const res = calcCapitalGains(sale, purchase, months, asset, { acquisitionDate });
+
+      const idxBox = document.getElementById('cgt-indexation');
+      const idx = res.indexation;
+      idxBox?.classList.toggle('hidden', !idx);
+      if (idx) {
+        const setText = (id: string, text: string) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = text;
+        };
+        setText('cgt-idx-flat', fmtVal(idx.taxWithoutIndexation));
+        setText('cgt-idx-label', `Tax at 20% with indexation (CII ${idx.ciiAcquisition} → ${idx.ciiSale})`);
+        setText('cgt-idx-indexed', fmtVal(idx.taxWithIndexation));
+        setText('cgt-idx-applied', idx.applied === 'with-indexation' ? '20% with indexation' : '12.5% without indexation');
+      }
 
       setResult({
         heroValue: fmtVal(res.totalTax),
@@ -547,6 +592,12 @@ const ASSET_OPTIONS = [
           { label: 'Gain Type', value: res.gainType },
           { label: 'Tax Rate', value: `${res.taxRatePct}%` },
           { label: 'Cess (4%)', value: fmtVal(res.cess) },
+          ...(idx
+            ? [
+                { label: '12.5% without indexation', value: fmtVal(idx.taxWithoutIndexation) },
+                { label: '20% with indexation', value: fmtVal(idx.taxWithIndexation) },
+              ]
+            : []),
           { label: 'Statutory Section', value: res.section },
         ],
       });
@@ -569,7 +620,9 @@ const ASSET_OPTIONS = [
         if (valEls[1]) valEls[1].textContent = fmtVal(res.totalTax);
       }
 
-      currentHashState = { s: sale, p: purchase, m: months, a: asset };
+      currentHashState = acquisitionDate
+        ? { s: sale, p: purchase, m: months, a: asset, d: acquisitionDate }
+        : { s: sale, p: purchase, m: months, a: asset };
     }
 
     function debounce() {
@@ -609,6 +662,7 @@ const ASSET_OPTIONS = [
     sync(purchaseSlider, purchaseInput, true);
     sync(monthsSlider, monthsInput, false);
     assetSelect.addEventListener('change', recalc);
+    acqDate?.addEventListener('change', recalc);
 
     document.getElementById('cgt-calculate')?.addEventListener('click', recalc);
     document.getElementById('cgt-reset')?.addEventListener('click', () => {
@@ -616,6 +670,7 @@ const ASSET_OPTIONS = [
       purchaseInput.value = fmtLiveInput(String(DEFAULTS.purchase));
       monthsInput.value = String(DEFAULTS.months);
       assetSelect.value = DEFAULTS.asset;
+      if (acqDate) acqDate.value = '';
       if (saleSlider) {
         saleSlider.value = String(DEFAULTS.sale);
         saleSlider.style.setProperty('--slider-pct', `${((DEFAULTS.sale - 10000) / (5000000 - 10000)) * 100}%`);
@@ -651,7 +706,8 @@ const ASSET_OPTIONS = [
 
       if (!vSale.valid || !vPurchase.valid || !vMonths.valid) return;
 
-      const res = calcCapitalGains(vSale.value!, vPurchase.value!, vMonths.value!, asset);
+      const acquisitionDate = asset === 'real-estate' && acqDate?.value ? acqDate.value : undefined;
+      const res = calcCapitalGains(vSale.value!, vPurchase.value!, vMonths.value!, asset, { acquisitionDate });
       const text = `Capital Gains Tax (${res.gainType}): ${fmtVal(res.totalTax)} on gain of ${fmtVal(res.gain)} (Net retained: ${fmtVal(res.netGain)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
@@ -711,6 +767,8 @@ const ASSET_OPTIONS = [
         if (a && ['equity', 'real-estate', 'gold', 'debt-fund'].includes(a)) {
           assetSelect.value = a;
         }
+        const d = hashParams.get('d');
+        if (acqDate) acqDate.value = d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : '';
       }
       recalc();
     }

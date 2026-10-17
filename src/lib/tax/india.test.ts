@@ -255,3 +255,54 @@ describe('calcSalaryCTC', () => {
     expect(res.annualGrossSalary).toBeCloseTo(res.ctc - res.employerEPF, 2);
   });
 });
+
+describe('calcCapitalGains — property acquired before 23 Jul 2024 (indexation option)', () => {
+  it('indexation wins: 20% on indexed gain is lower than 12.5% flat', () => {
+    // Bought 1 May 2010 (FY 2010-11, CII 167) for ₹20,00,000; held 197 months → sold Oct 2026 (FY 2026-27, CII 384) for ₹80,00,000
+    // Indexed cost = 20,00,000 × 384 / 167 = 45,98,802.40; indexed gain = 34,01,197.60
+    // With indexation: 20% × 34,01,197.60 = 6,80,239.52
+    // Without: 12.5% × 60,00,000 = 7,50,000 → indexation applied
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate', { acquisitionDate: '2010-05-01' });
+    expect(res.indexation?.ciiAcquisition).toBe(167);
+    expect(res.indexation?.ciiSale).toBe(384);
+    expect(res.indexation?.saleFY).toBe('2026-27');
+    expect(res.indexation?.indexedCost).toBeCloseTo((2000000 * 384) / 167, 4);
+    expect(res.indexation?.taxWithoutIndexation).toBeCloseTo(750000, 4);
+    expect(res.indexation?.taxWithIndexation).toBeCloseTo(680239.52, 1);
+    expect(res.indexation?.applied).toBe('with-indexation');
+    expect(res.taxRatePct).toBe(20);
+    expect(res.taxAmount).toBeCloseTo(680239.52, 1);
+    expect(res.cess).toBeCloseTo(680239.52 * 0.04, 1);
+  });
+
+  it('12.5% wins: flat rate is lower than 20% with indexation', () => {
+    // Bought 1 Jun 2020 (FY 2020-21, CII 301) for ₹50,00,000; held 76 months → sold Oct 2026 (CII 384) for ₹1,00,00,000
+    // Indexed cost = 50,00,000 × 384 / 301 = 63,78,737.54; indexed gain = 36,21,262.46
+    // With indexation: 20% × 36,21,262.46 = 7,24,252.49
+    // Without: 12.5% × 50,00,000 = 6,25,000 → 12.5% applied
+    const res = calcCapitalGains(10000000, 5000000, 76, 'real-estate', { acquisitionDate: '2020-06-01' });
+    expect(res.indexation?.taxWithIndexation).toBeCloseTo(724252.49, 1);
+    expect(res.indexation?.taxWithoutIndexation).toBeCloseTo(625000, 4);
+    expect(res.indexation?.applied).toBe('without-indexation');
+    expect(res.taxRatePct).toBe(12.5);
+    expect(res.taxAmount).toBeCloseTo(625000, 4);
+  });
+
+  it('explicit sale date overrides the derived one', () => {
+    // Sale in FY 2025-26 (CII 376) instead of the derived FY 2026-27
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate', { acquisitionDate: '2010-05-01', saleDate: '2026-03-15' });
+    expect(res.indexation?.ciiSale).toBe(376);
+  });
+
+  it('no indexation option for property acquired on or after 23 Jul 2024', () => {
+    const res = calcCapitalGains(8000000, 6000000, 30, 'real-estate', { acquisitionDate: '2024-07-23' });
+    expect(res.indexation).toBeUndefined();
+    expect(res.taxRatePct).toBe(12.5);
+  });
+
+  it('no acquisition date keeps the existing 12.5% behaviour', () => {
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate');
+    expect(res.indexation).toBeUndefined();
+    expect(res.taxAmount).toBeCloseTo(750000, 4);
+  });
+});
