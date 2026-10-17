@@ -19,6 +19,9 @@
     "/og-image.png",
     "/robots.txt",
     "/sitemap.xml",
-    "/sitemap-*.xml"
+    "/sitemap-index.xml",
+    "/sitemap-pages.xml",
+    "/sitemap-tools.xml",
+    "/sitemap-hubs.xml"
   ]
 }
