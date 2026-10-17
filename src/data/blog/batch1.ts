@@ -1,4 +1,5 @@
 import type { BlogPost } from './types';
+import { K401_LIMIT_YEAR, K401_ELECTIVE_DEFERRAL_LIMIT, K401_CATCH_UP_50_PLUS, K401_CATCH_UP_60_TO_63 } from '../../lib/calculators/401k';
 
 export const BATCH_1_POSTS: BlogPost[] = [
   {
@@ -218,9 +219,9 @@ export const BATCH_1_POSTS: BlogPost[] = [
         url: 'https://www.irs.gov/publications/p560',
       },
       {
-        name: 'IRS Notice 2023-75',
-        citation: '2024 Limitations on Contributions to Qualified Retirement Plans',
-        url: 'https://www.irs.gov',
+        name: 'IRS News Release IR-2025-111 (Notice 2025-67)',
+        citation: '401(k) limit increases to $24,500 for 2026, IRA limit increases to $7,500',
+        url: 'https://www.irs.gov/newsroom/401k-limit-increases-to-24500-for-2026-ira-limit-increases-to-7500',
       },
       {
         name: 'U.S. Department of Labor',
@@ -280,7 +281,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
       {
         question: 'Can you split your 401(k) contributions between Traditional and Roth?',
         answer:
-          'Yes. Most 401(k) plan administrators allow employees to allocate their annual contribution across both accounts (for example, 50% Traditional and 50% Roth), as long as the combined total does not exceed the annual elective deferral limit set by the IRS ($23,000 for 2024, plus catch-up if age 50 or older).',
+          `Yes. Most 401(k) plan administrators allow employees to allocate their annual contribution across both accounts (for example, 50% Traditional and 50% Roth), as long as the combined total does not exceed the annual elective deferral limit set by the IRS ($${K401_ELECTIVE_DEFERRAL_LIMIT.toLocaleString('en-US')} for ${K401_LIMIT_YEAR}, plus a $${K401_CATCH_UP_50_PLUS.toLocaleString('en-US')} catch-up at age 50 or older, or $${K401_CATCH_UP_60_TO_63.toLocaleString('en-US')} at ages 60–63).`,
       },
       {
         question: 'Do Roth 401(k) plans have Required Minimum Distributions (RMDs)?',

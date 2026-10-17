@@ -6,7 +6,7 @@ import Slider from '../../components/calculator/Slider.astro';
 import Input from '../../components/ui/Input.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
-import { calc401K } from '../../lib/calculators/401k';
+import { calc401K, K401_LIMIT_YEAR, K401_ELECTIVE_DEFERRAL_LIMIT, K401_CATCH_UP_50_PLUS, K401_CATCH_UP_60_TO_63 } from '../../lib/calculators/401k';
 import { TOOLS } from '../../config/site';
 
 const DEFAULT = {
@@ -28,6 +28,9 @@ const result = calc401K(
 );
 
 const fmtUSD = (n: number) => '$' + new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n));
+
+// IRS limits come from the engine so the copy and the cap it enforces cannot drift.
+const limitText = `For ${K401_LIMIT_YEAR}, the IRS employee elective deferral limit is ${fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT)}. Workers aged 50 and older can add a ${fmtUSD(K401_CATCH_UP_50_PLUS)} catch-up (${fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT + K401_CATCH_UP_50_PLUS)} total), and those aged 60–63 a higher ${fmtUSD(K401_CATCH_UP_60_TO_63)} catch-up (${fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT + K401_CATCH_UP_60_TO_63)} total).`;
 
 const RELATED_SLUGS = ['compound-interest-calculator', 'future-value-calculator', 'savings-goal-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
@@ -90,7 +93,7 @@ const jsonld = {
           name: 'What is the annual employee contribution limit for a 401(k)?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'For 2024–2026, the IRS employee elective deferral limit is $23,000 to $23,500 per year, with an additional catch-up contribution permitted for workers aged 50 and older.',
+            text: limitText,
           },
         },
         {
@@ -174,7 +177,7 @@ const jsonld = {
           suffix="%"
           value="8"
           isNumeric={true}
-          helperText="Percentage deducted each paycheck"
+          helperText={`Percentage deducted each paycheck (capped at the ${K401_LIMIT_YEAR} IRS limit of ${fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT)}/yr)`}
           inputmode="decimal"
           aria-describedby="k401-error-msg"
         />
@@ -274,6 +277,9 @@ const jsonld = {
           <span class="text-xs text-dark-muted">Your Contributions</span>
           <span id="k401-result-emp" class="text-sm font-medium tabular-nums text-dark-text">{fmtUSD(result.employeeContributed)}</span>
         </div>
+        <p id="k401-cap-note" class:list={['text-xs text-amber-300 py-2 leading-relaxed', !result.employeeContribCapped && 'hidden']}>
+          Capped at the {K401_LIMIT_YEAR} IRS elective deferral limit of {fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT)} a year.
+        </p>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
           <span class="text-xs text-dark-muted">Employer Match (Free Money)</span>
           <span id="k401-result-er" class="text-sm font-medium tabular-nums text-dark-text">{fmtUSD(result.employerContributed)}</span>
@@ -386,7 +392,7 @@ const jsonld = {
             <strong class="text-text-primary">Immediate Vesting:</strong> Assumes 100% immediate vesting of all employer match funds. Some company plans utilize graded vesting schedules (e.g. 20% per year of service) or cliff vesting.
           </li>
           <li>
-            <strong class="text-text-primary">IRS Statutory Contribution Caps:</strong> Employee contributions cannot exceed IRS elective deferral limits ($23,000 for 2024; $23,500 for 2025; plus catch-up for age 50+).
+            <strong class="text-text-primary">IRS Statutory Contribution Caps:</strong> Your contribution is capped at the {K401_LIMIT_YEAR} IRS elective deferral limit of {fmtUSD(K401_ELECTIVE_DEFERRAL_LIMIT)} a year, and the employer match is calculated on the capped amount. Age 50+ catch-up ({fmtUSD(K401_CATCH_UP_50_PLUS)}; {fmtUSD(K401_CATCH_UP_60_TO_63)} at ages 60–63) is not added.
           </li>
           <li>
             <strong class="text-text-primary">Plan Fees Excluded:</strong> Does not deduct underlying mutual fund expense ratios, index tracking error, or plan administration charges.
@@ -406,7 +412,7 @@ const jsonld = {
           {[
             ['What is employer matching in a 401(k)?', 'Employer match is additional money contributed by your company based on your own contributions. For instance, a 50% match up to 6% of salary means that if you contribute 6% of your $100,000 salary ($6,000), your employer contributes an additional $3,000, bringing total annual contributions to $9,000.'],
             ['When can I withdraw from a 401(k) without penalty?', 'Generally, qualified penalty-free distributions can begin at age 59½. Non-qualified withdrawals prior to 59½ are typically subject to regular income taxes plus an additional 10% early withdrawal tax penalty, barring specific statutory exceptions.'],
-            ['What is the annual employee contribution limit for a 401(k)?', 'For 2024–2026, the IRS employee elective deferral limit is $23,000 to $23,500 per year, with an additional catch-up contribution permitted for workers aged 50 and older.'],
+            ['What is the annual employee contribution limit for a 401(k)?', limitText],
             ['What is the difference between Traditional and Roth 401(k)?', 'A Traditional 401(k) is funded with pre-tax dollars, lowering your taxable income today, and withdrawals in retirement are taxed as ordinary income. A Roth 401(k) is funded with after-tax dollars, but qualified withdrawals in retirement are completely tax-free.'],
             ['What average annual return rate is realistic for a 401(k)?', 'Historically, broad US equity indices like the S&P 500 have generated long-term nominal annualized returns around 9% to 10% (around 7% real after inflation). Diversified retirement portfolios containing bonds typically project between 6% and 8% p.a.'],
           ].map(([q, a]) => (
@@ -541,6 +547,7 @@ const jsonld = {
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resEmp) resEmp.textContent = fmtVal(res.employeeContributed);
+      document.getElementById('k401-cap-note')?.classList.toggle('hidden', !res.employeeContribCapped);
       if (resEr) resEr.textContent = fmtVal(res.employerContributed);
       if (resTotalContrib) resTotalContrib.textContent = fmtVal(res.totalContributed);
       if (resGain) resGain.textContent = fmtVal(res.gain);
