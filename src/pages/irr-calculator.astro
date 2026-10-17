@@ -22,6 +22,9 @@ const npvAtHurdle = calcNPV(DEFAULT.hurdle, flows);
 const totalInflows = DEFAULT.cfs.reduce((a, b) => a + b, 0);
 
 const fmt = (n: number) => (n < 0 ? '-' : '') + '₹' + formatIndian(Math.abs(Math.round(n)));
+// Worked example below is rendered from the same engine results as the calculator (the defaults).
+const exIrr = `${result.irrPct.toFixed(2)}%`;
+const exSpread = result.irrPct - DEFAULT.hurdle;
 
 const RELATED_SLUGS = ['npv-calculator', 'payback-period-calculator', 'wacc-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
@@ -170,19 +173,19 @@ const jsonld = {
 
       <!-- Cash Inflows -->
       <div class="border-t border-border pt-4 mb-6">
-        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Annual Inflows</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Annual Cash Flows <span class="normal-case font-normal">(enter a negative value for an outflow)</span></div>
         <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
           <div>
-            <Input id="irr-cf1" label="Year 1 Inflow" prefix="₹" value="30,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
+            <Input id="irr-cf1" label="Year 1 Cash Flow" prefix="₹" value="30,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
           </div>
           <div>
-            <Input id="irr-cf2" label="Year 2 Inflow" prefix="₹" value="40,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
+            <Input id="irr-cf2" label="Year 2 Cash Flow" prefix="₹" value="40,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
           </div>
           <div>
-            <Input id="irr-cf3" label="Year 3 Inflow" prefix="₹" value="50,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
+            <Input id="irr-cf3" label="Year 3 Cash Flow" prefix="₹" value="50,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
           </div>
           <div>
-            <Input id="irr-cf4" label="Year 4 Inflow" prefix="₹" value="60,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
+            <Input id="irr-cf4" label="Year 4 Cash Flow" prefix="₹" value="60,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
           </div>
         </div>
       </div>
@@ -203,6 +206,13 @@ const jsonld = {
         <div id="irr-result-val" class="text-[40px] leading-none font-semibold tabular-nums text-dark-text" aria-live="polite">
           {result.valid ? result.irrPct.toFixed(2) + '%' : 'N/A'}
         </div>
+        <p
+          id="irr-multi-warning"
+          role="status"
+          class:list={['text-xs text-amber-300 mt-2 leading-relaxed', !result.multipleIRRsPossible && 'hidden']}
+        >
+          Cash flows change sign more than once, so more than one IRR may exist. The figure shown is one solution; compare projects with NPV instead.
+        </p>
         <p id="irr-plain-translation" class="text-xs text-dark-muted mt-1.5 leading-relaxed">
           {result.valid ? (
             result.irrPct >= DEFAULT.hurdle ? (
@@ -288,17 +298,17 @@ const jsonld = {
         <h2 id="irr-example" class="text-xl font-bold text-text-primary mb-4">Worked Example: Commercial Fleet Acquisition</h2>
         <div class="bg-surface border border-border rounded-card p-5 space-y-3 text-sm text-text-muted leading-relaxed">
           <p>
-            A delivery logistics firm invests <strong>₹1,00,000</strong> in a regional fleet route. Over 4 years, the route generates annual net cash inflows of <strong>₹30,000</strong>, <strong>₹40,000</strong>, <strong>₹50,000</strong>, and <strong>₹60,000</strong>. The firm's corporate hurdle rate is <strong>12%</strong>:
+            A delivery logistics firm invests <strong>{fmt(DEFAULT.initial)}</strong> in a regional fleet route. Over {DEFAULT.cfs.length} years, the route generates annual net cash inflows of {DEFAULT.cfs.map((cf, i) => <>{i === DEFAULT.cfs.length - 1 ? 'and ' : ''}<strong>{fmt(cf)}</strong>{i < DEFAULT.cfs.length - 1 ? ', ' : ''}</>)}. The firm's corporate hurdle rate is <strong>{DEFAULT.hurdle}%</strong>:
           </p>
           <ul class="list-disc pl-5 space-y-1">
-            <li><strong>Initial Capital Outflow (Year 0):</strong> &minus;₹1,00,000</li>
-            <li><strong>Total Undiscounted Inflows:</strong> ₹30,000 + ₹40,000 + ₹50,000 + ₹60,000 = <strong>₹1,80,000</strong></li>
-            <li><strong>Solved IRR:</strong> <strong>24.89%</strong> (annualized compound return)</li>
-            <li><strong>Hurdle Comparison:</strong> 24.89% vs 12.00% (+12.89% positive excess spread)</li>
-            <li><strong>NPV at 12% Cost of Capital:</strong> <strong>₹33,838</strong></li>
+            <li><strong>Initial Capital Outflow (Year 0):</strong> &minus;{fmt(DEFAULT.initial)}</li>
+            <li><strong>Total Undiscounted Inflows:</strong> {DEFAULT.cfs.map(fmt).join(' + ')} = <strong>{fmt(totalInflows)}</strong></li>
+            <li><strong>Solved IRR:</strong> <strong>{exIrr}</strong> (annualized compound return)</li>
+            <li><strong>Hurdle Comparison:</strong> {exIrr} vs {DEFAULT.hurdle.toFixed(2)}% ({exSpread >= 0 ? '+' : ''}{exSpread.toFixed(2)}% {exSpread >= 0 ? 'positive' : 'negative'} excess spread)</li>
+            <li><strong>NPV at {DEFAULT.hurdle}% Cost of Capital:</strong> <strong>{fmt(npvAtHurdle)}</strong></li>
           </ul>
           <p>
-            Because the project's IRR of 24.89% exceeds the 12% cost of borrowing by nearly 13 percentage points, the project delivers exceptional risk-adjusted value and should be approved.
+            Because the project's IRR of {exIrr} exceeds the {DEFAULT.hurdle}% cost of borrowing by about {Math.round(exSpread)} percentage points, the project delivers exceptional risk-adjusted value and should be approved.
           </p>
         </div>
       </section>
@@ -307,7 +317,7 @@ const jsonld = {
       <section aria-labelledby="irr-assumptions" class="mt-8">
         <h2 id="irr-assumptions" class="text-xl font-bold text-text-primary mb-4">Key Assumptions and Limitations</h2>
         <div class="bg-surface border border-border rounded-card p-5 space-y-2 text-sm text-text-muted leading-relaxed">
-          <p>• <strong>Reinvestment Rate Trap:</strong> Assumes intermediate cash inflows are reinvested throughout the term at the IRR rate (24.89%), which is often unrealistically high compared to general market yields.</p>
+          <p>• <strong>Reinvestment Rate Trap:</strong> Assumes intermediate cash inflows are reinvested throughout the term at the IRR rate ({exIrr}), which is often unrealistically high compared to general market yields.</p>
           <p>• <strong>Scale Insensitivity:</strong> IRR is a percentage metric that does not account for the absolute dollar size of investment projects.</p>
           <p>• <strong>Multiple Sign Changes:</strong> Projects with alternating cash flow directions (e.g. environmental restoration at decommissioning) may yield multiple or complex IRRs.</p>
           <p>• <strong>Equal Timing Intervals:</strong> Assumes uniform annual cash flow intervals.</p>
@@ -402,10 +412,10 @@ const jsonld = {
   const irrSchema = {
     h: { required: true, min: 0, max: 100, decimal: true, label: 'Hurdle Rate' },
     c0: { required: true, min: 0.01, max: 10000000000, decimal: true, label: 'Initial Outflow' },
-    c1: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 1 Inflow' },
-    c2: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 2 Inflow' },
-    c3: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 3 Inflow' },
-    c4: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 4 Inflow' },
+    c1: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 1 Cash Flow' },
+    c2: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 2 Cash Flow' },
+    c3: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 3 Cash Flow' },
+    c4: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 4 Cash Flow' },
   };
 
   function initIRRCalc() {
@@ -499,7 +509,7 @@ const jsonld = {
       const c3 = valC3.value!;
       const c4 = valC4.value!;
 
-      if (c1 + c2 + c3 + c4 <= 0) {
+      if (![c1, c2, c3, c4].some((c) => c > 0)) {
         showError('At least one positive cash inflow is required to calculate IRR.');
         return;
       }
@@ -508,6 +518,7 @@ const jsonld = {
       const res = calcIRR(flows);
 
       if (!res.valid) {
+        document.getElementById('irr-multi-warning')?.classList.add('hidden');
         showError(res.error || 'Cannot calculate IRR for the provided cash flows.');
         const heroVal = 'N/A';
         setResult({
@@ -525,6 +536,8 @@ const jsonld = {
       }
 
       hideError();
+      // More than one sign change (e.g. a negative year after inflows) can produce several IRRs.
+      document.getElementById('irr-multi-warning')?.classList.toggle('hidden', !res.multipleIRRsPossible);
       const npv = calcNPV(h, flows);
       const totalInflows = c1 + c2 + c3 + c4;
       const netProfit = totalInflows - c0;

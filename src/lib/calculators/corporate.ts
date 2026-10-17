@@ -182,13 +182,31 @@ export interface IRRResult {
   irrPct: number;
   valid: boolean;
   error?: string;
+  /** Number of sign changes in the cash-flow series (zeros ignored). */
+  signChanges: number;
+  /** True when cash flows change sign more than once, so more than one IRR may exist. */
+  multipleIRRsPossible: boolean;
+}
+
+/** Counts sign changes in a cash-flow series, ignoring zero flows. */
+export function countSignChanges(cashFlows: number[]): number {
+  let changes = 0;
+  let prev = 0;
+  for (const cf of cashFlows) {
+    if (cf === 0) continue;
+    if (prev !== 0 && Math.sign(cf) !== Math.sign(prev)) changes++;
+    prev = cf;
+  }
+  return changes;
 }
 
 export function calcIRR(cashFlows: number[], maxIter = 1000, tol = 1e-7): IRRResult {
+  const signChanges = countSignChanges(cashFlows);
+  const multipleIRRsPossible = signChanges > 1;
   const hasNeg = cashFlows.some((c) => c < 0);
   const hasPos = cashFlows.some((c) => c > 0);
   if (!hasNeg || !hasPos) {
-    return { irr: 0, irrPct: 0, valid: false, error: 'Requires at least one negative outflow and one positive inflow.' };
+    return { irr: 0, irrPct: 0, valid: false, error: 'Requires at least one negative outflow and one positive inflow.', signChanges, multipleIRRsPossible };
   }
 
   const startRates = [0.1, 0.05, 0.2, -0.05, 0.5];
@@ -207,14 +225,14 @@ export function calcIRR(cashFlows: number[], maxIter = 1000, tol = 1e-7): IRRRes
         const checkNPV = calcNPV(newRate * 100, cashFlows);
         const maxFlow = Math.max(...cashFlows.map(Math.abs));
         if (Math.abs(checkNPV) < Math.max(1, maxFlow * 1e-4)) {
-          return { irr: newRate, irrPct: newRate * 100, valid: true };
+          return { irr: newRate, irrPct: newRate * 100, valid: true, signChanges, multipleIRRsPossible };
         }
       }
       rate = newRate;
     }
   }
 
-  return { irr: 0, irrPct: 0, valid: false, error: 'IRR did not converge to a finite real rate.' };
+  return { irr: 0, irrPct: 0, valid: false, error: 'IRR did not converge to a finite real rate.', signChanges, multipleIRRsPossible };
 }
 
 // ── Payback Period ────────────────────────────────────────────────────────────
