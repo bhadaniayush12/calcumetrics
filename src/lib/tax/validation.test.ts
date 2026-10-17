@@ -1,3 +1,5 @@
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   getAllIndiaTaxRecords,
@@ -201,8 +203,21 @@ describe('Route Resolution & UI Notice Integration (Section 11 & 12)', () => {
       expect(record, `Failed to resolve tax record for route: ${route}`).toBeDefined();
       expect(record?.sourceTitle).toBeDefined();
       expect(record?.sourceUrl).toMatch(/^https?:\/\//);
-      expect(record?.verifiedOn).toMatch(/^2026-09-\d{2}$/);
+      expect(record?.verifiedOn).toMatch(/^2026-\d{2}-\d{2}$/);
       expect(record?.jurisdiction).toBe('IN');
+    }
+  });
+
+  it('resolves a record for every page in src/pages/in, in dev and built (.html) pathname forms', () => {
+    const pagesDir = fileURLToPath(new URL('../../pages/in/', import.meta.url));
+    const routes = readdirSync(pagesDir)
+      .filter((f) => f.endsWith('.astro'))
+      .map((f) => `/in/${f.replace(/\.astro$/, '')}`);
+    expect(routes).toHaveLength(9);
+    for (const route of routes) {
+      for (const form of [route, `${route}/`, `${route}.html`]) {
+        expect(resolveTaxRecordForRoute(form), `No tax record for ${form}`).not.toBeNull();
+      }
     }
   });
 

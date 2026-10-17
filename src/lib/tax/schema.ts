@@ -400,10 +400,20 @@ const ROUTE_TAX_RECORD_MAP: Record<string, TaxRecord> = {
   '/in/upi-mdr-calculator': INDIA_TAX_DATA.upiMDR.current,
 };
 
+/** All routes that carry an India tax record (used by tests and shared UI). */
+export const INDIA_TAX_ROUTES = Object.keys(ROUTE_TAX_RECORD_MAP);
+
+/**
+ * Normalizes a router pathname for lookup. With build.format 'file' Astro.url.pathname
+ * ends in ".html" at build time, so strip that as well as any trailing slash.
+ */
+export function normalizeRoutePath(pathname: string): string {
+  return pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+}
+
 /**
  * Resolves the authoritative tax record for a given router pathname.
  */
 export function resolveTaxRecordForRoute(pathname: string): TaxRecord | null {
-  const normalized = pathname.replace(/\/$/, '') || '/';
-  return ROUTE_TAX_RECORD_MAP[normalized] ?? null;
+  return ROUTE_TAX_RECORD_MAP[normalizeRoutePath(pathname)] ?? null;
 }
