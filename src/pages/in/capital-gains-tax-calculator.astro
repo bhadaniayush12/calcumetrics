@@ -213,9 +213,9 @@ const ASSET_OPTIONS = [
         </div>
       </div>
 
-      <!-- Acquisition date (property only): enables the pre-23 Jul 2024 indexation comparison -->
+      <!-- Acquisition date (property and debt funds): pre-23 Jul 2024 indexation option / Section 50AA test -->
       <div id="cgt-acq-wrap" class="mb-6 hidden">
-        <label for="cgt-acq-date" class="block text-sm font-medium text-text-primary mb-1.5">Property Acquisition Date</label>
+        <label for="cgt-acq-date" class="block text-sm font-medium text-text-primary mb-1.5">Acquisition Date</label>
         <input
           type="date"
           id="cgt-acq-date"
@@ -223,7 +223,7 @@ const ASSET_OPTIONS = [
           class="w-full h-11 px-3 rounded-control border border-border bg-canvas text-text-primary text-sm focus:outline-accent"
           aria-describedby="cgt-acq-help"
         />
-        <p id="cgt-acq-help" class="text-xs text-text-muted mt-1.5">If acquired before 23 Jul 2024 (resident individual/HUF), we compute 12.5% without indexation and 20% with indexation (CBDT Cost Inflation Index) and apply the lower. Sale date is taken as acquisition date + holding period.</p>
+        <p id="cgt-acq-help" class="text-xs text-text-muted mt-1.5">If acquired before 23 Jul 2024 (resident individual/HUF), we compute 12.5% without indexation and 20% with indexation (CBDT Cost Inflation Index) and apply the lower. Sale date is taken as acquisition date + holding period. For debt funds: units bought on or after 1 Apr 2023 are always short-term (Section 50AA); leave blank to assume that.</p>
       </div>
 
       <div class="flex gap-3 mt-6">
@@ -565,8 +565,8 @@ const ASSET_OPTIONS = [
       const purchase = vPurchase.value!;
       const months = vMonths.value!;
 
-      acqWrap?.classList.toggle('hidden', asset !== 'real-estate');
-      const acquisitionDate = asset === 'real-estate' && acqDate?.value ? acqDate.value : undefined;
+      acqWrap?.classList.toggle('hidden', asset !== 'real-estate' && asset !== 'debt-fund');
+      const acquisitionDate = (asset === 'real-estate' || asset === 'debt-fund') && acqDate?.value ? acqDate.value : undefined;
       const res = calcCapitalGains(sale, purchase, months, asset, { acquisitionDate });
 
       const idxBox = document.getElementById('cgt-indexation');
@@ -706,7 +706,7 @@ const ASSET_OPTIONS = [
 
       if (!vSale.valid || !vPurchase.valid || !vMonths.valid) return;
 
-      const acquisitionDate = asset === 'real-estate' && acqDate?.value ? acqDate.value : undefined;
+      const acquisitionDate = (asset === 'real-estate' || asset === 'debt-fund') && acqDate?.value ? acqDate.value : undefined;
       const res = calcCapitalGains(vSale.value!, vPurchase.value!, vMonths.value!, asset, { acquisitionDate });
       const text = `Capital Gains Tax (${res.gainType}): ${fmtVal(res.totalTax)} on gain of ${fmtVal(res.gain)} (Net retained: ${fmtVal(res.netGain)}). ${location.href.split('#')[0]}`;
       try {
