@@ -13,7 +13,10 @@ import { SBI_OCTOBER_POST } from './sbi-home-loan-rate-hike-october-2026-emi';
 
 import { SMALL_SAVINGS_POST } from './small-savings-rates-october-december-2026';
 
+import { DIWALI_BONUS_POST } from './diwali-bonus-2026-lump-sum-sip-or-prepay';
+
 export const BLOG_POSTS: BlogPost[] = [
+  DIWALI_BONUS_POST,
   SMALL_SAVINGS_POST,
   SBI_OCTOBER_POST,
   JIO_IPO_POST,
