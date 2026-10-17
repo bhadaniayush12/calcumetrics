@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   calcAmortization,
+  summarizeScheduleByYear,
   calcAffordability,
   calcDTI,
   calcCreditCardPayoff,
@@ -149,5 +150,32 @@ describe('calcImpliedRate', () => {
     const res = calcImpliedRate(100000, 10, 5);
     expect(Number.isNaN(res.annualRatePct)).toBe(false);
     expect(Number.isFinite(res.annualRatePct) || res.annualRatePct === 0).toBe(true);
+  });
+});
+
+describe('summarizeScheduleByYear', () => {
+  it('groups a 5-year schedule into 5 rows that reconcile to the loan', () => {
+    const res = calcAmortization(1000000, 9.5, 5, true);
+    const years = summarizeScheduleByYear(res.schedule, 1000000);
+    expect(years).toHaveLength(5);
+    expect(years[0].openingBalance).toBe(1000000);
+    for (let i = 1; i < years.length; i++) {
+      expect(years[i].openingBalance).toBeCloseTo(years[i - 1].closingBalance, 6);
+    }
+    for (const y of years) {
+      expect(y.openingBalance - y.principal).toBeCloseTo(y.closingBalance, 4);
+    }
+    expect(years[4].closingBalance).toBeCloseTo(0, 4);
+    const totalPrincipal = years.reduce((s, y) => s + y.principal, 0);
+    const totalInterest = years.reduce((s, y) => s + y.interest, 0);
+    expect(totalPrincipal).toBeCloseTo(1000000, 4);
+    expect(totalInterest).toBeCloseTo(res.totalInterest, 4);
+  });
+
+  it('handles a final partial year', () => {
+    const res = calcAmortization(100000, 10, 1.5, true); // 18 months
+    const years = summarizeScheduleByYear(res.schedule, 100000);
+    expect(years).toHaveLength(2);
+    expect(years[1].closingBalance).toBeCloseTo(0, 4);
   });
 });

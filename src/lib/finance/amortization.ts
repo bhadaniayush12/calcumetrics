@@ -105,6 +105,38 @@ export function calcAmortization(
   };
 }
 
+// ── Year-by-year schedule summary ─────────────────────────────────────────────
+export interface AmortizationYear {
+  year: number;
+  openingBalance: number;
+  principal: number;
+  interest: number;
+  closingBalance: number;
+}
+
+/**
+ * Groups a monthly schedule (from calcAmortization(..., true)) into 12-month years.
+ */
+export function summarizeScheduleByYear(schedule: AmortizationPeriod[], principal: number): AmortizationYear[] {
+  const years: AmortizationYear[] = [];
+  let opening = principal;
+  for (let start = 0; start < schedule.length; start += 12) {
+    const months = schedule.slice(start, start + 12);
+    const principalPaid = months.reduce((sum, m) => sum + m.principal, 0);
+    const interestPaid = months.reduce((sum, m) => sum + m.interest, 0);
+    const closing = months[months.length - 1].balance;
+    years.push({
+      year: start / 12 + 1,
+      openingBalance: opening,
+      principal: principalPaid,
+      interest: interestPaid,
+      closingBalance: closing,
+    });
+    opening = closing;
+  }
+  return years;
+}
+
 // ── Max Affordable Principal (Loan Affordability) ────────────────────────────
 
 export interface AffordabilityResult {
