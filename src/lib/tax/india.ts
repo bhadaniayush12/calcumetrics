@@ -46,7 +46,7 @@ export interface GSTResult {
  * Calculate GST amounts.
  *
  * @param amount   - Price amount.
- * @param ratePct  - GST rate (0, 5, 12, 18, or 28).
+ * @param ratePct  - GST rate: 0, 5, 18 or 40 (current slabs from 22 Sep 2025), or the legacy 12 or 28.
  * @param mode     - 'exclusive' if amount is pre-GST; 'inclusive' if amount includes GST.
  */
 export function calcGST(
@@ -147,9 +147,9 @@ export function calcHRA(
 
 /**
  * TDS scenarios supported.
- * Rates sourced from Finance Act 2024-25.
- * Source: income-taxindia.gov.in; Finance Act 2024-25.
- * Rates last verified: September 2026.
+ * Rates per Finance (No.2) Act 2024 (194H/194D cut to 2%); thresholds per Finance Act 2025
+ * (rationalised from 1 April 2025). Source recorded in data/tax/india/tds/current.json.
+ * Rates last verified: October 2026.
  */
 export type TDSSection =
   | '192'   // Salary
@@ -171,8 +171,9 @@ export type TDSSection =
 
 /**
  * TDS rate table for individuals (non-company, PAN-furnished).
- * Finance Act 2024-25 rates. Higher rate applies when PAN not furnished.
- * Rates last verified: September 2026.
+ * Finance (No.2) Act 2024 rates, Finance Act 2025 thresholds. Higher rate applies when PAN not furnished.
+ * Must match data/tax/india/tds/current.json (enforced by india.test.ts).
+ * Rates last verified: October 2026.
  */
 export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number; description: string }> = {
   '192':   { ratePct: 0, threshold: 0, description: 'Salary — as per income tax slab (computed separately)' },
@@ -183,10 +184,10 @@ export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number;
   '194B':  { ratePct: 30, threshold: 10000, description: 'Lottery / crossword winnings' },
   '194BB': { ratePct: 30, threshold: 10000, description: 'Horse race winnings' },
   '194C':  { ratePct: 1, threshold: 30000, description: 'Contractor (individual/HUF); 2% for others' },
-  '194D':  { ratePct: 5, threshold: 15000, description: 'Insurance commission' },
-  '194H':  { ratePct: 5, threshold: 15000, description: 'Commission / brokerage' },
-  '194I':  { ratePct: 10, threshold: 240000, description: 'Rent (land/building); 2% for plant/machinery' },
-  '194J':  { ratePct: 10, threshold: 30000, description: 'Professional services; 2% for technical services' },
+  '194D':  { ratePct: 2, threshold: 20000, description: 'Insurance commission (non-company payee)' },
+  '194H':  { ratePct: 2, threshold: 20000, description: 'Commission / brokerage' },
+  '194I':  { ratePct: 10, threshold: 600000, description: 'Rent (land/building) — ₹50,000 a month; 2% for plant/machinery' },
+  '194J':  { ratePct: 10, threshold: 50000, description: 'Professional services; 2% for technical services' },
   '194LA': { ratePct: 10, threshold: 250000, description: 'Compensation on compulsory acquisition' },
   '194N':  { ratePct: 2, threshold: 2000000, description: 'Cash withdrawal > ₹20 lakh' },
   '194O':  { ratePct: 0.1, threshold: 500000, description: 'E-commerce operator payments (0.1% from 1 Oct 2024)' },
@@ -274,7 +275,11 @@ export interface IndexationComparison {
 }
 
 export interface CapitalGainsOptions {
-  /** ISO date (YYYY-MM-DD) the property was acquired. Enables the pre-23 Jul 2024 indexation option. */
+  /**
+   * ISO date (YYYY-MM-DD) the asset was acquired. Enables the pre-23 Jul 2024 indexation option
+   * for property, and the holding-period test for debt-fund units bought before 1 Apr 2023.
+   * Debt funds with no acquisition date are treated as bought on/after 1 Apr 2023 (Section 50AA).
+   */
   acquisitionDate?: string;
   /** ISO date of sale. Defaults to acquisitionDate + holdingMonths. */
   saleDate?: string;
@@ -286,6 +291,9 @@ export const COST_INFLATION_INDEX: Record<string, number> =
 
 /** Land/buildings acquired before this date keep the 20%-with-indexation option (Finance (No.2) Act 2024). */
 export const INDEXATION_CUTOFF_DATE: string = capitalGainsFY2026_27.values.indexationCutoffDate;
+
+/** Specified (debt) MF units acquired on or after this date are always short-term (Section 50AA). */
+export const DEBT_FUND_50AA_DATE: string = capitalGainsFY2026_27.values.debtFund50AAFromDate;
 
 /** Financial year label ("2026-27") for an ISO date. */
 export function financialYearOf(isoDate: string): string {
@@ -338,7 +346,7 @@ export interface CapitalGainsResult {
 const LTCG_THRESHOLD_MONTHS: Record<AssetType, number> = {
   equity: 12,         // Listed equity / equity MF: more than 12 months
   'equity-fund': 12,
-  'debt-fund': Infinity, // Section 50AA: deemed short-term regardless of holding period
+  'debt-fund': 24,    // Only for units acquired before 1 Apr 2023; later units are always STCG (Section 50AA)
   'real-estate': 24,  // Immovable property: more than 24 months (Budget 2024 changed from 36)
   gold: 24,           // Physical gold & SGBs: more than 24 months (Budget 2024)
   other: 24,
@@ -368,7 +376,10 @@ export function calcCapitalGains(
 ): CapitalGainsResult {
   const gain = salePrice - purchasePrice;
   const ltcgThreshold = LTCG_THRESHOLD_MONTHS[assetType];
-  const gainType: 'LTCG' | 'STCG' = holdingMonths > ltcgThreshold ? 'LTCG' : 'STCG';
+  // Section 50AA: debt-fund units acquired on/after 1 Apr 2023 are short-term whatever the holding period.
+  const isSection50AA =
+    assetType === 'debt-fund' && !(options.acquisitionDate && options.acquisitionDate < DEBT_FUND_50AA_DATE);
+  const gainType: 'LTCG' | 'STCG' = !isSection50AA && holdingMonths > ltcgThreshold ? 'LTCG' : 'STCG';
 
   // Gains ≤ 0 — no tax
   if (gain <= 0) {
@@ -395,11 +406,16 @@ export function calcCapitalGains(
       taxRatePct = 12.5;
       section = '112A';
     }
-  } else if (assetType === 'debt-fund') {
+  } else if (assetType === 'debt-fund' && isSection50AA) {
     // Debt funds (purchased on/after 1 April 2023): deemed STCG under Section 50AA, taxed at slab rate.
     // This tool does not know the user's slab, so we report 30% (highest slab) as a conservative estimate
     taxRatePct = 30;
     section = '50AA (slab rate — conservative estimate at 30%)';
+  } else if (assetType === 'debt-fund') {
+    // Units acquired before 1 April 2023: normal rules. More than 24 months → LTCG under Section 112
+    // at 12.5% without indexation (transfers on/after 23 July 2024); otherwise slab rate.
+    taxRatePct = gainType === 'STCG' ? 30 : 12.5;
+    section = gainType === 'STCG' ? 'Slab rate (conservative estimate at 30%)' : '112 (12.5%, acquired before 1 Apr 2023)';
   } else if (assetType === 'real-estate') {
     if (gainType === 'STCG') {
       taxRatePct = 30; // Slab rate (conservative)

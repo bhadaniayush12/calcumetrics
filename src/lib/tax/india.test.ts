@@ -122,7 +122,7 @@ describe('calcTDS', () => {
   });
 
   it('senior citizen flag does not change other sections', () => {
-    expect(calcTDS(100000, '194J', { seniorCitizen: true }).threshold).toBe(30000);
+    expect(calcTDS(100000, '194J', { seniorCitizen: true }).threshold).toBe(50000);
   });
 
   it('194O e-commerce: 0.1% from 1 Oct 2024 (Finance (No.2) Act 2024)', () => {
@@ -196,6 +196,23 @@ describe('calcCapitalGains holding-period boundaries', () => {
 
   it('treats debt funds as deemed STCG regardless of holding (Section 50AA)', () => {
     expect(calcCapitalGains(500000, 300000, 120, 'debt-fund').gainType).toBe('STCG');
+  });
+
+  it('applies Section 50AA by acquisition date: on/after 1 Apr 2023 always STCG', () => {
+    const after = calcCapitalGains(500000, 300000, 36, 'debt-fund', { acquisitionDate: '2023-04-01' });
+    expect(after.gainType).toBe('STCG');
+    expect(after.section).toMatch(/50AA/);
+    expect(calcCapitalGains(500000, 300000, 40, 'debt-fund', { acquisitionDate: '2023-06-15' }).gainType).toBe('STCG');
+  });
+
+  it('debt-fund units acquired before 1 Apr 2023 use the 24-month rule', () => {
+    const lt = calcCapitalGains(500000, 300000, 30, 'debt-fund', { acquisitionDate: '2023-03-31' });
+    expect(lt.gainType).toBe('LTCG');
+    expect(lt.taxRatePct).toBe(12.5);
+    expect(lt.taxAmount).toBeCloseTo(25000, 2);
+    const st = calcCapitalGains(500000, 300000, 24, 'debt-fund', { acquisitionDate: '2022-01-10' });
+    expect(st.gainType).toBe('STCG');
+    expect(st.section).not.toMatch(/50AA/);
   });
 
   it('applies 12.5% LTCG to other assets after Budget 2024', () => {
