@@ -16,6 +16,17 @@ const result = calcAmortization(principal, DEFAULT.rate, DEFAULT.years);
 const fmtCurrency = (n: number, sym = '$', locale = 'en-US') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 
+// Worked example table is rendered from the same engine result as the calculator.
+const exDown = DEFAULT.homePrice - principal;
+const exMonthlyRatePct = DEFAULT.rate / 12;
+const exMonth1Interest = principal * (exMonthlyRatePct / 100);
+const exMonth1Principal = result.emi - exMonth1Interest;
+const exOutlay = exDown + result.totalPayment;
+const usd = (n: number) => fmtCurrency(n);
+const usdK = (n: number) => `$${Math.round(n / 1000)}k`;
+const ex15 = calcAmortization(principal, DEFAULT.rate, 15);
+const ex20 = calcAmortization(principal, DEFAULT.rate, 20);
+
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'mortgage-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/mortgage-calculator';
 const jsonld = {
@@ -276,7 +287,7 @@ const jsonld = {
 
         <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Consider a home purchased for <strong>$400,000</strong> with a <strong>20% down payment</strong> ($80,000) paid upfront, leaving a net loan of <strong>$320,000</strong> at a fixed rate of <strong>6.75%</strong> over <strong>30 years (360 months)</strong>:
+          Consider a home purchased for <strong>{usd(DEFAULT.homePrice)}</strong> with a <strong>{DEFAULT.downPaymentPct}% down payment</strong> ({usd(exDown)}) paid upfront, leaving a net loan of <strong>{usd(principal)}</strong> at a fixed rate of <strong>{DEFAULT.rate}%</strong> over <strong>{DEFAULT.years} years ({result.tenureMonths} months)</strong>:
         </p>
 
         <div class="overflow-x-auto border border-border rounded-card mb-6">
@@ -293,50 +304,50 @@ const jsonld = {
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Home Purchase Price</td>
                 <td class="py-2.5 px-4 font-mono">Agreed Contract Price</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">$400,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{usd(DEFAULT.homePrice)}</td>
                 <td class="py-2.5 px-4">Total gross real estate transaction value.</td>
               </tr>
               <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Down Payment (20%)</td>
-                <td class="py-2.5 px-4 font-mono">$400,000 &times; 20%</td>
-                <td class="py-2.5 px-4 font-mono">$80,000</td>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Down Payment ({DEFAULT.downPaymentPct}%)</td>
+                <td class="py-2.5 px-4 font-mono">{usd(DEFAULT.homePrice)} &times; {DEFAULT.downPaymentPct}%</td>
+                <td class="py-2.5 px-4 font-mono">{usd(exDown)}</td>
                 <td class="py-2.5 px-4">Instant equity buffer; avoids PMI requirement.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Net Principal Borrowed (P)</td>
-                <td class="py-2.5 px-4 font-mono">$400,000 &minus; $80,000</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">$320,000</td>
-                <td class="py-2.5 px-4">Total loan amount disbursed and amortized over 30 years.</td>
+                <td class="py-2.5 px-4 font-mono">{usd(DEFAULT.homePrice)} &minus; {usd(exDown)}</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{usd(principal)}</td>
+                <td class="py-2.5 px-4">Total loan amount disbursed and amortized over {DEFAULT.years} years.</td>
               </tr>
               <tr class="bg-surface/50 font-semibold text-text-primary">
                 <td class="py-2.5 px-4">Monthly Mortgage Payment</td>
-                <td class="py-2.5 px-4 font-mono">Amortization Formula (n=360, r=0.5625%)</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">$2,076 / Month</td>
-                <td class="py-2.5 px-4">Fixed monthly payment for 30 years.</td>
+                <td class="py-2.5 px-4 font-mono">Amortization Formula (n={result.tenureMonths}, r={exMonthlyRatePct.toFixed(4)}%)</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">{usd(result.emi)} / Month</td>
+                <td class="py-2.5 px-4">Fixed monthly payment for {DEFAULT.years} years.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
-                <td class="py-2.5 px-4 font-mono">Interest: $320k &times; 0.5625% = $1,800<br />Principal: $2,076 &minus; $1,800 = $276</td>
-                <td class="py-2.5 px-4 font-mono">86.7% Interest / 13.3% Principal</td>
+                <td class="py-2.5 px-4 font-mono">Interest: {usdK(principal)} &times; {exMonthlyRatePct.toFixed(4)}% = {usd(exMonth1Interest)}<br />Principal: {usd(result.emi)} &minus; {usd(exMonth1Interest)} = {usd(exMonth1Principal)}</td>
+                <td class="py-2.5 px-4 font-mono">{((exMonth1Interest / result.emi) * 100).toFixed(1)}% Interest / {((exMonth1Principal / result.emi) * 100).toFixed(1)}% Principal</td>
                 <td class="py-2.5 px-4">Early payments are overwhelmingly interest — equity builds slowly at first.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Repaid</td>
                 <td class="py-2.5 px-4 font-mono">Original Principal</td>
-                <td class="py-2.5 px-4 font-mono">$320,000 (42.8%)</td>
+                <td class="py-2.5 px-4 font-mono">{usd(principal)} ({(result.principalFraction * 100).toFixed(1)}%)</td>
                 <td class="py-2.5 px-4">Retires the entirety of debt obligation.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Paid</td>
-                <td class="py-2.5 px-4 font-mono">($2,076 &times; 360) &minus; $320,000</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">$427,185 (57.2%)</td>
-                <td class="py-2.5 px-4">Interest exceeds the original loan amount over 30 years.</td>
+                <td class="py-2.5 px-4 font-mono">({usd(result.emi)} &times; {result.tenureMonths}) &minus; {usd(principal)}</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">{usd(result.totalInterest)} ({(result.interestFraction * 100).toFixed(1)}%)</td>
+                <td class="py-2.5 px-4">{result.totalInterest > principal ? 'Interest exceeds the original loan amount' : 'Interest stays below the original loan amount'} over {DEFAULT.years} years.</td>
               </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
                 <td class="py-3 px-4">Total Housing Outlay</td>
-                <td class="py-3 px-4 font-mono">$80,000 (Down) + $747,185 (Loan+Interest)</td>
-                <td class="py-3 px-4 font-mono font-bold text-text-primary">$747,185</td>
-                <td class="py-3 px-4">1.87&times; the original purchase price.</td>
+                <td class="py-3 px-4 font-mono">{usd(exDown)} (Down) + {usd(result.totalPayment)} (Loan+Interest)</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">{usd(exOutlay)}</td>
+                <td class="py-3 px-4">{(exOutlay / DEFAULT.homePrice).toFixed(2)}&times; the original purchase price.</td>
               </tr>
             </tbody>
           </table>
@@ -346,12 +357,12 @@ const jsonld = {
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">Loan Term Trade-off: 15 vs 20 vs 30 Years</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
-              On the same $320,000 loan at 6.75% interest, choosing your loan term changes the total financing cost dramatically:
+              On the same {usd(principal)} loan at {DEFAULT.rate}% interest, choosing your loan term changes the total financing cost dramatically:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>15-Year Fixed:</strong> Payment rises to $2,832/mo (+$756/mo), but total interest drops to $189,708 — <strong>saving $237,477 in interest</strong> and retiring debt 15 years earlier.</li>
-              <li><strong>20-Year Term:</strong> Payment of $2,433/mo with total interest of $263,960 — saving $163,225 vs 30-year.</li>
-              <li><strong>30-Year Fixed (Default):</strong> Lowest monthly payment at $2,076/mo, but total interest reaches $427,185 — more than the original loan amount.</li>
+              <li><strong>15-Year Fixed:</strong> Payment rises to {usd(ex15.emi)}/mo (+{usd(ex15.emi - result.emi)}/mo), but total interest drops to {usd(ex15.totalInterest)} — <strong>saving {usd(result.totalInterest - ex15.totalInterest)} in interest</strong> and retiring debt {DEFAULT.years - 15} years earlier.</li>
+              <li><strong>20-Year Term:</strong> Payment of {usd(ex20.emi)}/mo with total interest of {usd(ex20.totalInterest)} — saving {usd(result.totalInterest - ex20.totalInterest)} vs {DEFAULT.years}-year.</li>
+              <li><strong>30-Year Fixed (Default):</strong> Lowest monthly payment at {usd(result.emi)}/mo, but total interest reaches {usd(result.totalInterest)} — more than the original loan amount.</li>
             </ul>
           </div>
 
