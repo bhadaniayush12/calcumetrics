@@ -1,0 +1,15 @@
+---
+/**
+ * IndiaTaxAdviceNote.astro — one-line "not tax advice" note shown under the result card.
+ * Rendered by CalculatorLayout only on routes that carry an India tax record (all /in/ pages).
+ */
+import { resolveTaxRecordForRoute } from '../../lib/tax/schema';
+
+const show = resolveTaxRecordForRoute(Astro.url.pathname) !== null;
+---
+
+{show && (
+  <p id="india-tax-advice-note" class="mt-4 pt-3 border-t border-dark-border text-xs text-dark-muted leading-relaxed">
+    For information only. Not tax advice. Verify with a Chartered Accountant before filing.
+  </p>
+)}
