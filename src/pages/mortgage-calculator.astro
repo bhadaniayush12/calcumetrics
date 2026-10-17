@@ -9,7 +9,8 @@ import Alert from '../components/ui/Alert.astro';
 import { calcAmortization } from '../lib/finance/amortization';
 import { TOOLS } from '../config/site';
 
-const DEFAULT = { homePrice: 400000, downPaymentPct: 20, rate: 6.75, years: 30 };
+// USD rate: Freddie Mac PMMS 30-year fixed average, 7.40% on 8 Oct 2026 (unchanged 15 Oct 2026).
+const DEFAULT = { homePrice: 400000, downPaymentPct: 20, rate: 7.4, years: 30 };
 const principal = DEFAULT.homePrice * (1 - DEFAULT.downPaymentPct / 100);
 const result = calcAmortization(principal, DEFAULT.rate, DEFAULT.years);
 
@@ -131,10 +132,12 @@ const jsonld = {
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Mortgage Calculator</h1>
       <p class="text-sm text-text-muted mb-4">Estimate your monthly payment on a fixed-rate mortgage, see amortization schedule, and understand total interest cost.</p>
 
-      <!-- India audience cross-link -->
-      <div class="mb-5 flex items-start gap-2 rounded-card border border-border bg-surface px-4 py-3 text-xs text-text-muted">
-        <span class="mt-0.5 shrink-0 text-accent">🇮🇳</span>
-        <span>Looking for Indian home loan calculations in ₹? Use our <a href="/home-loan-calculator" class="text-accent font-medium hover:underline">Home Loan EMI Calculator</a> — defaults to Indian rates and lakh/crore formatting.</span>
+      <!-- India audience cross-link: shown only when the selected currency is INR -->
+      <div data-inr-only class="hidden">
+        <div class="mb-5 flex items-start gap-2 rounded-card border border-border bg-surface px-4 py-3 text-xs text-text-muted">
+          <span class="mt-0.5 shrink-0 text-accent">🇮🇳</span>
+          <span>Looking for Indian home loan calculations in ₹? Use our <a href="/home-loan-calculator" class="text-accent font-medium hover:underline">Home Loan EMI Calculator</a> — defaults to Indian rates and lakh/crore formatting.</span>
+        </div>
       </div>
 
       <!-- Error alert -->
@@ -185,14 +188,14 @@ const jsonld = {
           id="mort-rate"
           label="Annual Interest Rate"
           suffix="%"
-          value="6.75"
+          value="7.40"
           isNumeric={true}
           helperText="Fixed annual mortgage rate"
           inputmode="decimal"
           aria-describedby="mort-error-msg"
         />
         <div class="mt-2">
-          <Slider id="mort-rate-slider" min={2} max={15} step={0.05} value={6.75} ariaLabel="Interest rate slider" />
+          <Slider id="mort-rate-slider" min={2} max={15} step={0.05} value={7.4} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -279,7 +282,7 @@ const jsonld = {
             <strong>1. Net Principal Borrowed:</strong> P = Home Purchase Price &minus; Upfront Down Payment<br /><br />
             <strong>2. Periodic Monthly Rate:</strong> r = Annual Interest Rate (%) &divide; 12 &divide; 100<br /><br />
             <strong>3. Total Repayment Periods:</strong> n = Loan Term (Years) &times; 12<br /><br />
-            <strong>4. Monthly Payment (EMI):</strong> M = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br /><br />
+            <strong>4. Monthly Payment:</strong> M = [ P &times; r &times; (1 + r)<sup>n</sup> ] &divide; [ (1 + r)<sup>n</sup> &minus; 1 ]<br /><br />
             <strong>5. Total Loan Interest:</strong> Total Interest = (M &times; n) &minus; P<br /><br />
             <strong>6. Total Property Outlay:</strong> Total Cash Outflow = Down Payment + (M &times; n)
           </p>
@@ -414,7 +417,7 @@ const jsonld = {
           <a href="/home-loan-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
             <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Home Loan Calculator</h3>
-            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate residential property EMI, loan interest, and amortization schedule.</p>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate the monthly payment, loan interest, and amortization schedule for a home loan.</p>
           </a>
           <a href="/loan-affordability-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
@@ -435,6 +438,7 @@ const jsonld = {
 <script>
   import { validate } from '../lib/validate';
   import { moneyRules } from '../lib/currency';
+  import { activePageCurrency, applyCurrencyVisibility, pageCurrencyFor } from '../lib/page-currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
@@ -472,13 +476,8 @@ const jsonld = {
     const errMsg = document.getElementById('mort-error-msg');
 
     if (!priceInput || !downInput || !rateInput || !yearsInput) return;
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved && !saved.includes('USD')) {
-        currSym = saved.includes('€') ? '€' : saved.includes('£') ? '£' : saved.includes('₹') ? '₹' : '$';
-        currLocale = saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : saved.includes('INR') ? 'en-IN' : 'en-US';
-      }
-    } catch (e) {}
+    ({ symbol: currSym, locale: currLocale } = activePageCurrency());
+    applyCurrencyVisibility(activePageCurrency().code);
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
     });
@@ -489,7 +488,7 @@ const jsonld = {
     }
     priceInput.dataset.bound = 'true';
 
-    const DEFAULTS = { homePrice: 400000, downPaymentPct: 20, rate: 6.75, years: 30 };
+    const DEFAULTS = { homePrice: 400000, downPaymentPct: 20, rate: 7.4, years: 30 }; // keep in sync with frontmatter DEFAULT
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -708,8 +707,8 @@ const jsonld = {
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        ({ symbol: currSym, locale: currLocale } = pageCurrencyFor(e.detail.code));
+        applyCurrencyVisibility(pageCurrencyFor(e.detail.code).code);
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });

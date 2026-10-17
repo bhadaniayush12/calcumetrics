@@ -2008,7 +2008,7 @@ export const MARKET_DEFAULTS = {
         "step": 0.05
       },
       "USD": {
-        "value": 6.75,
+        "value": 7.4,
         "min": 2,
         "max": 14,
         "step": 0.05

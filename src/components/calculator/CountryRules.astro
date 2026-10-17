@@ -1,0 +1,41 @@
+---
+/**
+ * CountryRules — three short labelled boxes with country-specific lending rules,
+ * so the general text on global calculators stays country-neutral.
+ * Used by the debt-to-income, credit-card payoff, loan affordability and mortgage pages.
+ */
+interface Props {
+  id?: string;
+}
+const { id = 'country-rules' } = Astro.props;
+---
+
+<section aria-labelledby={id} class="mb-6">
+  <h2 id={id} class="text-xl font-bold text-text-primary mb-4">Country rules at a glance</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-surface border border-border rounded-card p-4">
+      <h3 class="text-sm font-bold text-text-primary mb-2">India</h3>
+      <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
+        <li>Banks cap the <strong>FOIR</strong> (fixed obligations to income ratio) at about <strong>40–50%</strong> of net monthly income, depending on income level and lender.</li>
+        <li>A <strong>CIBIL</strong> score of 750+ usually gets the best rates.</li>
+        <li><strong>18% GST</strong> is charged on credit card interest and fees.</li>
+      </ul>
+    </div>
+    <div class="bg-surface border border-border rounded-card p-4">
+      <h3 class="text-sm font-bold text-text-primary mb-2">United States</h3>
+      <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
+        <li>The <strong>28/36 guideline</strong>: housing up to 28% and all debts up to 36% of gross income.</li>
+        <li>There has been <strong>no fixed Qualified Mortgage DTI cap</strong> since 2022 (CFPB replaced the 43% limit with a price-based test); limits come from each loan program and lender.</li>
+        <li>Card minimum payments are typically <strong>1% of the balance plus interest and fees</strong>, or a fixed floor (often $25–$40), whichever is higher.</li>
+      </ul>
+    </div>
+    <div class="bg-surface border border-border rounded-card p-4">
+      <h3 class="text-sm font-bold text-text-primary mb-2">United Kingdom</h3>
+      <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
+        <li>Lenders must run an <strong>FCA affordability assessment</strong> of income and committed spending before lending.</li>
+        <li>Card minimum payments must cover at least <strong>interest, fees and 1% of the balance</strong>.</li>
+        <li><strong>No VAT</strong> is charged on credit interest.</li>
+      </ul>
+    </div>
+  </div>
+</section>
