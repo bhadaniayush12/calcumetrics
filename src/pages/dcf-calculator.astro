@@ -16,6 +16,11 @@ const flows = [DEFAULT.fcf1, DEFAULT.fcf1 * 1.1, DEFAULT.fcf1 * 1.21, DEFAULT.fc
 const result = calcDCF(flows, DEFAULT.discountRate, DEFAULT.terminalGrowth);
 
 const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
+// WACC ±1% sensitivity from the engine (same flows and terminal growth).
+const lakh = (n: number) => `₹${(n / 100000).toFixed(2)}L`;
+const dcfUp = calcDCF(flows, DEFAULT.discountRate + 1, DEFAULT.terminalGrowth).intrinsicValue;
+const dcfDown = calcDCF(flows, DEFAULT.discountRate - 1, DEFAULT.terminalGrowth).intrinsicValue;
+const sensPct = (v: number) => (((v - result.intrinsicValue) / result.intrinsicValue) * 100).toFixed(1);
 
 const RELATED_SLUGS = ['wacc-calculator', 'npv-calculator', 'irr-calculator'];
 const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
@@ -373,8 +378,8 @@ const jsonld = {
               Because terminal value accounts for nearly 70% of total enterprise value, minor changes in assumptions dramatically move intrinsic value:
             </p>
             <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
-              <li><strong>+1% WACC (13%):</strong> Intrinsic value contracts from ₹13.82L to ~₹11.96L (&minus;13.5% reduction).</li>
-              <li><strong>&minus;1% WACC (11%):</strong> Intrinsic value expands from ₹13.82L to ~₹16.32L (+18.1% gain).</li>
+              <li><strong>+1% WACC ({DEFAULT.discountRate + 1}%):</strong> Intrinsic value contracts from {lakh(result.intrinsicValue)} to ~{lakh(dcfUp)} ({sensPct(dcfUp)}%).</li>
+              <li><strong>&minus;1% WACC ({DEFAULT.discountRate - 1}%):</strong> Intrinsic value expands from {lakh(result.intrinsicValue)} to ~{lakh(dcfDown)} (+{sensPct(dcfDown)}%).</li>
               <li><strong>Terminal Growth Cap (g &lt; r):</strong> Perpetual growth <em>must never exceed long-term GDP growth</em> (typically 2% to 4%), otherwise the company would mathematically consume the entire global economy.</li>
             </ul>
           </div>

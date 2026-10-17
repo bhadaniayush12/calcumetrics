@@ -6,7 +6,8 @@ import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
-import { calcAmortization, summarizeScheduleByYear } from '../lib/finance/amortization';
+import { calcAmortization, calcImpliedRate, summarizeScheduleByYear } from '../lib/finance/amortization';
+import { calcLoanPrepayment } from '../lib/calculators/prepayment';
 import { TOOLS } from '../config/site';
 
 const DEFAULT = { principal: 1000000, rate: 9.5, years: 5 };
@@ -15,6 +16,24 @@ const yearlySchedule = summarizeScheduleByYear(result.schedule, DEFAULT.principa
 
 const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+
+// Worked example — every figure below comes from the engine result above.
+const ex = {
+  n: result.tenureMonths,
+  monthlyRatePct: DEFAULT.rate / 12,
+  m1: result.schedule[0],
+  m2Interest: result.schedule[1].interest,
+  m36: result.schedule[35],
+  y1: yearlySchedule[0],
+};
+const pctOf = (part: number, whole: number) => ((part / whole) * 100).toFixed(1);
+// Flat-rate comparison: interest on the full principal for the whole term.
+const flatInterest = DEFAULT.principal * (DEFAULT.rate / 100) * DEFAULT.years;
+const flatEmi = (DEFAULT.principal + flatInterest) / result.tenureMonths;
+const flatApr = calcImpliedRate(DEFAULT.principal, flatEmi, DEFAULT.years).annualRatePct;
+// Prepayment of 1,00,000 after the 12th payment, keeping the payment (tenure reduces).
+const PREPAY = 100000;
+const prepay = calcLoanPrepayment(ex.y1.closingBalance, DEFAULT.rate, result.tenureMonths - 12, PREPAY, 'reduce-tenure');
 
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'loan-amortization-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/loan-amortization-calculator';
@@ -303,49 +322,49 @@ const jsonld = {
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Disbursed Principal (P)</td>
                 <td class="py-2.5 px-4 font-mono">Starting Borrowed Capital</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,00,000</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{fmtCurrency(DEFAULT.principal)}</td>
                 <td class="py-2.5 px-4">Opening balance on Day 1 upon loan disbursement.</td>
               </tr>
               <tr class="bg-surface/50 font-semibold text-text-primary">
                 <td class="py-2.5 px-4">Monthly Payment (EMI)</td>
-                <td class="py-2.5 px-4 font-mono">Formula (r=0.79167%, n=60)</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹21,002 / Month</td>
-                <td class="py-2.5 px-4">Constant installment due every month for 60 consecutive months.</td>
+                <td class="py-2.5 px-4 font-mono">Formula (r={ex.monthlyRatePct.toFixed(5)}%, n={ex.n})</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">{fmtCurrency(result.emi)} / Month</td>
+                <td class="py-2.5 px-4">Constant installment due every month for {ex.n} consecutive months.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
-                <td class="py-2.5 px-4 font-mono">Interest: ₹10L &times; 0.79167% = ₹7,917<br />Principal: ₹21,002 &minus; ₹7,917 = ₹13,085</td>
-                <td class="py-2.5 px-4 font-mono">37.7% Interest / 62.3% Principal</td>
-                <td class="py-2.5 px-4">Balance reduces to ₹9,86,915, lowering Month 2 interest to ₹7,813.</td>
+                <td class="py-2.5 px-4 font-mono">Interest: {fmtCurrency(DEFAULT.principal)} &times; {ex.monthlyRatePct.toFixed(5)}% = {fmtCurrency(ex.m1.interest)}<br />Principal: {fmtCurrency(result.emi)} &minus; {fmtCurrency(ex.m1.interest)} = {fmtCurrency(ex.m1.principal)}</td>
+                <td class="py-2.5 px-4 font-mono">{pctOf(ex.m1.interest, result.emi)}% Interest / {pctOf(ex.m1.principal, result.emi)}% Principal</td>
+                <td class="py-2.5 px-4">Balance reduces to {fmtCurrency(ex.m1.balance)}, lowering Month 2 interest to {fmtCurrency(ex.m2Interest)}.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Year 1 Cumulative</td>
                 <td class="py-2.5 px-4 font-mono">Months 1 to 12 Summation</td>
-                <td class="py-2.5 px-4 font-mono">₹1,64,517 Principal / ₹87,505 Interest</td>
-                <td class="py-2.5 px-4">Outstanding balance drops to ₹8,35,483 after 12 payments.</td>
+                <td class="py-2.5 px-4 font-mono">{fmtCurrency(ex.y1.principal)} Principal / {fmtCurrency(ex.y1.interest)} Interest</td>
+                <td class="py-2.5 px-4">Outstanding balance drops to {fmtCurrency(ex.y1.closingBalance)} after 12 payments.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Year 3 (Month 36) Midpoint</td>
-                <td class="py-2.5 px-4 font-mono">Balance: ₹4,53,607<br />Interest: ₹3,591 / Principal: ₹17,411</td>
-                <td class="py-2.5 px-4 font-mono">17.1% Interest / 82.9% Principal</td>
+                <td class="py-2.5 px-4 font-mono">Balance: {fmtCurrency(ex.m36.balance)}<br />Interest: {fmtCurrency(ex.m36.interest)} / Principal: {fmtCurrency(ex.m36.principal)}</td>
+                <td class="py-2.5 px-4 font-mono">{pctOf(ex.m36.interest, result.emi)}% Interest / {pctOf(ex.m36.principal, result.emi)}% Principal</td>
                 <td class="py-2.5 px-4">Notice how principal portion expands as interest burden shrinks!</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Principal Repaid</td>
                 <td class="py-2.5 px-4 font-mono">Original Principal</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,00,000 (79.4%)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{fmtCurrency(DEFAULT.principal)} ({(result.principalFraction * 100).toFixed(1)}%)</td>
                 <td class="py-2.5 px-4">Complete retirement of debt obligation.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Interest Payable</td>
-                <td class="py-2.5 px-4 font-mono">(₹21,002 &times; 60) &minus; ₹10,00,000</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">₹2,60,112 (20.6%)</td>
+                <td class="py-2.5 px-4 font-mono">({fmtCurrency(result.emi)} &times; {ex.n}) &minus; {fmtCurrency(DEFAULT.principal)}</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">{fmtCurrency(result.totalInterest)} ({(result.interestFraction * 100).toFixed(1)}%)</td>
                 <td class="py-2.5 px-4">Cost of borrowing over 5 full years.</td>
               </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
                 <td class="py-3 px-4">Total Amount Repaid</td>
                 <td class="py-3 px-4 font-mono">Principal + Total Interest</td>
-                <td class="py-3 px-4 font-mono font-bold text-text-primary">₹12,60,112</td>
+                <td class="py-3 px-4 font-mono font-bold text-text-primary">{fmtCurrency(result.totalPayment)}</td>
                 <td class="py-3 px-4">Total cash paid to lender across 60 monthly installments.</td>
               </tr>
             </tbody>
@@ -359,9 +378,9 @@ const jsonld = {
               Borrowers often encounter deceptively marketed "flat rate" financing:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Reducing Balance (Real 9.50%):</strong> Total interest is <strong>₹2,60,112</strong> because interest is charged only on remaining debt.</li>
-              <li><strong>Flat Rate (Advertised 9.50%):</strong> Interest is charged on the initial ₹10L for all 5 years: ₹10L &times; 9.5% &times; 5 = <strong>₹4,75,000 in interest</strong>!</li>
-              <li>A "9.5% Flat Rate" carries an effective reducing-balance APR of nearly <strong>17.5%</strong> — costing an extra ₹2,14,888 in disguised interest!</li>
+              <li><strong>Reducing Balance (Real 9.50%):</strong> Total interest is <strong>{fmtCurrency(result.totalInterest)}</strong> because interest is charged only on remaining debt.</li>
+              <li><strong>Flat Rate (Advertised 9.50%):</strong> Interest is charged on the initial {fmtCurrency(DEFAULT.principal)} for all {DEFAULT.years} years: {fmtCurrency(DEFAULT.principal)} &times; {DEFAULT.rate}% &times; {DEFAULT.years} = <strong>{fmtCurrency(flatInterest)} in interest</strong>!</li>
+              <li>A "{DEFAULT.rate}% Flat Rate" carries an effective reducing-balance APR of about <strong>{flatApr.toFixed(2)}%</strong> — costing an extra {fmtCurrency(flatInterest - result.totalInterest)} in disguised interest!</li>
             </ul>
           </div>
 
@@ -371,7 +390,7 @@ const jsonld = {
               Prepaying principal early delivers exponential compound interest savings:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Prepayment Timing:</strong> A ₹1,00,000 lump sum paid in Month 12 eliminates <strong>7 full months</strong> from your 5-year loan and saves over <strong>₹42,000 in interest</strong>.</li>
+              <li><strong>Prepayment Timing:</strong> A {fmtCurrency(PREPAY)} lump sum paid after the 12th payment eliminates <strong>{prepay.monthsSaved} months</strong> from your {DEFAULT.years}-year loan and saves <strong>{fmtCurrency(prepay.interestSaved)} in interest</strong>.</li>
               <li><strong>The "Front-Loaded Interest" Reality:</strong> Lenders don't front-load interest maliciously; interest is simply highest when your debt balance is highest.</li>
               <li>Every rupee of early prepayment permanently reduces the balance that future interest is computed upon.</li>
             </ul>

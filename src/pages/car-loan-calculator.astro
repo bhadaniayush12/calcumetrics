@@ -7,6 +7,7 @@ import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
 import { calcEMI } from '../lib/calculators/emi';
+import { calcImpliedRate } from '../lib/finance/amortization';
 import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
 
@@ -15,6 +16,10 @@ const initialLoan = DEFAULT.price - DEFAULT.down;
 const initialResult = calcEMI(initialLoan, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
+// Flat-rate quote converted to the equivalent reducing-balance rate (default loan and term).
+const FLAT_PCT = 5.5;
+const flatEmi = (initialLoan * (1 + (FLAT_PCT / 100) * DEFAULT.years)) / (DEFAULT.years * 12);
+const flatReducing = calcImpliedRate(initialLoan, flatEmi, DEFAULT.years).annualRatePct;
 
 const RELATED_SLUGS = ['emi-calculator', 'loan-affordability-calculator', 'loan-amortization-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
@@ -322,7 +327,7 @@ const jsonld = {
             <strong class="text-text-primary">Depreciation vs. Loan Amortization:</strong> Automobiles are depreciating consumer assets, commonly shedding 15% to 20% of their market value during the first year and approximately 10% annually thereafter. Choosing a longer tenure (e.g., 7 or 8 years) lowers your monthly EMI but causes the outstanding loan principal to decline much slower than the car's resale value. This results in negative equity (being "underwater" on your loan), leaving you owing more than the vehicle is worth if it is sold or totaled in an accident.
           </p>
           <p>
-            <strong class="text-text-primary">Flat Rate vs. Reducing Balance Trap:</strong> Auto dealerships frequently quote attractive "flat interest rates" (for instance, 5.5% flat). In a flat rate structure, interest is calculated on the original ₹10,00,000 principal throughout all 5 years, even when most of the principal has been repaid. A 5.5% flat rate translates to an effective reducing rate of approximately 10.2% p.a. Always ask the financier for the reducing balance annual percentage rate (APR) to compare offers accurately.
+            <strong class="text-text-primary">Flat Rate vs. Reducing Balance Trap:</strong> Auto dealerships frequently quote attractive "flat interest rates" (for instance, {FLAT_PCT}% flat). In a flat rate structure, interest is calculated on the original {fmt(initialLoan)} principal throughout all {DEFAULT.years} years, even when most of the principal has been repaid. A {FLAT_PCT}% flat rate translates to an effective reducing rate of approximately {flatReducing.toFixed(2)}% p.a. Always ask the financier for the reducing balance annual percentage rate (APR) to compare offers accurately.
           </p>
         </div>
       </section>

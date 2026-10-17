@@ -14,6 +14,10 @@ const DEFAULT = { annual: 150000, rate: 7.1, years: 15 };
 const result = calcPPF(DEFAULT.annual, DEFAULT.rate, DEFAULT.years);
 
 const fmt = (n: number) => '₹' + formatIndian(n);
+// Worked-example milestones straight from the engine's yearly breakdown.
+const y5 = result.yearlyBreakdown[4];
+const y10 = result.yearlyBreakdown[9];
+const investedBy = (yr: number) => DEFAULT.annual * yr;
 
 const RELATED_SLUGS = ['fd-calculator', 'rd-calculator', 'income-tax-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
@@ -279,11 +283,11 @@ const jsonld = {
           <p><strong class="text-text-primary">3. Cumulative Capital Invested:</strong> 15 &times; ₹1,50,000 = <strong class="text-text-primary">₹22,50,000</strong></p>
           <p><strong class="text-text-primary">4. Milestone Growth:</strong></p>
           <ul class="list-disc pl-5 space-y-1 text-xs">
-            <li><strong class="text-text-primary">Year 5:</strong> Invested ₹7,50,000 &rarr; Balance: ₹9,74,383 (Interest earned: ₹2,24,383)</li>
-            <li><strong class="text-text-primary">Year 10:</strong> Invested ₹15,00,000 &rarr; Balance: ₹23,54,482 (Interest earned: ₹8,54,482)</li>
-            <li><strong class="text-text-primary">Year 15 (Maturity):</strong> Invested ₹22,50,000 &rarr; Balance: <strong class="text-text-primary text-accent">₹40,68,209</strong></li>
+            <li><strong class="text-text-primary">Year 5:</strong> Invested {fmt(investedBy(5))} &rarr; Balance: {fmt(Math.round(y5.balance))} (Interest earned: {fmt(Math.round(y5.balance - investedBy(5)))})</li>
+            <li><strong class="text-text-primary">Year 10:</strong> Invested {fmt(investedBy(10))} &rarr; Balance: {fmt(Math.round(y10.balance))} (Interest earned: {fmt(Math.round(y10.balance - investedBy(10)))})</li>
+            <li><strong class="text-text-primary">Year {DEFAULT.years} (Maturity):</strong> Invested {fmt(investedBy(DEFAULT.years))} &rarr; Balance: <strong class="text-text-primary text-accent">{fmt(Math.round(result.maturity))}</strong></li>
           </ul>
-          <p><strong class="text-text-primary">5. Total Accumulated Interest:</strong> ₹40,68,209 &minus; ₹22,50,000 = <strong class="text-text-primary text-accent">₹18,18,209</strong></p>
+          <p><strong class="text-text-primary">5. Total Accumulated Interest:</strong> {fmt(Math.round(result.maturity))} &minus; {fmt(investedBy(DEFAULT.years))} = <strong class="text-text-primary text-accent">{fmt(Math.round(result.maturity - investedBy(DEFAULT.years)))}</strong></p>
         </div>
       </section>
 

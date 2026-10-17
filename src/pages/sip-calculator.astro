@@ -29,6 +29,8 @@ const yearly = calcSIPYearly(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years);
 // Extra 2 years curiosity calculation (17 yrs)
 const result17 = calcSIP(DEFAULT.monthly, DEFAULT.rate, 17);
 const extraGainDiff = result17.maturity - result.maturity;
+// Cost of delay: same horizon end, 5 fewer years of SIP (matches the client-side insight).
+const delayLoss = result.maturity - calcSIP(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years - 5).maturity;
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 const heroExact = fmt(result.maturity);
@@ -569,7 +571,7 @@ const jsonld = {
           Investing for just 2 more years (17 yrs) adds <strong>+{extraGainWords}</strong> to your corpus!
         </p>
         <p id="sip-insight-delay" class="text-[11px] text-amber-400/90 leading-relaxed pt-1 border-t border-dark-border/40">
-          <strong>Cost of Delay:</strong> Delaying by 5 years reduces your estimated maturity corpus by over ₹54 Lakh due to lost compounding.
+          <strong>Cost of Delay:</strong> Delaying by 5 years reduces your corpus by <strong>~{formatIndianCompact(delayLoss, '₹')}</strong> due to lost compounding.
         </p>
       </div>
 
