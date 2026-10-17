@@ -35,7 +35,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     ],
     type: 'Evergreen',
     summary:
-      'PPF interest is calculated monthly on the lowest balance between the close of the 5th day and the final day of each calendar month. Although interest is credited to the account once a year on March 31st, delaying a deposit past the 5th causes that month to earn zero interest on the new funds. Over a 15-year tenure, depositing consistently by the 5th of every month can increase total interest earnings by more than ₹2.5 lakh compared to end-of-month deposits.',
+      'PPF interest is calculated monthly on the lowest balance between the close of the 5th day and the final day of each calendar month. Although interest is credited to the account once a year on March 31st, delaying a deposit past the 5th causes that month to earn zero interest on the new funds. Over a 15-year tenure at 7.1%, depositing ₹12,500 by the 5th of every month earns about ₹22,500 more interest than depositing after the 5th, and a single ₹1.5 lakh deposit by 5 April earns about ₹1.24 lakh more than monthly deposits made by the 5th.',
     relatedCalculators: [
       {
         name: 'PPF Calculator',
@@ -111,7 +111,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Statutory Rule: Paragraph 11 of the PPF Scheme</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Statutory Rule: Paragraph 7 of the PPF Scheme</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         According to the Public Provident Fund Scheme Rules notified by the Ministry of Finance:
       </p>
@@ -120,7 +120,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
         <p class="italic text-text-primary font-medium mb-1">
           "Interest shall be calculated for each calendar month on the lowest balance at the credit of an account between the close of the fifth day and the end of the month and shall be credited to the account at the end of each year."
         </p>
-        <span class="text-xs text-text-muted">— Paragraph 11(1), Public Provident Fund Scheme, 2019</span>
+        <span class="text-xs text-text-muted">— Paragraph 7(1), Public Provident Fund Scheme, 2019</span>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
@@ -157,29 +157,29 @@ export const BATCH_1_POSTS: BlogPost[] = [
               <td class="p-3 font-medium text-text-primary">Deposited on or before 5th of every month</td>
               <td class="p-3 font-mono">₹12,500</td>
               <td class="p-3 font-mono">₹22,50,000</td>
-              <td class="p-3 font-mono font-semibold text-accent">₹18,18,209</td>
-              <td class="p-3 font-mono font-bold text-text-primary">₹40,68,209</td>
+              <td class="p-3 font-mono font-semibold text-accent">₹16,94,599</td>
+              <td class="p-3 font-mono font-bold text-text-primary">₹39,44,599</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">Deposited after 5th of every month (e.g., 10th)</td>
               <td class="p-3 font-mono">₹12,500</td>
               <td class="p-3 font-mono">₹22,50,000</td>
-              <td class="p-3 font-mono text-text-primary">₹15,66,410</td>
-              <td class="p-3 font-mono text-text-primary">₹38,16,410</td>
+              <td class="p-3 font-mono text-text-primary">₹16,72,125</td>
+              <td class="p-3 font-mono text-text-primary">₹39,22,125</td>
             </tr>
             <tr class="bg-canvas font-semibold text-text-primary">
               <td class="p-3">Lump Sum on April 5th every year</td>
               <td class="p-3 font-mono">₹1,50,000 / yr</td>
               <td class="p-3 font-mono">₹22,50,000</td>
-              <td class="p-3 font-mono text-emerald-500 font-bold">₹19,05,528</td>
-              <td class="p-3 font-mono text-emerald-500 font-bold">₹41,55,528</td>
+              <td class="p-3 font-mono text-emerald-500 font-bold">₹18,18,209</td>
+              <td class="p-3 font-mono text-emerald-500 font-bold">₹40,68,209</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p class="text-xs text-text-muted italic mb-6">
-        *Assumes constant 7.1% interest rate throughout the 15-year tenure. Calculations performed using standard circular compounding schedules under Ministry of Finance small-savings parameters.
+        *Assumes a constant 7.1% rate for 15 years. Interest is computed each month on the lowest balance between the 5th and month-end (7.1% ÷ 12 per month), summed and credited on 31 March, then compounded annually — the same rule as our PPF calculator. Paise rounding is ignored.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Annual April 5th Lump Sum Optimization</h2>
@@ -477,7 +477,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
       {
         question: 'Why do credit card companies quote APR instead of APY?',
         answer:
-          'Credit card companies quote APR because Regulation Z requires nominal APR disclosure, and marketing an APR of 24.99% sounds lower than disclosing an effective APY of 28.06% resulting from daily compounding. For consumers, the actual interest incurred always reflects the higher APY figure.',
+          'Credit card companies quote APR because Regulation Z requires nominal APR disclosure, and marketing an APR of 24.99% sounds lower than disclosing an effective APY of 28.38% resulting from daily compounding. For consumers, the actual interest incurred always reflects the higher APY figure.',
       },
       {
         question: 'When are APR and APY identical?',
@@ -837,7 +837,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     ],
     type: 'Evergreen',
     summary:
-      'The Debt-to-Income (DTI) ratio is the primary metric underwriting teams evaluate when deciding whether to approve a home mortgage. Front-end DTI measures housing expenses (Principal, Interest, Taxes, Insurance) against gross monthly income, with a traditional benchmark of 28%. Back-end DTI measures total recurring monthly obligations (housing plus auto loans, student loans, and minimum credit card payments) against gross monthly income, targeting 36% to 43% under Qualified Mortgage standards.',
+      'The Debt-to-Income (DTI) ratio is the primary metric underwriting teams evaluate when deciding whether to approve a home mortgage. Front-end DTI measures housing expenses (Principal, Interest, Taxes, Insurance) against gross monthly income, with a traditional benchmark of 28%. Back-end DTI measures total recurring monthly obligations (housing plus auto loans, student loans, and minimum credit card payments) against gross monthly income, with 36% as the traditional guideline; there has been no fixed Qualified Mortgage DTI cap since the CFPB replaced the 43% limit with a price-based test (mandatory compliance from 1 October 2022).',
     relatedCalculators: [
       {
         name: 'Debt-to-Income Ratio Calculator',
@@ -882,7 +882,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
       {
         question: 'What is the absolute maximum DTI ratio allowed for a mortgage?',
         answer:
-          'Under CFPB Qualified Mortgage standards, standard conventional conforming loans capped back-end DTI at 43%, though automated underwriting systems (like Fannie Mae Desktop Underwriter) can approve DTIs up to 45% or 50% with compensating factors like strong credit scores or substantial cash reserves. FHA loans permit back-end DTIs up to 50% or higher in certain qualifying profiles.',
+          'There is no single legal maximum. The CFPB removed the 43% DTI limit from the General Qualified Mortgage definition and replaced it with a price-based test (mandatory compliance from 1 October 2022), so the ceiling now comes from each loan program and lender. Automated underwriting systems (like Fannie Mae Desktop Underwriter) can approve DTIs up to 45% or 50% with compensating factors like strong credit scores or substantial cash reserves. FHA loans permit back-end DTIs up to 50% or higher in certain qualifying profiles.',
       },
       {
         question: 'Do regular monthly living expenses like groceries and utilities count in DTI?',

@@ -795,15 +795,15 @@ export const BATCH_2_POSTS: BlogPost[] = [
             </tr>
             <tr>
               <td class="p-3">Monthly Income Tax (TDS)</td>
-              <td class="p-3">New Tax Regime post-standard deduction</td>
-              <td class="p-3 font-mono text-red-400">-₹1,40,221</td>
-              <td class="p-3 font-mono text-red-400">-₹11,685</td>
+              <td class="p-3">New Tax Regime (FY 2026-27) on Gross − ₹75,000 standard deduction = ₹13,24,140, plus 4% cess</td>
+              <td class="p-3 font-mono text-red-400">-₹81,766</td>
+              <td class="p-3 font-mono text-red-400">-₹6,814</td>
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
               <td class="p-3 text-accent font-bold">Net In-Hand Take-Home Salary</td>
               <td class="p-3">Gross - (EPF + PT + TDS)</td>
-              <td class="p-3 font-mono font-bold text-accent">₹11,84,419</td>
-              <td class="p-3 font-mono font-bold text-accent">₹98,702 / mo</td>
+              <td class="p-3 font-mono font-bold text-accent">₹12,42,874</td>
+              <td class="p-3 font-mono font-bold text-accent">₹1,03,573 / mo</td>
             </tr>
           </tbody>
         </table>
