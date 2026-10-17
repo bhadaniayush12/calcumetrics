@@ -8,6 +8,7 @@
 import {
   type CurrencyCode,
   CURRENCY_CONFIG,
+  NON_FINITE_DISPLAY,
   formatDisplayCurrency,
 } from './currency';
 
@@ -33,8 +34,10 @@ export const CURRENCY_LOCALE: Record<Currency, { locale: string; grouping: Local
  * Rounds to the nearest integer; no decimal places.
  */
 export function formatIndian(value: number): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   return new Intl.NumberFormat('en-IN', {
     maximumFractionDigits: 0,
+    signDisplay: 'negative',
   }).format(Math.round(value));
 }
 
@@ -42,9 +45,11 @@ export function formatIndian(value: number): string {
  * Format a number with international grouping (e.g. 1,261,440).
  */
 export function formatIntl(value: number, decimals = 0): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
+    signDisplay: 'negative',
   }).format(value);
 }
 
@@ -60,7 +65,9 @@ export function formatCurrency(value: number, currency: Currency = 'INR', decima
  * Format a percentage with up to 2 decimal places.
  */
 export function formatPercent(value: number, decimals = 2): string {
-  return `${value.toFixed(decimals)}%`;
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
+  const fixed = value.toFixed(decimals);
+  return `${Number(fixed) === 0 ? fixed.replace('-', '') : fixed}%`;
 }
 
 /**
@@ -68,6 +75,7 @@ export function formatPercent(value: number, decimals = 2): string {
  * Infinity, which has no meaningful multiple, so it is labelled instead.
  */
 export function formatRatio(value: number, decimals = 2): string {
+  if (Number.isNaN(value)) return NON_FINITE_DISPLAY;
   return Number.isFinite(value) ? `${value.toFixed(decimals)}x` : 'No liabilities';
 }
 
@@ -237,26 +245,32 @@ function trimFixed(str: string): string {
  * Pick the Indian unit (Crore / Lakh / plain) AFTER rounding, so values that round
  * up across a boundary (e.g. 99,99,999.6 → "100 Lakh") move to the larger unit.
  */
+/** Minus sign only when the digits actually shown are non-zero, so -0 and -0.004 render unsigned. */
+function signFor(value: number, shown: string): string {
+  return value < 0 && /[1-9]/.test(shown) ? '-' : '';
+}
+
 function indianUnitParts(
   value: number,
   decimals: number
 ): { sign: string; unit: 'cr' | 'lakh' | 'plain'; str: string } {
   const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
   const lakhStr = (abs / 100000).toFixed(decimals);
+  const parts = (unit: 'cr' | 'lakh' | 'plain', str: string) => ({ sign: signFor(value, str), unit, str });
   if (abs >= 10000000 || parseFloat(lakhStr) >= 100) {
-    return { sign, unit: 'cr', str: trimFixed((abs / 10000000).toFixed(decimals)) };
+    return parts('cr', trimFixed((abs / 10000000).toFixed(decimals)));
   }
   if (Math.round(abs) >= 100000) {
-    return { sign, unit: 'lakh', str: trimFixed(lakhStr) };
+    return parts('lakh', trimFixed(lakhStr));
   }
-  return { sign, unit: 'plain', str: formatIndian(abs) };
+  return parts('plain', formatIndian(abs));
 }
 
 /**
  * Format a number into compact Indian notation (e.g. ₹1.26 Cr, ₹81.14 Lakh, ₹25,000).
  */
 export function formatIndianCompact(value: number, symbol = '₹', decimals = 2): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   const { sign, unit, str } = indianUnitParts(value, decimals);
   if (unit === 'cr') return `${sign}${symbol}${str} Cr`;
   if (unit === 'lakh') return `${sign}${symbol}${str} Lakh`;
@@ -267,6 +281,7 @@ export function formatIndianCompact(value: number, symbol = '₹', decimals = 2)
  * Format a number into full Indian words (e.g. ₹1.26 Crore, ₹81.14 Lakh, ₹25,000).
  */
 export function formatIndianWords(value: number, symbol = '₹', decimals = 2): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   const { sign, unit, str } = indianUnitParts(value, decimals);
   if (unit === 'cr') return `${sign}${symbol}${str} Crore`;
   if (unit === 'lakh') return `${sign}${symbol}${str} Lakh`;
@@ -279,30 +294,31 @@ export function formatIndianWords(value: number, symbol = '₹', decimals = 2): 
  * In international mode: uses K, M, B ($1.26M, €500K).
  */
 export function formatCompactCurrency(value: number, currency: Currency = 'INR', decimals = 2): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   const symbol = CURRENCY_SYMBOLS[currency] || '₹';
   if (currency === 'INR') {
     return formatIndianCompact(value, symbol, decimals);
   }
 
   const abs = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
 
   if (abs >= 1000000000) {
     const b = abs / 1000000000;
     const str = b.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str}B`;
+    return `${signFor(value, str)}${symbol}${str}B`;
   }
   if (abs >= 1000000) {
     const m = abs / 1000000;
     const str = m.toFixed(decimals).replace(/\.00$/, '').replace(/(\.[1-9])0$/, '$1');
-    return `${sign}${symbol}${str}M`;
+    return `${signFor(value, str)}${symbol}${str}M`;
   }
   if (abs >= 1000) {
     const k = abs / 1000;
     const str = k.toFixed(1).replace(/\.0$/, '');
-    return `${sign}${symbol}${str}K`;
+    return `${signFor(value, str)}${symbol}${str}K`;
   }
-  return `${sign}${symbol}${new Intl.NumberFormat(CURRENCY_LOCALE[currency].locale, { maximumFractionDigits: decimals }).format(abs)}`;
+  const str = new Intl.NumberFormat(CURRENCY_LOCALE[currency].locale, { maximumFractionDigits: decimals }).format(abs);
+  return `${signFor(value, str)}${symbol}${str}`;
 }
 
 /**

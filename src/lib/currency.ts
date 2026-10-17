@@ -283,24 +283,33 @@ export function getJurisdictionCurrency(pathname: string): CurrencyCode | null {
   return null;
 }
 
+/** What every formatter renders for NaN / ±Infinity instead of "₹NaN" or "₹∞". */
+export const NON_FINITE_DISPLAY = '-';
+
 /**
  * Formats a numeric value into a display currency string using standard Intl.NumberFormat.
  * NEVER alters the underlying numeric value (Zero FX conversion invariant).
+ * The minus sign goes before the symbol (-₹1,250), values that round to zero
+ * never show a sign (₹0), and NaN / Infinity render as NON_FINITE_DISPLAY.
  */
 export function formatDisplayCurrency(
   value: number,
   currencyCode: unknown = DEFAULT_CURRENCY,
   decimals = 0
 ): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   const config = getCurrencyConfig(currencyCode);
   const rounded = decimals === 0 ? Math.round(value) : value;
 
   const formattedNumber = new Intl.NumberFormat(config.locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
+    signDisplay: 'negative',
   }).format(rounded);
 
-  return `${config.symbol}${formattedNumber}`;
+  return formattedNumber.startsWith('-')
+    ? `-${config.symbol}${formattedNumber.slice(1)}`
+    : `${config.symbol}${formattedNumber}`;
 }
 
 /**
@@ -315,6 +324,7 @@ export function formatDisplayCurrency(
  *   >= 1,000         -> $5k (or $100k)
  */
 export function formatPresetChip(num: number, code: CurrencyCode = DEFAULT_CURRENCY, customSymbol?: string): string {
+  if (!Number.isFinite(num)) return NON_FINITE_DISPLAY;
   const sym = customSymbol || CURRENCY_CONFIG[code]?.symbol || '₹';
   if (code === 'INR') {
     if (num >= 10000000) {

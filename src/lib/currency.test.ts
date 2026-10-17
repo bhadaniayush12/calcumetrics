@@ -289,3 +289,26 @@ describe('moneyRules', () => {
     expect(rules.currency).toBe('INR'); // SSR / no window → default currency
   });
 });
+
+describe('formatDisplayCurrency: signs and non-finite values', () => {
+  it('puts the minus sign before the symbol', () => {
+    expect(formatDisplayCurrency(-1250, 'INR')).toBe('-₹1,250');
+    expect(formatDisplayCurrency(-1250000, 'INR')).toBe('-₹12,50,000');
+    expect(formatDisplayCurrency(-1250, 'USD')).toBe('-$1,250');
+    expect(formatDisplayCurrency(-1250.5, 'GBP', 2)).toBe('-£1,250.50');
+    expect(formatDisplayCurrency(-1250, 'EUR')).toBe('-€1.250');
+  });
+
+  it('renders -0 and values that round to zero without a sign', () => {
+    expect(formatDisplayCurrency(-0, 'INR')).toBe('₹0');
+    expect(formatDisplayCurrency(-0.4, 'INR')).toBe('₹0');
+    expect(formatDisplayCurrency(-0.001, 'USD', 2)).toBe('$0.00');
+  });
+
+  it('renders NaN and Infinity as "-"', () => {
+    expect(formatDisplayCurrency(NaN, 'INR')).toBe('-');
+    expect(formatDisplayCurrency(Infinity, 'USD')).toBe('-');
+    expect(formatDisplayCurrency(-Infinity, 'EUR')).toBe('-');
+    expect(formatPresetChip(NaN, 'INR')).toBe('-');
+  });
+});

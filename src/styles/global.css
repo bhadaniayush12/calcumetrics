@@ -65,6 +65,8 @@
   --color-accent: #176B5B;
   --color-accent-hover: #135A4D;
   --color-accent-pressed: #0E443A;
+  /* Text on solid accent fills: white on the dark green, near-black on the dark-mode mint */
+  --color-on-accent: #FFFFFF;
 
   --color-border: #D8DDD9;
 
@@ -113,6 +115,7 @@ html[data-theme="dark"] {
   --color-accent: #5FCDB6;
   --color-accent-hover: #76D7C2;
   --color-accent-pressed: #4EB8A3;
+  --color-on-accent: #0F1211;
 
   --color-error: #FDA29B;
   --color-error-text: #FDA29B;
@@ -132,7 +135,7 @@ html[data-theme="dark"] {
 
 html.dark .bg-accent.text-surface,
 html[data-theme="dark"] .bg-accent.text-surface {
-  color: #0F1211;
+  color: var(--color-on-accent);
 }
 
 @layer base {

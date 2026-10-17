@@ -1040,15 +1040,15 @@ export const BATCH_6_POSTS: BlogPost[] = [
     category: 'Business',
     market: 'India-Only',
     publishDate: '2026-10-11',
-    dateModified: '2026-10-11',
+    dateModified: '2026-10-17',
     readTime: '8 min read',
     author: 'Calcumetrics Editorial Team',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
-      'Under the evolving UPI MDR framework, merchant discount rate charges apply strictly to specified commercial merchant transactions above ₹2,000, while consumers pay zero fees. All person-to-person (P2P) transfers and merchant transactions up to ₹2,000 remain 100% free. On a ₹10,000 transaction, an illustrative MDR fee of 0.4% equals ₹40, plus 18% GST (₹7.20), totaling ₹47.20 in processing costs.',
+      'UPI payments made from a bank account carry zero MDR at any amount; a merchant charge applies only when the customer pays more than ₹2,000 through a PPI wallet or a RuPay credit card linked to UPI, and consumers pay no fee either way. All person-to-person (P2P) transfers and merchant transactions up to ₹2,000 remain 100% free. On a ₹10,000 transaction, an illustrative MDR fee of 0.4% equals ₹40, plus 18% GST (₹7.20), totaling ₹47.20 in processing costs.',
     type: 'Trending',
     summary:
-      'India’s Unified Payments Interface (UPI) framework introduces Merchant Discount Rates (MDR) for specified high-value commercial transactions above ₹2,000. Consumers will continue to enjoy completely free transactions, and all everyday peer-to-peer transfers or low-ticket retail purchases up to ₹2,000 carry zero MDR. For business owners, understanding exact PSP settlement deductibles, applicable 18% GST on processing fees, and margin implications is essential for maintaining healthy operational unit economics.',
+      'UPI payments made from a bank account carry zero MDR, whatever the amount; the charge applies only to merchant payments above ₹2,000 made through a PPI wallet or a RuPay credit card on UPI. Consumers will continue to enjoy completely free transactions, and all everyday peer-to-peer transfers or low-ticket retail purchases up to ₹2,000 carry zero MDR. For business owners, understanding exact PSP settlement deductibles, applicable 18% GST on processing fees, and margin implications is essential for maintaining healthy operational unit economics.',
     sources: [
       {
         name: 'National Payments Corporation of India (NPCI)',
@@ -1115,7 +1115,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     ],
     content: `
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
-        Under the regulatory framework governing India’s Unified Payments Interface (UPI), merchant discount rates (MDR) apply exclusively to specified commercial merchant transactions above ₹2,000, while consumers continue to pay absolutely zero fees. If you operate an enterprise or retail business, customers paying via UPI for high-ticket purchases will not bear the cost; instead, the merchant absorbs the MDR fee. On a ₹10,000 merchant sale, an illustrative MDR rate of 0.4% incurs a ₹40 merchant charge plus 18% GST (₹7.20), totaling ₹47.20 in payment processing costs.
+        UPI payments made from a bank account carry zero MDR, whatever the amount; a merchant charge applies only to payments above ₹2,000 made through a PPI wallet or a RuPay credit card on UPI, and consumers continue to pay zero fees. If you operate an enterprise or retail business, customers paying via UPI for high-ticket purchases will not bear the cost; instead, the merchant absorbs the MDR fee. On a ₹10,000 merchant sale, an illustrative MDR rate of 0.4% incurs a ₹40 merchant charge plus 18% GST (₹7.20), totaling ₹47.20 in payment processing costs.
       </p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">

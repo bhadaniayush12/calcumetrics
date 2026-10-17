@@ -573,8 +573,34 @@ const popularSearches = [
         openModal();
       } else if (e.key === 'Escape' && !backdrop.classList.contains('hidden')) {
         closeModal();
+      } else if (e.key === 'Tab' && !backdrop.classList.contains('hidden')) {
+        trapFocus(e);
       }
     });
+
+    // Keep Tab / Shift+Tab cycling inside the open dialog.
+    function trapFocus(e: KeyboardEvent) {
+      const focusable = Array.from(
+        backdrop!.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((el) => el.offsetParent !== null);
+      if (focusable.length === 0) {
+        e.preventDefault();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      const inside = active !== null && backdrop!.contains(active);
+      if (e.shiftKey && (active === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
 
     window.addEventListener('cm:open-search', openModal);
     window.addEventListener('open-search-modal', openModal);

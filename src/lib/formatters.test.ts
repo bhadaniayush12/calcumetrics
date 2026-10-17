@@ -10,6 +10,8 @@ import {
   formatIndianWords,
   formatCompactCurrency,
   formatDisplayDate,
+  formatRatio,
+  formatCurrency,
 } from './formatters';
 
 describe('formatters', () => {
@@ -206,5 +208,36 @@ describe('formatters', () => {
         expect(parseSmartInput('0.0')).toBe(0);
       });
     });
+  });
+});
+
+describe('formatters: signs and non-finite values', () => {
+  it('render NaN and ±Infinity as "-"', () => {
+    for (const v of [NaN, Infinity, -Infinity]) {
+      expect(formatIndian(v)).toBe('-');
+      expect(formatIntl(v, 2)).toBe('-');
+      expect(formatPercent(v)).toBe('-');
+      expect(formatCurrency(v, 'INR')).toBe('-');
+      expect(formatIndianCompact(v)).toBe('-');
+      expect(formatIndianWords(v)).toBe('-');
+      expect(formatCompactCurrency(v, 'USD')).toBe('-');
+    }
+    expect(formatRatio(NaN)).toBe('-');
+  });
+
+  it('never show a minus sign on zero', () => {
+    expect(formatIndian(-0)).toBe('0');
+    expect(formatIndian(-0.4)).toBe('0');
+    expect(formatIntl(-0.001, 2)).toBe('0.00');
+    expect(formatPercent(-0.001)).toBe('0.00%');
+    expect(formatCurrency(-0, 'INR')).toBe('₹0');
+    expect(formatIndianCompact(-0.4, '₹', 0)).toBe('₹0');
+    expect(formatCompactCurrency(-0.001, 'USD')).toBe('$0');
+  });
+
+  it('put the minus sign before the symbol', () => {
+    expect(formatCurrency(-1250, 'INR')).toBe('-₹1,250');
+    expect(formatIndianCompact(-12600000)).toBe('-₹1.26 Cr');
+    expect(formatCompactCurrency(-1260000, 'USD')).toBe('-$1.26M');
   });
 });
