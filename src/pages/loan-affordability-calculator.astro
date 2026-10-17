@@ -7,17 +7,27 @@ import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
 import { calcAffordability } from '../lib/finance/amortization';
+import CountryRules from '../components/calculator/CountryRules.astro';
+import { getCalculatorDefaults } from '../data/market-defaults';
 import { TOOLS } from '../config/site';
 
-const DEFAULT = { monthlyBudget: 40000, rate: 9.0, years: 15 };
+// Server render uses the USD market defaults; the client swaps symbol, grouping and defaults.
+const usdDefaults = getCalculatorDefaults('loan-affordability', 'USD');
+const DEFAULT = { monthlyBudget: usdDefaults['afford-budget'].value, rate: usdDefaults['afford-rate'].value, years: 15 };
 const result = calcAffordability(DEFAULT.monthlyBudget, DEFAULT.rate, DEFAULT.years);
 
-const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+const fmtCurrency = (n: number, sym = '$', locale = 'en-US') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtInput = (n: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
 
 // Worked example and tenure comparison are rendered from the same engine as the calculator.
 const inr = (n: number) => fmtCurrency(n);
-const lakhs = (n: number) => `₹${(n / 100000).toFixed(2)}L`;
+const compactMoney = (n: number) => '$' + new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+const exIncome = DEFAULT.monthlyBudget / 0.4; // budget = 40% of monthly income
+const exCarPayment = Math.round(exIncome * 0.15);
+const RATE_SHOCK_BPS = 150;
+const shocked = calcAffordability(DEFAULT.monthlyBudget, DEFAULT.rate + RATE_SHOCK_BPS / 100, DEFAULT.years);
+const shockDropPct = ((result.maxLoanAmount - shocked.maxLoanAmount) / result.maxLoanAmount) * 100;
 const exMonths = DEFAULT.years * 12;
 const exPrincipalPct = (result.maxLoanAmount / result.totalRepayment) * 100;
 const exInterestPct = 100 - exPrincipalPct;
@@ -70,12 +80,12 @@ const jsonld = {
           name: 'How is maximum loan affordability calculated?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'It inverts the standard loan EMI formula by calculating the present value of an annuity. Given your maximum affordable monthly installment, loan tenure, and prevailing interest rate, it solves for the maximum principal sum a lender would sanction.',
+            text: 'It inverts the standard loan payment formula by calculating the present value of an annuity. Given your maximum affordable monthly installment, loan tenure, and prevailing interest rate, it solves for the maximum principal sum a lender would sanction.',
           },
         },
         {
           '@type': 'Question',
-          name: 'What percentage of my monthly income should go toward loan EMIs?',
+          name: 'What percentage of my monthly income should go toward loan payments?',
           acceptedAnswer: {
             '@type': 'Answer',
             text: 'Prudent financial planning guidelines suggest keeping total debt obligations (including home loan, car loan, and credit cards) under 35% to 40% of gross monthly income (the Debt-to-Income or DTI benchmark).',
@@ -99,7 +109,7 @@ const jsonld = {
         },
         {
           '@type': 'Question',
-          name: 'What other costs should I budget for besides loan EMI?',
+          name: 'What other costs should I budget for besides the loan payment?',
           acceptedAnswer: {
             '@type': 'Answer',
             text: 'Borrowers should budget for loan processing fees, legal verification costs, stamp duty, mandatory property or loan insurance, and future maintenance or property taxes.',
@@ -113,7 +123,7 @@ const jsonld = {
 
 <Layout
   title="Loan Affordability Calculator: Max Borrowing | Calcumetrics"
-  description="Free home loan affordability calculator. Find your maximum affordable loan amount from your monthly EMI budget, interest rate, and tenure. Instant results."
+  description="Free home loan affordability calculator. Find your maximum affordable loan amount from your monthly payment budget, interest rate, and term. Instant results."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -142,16 +152,16 @@ const jsonld = {
         <Input
           id="afford-budget"
           label="Monthly Repayment Budget"
-          prefix="₹"
-          value="40,000"
+          prefix="$"
+          value={fmtInput(DEFAULT.monthlyBudget)}
           isNumeric={true}
           localeFormat="indian"
-          helperText="Maximum monthly EMI you can comfortably afford"
+          helperText="Maximum monthly payment you can comfortably afford"
           inputmode="decimal"
           aria-describedby="afford-error-msg"
         />
         <div class="mt-2">
-          <Slider id="afford-budget-slider" min={5000} max={500000} step={2500} value={40000} ariaLabel="Monthly budget slider" />
+          <Slider id="afford-budget-slider" min={usdDefaults['afford-budget'].min} max={usdDefaults['afford-budget'].max} step={usdDefaults['afford-budget'].step} value={DEFAULT.monthlyBudget} ariaLabel="Monthly budget slider" />
         </div>
       </div>
 
@@ -161,14 +171,14 @@ const jsonld = {
           id="afford-rate"
           label="Expected Annual Interest Rate"
           suffix="%"
-          value="9.0"
+          value={String(DEFAULT.rate)}
           isNumeric={true}
           helperText="Anticipated loan interest rate"
           inputmode="decimal"
           aria-describedby="afford-error-msg"
         />
         <div class="mt-2">
-          <Slider id="afford-rate-slider" min={3} max={20} step={0.1} value={9.0} ariaLabel="Interest rate slider" />
+          <Slider id="afford-rate-slider" min={usdDefaults['afford-rate'].min} max={usdDefaults['afford-rate'].max} step={usdDefaults['afford-rate'].step} value={DEFAULT.rate} ariaLabel="Interest rate slider" />
         </div>
       </div>
 
@@ -204,7 +214,7 @@ const jsonld = {
 
       <div class="space-y-0 border-t border-dark-border pt-4 mb-5">
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
-          <span class="text-xs text-dark-muted">Monthly EMI Budget</span>
+          <span class="text-xs text-dark-muted">Monthly Payment Budget</span>
           <span id="afford-result-budget" class="text-sm font-medium tabular-nums text-dark-text">{fmtCurrency(result.monthlyBudget)}</span>
         </div>
         <div class="flex items-center justify-between py-2.5 border-b border-dark-border">
@@ -248,21 +258,21 @@ const jsonld = {
       <section aria-labelledby="afford-calculator-how">
         <h2 id="afford-calculator-how" class="text-xl font-bold text-text-primary mb-4">How loan affordability is determined</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Loan affordability models invert the standard Equated Monthly Installment (EMI) reducing-balance equation by calculating the Present Value (PV) of an ordinary annuity. Lenders calculate the maximum principal balance your monthly disposable cash flow can service:
+          Loan affordability models invert the standard reducing-balance loan payment equation by calculating the Present Value (PV) of an ordinary annuity. Lenders calculate the maximum principal balance your monthly disposable cash flow can service:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <p class="text-sm text-text-muted leading-relaxed font-mono">
             <strong>1. Periodic Monthly Rate:</strong> r = Annual Interest Rate (%) &divide; 12 &divide; 100<br /><br />
             <strong>2. Total Payment Installments:</strong> n = Loan Term (Years) &times; 12<br /><br />
-            <strong>3. Maximum Affordable Principal:</strong> P<sub>max</sub> = EMI &times; [ (1 + r)<sup>n</sup> &minus; 1 ] &divide; [ r &times; (1 + r)<sup>n</sup> ]<br /><br />
-            <strong>4. Total Cumulative Outflow:</strong> Total Repayment = EMI &times; n<br /><br />
-            <strong>5. Total Lifetime Interest:</strong> Total Interest = (EMI &times; n) &minus; P<sub>max</sub>
+            <strong>3. Maximum Affordable Principal:</strong> P<sub>max</sub> = PMT &times; [ (1 + r)<sup>n</sup> &minus; 1 ] &divide; [ r &times; (1 + r)<sup>n</sup> ]<br /><br />
+            <strong>4. Total Cumulative Outflow:</strong> Total Repayment = PMT &times; n<br /><br />
+            <strong>5. Total Lifetime Interest:</strong> Total Interest = (PMT &times; n) &minus; P<sub>max</sub>
           </p>
         </div>
 
         <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Suppose you can comfortably dedicate <strong>₹40,000 per month</strong> toward debt service, applying for a loan at an expected annual interest rate of <strong>9.00%</strong> over a <strong>15-year tenure (180 months)</strong>:
+          Suppose you can comfortably dedicate <strong>{inr(DEFAULT.monthlyBudget)} per month</strong> toward debt service, applying for a loan at an expected annual interest rate of <strong>9.00%</strong> over a <strong>15-year tenure (180 months)</strong>:
         </p>
 
         <div class="overflow-x-auto border border-border rounded-card mb-6">
@@ -277,10 +287,10 @@ const jsonld = {
             </thead>
             <tbody class="divide-y divide-border text-text-muted">
               <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Repayment Budget (EMI)</td>
+                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Repayment Budget (PMT)</td>
                 <td class="py-2.5 px-4 font-mono">Target Monthly Allocation</td>
                 <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{inr(DEFAULT.monthlyBudget)} / Month</td>
-                <td class="py-2.5 px-4">Represents 40% of a ₹1,00,000 monthly take-home salary.</td>
+                <td class="py-2.5 px-4">Represents 40% of a {inr(exIncome)} monthly income.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Periodic Monthly Rate (r)</td>
@@ -314,7 +324,7 @@ const jsonld = {
               </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
                 <td class="py-3 px-4">Principal vs Interest Composition</td>
-                <td class="py-3 px-4 font-mono">{lakhs(result.maxLoanAmount)} (P) vs {lakhs(result.totalInterest)} (I)</td>
+                <td class="py-3 px-4 font-mono">{compactMoney(result.maxLoanAmount)} (P) vs {compactMoney(result.totalInterest)} (I)</td>
                 <td class="py-3 px-4 font-mono">{exPrincipalPct.toFixed(1)}% Principal / {exInterestPct.toFixed(1)}% Interest</td>
                 <td class="py-3 px-4">Over half of your total lifetime payments go toward principal retirement.</td>
               </tr>
@@ -334,8 +344,8 @@ const jsonld = {
                 return (
                   <li>
                     <strong>{row.years}-Year Loan{row.years === DEFAULT.years ? ' (Default)' : ''}:</strong> Borrow {inr(row.maxLoanAmount)}
-                    {prev && <> (+{lakhs(row.maxLoanAmount - prev.maxLoanAmount)} borrowing power)</>}. Total interest paid is {inr(row.totalInterest)}
-                    {prev ? <> (+{lakhs(row.totalInterest - prev.totalInterest)})</> : <> ({((row.totalInterest / row.totalRepayment) * 100).toFixed(1)}% of outflow)</>}
+                    {prev && <> (+{compactMoney(row.maxLoanAmount - prev.maxLoanAmount)} borrowing power)</>}. Total interest paid is {inr(row.totalInterest)}
+                    {prev ? <> (+{compactMoney(row.totalInterest - prev.totalInterest)})</> : <> ({((row.totalInterest / row.totalRepayment) * 100).toFixed(1)}% of outflow)</>}
                     {row.totalInterest > row.maxLoanAmount && <> — {(row.totalInterest / row.maxLoanAmount).toFixed(2)}&times; the principal borrowed</>}.
                   </li>
                 );
@@ -344,14 +354,14 @@ const jsonld = {
           </div>
 
           <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">FOIR &amp; DTI Underwriting Standards</h3>
+            <h3 class="text-base font-bold text-text-primary mb-2">Debt-to-Income Underwriting Limits</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
-              Banks do not permit borrowers to commit 100% of their salary to EMIs. Lenders apply strict underwriting caps:
+              Lenders do not let borrowers commit their whole income to loan payments. They cap total debt payments as a share of income (see the country boxes below):
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>FOIR (Fixed Obligation to Income Ratio):</strong> In India, banks cap total monthly debt obligations at 40% to 50% of net monthly income (or up to 60% for high earners above ₹2L/month).</li>
-              <li><strong>Existing Debt Deductions:</strong> If you earn ₹1,00,000/month and already have a ₹15,000 car EMI, your eligible mortgage budget drops from ₹40,000 to ₹25,000.</li>
-              <li><strong>Credit Score Hurdle:</strong> A CIBIL score &ge;750 (or FICO &ge;740) is required to secure prime rates. Scores below 700 add 100–250 bps in risk premiums, shrinking borrowing power by 6–15%.</li>
+              <li><strong>Debt-to-Income Cap:</strong> Total monthly debt payments are usually limited to a fixed share of income, set by the lender, loan program and country.</li>
+              <li><strong>Existing Debt Deductions:</strong> If you earn {inr(exIncome)}/month and already pay {inr(exCarPayment)} on a car loan, your budget for a new loan drops from {inr(DEFAULT.monthlyBudget)} to {inr(DEFAULT.monthlyBudget - exCarPayment)}.</li>
+              <li><strong>Credit Score Hurdle:</strong> The best rates go to borrowers with strong credit scores. A higher rate means a smaller loan for the same monthly payment.</li>
             </ul>
           </div>
         </div>
@@ -359,12 +369,14 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Exclusions</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-            <li><strong>LTV (Loan-to-Value) Ceiling:</strong> Even if your income supports a ₹40L loan, lenders will not lend more than 75% to 80% of the property's appraised market value. You must provide the remaining 20% to 25% as an upfront cash down payment.</li>
-            <li><strong>Interest Rate Volatility:</strong> This calculation models a constant 9.00% fixed rate. Most long-term retail loans are floating. If RBI or central bank rates rise by 150 bps, your affordable principal shrinks by over 8% for the same monthly budget.</li>
+            <li><strong>LTV (Loan-to-Value) Ceiling:</strong> Even if your income supports a {compactMoney(result.maxLoanAmount)} loan, lenders will not lend more than 75% to 80% of the property's appraised market value. You must provide the remaining 20% to 25% as an upfront cash down payment.</li>
+            <li><strong>Interest Rate Volatility:</strong> This calculation models a constant {DEFAULT.rate.toFixed(2)}% fixed rate. Many long-term loans are variable. If rates rise by {RATE_SHOCK_BPS} bps, your affordable principal shrinks by about {shockDropPct.toFixed(1)}% for the same monthly budget.</li>
             <li><strong>Incidental Closing Costs:</strong> Mandatory statutory outlays like stamp duty, property registration, legal documentation fees, and property insurance are excluded from the sanctioned loan sum.</li>
           </ul>
         </div>
       </section>
+
+      <CountryRules id="afford-country-rules" />
 
       <div class="p-4 bg-surface border border-accent/30 rounded-card mb-10 text-xs text-text-muted">
         <strong class="text-text-primary text-sm block mb-1">Wondering how lenders evaluate your debt limits?</strong>
@@ -396,7 +408,7 @@ const jsonld = {
           <a href="/home-loan-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
             <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Home Loan Calculator</h3>
-            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate residential property EMI, loan interest, and amortization schedule.</p>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate the monthly payment, loan interest, and amortization schedule for a home loan.</p>
           </a>
           <a href="/debt-to-income-ratio-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Loans</span>
@@ -412,14 +424,15 @@ const jsonld = {
 <script>
   import { validate } from '../lib/validate';
   import { moneyRules } from '../lib/currency';
+  import { activePageCurrency, applyCurrencyVisibility, pageCurrencyFor } from '../lib/page-currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcAffordability } from '../lib/finance/amortization';
 
   let currentHashState: Record<string, any> = {};
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  let currSym = '$';
+  let currLocale = 'en-US';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -447,13 +460,8 @@ const jsonld = {
     const errMsg = document.getElementById('afford-error-msg');
 
     if (!bInput || !rInput || !yInput) return;
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
+    ({ symbol: currSym, locale: currLocale } = activePageCurrency());
+    applyCurrencyVisibility(activePageCurrency().code);
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
     });
@@ -464,7 +472,7 @@ const jsonld = {
     }
     bInput.dataset.bound = 'true';
 
-    const DEFAULTS = { monthlyBudget: 40000, rate: 9.0, years: 15 };
+    const DEFAULTS = { monthlyBudget: 2000, rate: 6.5, years: 15 }; // USD market defaults; the layout applies the active market's defaults on reset
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -503,7 +511,7 @@ const jsonld = {
         heroValue: fmtVal(res.maxLoanAmount),
         heroLabel: 'Maximum Affordable Loan',
         rows: [
-          { label: 'Monthly EMI Budget', value: fmtVal(budget) },
+          { label: 'Monthly Payment Budget', value: fmtVal(budget) },
           { label: 'Total Loan Repayment', value: fmtVal(res.totalRepayment) },
           { label: 'Total Interest Payable', value: fmtVal(res.totalInterest) },
           { label: 'Principal Share', value: shareText },
@@ -577,15 +585,15 @@ const jsonld = {
 
       if (bSlider) {
         bSlider.value = String(DEFAULTS.monthlyBudget);
-        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthlyBudget - 5000) / (500000 - 5000)) * 100}%`);
+        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.monthlyBudget - Number(bSlider.min)) / (Number(bSlider.max) - Number(bSlider.min))) * 100}%`);
       }
       if (rSlider) {
         rSlider.value = String(DEFAULTS.rate);
-        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - 3) / (20 - 3)) * 100}%`);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.rate - Number(rSlider.min)) / (Number(rSlider.max) - Number(rSlider.min))) * 100}%`);
       }
       if (ySlider) {
         ySlider.value = String(DEFAULTS.years);
-        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - 1) / (30 - 1)) * 100}%`);
+        ySlider.style.setProperty('--slider-pct', `${((DEFAULTS.years - Number(ySlider.min)) / (Number(ySlider.max) - Number(ySlider.min))) * 100}%`);
       }
 
       clearError();
@@ -672,8 +680,8 @@ const jsonld = {
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        ({ symbol: currSym, locale: currLocale } = pageCurrencyFor(e.detail.code));
+        applyCurrencyVisibility(pageCurrencyFor(e.detail.code).code);
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });
