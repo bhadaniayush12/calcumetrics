@@ -11,7 +11,10 @@ import { JIO_IPO_POST } from './jio-platforms-ipo-listing-gains-tax';
 
 import { SBI_OCTOBER_POST } from './sbi-home-loan-rate-hike-october-2026-emi';
 
+import { SMALL_SAVINGS_POST } from './small-savings-rates-october-december-2026';
+
 export const BLOG_POSTS: BlogPost[] = [
+  SMALL_SAVINGS_POST,
   SBI_OCTOBER_POST,
   JIO_IPO_POST,
   ...PHASE_11_POSTS,
