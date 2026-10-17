@@ -2,6 +2,9 @@
  * Computes merchant transaction fees, GST, and net settlement for UPI / PPI / RuPay Credit on UPI.
  */
 
+/** PPI / RuPay interchange applies only to transactions above this value (NPCI). */
+export const PPI_INTERCHANGE_TICKET_THRESHOLD = 2000;
+
 export interface UPIMDRResult {
   monthlyVolume: number;
   chargeableVolume: number;
@@ -16,7 +19,7 @@ export interface UPIMDRResult {
 export function calcUPIMDR(
   monthlyVolume: number,
   averageTicketSize: number = 1500,
-  chargeableSharePct: number = 20, // percentage of volume from PPI wallets / RuPay Credit cards over ₹2,000
+  chargeableSharePct: number = 20, // percentage of volume from PPI wallets / RuPay Credit cards
   mdrRatePct: number = 1.1,        // standard NPCI interchange cap: 1.1%
   gstRatePct: number = 18          // standard 18% GST on merchant financial services
 ): UPIMDRResult {
@@ -33,7 +36,10 @@ export function calcUPIMDR(
     };
   }
 
-  const chargeableFraction = Math.min(100, Math.max(0, chargeableSharePct)) / 100;
+  // Interchange applies only above ₹2,000 per transaction, so an average ticket at or
+  // below that leaves the PPI / RuPay share with 0 interchange.
+  const ticketExempt = averageTicketSize <= PPI_INTERCHANGE_TICKET_THRESHOLD;
+  const chargeableFraction = ticketExempt ? 0 : Math.min(100, Math.max(0, chargeableSharePct)) / 100;
   const chargeableVolume = monthlyVolume * chargeableFraction;
   const exemptVolume = monthlyVolume - chargeableVolume;
 
