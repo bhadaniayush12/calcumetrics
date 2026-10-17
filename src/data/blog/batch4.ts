@@ -202,7 +202,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'cogs-vs-opex-accounting',
     title: 'COGS vs. Operating Expenses (OpEx): Why Misclassifying Costs Distorts Your Profit Margins',
-    seoTitle: 'COGS vs OpEx: Cost Classification & Profit Margins | Calcumetrics',
+    seoTitle: 'COGS vs OpEx: Cost Classification & Profit Margins',
     description:
       'Learn the accounting differences between Cost of Goods Sold (COGS) and Operating Expenses (OpEx), and how proper classification protects gross margins.',
     category: 'Business',
@@ -405,7 +405,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-wacc',
     title: 'How to Calculate WACC: The Formula, Capital Structure Weights, and Real-World Hurdles',
-    seoTitle: 'How to Calculate WACC: Formula & Capital Structure | Calcumetrics',
+    seoTitle: 'How to Calculate WACC: Formula & Capital Structure',
     description:
       'Master the Weighted Average Cost of Capital (WACC) formula. Learn CAPM cost of equity, after-tax cost of debt, and capital structure weights.',
     category: 'Corporate Finance',
@@ -599,7 +599,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'dcf-valuation-terminal-value-guide',
     title: 'Discounted Cash Flow (DCF) Valuation: How Terminal Value Drives 70% of Company Worth',
-    seoTitle: 'DCF Valuation & Terminal Value: Complete Guide | Calcumetrics',
+    seoTitle: 'DCF Valuation & Terminal Value Guide | Calcumetrics',
     description:
       'Learn how to model Discounted Cash Flow (DCF) valuations, forecast Free Cash Flow to Firm (FCFF), and accurately calculate Terminal Value.',
     category: 'Corporate Finance',
@@ -823,7 +823,7 @@ export const BATCH_4_POSTS: BlogPost[] = [
   {
     slug: 'payback-period-vs-discounted-payback',
     title: 'Payback Period vs. Discounted Payback Period: Why Ignoring the Time Value of Money Misleads Investors',
-    seoTitle: 'Payback Period vs Discounted Payback: Formulas | Calcumetrics',
+    seoTitle: 'Payback Period vs Discounted Payback | Calcumetrics',
     description:
       'Compare standard Payback Period with Discounted Payback Period. Learn how factoring in cost of capital and time value prevents flawed capital allocation.',
     category: 'Corporate Finance',

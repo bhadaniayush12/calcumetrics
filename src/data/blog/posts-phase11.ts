@@ -196,8 +196,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
               <td class="p-3">Performance Metrics</td>
-              <td class="p-3">CAGR: 16.96%<br>XIRR: 16.96%</td>
-              <td class="p-3">CAGR: Mathematical Error<br>XIRR: 25.12%</td>
+              <td class="p-3">CAGR: 16.96%<br>XIRR: 16.94% (1,096 days incl. leap day)</td>
+              <td class="p-3">CAGR: Mathematical Error<br>XIRR: 26.72%</td>
               <td class="p-3">Why? Investor B had $40,000 invested for only 1 year!</td>
             </tr>
           </tbody>
@@ -205,7 +205,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Revelation:</strong> Investor A's $100,000 was at risk for a full 36 months, compounding at an annual rate of <strong>16.96%</strong>. Investor B achieved the exact same final $160,000 with a <strong>25.12% XIRR</strong>. Why? Because Investor B held back $70,000 from market risk initially, deploying the final $40,000 just 12 months before redemption. XIRR credits Investor B for generating $60,000 in capital gains while cash was deployed for a substantially shorter average duration.
+        <strong>The Revelation:</strong> Investor A's $100,000 was at risk for a full 36 months, compounding at an annual rate of <strong>16.96%</strong>. Investor B achieved the exact same final $160,000 with a <strong>26.72% XIRR</strong>. Why? Because Investor B held back $70,000 from market risk initially, deploying the final $40,000 just 12 months before redemption. XIRR credits Investor B for generating $60,000 in capital gains while cash was deployed for a substantially shorter average duration.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Metric Comparison Matrix</h2>
@@ -454,9 +454,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
             <tr class="bg-canvas">
               <td class="p-3 font-medium text-text-primary">Path A: Prepay Extra ₹10,000/mo</td>
               <td class="p-3 font-semibold text-text-primary">₹53,391</td>
-              <td class="p-3 font-semibold text-accent">12.3 Years (148 mos)</td>
-              <td class="p-3 font-semibold text-accent">Interest Saved: ₹23,19,450</td>
-              <td class="p-3">Debt-free 7.7 years earlier! From Year 12.3 to 20, investing the full ₹53,391 EMI into SIP creates ~₹78 Lakh corpus by Year 20.</td>
+              <td class="p-3 font-semibold text-accent">~12.9 Years (154 mos + a final ₹12,919)</td>
+              <td class="p-3 font-semibold text-accent">Total Interest Paid: ₹32,35,158<br>Interest Saved: ₹21,78,721</td>
+              <td class="p-3">Debt-free about 7 years earlier. Investing the full ₹53,391 into an SIP for the remaining 85 months (to Year 20) at 12% creates ~₹71.7 Lakh by Year 20.</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">Path B: Keep EMI, Put ₹10k in Equity SIP</td>
@@ -470,7 +470,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Math Verdict:</strong> Investing ₹10,000 monthly into an equity index fund generating 12% over 20 years creates <strong>₹99.91 Lakh</strong>. Deducting the ₹23.19 Lakh in home loan interest saved by prepaying, the SIP path generates approximately <strong>₹40 to ₹45 Lakh more in net wealth</strong>, even after accounting for the revised 12.5% long-term capital gains tax.
+        <strong>The Math Verdict:</strong> Investing ₹10,000 monthly into an equity index fund generating 12% over 20 years creates <strong>₹99.91 Lakh</strong>. Path A saves ₹21.79 Lakh of interest and then builds about ₹71.7 Lakh from Year 12.9 to Year 20. Both paths leave the house fully paid at Year 20, so the comparison is the two portfolios: the SIP path ends roughly <strong>₹28 Lakh ahead before tax, or about ₹22 Lakh ahead after 12.5% LTCG</strong> (applying the ₹1.25 lakh exemption once).
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Critical Non-Mathematical Risks</h2>
@@ -529,10 +529,10 @@ export const PHASE_11_POSTS: BlogPost[] = [
   },
   {
     slug: 'old-vs-new-tax-regime',
-    title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
-    seoTitle: 'Old vs New Tax Regime: Breakeven Deduction Formula | Calcumetrics',
+    title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
+    seoTitle: 'Old vs New Tax Regime: Breakeven Deduction Formula',
     description:
-      'Breakeven deduction guide between Old and New Tax Regime for FY 2025-27, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
+      'Breakeven deduction guide between Old and New Tax Regime for FY 2025-26, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',
     publishDate: '2026-05-10',
     dateModified: '2026-09-24',
@@ -550,7 +550,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
       {
         name: 'Ministry of Finance, Government of India',
-        citation: 'Statutory Tax Slabs & Provisions in the Finance Bill (FY 2025-27)',
+        citation: 'Statutory Tax Slabs & Provisions in the Finance Bill (FY 2025-26)',
         url: 'https://www.indiabudget.gov.in',
       },
       {
@@ -596,7 +596,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     faqs: [
       {
         question: 'What is the breakeven deduction between Old and New Tax Regime for a ₹15 Lakh salary?',
-        answer: 'For a gross salary of ₹15,00,000 under the current statutory framework (FY 2025-27), the breakeven eligible deduction is ₹5,43,750 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹5,43,750, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
+        answer: 'For a gross salary of ₹15,00,000 under the current statutory framework (FY 2025-26), the breakeven eligible deduction is ₹5,43,750 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹5,43,750, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
       },
       {
         question: 'Is the standard deduction ₹75,000 in both Old and New Tax Regimes?',
@@ -629,7 +629,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         To run your exact salary, rent receipts, and Section 80C deductions through our verified engine, open the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> and compute your exact tax liability under both regimes in seconds.
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Current Statutory Framework &amp; Slabs (FY 2025-27)</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Current Statutory Framework &amp; Slabs (FY 2025-26)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         The statutory tax framework under Section 115BAC features key modifications specifically designed to make the New Tax Regime the default choice for the vast majority of middle- and upper-income taxpayers:
       </p>
@@ -735,7 +735,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Master Breakeven Deduction Table by Salary Band</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
-        Here is the exact mathematical breakeven schedule for salaried individuals under the current statutory framework (FY 2025-27):
+        Here is the exact mathematical breakeven schedule for salaried individuals under the current statutory framework (FY 2025-26):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -848,7 +848,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <p><strong class="text-text-primary">Step 2: Compute your rent or home loan interest shield</strong><br>
         If you pay rent in a metro city or pay substantial home loan interest on a self-occupied property (up to ₹2,00,000 under Section 24(b)), add this to your Step 1 deductions.</p>
         <p><strong class="text-text-primary">Step 3: Compare against the Breakeven Table</strong><br>
-        Check your gross income against our Section 3 lookup table. If your total eligible deductions exceed the breakeven threshold for your band (e.g. ₹4,08,333 for ₹15 Lakh income), opt for the Old Regime. If they fall below, choose the New Regime.</p>
+        Check your gross income against our Section 3 lookup table. If your total eligible deductions exceed the breakeven threshold for your band (e.g. ₹5,43,750 for ₹15 Lakh income), opt for the Old Regime. If they fall below, choose the New Regime.</p>
         <p><strong class="text-text-primary">Step 4: Verify with the Calcumetrics Engine</strong><br>
         Before submitting your investment declaration or filing your ITR, plug your numbers into the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> to compare exact tax outgoes, including marginal relief and cess.</p>
       </div>
@@ -915,7 +915,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'How your total annual taxable income and tax regime choice interact with capital gains liabilities.',
       },
       {
@@ -1699,9 +1699,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
             </tr>
             <tr class="border-t-2 border-border font-semibold text-xs">
               <td class="p-3 text-text-primary">Metric Outputs</td>
-              <td class="p-3">IRR = <span class="text-accent font-bold">24.0%</span><br>NPV @ 10% = $21,638</td>
-              <td class="p-3">IRR = 21.2%<br>NPV @ 10% = <span class="text-accent font-bold">$26,371</span></td>
-              <td class="p-3 text-accent font-bold">Crossover Rate = 14.5%</td>
+              <td class="p-3">IRR = <span class="text-accent font-bold">23.6%</span><br>NPV @ 10% = $19,985</td>
+              <td class="p-3">IRR = 21.1%<br>NPV @ 10% = <span class="text-accent font-bold">$26,371</span></td>
+              <td class="p-3 text-accent font-bold">Crossover Rate = 16.9%</td>
             </tr>
           </tbody>
         </table>
@@ -1711,8 +1711,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <strong>The Decision Rule:</strong>
       </p>
       <ul class="list-disc list-inside text-xs text-text-muted space-y-1 mb-6 ml-2">
-        <li><strong>When Cost of Capital &lt; Crossover Rate (10% &lt; 14.5%):</strong> NPV and IRR conflict! Project A has the higher IRR (24.0% vs 21.2%), but Project B creates more wealth ($NPV_B = $26,371 > $21,638$). <strong>Select Project B.</strong></li>
-        <li><strong>When Cost of Capital &gt; Crossover Rate (e.g. 16% &gt; 14.5%):</strong> Conflict disappears. Project A has both higher IRR and higher NPV. <strong>Select Project A.</strong></li>
+        <li><strong>When Cost of Capital &lt; Crossover Rate (10% &lt; 16.9%):</strong> NPV and IRR conflict! Project A has the higher IRR (23.6% vs 21.1%), but Project B creates more wealth (NPV<sub>B</sub> = $26,371 &gt; NPV<sub>A</sub> = $19,985). <strong>Select Project B.</strong></li>
+        <li><strong>When Cost of Capital &gt; Crossover Rate (e.g. 20% &gt; 16.9%):</strong> Conflict disappears. Project A has both higher IRR and higher NPV ($4,630 vs $2,315 at 20%). <strong>Select Project A.</strong></li>
       </ul>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Multiple IRR Trap in Non-Conventional Cash Flows</h2>
@@ -1959,7 +1959,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
           <div class="border-t border-border pt-2 text-xs space-y-1">
             <div class="flex justify-between"><span>5-Year Total Interest:</span> <strong class="font-mono text-red-400">₹4,25,000</strong></div>
             <div class="flex justify-between"><span>Monthly EMI:</span> <strong class="font-mono text-text-primary">₹23,750</strong></div>
-            <div class="flex justify-between"><span>True Reducing APR:</span> <strong class="font-mono text-red-400 font-bold">15.84%</strong></div>
+            <div class="flex justify-between"><span>True Reducing APR:</span> <strong class="font-mono text-red-400 font-bold">14.92%</strong></div>
+            <div class="flex justify-between"><span>Effective Annual Rate (EAR):</span> <strong class="font-mono text-red-400">15.99%</strong></div>
           </div>
         </div>
 
@@ -1969,7 +1970,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
           <p class="text-xs text-text-muted mb-2">• Stated Rate: 14.0% Reducing Balance</p>
           <p class="text-xs text-text-muted mb-3">• Interest charged strictly on monthly balance</p>
           <div class="border-t border-border pt-2 text-xs space-y-1">
-            <div class="flex justify-between"><span>5-Year Total Interest:</span> <strong class="font-mono text-accent">₹3,96,096</strong></div>
+            <div class="flex justify-between"><span>5-Year Total Interest:</span> <strong class="font-mono text-accent">₹3,96,095</strong></div>
             <div class="flex justify-between"><span>Monthly EMI:</span> <strong class="font-mono text-accent">₹23,268</strong></div>
             <div class="flex justify-between"><span>True Reducing APR:</span> <strong class="font-mono text-accent font-bold">14.00%</strong></div>
           </div>
@@ -1977,7 +1978,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        <strong>The Counter-Intuitive Outcome:</strong> The dealership's "8.5%" loan costs <strong>₹28,904 MORE in interest</strong> than the bank's "14.0%" loan, and requires a higher monthly EMI (₹23,750 vs ₹23,268). A consumer who did not understand the difference would eagerly pick Offer A, believing they saved 5.5% on interest.
+        <strong>The Counter-Intuitive Outcome:</strong> The dealership's "8.5%" loan costs <strong>₹28,905 MORE in interest</strong> than the bank's "14.0%" loan, and requires a higher monthly EMI (₹23,750 vs ₹23,268). A consumer who did not understand the difference would eagerly pick Offer A, believing they saved 5.5% on interest.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Regulatory Defense: RBI's Key Facts Statement (KFS)</h2>
@@ -2366,7 +2367,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Determine your baseline annual tax liability before scheduling quarterly advance tax payments.',
       },
     ],

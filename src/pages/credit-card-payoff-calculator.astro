@@ -6,14 +6,43 @@ import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import CountryRules from '../components/calculator/CountryRules.astro';
 import { calcCreditCardPayoff } from '../lib/finance/amortization';
+import { CURRENCY_CONFIG, type CurrencyCode } from '../lib/currency';
+import { getCalculatorDefaults } from '../data/market-defaults';
 import { TOOLS } from '../config/site';
 
-const DEFAULT = { balance: 150000, apr: 36.0, payment: 10000 };
+// Server render uses the USD market defaults (like the mortgage page); the client swaps
+// symbol, grouping and defaults for the selected currency.
+const usdDefaults = getCalculatorDefaults('credit-card-payoff', 'USD');
+const DEFAULT = { balance: usdDefaults['cc-balance'].value, apr: usdDefaults['cc-apr'].value, payment: usdDefaults['cc-payment'].value };
 const result = calcCreditCardPayoff(DEFAULT.balance, DEFAULT.apr, DEFAULT.payment);
 
-const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
-  sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const moneyIn = (code: CurrencyCode) => (n: number) =>
+  CURRENCY_CONFIG[code].symbol + new Intl.NumberFormat(CURRENCY_CONFIG[code].locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtCurrency = moneyIn('USD');
+const fmtInput = (n: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
+
+// Worked examples from the engine with each market's defaults. USD is shown by default;
+// the INR version is shown only to INR visitors.
+const CONSOLIDATION_APR: Partial<Record<CurrencyCode, number>> = { USD: 12, INR: 13 };
+function buildExample(code: CurrencyCode) {
+  const d = getCalculatorDefaults('credit-card-payoff', code);
+  const balance = d['cc-balance'].value, apr = d['cc-apr'].value, payment = d['cc-payment'].value;
+  const money = moneyIn(code);
+  const res = calcCreditCardPayoff(balance, apr, payment);
+  const monthlyPct = apr / 12;
+  const m1Interest = (balance * monthlyPct) / 100;
+  const m1Principal = payment - m1Interest;
+  const m2Interest = ((balance - m1Principal) * monthlyPct) / 100;
+  const ear = (Math.pow(1 + apr / 1200, 12) - 1) * 100;
+  const fastPayment = payment * 1.5;
+  const fast = calcCreditCardPayoff(balance, apr, fastPayment);
+  const loanApr = CONSOLIDATION_APR[code] ?? 12;
+  const loanInterest = (balance * loanApr) / 1200;
+  return { code, balance, apr, payment, money, res, monthlyPct, m1Interest, m1Principal, m2Interest, ear, fastPayment, fast, loanApr, loanInterest };
+}
+const examples = [buildExample('USD'), buildExample('INR')];
 
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'credit-card-payoff-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/credit-card-payoff-calculator';
@@ -59,7 +88,7 @@ const jsonld = {
           name: 'What happens if I only pay the minimum due on my credit card?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Paying only the minimum due (usually 5% of the balance) prolongs debt repayment over decades because the vast majority of your payment covers finance charges and taxes, leaving principal virtually untouched while interest continues to compound.',
+            text: 'Paying only the minimum due can stretch repayment over many years, because most of each payment covers interest and fees and only a small slice reduces the balance. How the minimum is set varies by country and card issuer (see the country boxes on this page).',
           },
         },
         {
@@ -67,7 +96,7 @@ const jsonld = {
           name: 'Why are credit card interest rates (APR) so high?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Credit cards represent unsecured revolving consumer debt without collateral. To offset high default and delinquency risks, banks charge APRs typically ranging between 24% and 42% per annum.',
+            text: 'Credit cards are unsecured revolving debt with no collateral. To offset higher default risk, card issuers charge far more than secured loans; typical purchase APRs differ by country, so check the rate on your statement.',
           },
         },
         {
@@ -83,7 +112,7 @@ const jsonld = {
           name: 'How does a balance transfer card or personal loan help?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Consolidating revolving 36%–42% card debt into a lower-interest personal loan (12%–15%) or a 0% introductory APR balance transfer card drastically lowers monthly finance charges, allowing 100% of your payment to extinguish principal faster.',
+            text: 'Moving high-APR card debt to a lower-rate personal loan or a 0% introductory balance transfer card cuts the monthly interest charge, so more of each payment reduces the balance. Watch for transfer fees and the rate after the introductory period ends.',
           },
         },
         {
@@ -101,7 +130,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="Credit Card Payoff Calculator: Debt Free Timeline | Calcumetrics"
+  title="Credit Card Payoff Calculator: Debt-Free Date | Calcumetrics"
   description="Free credit card payoff calculator. Use this credit card debt payoff calculator to find payoff duration, interest savings, and debt-free schedules."
   canonical={canonicalUrl}
 >
@@ -131,16 +160,16 @@ const jsonld = {
         <Input
           id="cc-balance"
           label="Current Outstanding Balance"
-          prefix="₹"
-          value="1,50,000"
+          prefix="$"
+          value={fmtInput(DEFAULT.balance)}
           isNumeric={true}
-          localeFormat="indian"
+          localeFormat="international"
           helperText="Total credit card balance to eliminate"
           inputmode="decimal"
           aria-describedby="cc-error-msg"
         />
         <div class="mt-2">
-          <Slider id="cc-balance-slider" min={5000} max={2000000} step={5000} value={150000} ariaLabel="Card balance slider" />
+          <Slider id="cc-balance-slider" min={usdDefaults['cc-balance'].min} max={usdDefaults['cc-balance'].max} step={usdDefaults['cc-balance'].step} value={DEFAULT.balance} ariaLabel="Card balance slider" />
         </div>
       </div>
 
@@ -150,14 +179,14 @@ const jsonld = {
           id="cc-apr"
           label="Annual Interest Rate (APR)"
           suffix="%"
-          value="36.0"
+          value={String(DEFAULT.apr)}
           isNumeric={true}
-          helperText="Standard card APR (typically 36% to 42% p.a.)"
+          helperText="Purchase APR shown on your card statement"
           inputmode="decimal"
           aria-describedby="cc-error-msg"
         />
         <div class="mt-2">
-          <Slider id="cc-apr-slider" min={10} max={50} step={0.5} value={36.0} ariaLabel="APR slider" />
+          <Slider id="cc-apr-slider" min={usdDefaults['cc-apr'].min} max={usdDefaults['cc-apr'].max} step={usdDefaults['cc-apr'].step} value={DEFAULT.apr} ariaLabel="APR slider" />
         </div>
       </div>
 
@@ -166,16 +195,16 @@ const jsonld = {
         <Input
           id="cc-payment"
           label="Planned Monthly Payment"
-          prefix="₹"
-          value="10,000"
+          prefix="$"
+          value={fmtInput(DEFAULT.payment)}
           isNumeric={true}
-          localeFormat="indian"
+          localeFormat="international"
           helperText="Fixed amount you plan to pay each month"
           inputmode="decimal"
           aria-describedby="cc-error-msg"
         />
         <div class="mt-2">
-          <Slider id="cc-payment-slider" min={1000} max={100000} step={500} value={10000} ariaLabel="Monthly payment slider" />
+          <Slider id="cc-payment-slider" min={usdDefaults['cc-payment'].min} max={usdDefaults['cc-payment'].max} step={usdDefaults['cc-payment'].step} value={DEFAULT.payment} ariaLabel="Monthly payment slider" />
         </div>
       </div>
 
@@ -252,102 +281,100 @@ const jsonld = {
           </p>
         </div>
 
-        <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
-        <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Consider an outstanding credit card debt of <strong>₹1,50,000</strong> at a standard revolving APR of <strong>36.00%</strong> (3.00% per month) with a disciplined commitment of <strong>₹10,000 per month</strong> toward debt elimination:
-        </p>
-
-        <div class="overflow-x-auto border border-border rounded-card mb-6">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="bg-surface border-b border-border text-text-primary font-semibold">
-                <th class="py-2.5 px-4">Payoff Metric / Milestone</th>
-                <th class="py-2.5 px-4">Calculation / Methodology</th>
-                <th class="py-2.5 px-4">Computed Output</th>
-                <th class="py-2.5 px-4">Financial Consequence</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-border text-text-muted">
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Starting Revolving Balance (P)</td>
-                <td class="py-2.5 px-4 font-mono">Current Card Statement Due</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,50,000</td>
-                <td class="py-2.5 px-4">Principal debt subject to 36% annual compounding finance charges.</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Interest Rate (r)</td>
-                <td class="py-2.5 px-4 font-mono">36.00% &divide; 12</td>
-                <td class="py-2.5 px-4 font-mono">3.00% / Month</td>
-                <td class="py-2.5 px-4">Vicious compounding rate (compounds to 42.58% effective annual rate EAR).</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Planned Monthly Payment (PMT)</td>
-                <td class="py-2.5 px-4 font-mono">Fixed User Commitment</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹10,000 / Month</td>
-                <td class="py-2.5 px-4">Well above Month 1 interest threshold (₹4,500), guaranteeing debt reduction.</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
-                <td class="py-2.5 px-4 font-mono">Interest: ₹1.5L &times; 3% = ₹4,500<br />Principal: ₹10k &minus; ₹4.5k = ₹5,500</td>
-                <td class="py-2.5 px-4 font-mono">45% Interest / 55% Principal</td>
-                <td class="py-2.5 px-4">Ending balance drops to ₹1,44,500, lowering Month 2 interest to ₹4,335.</td>
-              </tr>
-              <tr class="bg-surface/50 font-semibold text-text-primary">
-                <td class="py-2.5 px-4">Total Payoff Duration</td>
-                <td class="py-2.5 px-4 font-mono">Amortization Equation Solved</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">21 Months (1.8 Years)</td>
-                <td class="py-2.5 px-4">Complete debt freedom achieved in under two years.</td>
-              </tr>
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Total Cash Paid to Bank</td>
-                <td class="py-2.5 px-4 font-mono">₹10,000 &times; 21 Months</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹2,10,000</td>
-                <td class="py-2.5 px-4">Gross cash outflow required to eliminate card obligation.</td>
-              </tr>
-              <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
-                <td class="py-3 px-4">Total Interest Accrued</td>
-                <td class="py-3 px-4 font-mono">₹2,10,000 &minus; ₹1,50,000</td>
-                <td class="py-3 px-4 font-mono text-accent font-bold">₹60,000 (28.6%)</td>
-                <td class="py-3 px-4">Pure financing cost paid to the credit card company.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
-          <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">The Brutal "Minimum Payment" Trap</h3>
-            <p class="text-xs text-text-muted leading-relaxed mb-3">
-              Paying only the standard minimum due (typically 5% of balance) on this ₹1,50,000 debt causes severe financial damage:
+        {examples.map((ex) => (
+          <div {...(ex.code === 'INR' ? { 'data-inr-only': '', class: 'hidden' } : { 'data-non-inr-only': '' })}>
+            <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario{ex.code === 'INR' ? ', India' : ''})</h3>
+            <p class="text-sm text-text-muted leading-relaxed mb-3">
+              Consider an outstanding credit card balance of <strong>{ex.money(ex.balance)}</strong> at an APR of <strong>{ex.apr.toFixed(2)}%</strong> ({ex.monthlyPct.toFixed(2)}% per month) with a fixed payment of <strong>{ex.money(ex.payment)} per month</strong>:
             </p>
-            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Minimum Due Only:</strong> Takes over <strong>14 years (170+ months)</strong> to become debt free, costing over <strong>₹1,85,000 in interest alone</strong> (exceeding original principal!).</li>
-              <li><strong>Fixed ₹10,000 Payment:</strong> Eradicates debt in <strong>21 months</strong> and saves over <strong>₹1,25,000 in interest</strong>.</li>
-              <li><strong>Accelerated ₹15,000 Payment:</strong> Eradicates debt in just <strong>12 months</strong> with only ₹32,450 total interest.</li>
-            </ul>
-          </div>
+            <div class="overflow-x-auto border border-border rounded-card mb-6">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-surface border-b border-border text-text-primary font-semibold">
+                    <th class="py-2.5 px-4">Payoff Metric / Milestone</th>
+                    <th class="py-2.5 px-4">Calculation / Methodology</th>
+                    <th class="py-2.5 px-4">Computed Output</th>
+                    <th class="py-2.5 px-4">Financial Consequence</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-border text-text-muted">
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-text-primary">Starting Balance (P)</td>
+                    <td class="py-2.5 px-4 font-mono">Current statement balance</td>
+                    <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{ex.money(ex.balance)}</td>
+                    <td class="py-2.5 px-4">Principal subject to {ex.apr}% annual finance charges.</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-text-primary">Monthly Interest Rate (r)</td>
+                    <td class="py-2.5 px-4 font-mono">{ex.apr.toFixed(2)}% &divide; 12</td>
+                    <td class="py-2.5 px-4 font-mono">{ex.monthlyPct.toFixed(2)}% / Month</td>
+                    <td class="py-2.5 px-4">Compounds to a {ex.ear.toFixed(2)}% effective annual rate (EAR).</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-text-primary">Planned Monthly Payment (PMT)</td>
+                    <td class="py-2.5 px-4 font-mono">Fixed commitment</td>
+                    <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{ex.money(ex.payment)} / Month</td>
+                    <td class="py-2.5 px-4">Above the Month 1 interest of {ex.money(ex.m1Interest)}, so the balance falls every month.</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-text-primary">Month 1 Breakdown</td>
+                    <td class="py-2.5 px-4 font-mono">Interest: {ex.money(ex.balance)} &times; {ex.monthlyPct.toFixed(2)}% = {ex.money(ex.m1Interest)}<br />Principal: {ex.money(ex.payment)} &minus; {ex.money(ex.m1Interest)} = {ex.money(ex.m1Principal)}</td>
+                    <td class="py-2.5 px-4 font-mono">{Math.round((ex.m1Interest / ex.payment) * 100)}% Interest / {Math.round((ex.m1Principal / ex.payment) * 100)}% Principal</td>
+                    <td class="py-2.5 px-4">Balance drops to {ex.money(ex.balance - ex.m1Principal)}, lowering Month 2 interest to {ex.money(ex.m2Interest)}.</td>
+                  </tr>
+                  <tr class="bg-surface/50 font-semibold text-text-primary">
+                    <td class="py-2.5 px-4">Total Payoff Duration</td>
+                    <td class="py-2.5 px-4 font-mono">Amortization equation solved</td>
+                    <td class="py-2.5 px-4 font-mono text-accent font-bold">{ex.res.payoffMonths} Months ({(ex.res.payoffMonths / 12).toFixed(1)} Years)</td>
+                    <td class="py-2.5 px-4">The last payment is smaller because it only clears what is left.</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-4 font-medium text-text-primary">Total Cash Paid</td>
+                    <td class="py-2.5 px-4 font-mono">{ex.money(ex.payment)} &times; {ex.res.payoffMonths - 1} + final payment</td>
+                    <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{ex.money(ex.res.totalPaid)}</td>
+                    <td class="py-2.5 px-4">Gross cash outflow needed to clear the card.</td>
+                  </tr>
+                  <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
+                    <td class="py-3 px-4">Total Interest</td>
+                    <td class="py-3 px-4 font-mono">{ex.money(ex.res.totalPaid)} &minus; {ex.money(ex.balance)}</td>
+                    <td class="py-3 px-4 font-mono text-accent font-bold">{ex.money(ex.res.totalInterest)} ({((ex.res.totalInterest / ex.res.totalPaid) * 100).toFixed(1)}%)</td>
+                    <td class="py-3 px-4">Financing cost paid to the card issuer.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-          <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">Debt Elimination Strategies</h3>
-            <p class="text-xs text-text-muted leading-relaxed mb-3">
-              Maximize payoff velocity with these proven financial frameworks:
-            </p>
-            <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>The Avalanche Method:</strong> Direct all surplus cash toward the highest APR card first while paying minimums on others. Mathematically minimizes total interest paid across all liabilities.</li>
-              <li><strong>Personal Loan Consolidation:</strong> Refinancing ₹1,50,000 at 36% APR into a 13% personal loan drops monthly interest from ₹4,500 to ₹1,625 — instantly freeing ₹2,875/month for principal retirement.</li>
-              <li><strong>0% Balance Transfer Card:</strong> Transferring balance to a 0% introductory APR card stops interest accrual for 12–18 months, ensuring 100% of every payment retires principal.</li>
-            </ul>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+              <div class="bg-surface border border-border rounded-card p-5">
+                <h3 class="text-base font-bold text-text-primary mb-2">Why Paying More Each Month Matters</h3>
+                <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+                  <li><strong>Minimum Due Only:</strong> Minimum payments shrink as the balance shrinks, so most of each payment goes to interest and repayment can take many years. See the country boxes below for how minimums are set.</li>
+                  <li><strong>Fixed {ex.money(ex.payment)} Payment:</strong> Clears the debt in <strong>{ex.res.payoffMonths} months</strong> with {ex.money(ex.res.totalInterest)} total interest.</li>
+                  <li><strong>Accelerated {ex.money(ex.fastPayment)} Payment:</strong> Clears the debt in <strong>{ex.fast.payoffMonths} months</strong> with {ex.money(ex.fast.totalInterest)} total interest — {ex.money(ex.res.totalInterest - ex.fast.totalInterest)} less.</li>
+                </ul>
+              </div>
+              <div class="bg-surface border border-border rounded-card p-5">
+                <h3 class="text-base font-bold text-text-primary mb-2">Debt Elimination Strategies</h3>
+                <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
+                  <li><strong>The Avalanche Method:</strong> Direct all surplus cash toward the highest APR card first while paying minimums on others. Mathematically minimizes total interest paid across all liabilities.</li>
+                  <li><strong>Personal Loan Consolidation:</strong> Refinancing {ex.money(ex.balance)} at {ex.apr}% APR into a {ex.loanApr}% personal loan drops monthly interest from {ex.money(ex.m1Interest)} to {ex.money(ex.loanInterest)} — freeing {ex.money(ex.m1Interest - ex.loanInterest)}/month for principal.</li>
+                  <li><strong>0% Balance Transfer Card:</strong> A 0% introductory APR stops interest for the promotional period (often 12–21 months), so every payment reduces principal; check the transfer fee.</li>
+                </ul>
+              </div>
+            </div>
           </div>
-        </div>
+        ))}
 
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Real-World Exclusions</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
             <li><strong>Zero New Transactions:</strong> The model assumes you immediately stop using the card. Any new purchases during the payoff period reset interest calculations and prolong payoff.</li>
-            <li><strong>GST on Finance Charges:</strong> In India, an additional 18% Goods &amp; Services Tax (GST) is levied on all credit card finance charges and processing fees, effectively inflating a 36% APR to over 42.48%.</li>
-            <li><strong>Loss of Interest-Free Grace Period:</strong> Once you carry a rolling month-to-month balance, the 45–50 day interest-free grace period is voided; interest accrues on all new purchases from the exact date of transaction.</li>
+            <li><strong>Taxes and Fees Excluded:</strong> Taxes on finance charges (for example GST in India), annual fees and late fees are not included.</li>
+            <li><strong>Loss of Interest-Free Grace Period:</strong> Once you carry a balance from month to month, the interest-free grace period usually stops; interest can accrue on new purchases from the transaction date.</li>
           </ul>
         </div>
+
+        <CountryRules id="cc-country-rules" />
       </section>
 
       <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
@@ -396,14 +423,15 @@ const jsonld = {
 <script>
   import { validate } from '../lib/validate';
   import { moneyRules } from '../lib/currency';
+  import { activePageCurrency, applyCurrencyVisibility, pageCurrencyFor } from '../lib/page-currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcCreditCardPayoff } from '../lib/finance/amortization';
 
   let currentHashState: Record<string, any> = {};
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  let currSym = '$';
+  let currLocale = 'en-US';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -431,13 +459,8 @@ const jsonld = {
     const errMsg = document.getElementById('cc-error-msg');
 
     if (!bInput || !rInput || !pInput) return;
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
+    ({ symbol: currSym, locale: currLocale } = activePageCurrency());
+    applyCurrencyVisibility(activePageCurrency().code);
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
     });
@@ -448,7 +471,7 @@ const jsonld = {
     }
     bInput.dataset.bound = 'true';
 
-    const DEFAULTS = { balance: 150000, apr: 36.0, payment: 10000 };
+    const DEFAULTS = { balance: 6000, apr: 22, payment: 250 }; // USD market defaults; the layout applies the active market's defaults on reset
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -566,15 +589,15 @@ const jsonld = {
 
       if (bSlider) {
         bSlider.value = String(DEFAULTS.balance);
-        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.balance - 5000) / (2000000 - 5000)) * 100}%`);
+        bSlider.style.setProperty('--slider-pct', `${((DEFAULTS.balance - Number(bSlider.min)) / (Number(bSlider.max) - Number(bSlider.min))) * 100}%`);
       }
       if (rSlider) {
         rSlider.value = String(DEFAULTS.apr);
-        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.apr - 10) / (50 - 10)) * 100}%`);
+        rSlider.style.setProperty('--slider-pct', `${((DEFAULTS.apr - Number(rSlider.min)) / (Number(rSlider.max) - Number(rSlider.min))) * 100}%`);
       }
       if (pSlider) {
         pSlider.value = String(DEFAULTS.payment);
-        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.payment - 1000) / (100000 - 1000)) * 100}%`);
+        pSlider.style.setProperty('--slider-pct', `${((DEFAULTS.payment - Number(pSlider.min)) / (Number(pSlider.max) - Number(pSlider.min))) * 100}%`);
       }
 
       clearError();
@@ -661,8 +684,8 @@ const jsonld = {
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        ({ symbol: currSym, locale: currLocale } = pageCurrencyFor(e.detail.code));
+        applyCurrencyVisibility(pageCurrencyFor(e.detail.code).code);
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });

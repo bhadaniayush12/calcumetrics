@@ -23,6 +23,7 @@
 import type { HTMLAttributes } from 'astro/types';
 import AdSlot from '../ui/AdSlot.astro';
 import IndiaTaxSourceNotice from './IndiaTaxSourceNotice.astro';
+import IndiaTaxAdviceNote from './IndiaTaxAdviceNote.astro';
 import { getCalculatorType } from '../../lib/analytics';
 import { getEmbedForPage } from '../../lib/embed';
 import { ADS_ENABLED } from '../../config/site';
@@ -159,8 +160,6 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
                 <div
                   id="calc-desktop-hero"
                   class="text-[40px] leading-none font-semibold tabular-nums text-dark-text"
-                  aria-live="polite"
-                  aria-atomic="true"
                 >
                   {heroValue}
                 </div>
@@ -168,6 +167,7 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
               <div id="calc-generic-metrics" class="space-y-0 border-t border-dark-border pt-4 empty:hidden"></div>
             </div>
           </slot>
+          <IndiaTaxAdviceNote />
         </div>
       </div>
     </div>
@@ -189,6 +189,10 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
   )}
 </div>
 
+<!-- Screen-reader announcement of the final hero value. The visible hero numbers
+     animate frame by frame, so they carry no aria-live; this updates once after input settles. -->
+<div id="calc-hero-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
 <!-- Mobile: Fixed bottom bar (hidden on desktop) -->
 <div
   id="calc-mobile-bar"
@@ -201,7 +205,6 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
     <p
       id="calc-mobile-hero"
       class="text-xl sm:text-2xl font-bold text-dark-text tabular-nums truncate tracking-tight"
-      aria-live="polite"
     >
       {heroValue}
     </p>
@@ -390,6 +393,18 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
       });
     }
 
+    // Announce the final hero value once, 500 ms after the user stops typing
+    let announceTimer: ReturnType<typeof setTimeout> | undefined;
+    const announceHero = (result: CalcResult) => {
+      clearTimeout(announceTimer);
+      announceTimer = setTimeout(() => {
+        const announcer = document.getElementById('calc-hero-announcer');
+        if (!announcer) return;
+        const label = result.heroLabel ?? document.getElementById('calc-desktop-hero-label')?.textContent?.trim();
+        announcer.textContent = label ? `${label}: ${result.heroValue}` : result.heroValue;
+      }, 500);
+    };
+
     // Helper to render/update DOM from canonical result state with smooth count-up animation
     const applyCanonicalResult = (result: CalcResult) => {
       // Expose animateValue globally for page scripts
@@ -406,6 +421,8 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
       if (desktopHero) animateValue(desktopHero, result.heroValue);
       const desktopLabel = document.getElementById('calc-desktop-hero-label');
       if (desktopLabel && result.heroLabel) desktopLabel.textContent = result.heroLabel;
+
+      announceHero(result);
 
       // Generic metrics/rows rendering (if generic container exists)
       const metricsContainer = document.getElementById('calc-generic-metrics');

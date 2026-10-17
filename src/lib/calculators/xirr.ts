@@ -18,7 +18,8 @@ export interface XIRRResult {
 function npvAtRate(cashFlows: XIRRCashFlow[], rate: number): number {
   const t0 = cashFlows[0].date.getTime();
   return cashFlows.reduce((sum, cf) => {
-    const years = (cf.date.getTime() - t0) / (365.25 * 24 * 3600 * 1000);
+    // Excel XIRR convention: year fraction = days / 365
+    const years = (cf.date.getTime() - t0) / (365 * 24 * 3600 * 1000);
     return sum + cf.amount / Math.pow(1 + rate, years);
   }, 0);
 }
@@ -54,4 +55,34 @@ export function calcXIRR(cashFlows: XIRRCashFlow[], maxIter = 1000, tol = 1e-7):
     }
   }
   return { xirr: 0, xirrPct: 0, valid: false, error: 'XIRR did not converge to a finite real rate.' };
+}
+
+// ── Share-link state ──────────────────────────────────────────────────────────
+// Rows are encoded in the URL hash as "#f=YYYY-MM-DD_amount~YYYY-MM-DD_amount".
+
+export interface XIRRShareRow {
+  date: string;   // YYYY-MM-DD
+  amount: number;
+}
+
+const MAX_SHARED_ROWS = 100;
+
+export function encodeXIRRFlows(rows: XIRRShareRow[]): string {
+  return '#f=' + rows.map((r) => `${r.date}_${r.amount}`).join('~');
+}
+
+/** Returns the shared rows, or null if the hash has no valid "f" state (needs at least 2 rows). */
+export function decodeXIRRFlows(hash: string): XIRRShareRow[] | null {
+  const raw = new URLSearchParams(hash.replace(/^#/, '')).get('f');
+  if (!raw) return null;
+  const rows: XIRRShareRow[] = [];
+  for (const part of raw.split('~').slice(0, MAX_SHARED_ROWS)) {
+    const [date, amt] = part.split('_');
+    const amount = Number(amt);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date ?? '') || Number.isNaN(new Date(date).getTime()) || amt === '' || !Number.isFinite(amount)) {
+      return null;
+    }
+    rows.push({ date, amount });
+  }
+  return rows.length >= 2 ? rows : null;
 }

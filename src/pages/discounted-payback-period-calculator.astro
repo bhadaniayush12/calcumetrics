@@ -107,7 +107,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="Discounted Payback Period Calculator: DPP Formula | Calcumetrics"
+  title="Discounted Payback Period Calculator (DPP) | Calcumetrics"
   description="Free discounted payback period calculator. Apply the discounted payback period formula with TVM discount rates to measure capital recovery timeline."
   canonical={canonicalUrl}
 >
@@ -146,7 +146,7 @@ const jsonld = {
         {DEFAULT_FLOWS.map((flow, i) => (
           <div class="flex gap-3 items-center">
             <span class="text-xs text-text-muted w-12 shrink-0">Year {i + 1}</span>
-            <Input id={`dpp-flow-${i}`} label="" prefix="₹" value={formatIndian(flow)} isNumeric={true} localeFormat="indian" helperText="" inputmode="decimal" class="flex-1" aria-describedby="dpp-error-msg" />
+            <Input id={`dpp-flow-${i}`} label="" aria-label={`Year ${i + 1} cash flow`} prefix="₹" value={formatIndian(flow)} isNumeric={true} localeFormat="indian" helperText="" inputmode="decimal" class="flex-1" aria-describedby="dpp-error-msg" />
           </div>
         ))}
       </div>
@@ -546,10 +546,10 @@ const jsonld = {
       if (yearCount >= 10) return;
       const div = document.createElement('div');
       div.className = 'flex gap-3 items-center';
-      div.innerHTML = `<span class="text-xs text-text-muted w-12 shrink-0">Year ${yearCount + 1}</span>
+      div.innerHTML = `<label for="dpp-flow-${yearCount}" class="text-xs text-text-muted w-12 shrink-0">Year ${yearCount + 1}</label>
         <div class="flex-1 relative">
           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10" data-currency-prefix="true">${currSym}</span>
-          <input id="dpp-flow-${yearCount}" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="0" />
+          <input id="dpp-flow-${yearCount}" aria-label="Year ${yearCount + 1} cash flow" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="0" />
         </div>`;
       container.appendChild(div);
       yearCount++;
@@ -584,10 +584,10 @@ const jsonld = {
       DEFAULT_FLOWS.forEach((flow, i) => {
         const div = document.createElement('div');
         div.className = 'flex gap-3 items-center';
-        div.innerHTML = `<span class="text-xs text-text-muted w-12 shrink-0">Year ${i + 1}</span>
+        div.innerHTML = `<label for="dpp-flow-${i}" class="text-xs text-text-muted w-12 shrink-0">Year ${i + 1}</label>
           <div class="flex-1 relative">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-dark-muted pointer-events-none z-10">₹</span>
-            <input id="dpp-flow-${i}" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="${fmtInput(String(flow))}" />
+            <input id="dpp-flow-${i}" aria-label="Year ${i + 1} cash flow" class="w-full h-10 pl-7 pr-3 text-sm rounded-control border border-dark-border bg-dark-surface text-dark-text tabular-nums focus:outline-none focus:border-dark-accent transition-standard" inputmode="decimal" value="${fmtInput(String(flow))}" />
           </div>`;
         container.appendChild(div);
         yearCount++;

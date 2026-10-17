@@ -115,7 +115,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="WACC Calculator: Weighted Average Cost of Capital | Calcumetrics"
+  title="WACC Calculator: Weighted Average Cost of Capital"
   description="Free WACC calculator. Apply the wacc formula to calculate weighted average cost of capital from equity, debt, hurdle rates, and corporate tax shields."
   canonical={canonicalUrl}
 >
@@ -131,7 +131,7 @@ const jsonld = {
   >
     <Fragment slot="inputs">
       <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">WACC Calculator</h1>
-      <p class="text-sm text-text-muted mb-6">Calculate blended corporate hurdle rates across equity financing and tax-shielded debt capital.</p>
+      <p class="text-sm text-text-muted mb-6">This WACC calculator blends your cost of equity and after-tax cost of debt into one weighted average cost of capital, the hurdle rate for new projects.</p>
 
       <!-- Dynamic validation error alert -->
       <div id="wacc-error-alert" class="hidden mb-5">
@@ -316,6 +316,30 @@ const jsonld = {
             &bull; <strong>T</strong> = Corporate tax rate
           </p>
         </div>
+      </section>
+
+      <!-- WACC in Excel -->
+      <section aria-labelledby="wacc-excel" class="mt-8">
+        <h2 id="wacc-excel" class="text-xl font-bold text-text-primary mb-4">WACC Formula in Excel</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">
+          Put each input in its own cell, with rates entered as percentages: <strong>B1</strong> equity value (E), <strong>B2</strong> debt value (D), <strong>B3</strong> cost of equity (R<sub>e</sub>), <strong>B4</strong> pre-tax cost of debt (R<sub>d</sub>) and <strong>B5</strong> tax rate (T). Then paste this into any empty cell:
+        </p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-4">
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <code class="text-sm font-mono text-text-primary break-all">=B1/(B1+B2)*B3 + B2/(B1+B2)*B4*(1-B5)</code>
+            <Button variant="secondary" size="sm" isCopyButton copyText="=B1/(B1+B2)*B3 + B2/(B1+B2)*B4*(1-B5)" aria-label="Copy WACC Excel formula">Copy</Button>
+          </div>
+          <p class="text-sm text-text-muted leading-relaxed">
+            If you need the cost of equity first, estimate it with CAPM: R<sub>e</sub> = R<sub>f</sub> + &beta; &times; (R<sub>m</sub> &minus; R<sub>f</sub>). With the risk-free rate in <strong>B6</strong>, beta in <strong>B7</strong> and expected market return in <strong>B8</strong>, put this in B3:
+          </p>
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <code class="text-sm font-mono text-text-primary break-all">=B6+B7*(B8-B6)</code>
+            <Button variant="secondary" size="sm" isCopyButton copyText="=B6+B7*(B8-B6)" aria-label="Copy CAPM cost of equity Excel formula">Copy</Button>
+          </div>
+        </div>
+        <p class="text-sm text-text-muted leading-relaxed">
+          With the worked example below (B1 = 7,000,000, B2 = 3,000,000, B3 = 14.2%, B4 = 8.5%, B5 = 25%) the formula returns 11.85%, matching this calculator.
+        </p>
       </section>
 
       <!-- Worked Example -->

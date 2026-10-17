@@ -250,6 +250,10 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
         // Count commas before cursor in raw input
         const commasBeforeCursor = (rawValue.slice(0, cursorPosition).match(/,/g) || []).length;
 
+        // Keep a leading minus so cash-flow fields that accept negatives can be typed;
+        // each calculator's validation still rejects negatives where they are not allowed.
+        const sign = /^\s*[-−]/.test(rawValue) ? '-' : '';
+
         // Strip non-digits and preserve at most one decimal point
         const clean = rawValue.replace(/[^\d.]/g, '');
         const parts = clean.split('.');
@@ -257,7 +261,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
         const decimalPart = parts.length > 1 ? '.' + parts.slice(1).join('') : '';
 
         if (!integerPart && !decimalPart) {
-          target.value = '';
+          target.value = sign;
           return;
         }
 
@@ -278,7 +282,7 @@ const describedBy = [errorId, helperId].filter(Boolean).join(' ') || undefined;
           formattedInteger = integerPart;
         }
 
-        const newValue = formattedInteger + decimalPart;
+        const newValue = sign + formattedInteger + decimalPart;
         target.value = newValue;
 
         // Restore cursor position correctly

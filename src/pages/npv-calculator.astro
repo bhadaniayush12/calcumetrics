@@ -107,7 +107,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="NPV Calculator: Net Present Value of Cash Flows | Calcumetrics"
+  title="NPV Calculator: Net Present Value | Calcumetrics"
   description="Free NPV calculator. Apply the npv formula to calculate net present value from projected cash flows and discount rates. Capital budgeting made simple."
   canonical={canonicalUrl}
 >
@@ -167,7 +167,7 @@ const jsonld = {
 
       <!-- Yearly Cash Inflows -->
       <div class="border-t border-border pt-4 mb-6">
-        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Annual Inflows</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-text-muted mb-3">Projected Annual Cash Flows <span class="normal-case font-normal">(enter a negative value for an outflow)</span></div>
         <div class="grid grid-cols-2 sm:grid-cols-2 gap-3">
           <div>
             <Input id="npv-cf1" label="Year 1 Cash Flow" prefix="₹" value="30,000" isNumeric={true} localeFormat="indian" inputmode="decimal" />
@@ -384,10 +384,10 @@ const jsonld = {
   const npvSchema = {
     r: { required: true, min: 0, max: 100, decimal: true, label: 'Discount Rate' },
     c0: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Initial Outflow' },
-    c1: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 1 Inflow' },
-    c2: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 2 Inflow' },
-    c3: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 3 Inflow' },
-    c4: { required: true, min: 0, max: 10000000000, decimal: true, label: 'Year 4 Inflow' },
+    c1: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 1 Cash Flow' },
+    c2: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 2 Cash Flow' },
+    c3: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 3 Cash Flow' },
+    c4: { required: true, min: -10000000000, max: 10000000000, decimal: true, negativeAllowed: true, label: 'Year 4 Cash Flow' },
   };
 
   function initNPVCalc() {
@@ -522,9 +522,11 @@ const jsonld = {
       if (mobileHero) mobileHero.textContent = heroVal;
 
       const wrapper = document.getElementById('npv-composition-wrapper');
-      if (wrapper && res.totalDiscountedInflows > 0) {
-        const outFrac = Math.min(1, res.initialOutflow / res.totalDiscountedInflows);
-        const gainFrac = Math.max(0, res.npv / res.totalDiscountedInflows);
+      if (wrapper) {
+        // Negative later cash flows can push the PV of inflows to zero or below; the bar is then all outflow.
+        const pv = res.totalDiscountedInflows;
+        const outFrac = pv > 0 ? Math.min(1, res.initialOutflow / pv) : 1;
+        const gainFrac = pv > 0 ? Math.max(0, res.npv / pv) : 0;
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
         if (bar) bar.style.width = `${(outFrac * 100).toFixed(2)}%`;

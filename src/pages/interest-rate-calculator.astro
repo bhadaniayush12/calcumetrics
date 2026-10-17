@@ -17,6 +17,12 @@ const totalInterest = Math.max(0, totalRepayment - DEFAULT.principal);
 const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
 
+// Processing-fee example: 2% fee + 18% GST deducted from the disbursal, same EMI and term.
+const FEE_PCT = 2;
+const feeWithGst = DEFAULT.principal * (FEE_PCT / 100) * 1.18;
+const netDisbursed = DEFAULT.principal - feeWithGst;
+const netApr = calcImpliedRate(netDisbursed, DEFAULT.emi, DEFAULT.years).annualRatePct;
+
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'interest-rate-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/interest-rate-calculator';
 const jsonld = {
@@ -332,8 +338,8 @@ const jsonld = {
               Upfront processing fees secretly inflate borrowing costs far beyond the contract rate:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Processing Fee Haircut:</strong> If the lender deducts a 2% processing fee (₹10,000 + GST = ₹11,800), you only receive <strong>₹4,88,200</strong> in hand.</li>
-              <li><strong>True Net APR:</strong> Entering ₹4,88,200 net principal with the same ₹12,000 EMI solves to a <strong>16.63% Net APR</strong>!</li>
+              <li><strong>Processing Fee Haircut:</strong> If the lender deducts a {FEE_PCT}% processing fee ({fmtCurrency(DEFAULT.principal * FEE_PCT / 100)} + GST = {fmtCurrency(feeWithGst)}), you only receive <strong>{fmtCurrency(netDisbursed)}</strong> in hand.</li>
+              <li><strong>True Net APR:</strong> Entering {fmtCurrency(netDisbursed)} net principal with the same {fmtCurrency(DEFAULT.emi)} EMI solves to a <strong>{netApr.toFixed(2)}% Net APR</strong>, against {result.annualRatePct.toFixed(2)}% on the full {fmtCurrency(DEFAULT.principal)}.</li>
               <li>Always compute implied rate using net disbursed proceeds to identify the real cost of debt.</li>
             </ul>
           </div>

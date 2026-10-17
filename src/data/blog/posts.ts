@@ -7,7 +7,22 @@ import { BATCH_4_POSTS } from './batch4';
 import { BATCH_5_POSTS } from './batch5';
 import { BATCH_6_POSTS } from './batch6';
 
+import { JIO_IPO_POST } from './jio-platforms-ipo-listing-gains-tax';
+
+import { SBI_OCTOBER_POST } from './sbi-home-loan-rate-hike-october-2026-emi';
+
+import { SMALL_SAVINGS_POST } from './small-savings-rates-october-december-2026';
+
+import { DIWALI_BONUS_POST } from './diwali-bonus-2026-lump-sum-sip-or-prepay';
+
+import { NEW_TAX_ACT_POST } from './new-income-tax-act-2025-salaried-guide';
+
 export const BLOG_POSTS: BlogPost[] = [
+  NEW_TAX_ACT_POST,
+  DIWALI_BONUS_POST,
+  SMALL_SAVINGS_POST,
+  SBI_OCTOBER_POST,
+  JIO_IPO_POST,
   ...PHASE_11_POSTS,
   ...BATCH_1_POSTS,
   ...BATCH_2_POSTS,

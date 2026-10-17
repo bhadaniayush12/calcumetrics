@@ -18,7 +18,9 @@ import gstCurrent from '../../data/tax/india/gst/current.json';
 import tdsCurrent from '../../data/tax/india/tds/current.json';
 import hraAY2026_27 from '../../data/tax/india/hra/AY-2026-27.json';
 import capitalGainsAY2025_26 from '../../data/tax/india/capital-gains/AY-2025-26.json';
+import capitalGainsFY2026_27 from '../../data/tax/india/capital-gains/FY-2026-27.json';
 import advanceTaxAY2026_27 from '../../data/tax/india/advance-tax/AY-2026-27.json';
+import advanceTaxFY2026_27 from '../../data/tax/india/advance-tax/FY-2026-27.json';
 import salaryCTCFY2025_26 from '../../data/tax/india/salary-ctc/FY-2025-26.json';
 import ppfCurrent from '../../data/tax/india/ppf/current.json';
 import upiMDRCurrent from '../../data/tax/india/upi-mdr/current.json';
@@ -350,9 +352,11 @@ export const INDIA_TAX_DATA = {
   },
   capitalGains: {
     'AY-2025-26': capitalGainsAY2025_26 as unknown as TaxRecord,
+    'FY-2026-27': capitalGainsFY2026_27 as unknown as TaxRecord,
   },
   advanceTax: {
     'AY-2026-27': advanceTaxAY2026_27 as unknown as TaxRecord,
+    'FY-2026-27': advanceTaxFY2026_27 as unknown as TaxRecord,
   },
   salaryCTC: {
     'FY-2025-26': salaryCTCFY2025_26 as unknown as TaxRecord,
@@ -375,7 +379,9 @@ export function getAllIndiaTaxRecords(): TaxRecord[] {
     INDIA_TAX_DATA.tds.current,
     INDIA_TAX_DATA.hra['AY-2026-27'],
     INDIA_TAX_DATA.capitalGains['AY-2025-26'],
+    INDIA_TAX_DATA.capitalGains['FY-2026-27'],
     INDIA_TAX_DATA.advanceTax['AY-2026-27'],
+    INDIA_TAX_DATA.advanceTax['FY-2026-27'],
     INDIA_TAX_DATA.salaryCTC['FY-2025-26'],
     INDIA_TAX_DATA.ppf.current,
     INDIA_TAX_DATA.upiMDR.current,
@@ -393,17 +399,27 @@ const ROUTE_TAX_RECORD_MAP: Record<string, TaxRecord> = {
   '/in/gst-calculator': INDIA_TAX_DATA.gst.current,
   '/in/hra-calculator': INDIA_TAX_DATA.hra['AY-2026-27'],
   '/in/tds-calculator': INDIA_TAX_DATA.tds.current,
-  '/in/capital-gains-tax-calculator': INDIA_TAX_DATA.capitalGains['AY-2025-26'],
-  '/in/advance-tax-calculator': INDIA_TAX_DATA.advanceTax['AY-2026-27'],
+  '/in/capital-gains-tax-calculator': INDIA_TAX_DATA.capitalGains['FY-2026-27'],
+  '/in/advance-tax-calculator': INDIA_TAX_DATA.advanceTax['FY-2026-27'],
   '/in/salary-ctc-calculator': INDIA_TAX_DATA.salaryCTC['FY-2025-26'],
   '/in/ppf-calculator': INDIA_TAX_DATA.ppf.current,
   '/in/upi-mdr-calculator': INDIA_TAX_DATA.upiMDR.current,
 };
 
+/** All routes that carry an India tax record (used by tests and shared UI). */
+export const INDIA_TAX_ROUTES = Object.keys(ROUTE_TAX_RECORD_MAP);
+
+/**
+ * Normalizes a router pathname for lookup. With build.format 'file' Astro.url.pathname
+ * ends in ".html" at build time, so strip that as well as any trailing slash.
+ */
+export function normalizeRoutePath(pathname: string): string {
+  return pathname.replace(/\.html$/, '').replace(/\/+$/, '') || '/';
+}
+
 /**
  * Resolves the authoritative tax record for a given router pathname.
  */
 export function resolveTaxRecordForRoute(pathname: string): TaxRecord | null {
-  const normalized = pathname.replace(/\/$/, '') || '/';
-  return ROUTE_TAX_RECORD_MAP[normalized] ?? null;
+  return ROUTE_TAX_RECORD_MAP[normalizeRoutePath(pathname)] ?? null;
 }

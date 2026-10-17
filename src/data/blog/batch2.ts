@@ -648,7 +648,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
       {
@@ -734,7 +734,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Breakdown: ₹15,00,000 CTC</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (FY 2025-27 parameters, ₹75,000 standard deduction):
+        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (FY 2025-26 parameters, ₹75,000 standard deduction):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -795,15 +795,15 @@ export const BATCH_2_POSTS: BlogPost[] = [
             </tr>
             <tr>
               <td class="p-3">Monthly Income Tax (TDS)</td>
-              <td class="p-3">New Tax Regime post-standard deduction</td>
-              <td class="p-3 font-mono text-red-400">-₹1,40,221</td>
-              <td class="p-3 font-mono text-red-400">-₹11,685</td>
+              <td class="p-3">New Tax Regime (FY 2026-27) on Gross − ₹75,000 standard deduction = ₹13,24,140, plus 4% cess</td>
+              <td class="p-3 font-mono text-red-400">-₹81,766</td>
+              <td class="p-3 font-mono text-red-400">-₹6,814</td>
             </tr>
             <tr class="bg-surface font-semibold text-text-primary">
               <td class="p-3 text-accent font-bold">Net In-Hand Take-Home Salary</td>
               <td class="p-3">Gross - (EPF + PT + TDS)</td>
-              <td class="p-3 font-mono font-bold text-accent">₹11,84,419</td>
-              <td class="p-3 font-mono font-bold text-accent">₹98,702 / mo</td>
+              <td class="p-3 font-mono font-bold text-accent">₹12,42,874</td>
+              <td class="p-3 font-mono font-bold text-accent">₹1,03,573 / mo</td>
             </tr>
           </tbody>
         </table>
@@ -875,7 +875,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Review statutory tax thresholds and personal deduction calculations.',
       },
       {

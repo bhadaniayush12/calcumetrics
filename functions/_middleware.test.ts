@@ -61,6 +61,27 @@ describe('Cloudflare Pages _middleware', () => {
     expect(nextCalled).toBe(false);
   });
 
+  it('upgrades http to https in the same hop as the trailing-slash redirect', async () => {
+    const context = {
+      request: new Request('http://calcumetrics.com/sip-calculator/'),
+      next: async () => new Response('OK'),
+    };
+
+    const response = await onRequest(context);
+    expect(response.status).toBe(301);
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/sip-calculator');
+  });
+
+  it('upgrades http to https in the same hop as a www-to-apex redirect', async () => {
+    const context = {
+      request: new Request('http://www.calcumetrics.com/sip-calculator/'),
+      next: async () => new Response('OK'),
+    };
+
+    const response = await onRequest(context);
+    expect(response.headers.get('Location')).toBe('https://calcumetrics.com/sip-calculator');
+  });
+
   it('preserves query parameters when redirecting trailing slash (301)', async () => {
     const context = {
       request: new Request('https://calcumetrics.com/sip-calculator/?p=5000&r=12'),

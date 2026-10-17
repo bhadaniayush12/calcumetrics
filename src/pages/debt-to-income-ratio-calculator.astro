@@ -6,6 +6,8 @@ import Slider from '../components/calculator/Slider.astro';
 import Input from '../components/ui/Input.astro';
 import Button from '../components/ui/Button.astro';
 import Alert from '../components/ui/Alert.astro';
+import CountryRules from '../components/calculator/CountryRules.astro';
+import { getCalculatorDefaults } from '../data/market-defaults';
 import { TOOLS } from '../config/site';
 
 // Architecture Note (Correction 3): DTI is a direct, pure ratio calculation independent of amortization engines
@@ -21,11 +23,18 @@ function calcDTIInline(debt: number, income: number) {
   return { dtiPct, assessment, colorClass, remaining: Math.max(0, income - debt) };
 }
 
-const DEFAULT = { debt: 30000, income: 100000 };
+// Server render uses the USD market defaults; the client swaps symbol, grouping and defaults.
+const usdDefaults = getCalculatorDefaults('debt-to-income-ratio', 'USD');
+const DEFAULT = { debt: usdDefaults['dti-debt'].value, income: usdDefaults['dti-income'].value };
 const result = calcDTIInline(DEFAULT.debt, DEFAULT.income);
 
-const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
+const fmtCurrency = (n: number, sym = '$', locale = 'en-US') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtInput = (n: number) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(n);
+// Worked example split of the default monthly debt (housing / car / cards).
+const exSplit = { home: Math.round(DEFAULT.debt * 0.6), car: Math.round(DEFAULT.debt * 0.3) };
+const exCards = DEFAULT.debt - exSplit.home - exSplit.car;
+const exLimit36 = DEFAULT.income * 0.36;
 
 const related = TOOLS.filter((t) => t.category === 'Loans' && t.slug !== 'debt-to-income-ratio-calculator' && t.status === 'published').slice(0, 3);
 const canonicalUrl = 'https://calcumetrics.com/debt-to-income-ratio-calculator';
@@ -79,7 +88,7 @@ const jsonld = {
           name: 'What is a good DTI ratio for mortgage approval?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Most mortgage lenders prefer a back-end DTI ratio of 36% or lower. Lenders participating in qualified mortgage programs frequently allow up to 43%, and certain FHA or specialized loan programs may permit up to 50% with strong compensating factors.',
+            text: 'Many lenders prefer a back-end DTI ratio of 36% or lower. Higher ratios can still be approved with strong credit, reserves or a larger down payment, and the limit depends on the country, lender and loan program (see the country boxes on this page).',
           },
         },
         {
@@ -143,16 +152,16 @@ const jsonld = {
         <Input
           id="dti-debt"
           label="Total Monthly Debt Obligations"
-          prefix="₹"
-          value="30,000"
+          prefix="$"
+          value={fmtInput(DEFAULT.debt)}
           isNumeric={true}
-          localeFormat="indian"
-          helperText="All monthly EMIs, minimum credit card bills, and loan payments"
+          localeFormat="international"
+          helperText="All monthly loan payments and minimum credit card payments"
           inputmode="decimal"
           aria-describedby="dti-error-msg"
         />
         <div class="mt-2">
-          <Slider id="dti-debt-slider" min={0} max={500000} step={2500} value={30000} ariaLabel="Monthly debt slider" />
+          <Slider id="dti-debt-slider" min={usdDefaults['dti-debt'].min} max={usdDefaults['dti-debt'].max} step={usdDefaults['dti-debt'].step} value={DEFAULT.debt} ariaLabel="Monthly debt slider" />
         </div>
       </div>
 
@@ -161,16 +170,16 @@ const jsonld = {
         <Input
           id="dti-income"
           label="Gross Monthly Income (Pre-Tax)"
-          prefix="₹"
-          value="1,00,000"
+          prefix="$"
+          value={fmtInput(DEFAULT.income)}
           isNumeric={true}
-          localeFormat="indian"
+          localeFormat="international"
           helperText="Total pre-tax monthly salary or business income"
           inputmode="decimal"
           aria-describedby="dti-error-msg"
         />
         <div class="mt-2">
-          <Slider id="dti-income-slider" min={10000} max={1000000} step={5000} value={100000} ariaLabel="Monthly income slider" />
+          <Slider id="dti-income-slider" min={usdDefaults['dti-income'].min} max={usdDefaults['dti-income'].max} step={usdDefaults['dti-income'].step} value={DEFAULT.income} ariaLabel="Monthly income slider" />
         </div>
       </div>
 
@@ -227,7 +236,7 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Most mortgage underwriters cap total recurring debt service between 36% and 43% of gross income.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Many lenders look for total debt payments at or below about 36% of gross income; limits vary by country and loan type.</p>
     </Fragment>
 
     <Fragment slot="below">
@@ -239,7 +248,7 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <p class="text-sm text-text-muted leading-relaxed font-mono">
             <strong>1. Back-End DTI Formula:</strong> DTI = [ &sum; Monthly Debt Commitments &divide; Gross Monthly Pre-Tax Income ] &times; 100%<br /><br />
-            <strong>2. Eligible Debt Commitments:</strong> Total Debt = Home Loan EMI + Auto EMI + Personal Loan EMIs + Credit Card Minimums + Student Loans<br /><br />
+            <strong>2. Eligible Debt Commitments:</strong> Total Debt = Mortgage Payment + Car Loan Payment + Personal Loan Payments + Credit Card Minimums + Student Loans<br /><br />
             <strong>3. Monthly Residual Income:</strong> Disposable Margin = Gross Income &minus; Total Debt Commitments<br /><br />
             <strong>4. Front-End (Housing) DTI:</strong> Housing Ratio = [ Housing Principal + Interest + Property Tax + Insurance ] &divide; Gross Income
           </p>
@@ -247,7 +256,7 @@ const jsonld = {
 
         <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Consider a borrower earning a verified <strong>gross pre-tax income of ₹1,00,000 per month</strong> with cumulative recurring debt obligations totaling <strong>₹30,000 per month</strong> (e.g., ₹20,000 existing home loan + ₹7,000 car EMI + ₹3,000 credit card minimum):
+          Consider a borrower earning a verified <strong>gross pre-tax income of {fmtCurrency(DEFAULT.income)} per month</strong> with recurring debt payments totaling <strong>{fmtCurrency(DEFAULT.debt)} per month</strong> (e.g., {fmtCurrency(exSplit.home)} mortgage + {fmtCurrency(exSplit.car)} car loan + {fmtCurrency(exCards)} credit card minimum):
         </p>
 
         <div class="overflow-x-auto border border-border rounded-card mb-6">
@@ -264,38 +273,32 @@ const jsonld = {
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Gross Monthly Income (Pre-Tax)</td>
                 <td class="py-2.5 px-4 font-mono">Verified Base Salary / Cash Flow</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹1,00,000 / Month</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{fmtCurrency(DEFAULT.income)} / Month</td>
                 <td class="py-2.5 px-4">Denominator utilized across all institutional underwriting guidelines.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Total Monthly Debt Service</td>
-                <td class="py-2.5 px-4 font-mono">₹20k (Home) + ₹7k (Auto) + ₹3k (Cards)</td>
-                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">₹30,000 / Month</td>
+                <td class="py-2.5 px-4 font-mono">{fmtCurrency(exSplit.home)} (Home) + {fmtCurrency(exSplit.car)} (Car) + {fmtCurrency(exCards)} (Cards)</td>
+                <td class="py-2.5 px-4 font-mono font-semibold text-text-primary">{fmtCurrency(DEFAULT.debt)} / Month</td>
                 <td class="py-2.5 px-4">All contractual credit obligations currently reported on credit bureaus.</td>
               </tr>
               <tr class="bg-surface/50 font-semibold text-text-primary">
                 <td class="py-2.5 px-4">Debt-to-Income (DTI) Ratio</td>
-                <td class="py-2.5 px-4 font-mono">(₹30,000 &divide; ₹1,00,000) &times; 100%</td>
-                <td class="py-2.5 px-4 font-mono text-accent font-bold">30.0%</td>
-                <td class="py-2.5 px-4">Fair / Healthy range; comfortably clears standard 36% retail ceilings.</td>
+                <td class="py-2.5 px-4 font-mono">({fmtCurrency(DEFAULT.debt)} &divide; {fmtCurrency(DEFAULT.income)}) &times; 100%</td>
+                <td class="py-2.5 px-4 font-mono text-accent font-bold">{result.dtiPct.toFixed(1)}%</td>
+                <td class="py-2.5 px-4">{result.assessment}; within the common 36% guideline.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Uncommitted Disposable Cash</td>
-                <td class="py-2.5 px-4 font-mono">₹1,00,000 &minus; ₹30,000</td>
-                <td class="py-2.5 px-4 font-mono">₹70,000 / Month (70.0%)</td>
+                <td class="py-2.5 px-4 font-mono">{fmtCurrency(DEFAULT.income)} &minus; {fmtCurrency(DEFAULT.debt)}</td>
+                <td class="py-2.5 px-4 font-mono">{fmtCurrency(result.remaining)} / Month ({(100 - result.dtiPct).toFixed(1)}%)</td>
                 <td class="py-2.5 px-4">Sufficient cash buffer for taxes, daily household expenses, and emergency savings.</td>
               </tr>
-              <tr>
-                <td class="py-2.5 px-4 font-medium text-text-primary">Standard Benchmark Limit (36%)</td>
-                <td class="py-2.5 px-4 font-mono">₹1,00,000 &times; 36%</td>
-                <td class="py-2.5 px-4 font-mono">₹36,000 / Month</td>
-                <td class="py-2.5 px-4">Borrower can safely take on an additional ₹6,000/month in new loan installments.</td>
-              </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
-                <td class="py-3 px-4">Qualified Mortgage Cap (43%)</td>
-                <td class="py-3 px-4 font-mono">₹1,00,000 &times; 43%</td>
-                <td class="py-3 px-4 font-mono">₹43,000 / Month</td>
-                <td class="py-3 px-4">Maximum legal debt ceiling under Qualified Mortgage standards (₹13,000 buffer).</td>
+                <td class="py-3 px-4">Common Guideline Limit (36%)</td>
+                <td class="py-3 px-4 font-mono">{fmtCurrency(DEFAULT.income)} &times; 36%</td>
+                <td class="py-3 px-4 font-mono">{fmtCurrency(exLimit36)} / Month</td>
+                <td class="py-3 px-4">Room for about {fmtCurrency(Math.max(0, exLimit36 - DEFAULT.debt))}/month in new loan payments before reaching 36%.</td>
               </tr>
             </tbody>
           </table>
@@ -308,8 +311,8 @@ const jsonld = {
               <li><strong>&le; 20% (Excellent):</strong> Top-tier credit profile. Unlocks prime loan interest discounts, waived processing fees, and instant loan approvals.</li>
               <li><strong>21% &ndash; 28% (Prime):</strong> Optimal balance. Complies with the classical "28% front-end housing cap" with ample liquidity cushion.</li>
               <li><strong>29% &ndash; 36% (Healthy Maximum):</strong> Standard institutional ceiling for conventional home loans and unsecured credit.</li>
-              <li><strong>37% &ndash; 43% (Stretched):</strong> Approaching regulatory limits. Lenders demand higher CIBIL scores (&ge;750), 20%+ down payments, or 6 months of liquid reserves.</li>
-              <li><strong>&gt; 43% (Critical Risk):</strong> Severe default vulnerability. Most institutional banks reject applications; borrowers are forced to high-cost subprime lenders.</li>
+              <li><strong>37% &ndash; 43% (Stretched):</strong> Above most guidelines. Lenders often ask for stronger credit scores, a larger down payment, or several months of cash reserves.</li>
+              <li><strong>&gt; 43% (Critical Risk):</strong> High default risk. Many mainstream lenders decline; approval usually needs strong compensating factors or a specialist (often higher-cost) lender.</li>
             </ul>
           </div>
 
@@ -319,7 +322,7 @@ const jsonld = {
               If your DTI exceeds 36% and you need to qualify for a mortgage, apply these targeted debt reduction tactics:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>The Snowball Method:</strong> Pay off small loan balances (like a remaining ₹30,000 two-wheeler loan) first. This completely removes that ₹4,000 monthly EMI from your DTI numerator.</li>
+              <li><strong>The Snowball Method:</strong> Pay off small loan balances first. Clearing a small loan removes its whole monthly payment from your DTI numerator.</li>
               <li><strong>Zero-Balance Revolving Cards:</strong> Credit card minimum payments directly count toward DTI. Retiring credit card balances immediately expands debt capacity.</li>
               <li><strong>Tenure Restructuring:</strong> Extending an auto or personal loan tenure lowers its monthly installment, instantly shrinking your DTI ratio before applying for a home loan.</li>
             </ul>
@@ -331,14 +334,16 @@ const jsonld = {
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
             <li><strong>Gross Income Distortion:</strong> DTI is measured against gross pre-tax income, but you service debt with post-tax take-home pay. If income tax takes 25%, a 36% gross DTI actually consumes nearly <strong>48% of your real take-home cash</strong>!</li>
             <li><strong>Living Expenses Ignored:</strong> Underwriting DTI completely ignores essential non-debt expenditures like groceries, utilities, school fees, and medical insurance. A low DTI does not guarantee financial security if basic living costs are high.</li>
-            <li><strong>Minimum Payments vs True Liability:</strong> Credit card issuers report only the 5% minimum payment. A borrower carrying ₹5,00,000 in credit card debt at 42% APR may show an artificially low DTI while facing severe compound debt spiraling.</li>
+            <li><strong>Minimum Payments vs True Liability:</strong> Lenders count only the minimum card payment. A large card balance at a high APR can show a modest DTI while the debt keeps compounding.</li>
           </ul>
         </div>
       </section>
 
+      <CountryRules id="dti-country-rules" />
+
       <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
         <strong class="text-text-primary text-sm block mb-1">Planning a mortgage or home loan application?</strong>
-        Read our underwriting guide on <a href="/blog/debt-to-income-ratio-for-mortgage" class="text-accent font-medium hover:underline">Debt-to-Income (DTI) Ratio for Mortgage Approval: Front-End vs. Back-End Limits</a> to see exact qualifying thresholds (28/36 rule vs. 43% QM vs. 50% FOIR) and fast ways to optimize your profile.
+        Read our underwriting guide on <a href="/blog/debt-to-income-ratio-for-mortgage" class="text-accent font-medium hover:underline">Debt-to-Income (DTI) Ratio for Mortgage Approval: Front-End vs. Back-End Limits</a> to see exact qualifying thresholds (28/36 guideline, lender and program limits, and country rules) and fast ways to optimize your profile.
       </div>
 
       <section aria-labelledby="dti-calculator-faq">
@@ -382,13 +387,14 @@ const jsonld = {
 <script>
   import { validate } from '../lib/validate';
   import { moneyRules } from '../lib/currency';
+  import { activePageCurrency, applyCurrencyVisibility, pageCurrencyFor } from '../lib/page-currency';
   import { parseSmartInput } from '../lib/formatters';
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
 
   let currentHashState: Record<string, any> = {};
-  let currSym = '₹';
-  let currLocale = 'en-IN';
+  let currSym = '$';
+  let currLocale = 'en-US';
   function fmtVal(n: number) {
     return currSym + new Intl.NumberFormat(currLocale, { maximumFractionDigits: 0 }).format(Math.round(n));
   }
@@ -414,13 +420,8 @@ const jsonld = {
     const errMsg = document.getElementById('dti-error-msg');
 
     if (!debtInput || !incomeInput) return;
-    try {
-      const saved = localStorage.getItem('cm_currency');
-      if (saved) {
-        currSym = saved.includes('$') ? '$' : saved.includes('€') ? '€' : saved.includes('£') ? '£' : '₹';
-        currLocale = saved.includes('USD') ? 'en-US' : saved.includes('EUR') ? 'de-DE' : saved.includes('GBP') ? 'en-GB' : 'en-IN';
-      }
-    } catch (e) {}
+    ({ symbol: currSym, locale: currLocale } = activePageCurrency());
+    applyCurrencyVisibility(activePageCurrency().code);
     document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
       el.textContent = currSym;
     });
@@ -431,7 +432,7 @@ const jsonld = {
     }
     debtInput.dataset.bound = 'true';
 
-    const DEFAULTS = { debt: 30000, income: 100000 };
+    const DEFAULTS = { debt: 1500, income: 6000 }; // USD market defaults; the layout applies the active market's defaults on reset
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -548,11 +549,11 @@ const jsonld = {
 
       if (debtSlider) {
         debtSlider.value = String(DEFAULTS.debt);
-        debtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.debt - 0) / (500000 - 0)) * 100}%`);
+        debtSlider.style.setProperty('--slider-pct', `${((DEFAULTS.debt - Number(debtSlider.min)) / (Number(debtSlider.max) - Number(debtSlider.min))) * 100}%`);
       }
       if (incomeSlider) {
         incomeSlider.value = String(DEFAULTS.income);
-        incomeSlider.style.setProperty('--slider-pct', `${((DEFAULTS.income - 10000) / (1000000 - 10000)) * 100}%`);
+        incomeSlider.style.setProperty('--slider-pct', `${((DEFAULTS.income - Number(incomeSlider.min)) / (Number(incomeSlider.max) - Number(incomeSlider.min))) * 100}%`);
       }
 
       clearError();
@@ -635,8 +636,8 @@ const jsonld = {
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {
-        currSym = e.detail.symbol;
-        currLocale = e.detail.code === 'USD' ? 'en-US' : e.detail.code === 'EUR' ? 'de-DE' : e.detail.code === 'GBP' ? 'en-GB' : 'en-IN';
+        ({ symbol: currSym, locale: currLocale } = pageCurrencyFor(e.detail.code));
+        applyCurrencyVisibility(pageCurrencyFor(e.detail.code).code);
         document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
           el.textContent = currSym;
         });

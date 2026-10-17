@@ -11,8 +11,8 @@
  */
 import { resolveTaxRecordForRoute } from '../../lib/tax/schema';
 
-const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
-const record = resolveTaxRecordForRoute(pathname);
+// resolveTaxRecordForRoute strips ".html" (build.format 'file') and trailing slashes.
+const record = resolveTaxRecordForRoute(Astro.url.pathname);
 
 const periodLabel = record
   ? record.assessmentYear

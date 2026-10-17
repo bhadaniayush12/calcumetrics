@@ -14,6 +14,12 @@ const result = calcSavingsGoal(DEFAULT.target, DEFAULT.current, DEFAULT.rate, DE
 
 const fmtCurrency = (n: number, sym = '₹', locale = 'en-IN') =>
   sym + new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(Math.round(n));
+const fmtLakh = (n: number) => `₹${(n / 100000).toFixed(2)}L`;
+
+// Cost of delay: same target and current savings, 2 fewer years.
+const DELAY_YEARS = 2;
+const delayed = calcSavingsGoal(DEFAULT.target, DEFAULT.current, DEFAULT.rate, DEFAULT.years - DELAY_YEARS);
+const delayBurdenPct = Math.round((delayed.monthlyContribution / result.monthlyContribution - 1) * 100);
 
 const RELATED_SLUGS = ['sip-calculator', 'inflation-calculator', 'future-value-calculator'];
 const related = TOOLS.filter((t) => RELATED_SLUGS.includes(t.slug) && t.status === 'published');
@@ -102,7 +108,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="Savings Goal Calculator: How Much to Save Monthly | Calcumetrics"
+  title="Savings Goal Calculator: How Much to Save Monthly"
   description="Free savings goal calculator. Determine how much to save monthly to achieve your savings goal with compound interest projections and visual timelines."
   canonical={canonicalUrl}
 >
@@ -354,8 +360,8 @@ const jsonld = {
               Waiting drastically compresses the compounding window, escalating monthly requirements:
             </p>
             <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4">
-              <li>Starting Today (5 Years): <strong>₹28,035 / month</strong> (Total out-of-pocket: ₹18.82L).</li>
-              <li>Delaying 2 Years (3 Years Remaining): <strong>₹54,320 / month</strong> (+94% monthly burden; total out-of-pocket climbs to ₹21.56L).</li>
+              <li>Starting Today ({DEFAULT.years} Years): <strong>{fmtCurrency(result.monthlyContribution)} / month</strong> (Total out-of-pocket: {fmtLakh(result.totalContributions)}).</li>
+              <li>Delaying {DELAY_YEARS} Years ({DEFAULT.years - DELAY_YEARS} Years Remaining): <strong>{fmtCurrency(delayed.monthlyContribution)} / month</strong> (+{delayBurdenPct}% monthly burden; total out-of-pocket climbs to {fmtLakh(delayed.totalContributions)}).</li>
               <li>Every year of delay transfers the burden from compound interest to your monthly paycheck!</li>
             </ul>
           </div>

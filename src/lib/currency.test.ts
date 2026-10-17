@@ -249,8 +249,27 @@ describe('Phase 9: Currency Display / Locale System', () => {
     expect(detectUserCurrency('', 'en-IN')).toBe('INR');
     expect(detectUserCurrency('', 'hi')).toBe('INR');
 
-    expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('INR');
-    expect(detectUserCurrency('', '')).toBe('INR');
+    expect(detectUserCurrency('Etc/Unknown', 'xyz')).toBe('USD');
+    expect(detectUserCurrency('', '')).toBe('USD');
+  });
+
+  it('falls back to USD (not INR) for unmapped regions; only India gets INR', () => {
+    // Australia / New Zealand
+    expect(detectUserCurrency('Australia/Sydney', 'en-AU')).toBe('USD');
+    expect(detectUserCurrency('Australia/Perth', '')).toBe('USD');
+    expect(detectUserCurrency('Pacific/Auckland', 'en-NZ')).toBe('USD');
+    // Gulf
+    expect(detectUserCurrency('Asia/Dubai', 'ar-AE')).toBe('USD');
+    expect(detectUserCurrency('Asia/Riyadh', 'ar-SA')).toBe('USD');
+    expect(detectUserCurrency('Asia/Qatar', 'en')).toBe('USD');
+    // Other Asia / Africa / generic English
+    expect(detectUserCurrency('Asia/Singapore', 'en-SG')).toBe('USD');
+    expect(detectUserCurrency('Asia/Tokyo', 'ja-JP')).toBe('USD');
+    expect(detectUserCurrency('Africa/Lagos', 'en-NG')).toBe('USD');
+    expect(detectUserCurrency('', 'en')).toBe('USD');
+    // India is still INR by timezone or locale
+    expect(detectUserCurrency('Asia/Kolkata', 'en-US')).toBe('INR');
+    expect(detectUserCurrency('', 'ta-IN')).toBe('INR');
   });
 
   // ── 8. Preset Chip Dynamic Localization ────────────────────────────────────
@@ -287,5 +306,28 @@ describe('moneyRules', () => {
     expect(rules.amount).toBe(true);
     expect(rules.min).toBe(10000);
     expect(rules.currency).toBe('INR'); // SSR / no window → default currency
+  });
+});
+
+describe('formatDisplayCurrency: signs and non-finite values', () => {
+  it('puts the minus sign before the symbol', () => {
+    expect(formatDisplayCurrency(-1250, 'INR')).toBe('-₹1,250');
+    expect(formatDisplayCurrency(-1250000, 'INR')).toBe('-₹12,50,000');
+    expect(formatDisplayCurrency(-1250, 'USD')).toBe('-$1,250');
+    expect(formatDisplayCurrency(-1250.5, 'GBP', 2)).toBe('-£1,250.50');
+    expect(formatDisplayCurrency(-1250, 'EUR')).toBe('-€1.250');
+  });
+
+  it('renders -0 and values that round to zero without a sign', () => {
+    expect(formatDisplayCurrency(-0, 'INR')).toBe('₹0');
+    expect(formatDisplayCurrency(-0.4, 'INR')).toBe('₹0');
+    expect(formatDisplayCurrency(-0.001, 'USD', 2)).toBe('$0.00');
+  });
+
+  it('renders NaN and Infinity as "-"', () => {
+    expect(formatDisplayCurrency(NaN, 'INR')).toBe('-');
+    expect(formatDisplayCurrency(Infinity, 'USD')).toBe('-');
+    expect(formatDisplayCurrency(-Infinity, 'EUR')).toBe('-');
+    expect(formatPresetChip(NaN, 'INR')).toBe('-');
   });
 });

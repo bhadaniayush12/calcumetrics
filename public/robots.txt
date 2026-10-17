@@ -18,4 +18,3 @@ User-agent: OAI-SearchBot
 Allow: /
 
 Sitemap: https://calcumetrics.com/sitemap-index.xml
-Sitemap: https://calcumetrics.com/sitemap.xml

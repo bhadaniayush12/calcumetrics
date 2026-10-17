@@ -824,7 +824,7 @@ export const MARKET_DEFAULTS = {
       "label": "Initial Investment Cost",
       "kind": "amount",
       "INR": {
-        "value": 500000,
+        "value": 1000000,
         "min": 1000,
         "max": 100000000,
         "step": 10000
@@ -2008,7 +2008,7 @@ export const MARKET_DEFAULTS = {
         "step": 0.05
       },
       "USD": {
-        "value": 6.75,
+        "value": 7.4,
         "min": 2,
         "max": 14,
         "step": 0.05

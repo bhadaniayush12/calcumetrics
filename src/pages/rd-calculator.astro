@@ -13,6 +13,8 @@ import { TOOLS } from '../config/site';
 const DEFAULT = { monthly: 5000, rate: 7.0, months: 60 };
 const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months / 12);
 const defaultGainPct = result.invested > 0 ? (result.interest / result.invested) * 100 : 0;
+// Worked example below is rendered from the same engine as the calculator (the defaults).
+const EXAMPLE = result;
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
@@ -70,7 +72,7 @@ const jsonld = {
           name: 'Is Recurring Deposit interest taxable in India?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹40,000 (₹50,000 for senior citizens).',
+            text: 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹50,000 (₹1,00,000 for senior citizens).',
           },
         },
         {
@@ -272,8 +274,8 @@ const jsonld = {
           <p><strong class="text-text-primary">2. Number of installments (N):</strong> 60 months (5 years)</p>
           <p><strong class="text-text-primary">3. Cumulative principal invested:</strong> 60 &times; ₹5,000 = <strong class="text-text-primary">₹3,00,000</strong></p>
           <p><strong class="text-text-primary">4. Quarterly compounding mechanics:</strong> The 1st installment compounds across all 20 quarters; the 30th installment compounds for 10 quarters; the 60th installment compounds for 1 month.</p>
-          <p><strong class="text-text-primary">5. Total maturity corpus:</strong> <strong class="text-text-primary text-accent">₹3,61,746</strong></p>
-          <p><strong class="text-text-primary">6. Total interest earned:</strong> ₹3,61,746 &minus; ₹3,00,000 = <strong class="text-text-primary text-accent">₹61,746</strong> (an effective 20.6% total return on deposited capital)</p>
+          <p><strong class="text-text-primary">5. Total maturity corpus:</strong> <strong class="text-text-primary text-accent">{fmt(EXAMPLE.maturity)}</strong></p>
+          <p><strong class="text-text-primary">6. Total interest earned:</strong> {fmt(EXAMPLE.maturity)} &minus; {fmt(EXAMPLE.invested)} = <strong class="text-text-primary text-accent">{fmt(EXAMPLE.interest)}</strong> (an effective {defaultGainPct.toFixed(1)}% total return on deposited capital)</p>
         </div>
       </section>
 
@@ -304,7 +306,7 @@ const jsonld = {
             <strong class="text-text-primary">Fixed Interest Rate:</strong> The interest rate remains uniform throughout the entire contracted duration.
           </li>
           <li>
-            <strong class="text-text-primary">TDS Excluded:</strong> Displays gross pre-tax maturity value. Banks deduct 10% TDS (with PAN) if total interest earned across deposits in a financial year exceeds ₹40,000 (₹50,000 for senior citizens).
+            <strong class="text-text-primary">TDS Excluded:</strong> Displays gross pre-tax maturity value. Banks deduct 10% TDS (with PAN) if total interest earned across deposits in a financial year exceeds ₹50,000 (₹1,00,000 for senior citizens).
           </li>
         </ul>
       </section>
@@ -320,7 +322,7 @@ const jsonld = {
         <div class="space-y-3">
           {[
             ['Can I change my monthly RD installment amount?', 'In standard recurring deposits with commercial banks and post offices, the monthly installment amount is fixed at account opening. Some specialized digital banks offer flexible RD accounts where contributions can vary.'],
-            ['Is Recurring Deposit interest taxable in India?', 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹40,000 (₹50,000 for senior citizens).'],
+            ['Is Recurring Deposit interest taxable in India?', 'Yes. RD interest is fully taxable as "Income from Other Sources" at your applicable income tax slab rate. TDS applies if total annual interest across all deposits with a banking entity exceeds ₹50,000 (₹1,00,000 for senior citizens).'],
             ['How is interest compounded on a Recurring Deposit?', 'Per Indian Banks\' Association (IBA) guidelines, commercial banks compound RD interest quarterly. Each monthly installment earns interest compounded quarterly for its respective remaining tenure until maturity.'],
             ['What happens if I miss an RD monthly installment?', 'Banks usually levy a nominal penalty (e.g. ₹1.50 to ₹2.00 per ₹100 per month) for missed installments. If installments remain unpaid for consecutive months (typically 4 to 6 months), the bank may prematurely deactivate the account.'],
             ['Can I withdraw funds prematurely from an RD account?', 'Yes, premature closure is permitted by most banks, but it typically incurs a penalty of 0.5% to 1% reduction from the applicable interest rate for the period the deposit actually ran.'],
@@ -356,25 +358,6 @@ const jsonld = {
   import { setResult } from '../lib/result-bus';
   import { serializeHash, restoreFromHash, readCurrentHash } from '../lib/url-state';
   import { calcRD } from '../lib/calculators/rd';
-
-  function calcRDClient(p: number, rate: number, months: number) {
-    const r = rate / 100;
-    let maturity = 0;
-    for (let i = 0; i < months; i++) {
-      const remainingMonths = months - i;
-      maturity += p * Math.pow(1 + r / 4, (remainingMonths / 12) * 4);
-    }
-    const invested = p * months;
-    const gain = maturity - invested;
-    return {
-      maturity,
-      invested,
-      gain,
-      gainPct: invested > 0 ? (gain / invested) * 100 : 0,
-      principalFraction: maturity > 0 ? invested / maturity : 0,
-      gainFraction: maturity > 0 ? gain / maturity : 0,
-    };
-  }
 
   let currentHashState: Record<string, any> = {};
   let currSym = '₹';
@@ -451,32 +434,33 @@ const jsonld = {
       const r = vR.value!;
       const mo = vMo.value!;
 
-      const res = calcRDClient(m, r, mo);
+      const res = calcRD(m, r, mo / 12);
+      const gainPct = res.invested > 0 ? (res.interest / res.invested) * 100 : 0;
 
       setResult({
         heroValue: fmtVal(res.maturity),
         heroLabel: 'Maturity Value',
         rows: [
           { label: 'Total Invested', value: fmtVal(res.invested) },
-          { label: 'Interest Earned', value: fmtVal(res.gain) },
-          { label: 'Return on Investment', value: res.gainPct.toFixed(1) + '%' },
+          { label: 'Interest Earned', value: fmtVal(res.interest) },
+          { label: 'Return on Investment', value: gainPct.toFixed(1) + '%' },
         ],
       });
 
       if (resMaturity) resMaturity.textContent = fmtVal(res.maturity);
       if (resInvested) resInvested.textContent = fmtVal(res.invested);
-      if (resGain) resGain.textContent = fmtVal(res.gain);
-      if (resGainPct) resGainPct.textContent = res.gainPct.toFixed(1) + '%';
+      if (resGain) resGain.textContent = fmtVal(res.interest);
+      if (resGainPct) resGainPct.textContent = gainPct.toFixed(1) + '%';
 
       const wrapper = document.getElementById('rd-composition-wrapper');
       if (wrapper && res.maturity > 0) {
         const bar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-muted"]');
         const gainBar = wrapper.querySelector<HTMLElement>('[class*="bg-dark-accent"]');
-        if (bar) bar.style.width = `${(res.principalFraction * 100).toFixed(2)}%`;
-        if (gainBar) gainBar.style.width = `${(res.gainFraction * 100).toFixed(2)}%`;
+        if (bar) bar.style.width = `${(res.investedFraction * 100).toFixed(2)}%`;
+        if (gainBar) gainBar.style.width = `${(res.interestFraction * 100).toFixed(2)}%`;
         const legendEls = wrapper.querySelectorAll('[class*="tabular-nums"]');
         if (legendEls[0]) legendEls[0].textContent = fmtVal(res.invested);
-        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.gain);
+        if (legendEls[1]) legendEls[1].textContent = fmtVal(res.interest);
       }
 
       currentHashState = { m, r, mo };
@@ -558,8 +542,8 @@ const jsonld = {
 
       if (!vM.valid || !vR.valid || !vMo.valid) return;
 
-      const res = calcRDClient(vM.value!, vR.value!, vMo.value!);
-      const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.gain)}). ${location.href.split('#')[0]}`;
+      const res = calcRD(vM.value!, vR.value!, vMo.value! / 12);
+      const text = `Recurring Deposit: ${fmtVal(vM.value!)}/mo for ${vMo.value} months at ${vR.value}% p.a. gives maturity of ${fmtVal(res.maturity)} (invested: ${fmtVal(res.invested)}, interest: ${fmtVal(res.interest)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {

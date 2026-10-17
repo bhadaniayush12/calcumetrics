@@ -15,7 +15,10 @@ import Dropdown from '../components/ui/Dropdown.astro';
 import Alert from '../components/ui/Alert.astro';
 import Tooltip from '../components/ui/Tooltip.astro';
 import { calcSIP, calcSIPYearly, calcStepUpSIP, calcStepUpSIPYearly } from '../lib/calculators/sip';
-import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords, formatPercent } from '../lib/formatters';
+import { formatCurrency, formatDisplayDate, formatIndian, formatIndianCompact, formatIndianWords, formatPercent } from '../lib/formatters';
+import { gitLastEdited } from '../lib/git-date';
+
+const lastEdited = gitLastEdited('src/pages/sip-calculator.astro');
 import { TOOLS } from '../config/site';
 
 // Pre-rendered fixture: ₹25,000/month, 12% p.a., 15 yrs = ₹1,26,14,400
@@ -26,6 +29,8 @@ const yearly = calcSIPYearly(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years);
 // Extra 2 years curiosity calculation (17 yrs)
 const result17 = calcSIP(DEFAULT.monthly, DEFAULT.rate, 17);
 const extraGainDiff = result17.maturity - result.maturity;
+// Cost of delay: same horizon end, 5 fewer years of SIP (matches the client-side insight).
+const delayLoss = result.maturity - calcSIP(DEFAULT.monthly, DEFAULT.rate, DEFAULT.years - 5).maturity;
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 const heroExact = fmt(result.maturity);
@@ -45,7 +50,7 @@ const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).
 
 // SEO Canonical & Schema
 const canonicalUrl = 'https://calcumetrics.com/sip-calculator';
-const pageTitle = 'SIP Calculator: Monthly SIP Returns & Wealth Gain | Calcumetrics';
+const pageTitle = 'SIP Calculator: Monthly SIP Returns | Calcumetrics';
 const pageDesc = 'Free SIP calculator. Use this sip investment plan calculator to compute monthly wealth gain, step up sip calculator options, formula, and returns schedule.';
 
 const jsonld = {
@@ -336,18 +341,18 @@ const jsonld = {
           class="w-full flex items-center justify-between gap-3 text-left cursor-pointer group focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 rounded-control p-1 -m-1"
           role="switch"
           aria-checked="false"
-          aria-label="Toggle Annual Step-Up SIP"
+          aria-labelledby="sip-stepup-label"
         >
           <div class="flex-1">
             <div class="flex items-center gap-1.5">
-              <span class="text-xs sm:text-sm font-semibold text-text-primary group-hover:text-accent transition-standard">Annual Step-Up (Top-Up)</span>
+              <span id="sip-stepup-label" class="text-xs sm:text-sm font-semibold text-text-primary group-hover:text-accent transition-standard">Annual Step-Up (Top-Up)</span>
               <span id="sip-stepup-status-badge" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-accent/10 text-accent">Optional</span>
             </div>
             <span class="text-[11px] text-text-muted block mt-0.5">Increase monthly contribution each year in line with salary hikes</span>
           </div>
           <!-- Switch visual container with min 44px touch area -->
           <div class="relative inline-flex items-center justify-center w-12 h-11 shrink-0">
-            <input type="checkbox" id="sip-stepup-toggle" class="sr-only" tabindex="-1" />
+            <input type="checkbox" id="sip-stepup-toggle" class="sr-only" tabindex="-1" aria-labelledby="sip-stepup-label" />
             <div id="sip-stepup-switch-track" class="w-11 h-6 bg-border rounded-full transition-colors duration-200 relative">
               <div id="sip-stepup-switch-thumb" class="w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 left-0.5 transition-transform duration-200 pointer-events-none"></div>
             </div>
@@ -566,7 +571,7 @@ const jsonld = {
           Investing for just 2 more years (17 yrs) adds <strong>+{extraGainWords}</strong> to your corpus!
         </p>
         <p id="sip-insight-delay" class="text-[11px] text-amber-400/90 leading-relaxed pt-1 border-t border-dark-border/40">
-          <strong>Cost of Delay:</strong> Delaying by 5 years reduces your estimated maturity corpus by over ₹54 Lakh due to lost compounding.
+          <strong>Cost of Delay:</strong> Delaying by 5 years reduces your corpus by <strong>~{formatIndianCompact(delayLoss, '₹')}</strong> due to lost compounding.
         </p>
       </div>
 
@@ -835,12 +840,13 @@ const jsonld = {
       <!-- 9. Authoritative Footer Review & Methodology -->
       <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
         <div>
-          <span>Last updated: <strong>September 2026</strong></span>
-          <span class="mx-2">·</span>
-          <span>Reviewed against statutory Indian financial modeling conventions</span>
-        </div>
-        <div>
-          <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
+          {lastEdited && (
+            <>
+              <span>Last edited: <time datetime={lastEdited}><strong>{formatDisplayDate(lastEdited)}</strong></time></span>
+              <span class="mx-2">·</span>
+            </>
+          )}
+          <span>Formulas: see <a href="/methodology" class="hover:text-accent underline transition-standard">Methodology</a></span>
         </div>
       </div>
 

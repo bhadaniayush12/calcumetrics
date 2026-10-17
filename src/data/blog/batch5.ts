@@ -4,7 +4,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
   {
     slug: 'debt-to-income-ratio-uk',
     title: 'Debt-to-Income Ratio in the UK: What Lenders Actually Look At (And How to Calculate Yours)',
-    seoTitle: 'Debt-to-Income Ratio UK: Mortgage Rules & Calculator | Calcumetrics',
+    seoTitle: 'Debt-to-Income Ratio UK: Mortgage Rules | Calcumetrics',
     description:
       'UK mortgage lenders use Loan-to-Income multiples and stress tests instead of DTI. Learn how affordability works and calculate your ratio under FCA rules.',
     category: 'Loans',
@@ -83,9 +83,9 @@ export const BATCH_5_POSTS: BlogPost[] = [
           'UK lenders count: existing personal loan and car finance repayments, credit card minimum payments, student loan deductions (Plan 1 or Plan 2), child maintenance obligations, ground rent and service charges (for leasehold properties), and any other regular debt payments appearing on bank statements.',
       },
       {
-        question: 'How does the FCA stress test affect how much I can borrow?',
+        question: 'Is there still a mortgage stress test in the UK?',
         answer:
-          "The FCA's 2014 Mortgage Market Review (MMR) requires lenders to stress-test your affordability at a rate that is typically 2–3 percentage points above the initial rate. This means if you apply at 5%, the lender checks whether you could still afford payments at 7–8%. The stress test effectively reduces maximum borrowing power compared to what the headline LTI multiple alone would suggest.",
+          "Not a fixed one. The Bank of England's Financial Policy Committee withdrew its affordability-test recommendation (checking payments at the lender's reversion rate plus 3 percentage points) in August 2022. Lenders must still assess affordability under the FCA's MCOB 11 rules, which require them to consider the effect of likely future interest rate rises; for fixed rates shorter than five years they look at market expectations of rates over at least five years. Each lender sets its own test rate, so the result can still be lower than the headline LTI multiple suggests.",
       },
       {
         question: 'What is a good debt-to-income ratio for a UK mortgage?',
@@ -144,9 +144,9 @@ export const BATCH_5_POSTS: BlogPost[] = [
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">Stress Test</td>
-              <td class="p-3 font-mono">Can borrower afford payment at rate +2–3%?</td>
+              <td class="p-3 font-mono">Can borrower afford payments if rates rise? (lender-set rate)</td>
               <td class="p-3 font-mono">Must pass</td>
-              <td class="p-3">FCA Mortgage Market Review (MMR)</td>
+              <td class="p-3">FCA MCOB 11.6 (BoE 3% stress-rate recommendation withdrawn Aug 2022)</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">Residual Income</td>
@@ -227,15 +227,15 @@ export const BATCH_5_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        A 35% ratio is healthy. Most lenders would be comfortable here, assuming the couple also clears the LTI test: combined salary of £72,000 per year, a mortgage of £1,400/month at 5% over 25 years implies a loan of roughly £247,000 — an LTI of 3.43&times;, well inside the 4.5&times; cap.
+        A 35% ratio is healthy. Most lenders would be comfortable here, assuming the couple also clears the LTI test: combined salary of £72,000 per year, a mortgage of £1,400/month at 5% over 25 years implies a loan of roughly £239,484 — an LTI of 3.33&times;, well inside the 4.5&times; cap.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. The FCA Stress Test: The Hidden Limit</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Interest Rate Affordability Checks: The Hidden Limit</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         LTI and DTI are not the only gates. UK lenders must also confirm the borrower can handle repayments if interest rates rise materially. This stress test has a real effect on maximum loan sizes.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        If a lender's standard variable rate (SVR) is 6.5%, the affordability calculation is often done at 9–9.5%. That gap between the actual initial rate and the stress rate can reduce maximum borrowing capacity by 10–20% compared to what the headline LTI multiple alone would permit. Some brokers frame it this way: <em>"The LTI cap is what the regulator allows in theory. The stress test is what the market allows in practice."</em>
+        Until August 2022 the Bank of England's Financial Policy Committee recommended that lenders test whether borrowers could afford payments at their reversion rate plus 3 percentage points. That recommendation was withdrawn, but lenders still have to assess affordability under the FCA's MCOB 11 rules, including the effect of likely future rate rises (for fixed rates under five years, market expectations of rates over at least five years). Each lender now picks its own test rate, so the check can still cut maximum borrowing below what the headline LTI multiple alone would permit. Some brokers frame it this way: <em>"The LTI cap is what the regulator allows in theory. The affordability assessment is what the lender allows in practice."</em>
       </p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -256,7 +256,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
             <li>Multiple car finance agreements</li>
             <li>Self-employed income averaged during a low-profit year</li>
             <li>Student loan deductions on high income reducing net pay</li>
-            <li>Failing the stress test at the projected SVR — even when current payments are comfortable</li>
+            <li>Failing the lender's own interest-rate affordability check — even when current payments are comfortable</li>
           </ul>
         </div>
       </div>
@@ -279,7 +279,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
   {
     slug: 'how-mortgage-amortization-works',
     title: 'How Mortgage Amortization Works: Every Payment Explained (With the Exact Math)',
-    seoTitle: 'How Mortgage Amortization Works: Schedule & Formula Explained | Calcumetrics',
+    seoTitle: 'How Mortgage Amortization Works: Schedule & Formula',
     description:
       'See how mortgage payments split between principal and interest, why early payments are interest-heavy, and how extra payments cut your loan payoff date.',
     category: 'Loans',
@@ -370,7 +370,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
       {
         question: 'How much do extra payments save on a mortgage?',
         answer:
-          'Making one extra monthly payment per year on a 30-year mortgage typically cuts the loan term by 4–5 years and saves tens of thousands of dollars in interest, depending on the rate and balance. The savings are largest early in the loan when the outstanding balance is highest. Even small regular overpayments — say, an extra $100 or £100 per month — compound significantly over a 25–30 year term.',
+          'Making one extra monthly payment per year on a 30-year mortgage typically cuts the loan term by roughly 4–6 years (about 5.8 years on a $320,000 loan at 6.75%) and saves tens of thousands of dollars in interest, depending on the rate and balance. The savings are largest early in the loan when the outstanding balance is highest. Even small regular overpayments — say, an extra $100 or £100 per month — compound significantly over a 25–30 year term.',
       },
       {
         question: 'What is the difference between amortization and depreciation?',
@@ -438,14 +438,14 @@ export const BATCH_5_POSTS: BlogPost[] = [
       </div>
       <div class="p-4 bg-surface border border-border rounded-card mb-6 text-xs text-text-muted">
         <strong class="text-text-primary block mb-2">Step 3: Apply the formula</strong>
-        (1.005625)^360 &asymp; 7.6935<br/>
-        M = 320,000 &times; (0.005625 &times; 7.6935) &divide; (7.6935 &minus; 1)<br/>
-        M = 320,000 &times; 0.04328 &divide; 6.6935 = <span class="font-mono font-bold text-accent">$2,069 / month</span>
+        (1.005625)^360 &asymp; 7.5332<br/>
+        M = 320,000 &times; (0.005625 &times; 7.5332) &divide; (7.5332 &minus; 1)<br/>
+        M = 320,000 &times; 0.042375 &divide; 6.5332 = <span class="font-mono font-bold text-accent">$2,076 / month</span>
       </div>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The First 6 Months of Your Schedule</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        Watch what happens inside each of those $2,069 payments:
+        Watch what happens inside each of those $2,076 payments:
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -464,50 +464,50 @@ export const BATCH_5_POSTS: BlogPost[] = [
               <td class="p-3 font-medium text-text-primary">1</td>
               <td class="p-3 font-mono">$320,000</td>
               <td class="p-3 font-mono text-red-400">$1,800</td>
-              <td class="p-3 font-mono text-emerald-400">$269</td>
-              <td class="p-3 font-mono">$319,731</td>
+              <td class="p-3 font-mono text-emerald-400">$276</td>
+              <td class="p-3 font-mono">$319,724</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">2</td>
-              <td class="p-3 font-mono">$319,731</td>
+              <td class="p-3 font-mono">$319,724</td>
               <td class="p-3 font-mono text-red-400">$1,798</td>
-              <td class="p-3 font-mono text-emerald-400">$271</td>
-              <td class="p-3 font-mono">$319,460</td>
+              <td class="p-3 font-mono text-emerald-400">$277</td>
+              <td class="p-3 font-mono">$319,447</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">3</td>
-              <td class="p-3 font-mono">$319,460</td>
+              <td class="p-3 font-mono">$319,447</td>
               <td class="p-3 font-mono text-red-400">$1,797</td>
-              <td class="p-3 font-mono text-emerald-400">$272</td>
-              <td class="p-3 font-mono">$319,188</td>
+              <td class="p-3 font-mono text-emerald-400">$279</td>
+              <td class="p-3 font-mono">$319,169</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">6</td>
-              <td class="p-3 font-mono">$318,377</td>
-              <td class="p-3 font-mono text-red-400">$1,791</td>
-              <td class="p-3 font-mono text-emerald-400">$278</td>
-              <td class="p-3 font-mono">$318,099</td>
+              <td class="p-3 font-mono">$318,607</td>
+              <td class="p-3 font-mono text-red-400">$1,792</td>
+              <td class="p-3 font-mono text-emerald-400">$283</td>
+              <td class="p-3 font-mono">$318,323</td>
             </tr>
             <tr>
               <td class="p-3 font-medium text-text-primary">12</td>
-              <td class="p-3 font-mono">$316,341</td>
-              <td class="p-3 font-mono text-red-400">$1,779</td>
-              <td class="p-3 font-mono text-emerald-400">$290</td>
-              <td class="p-3 font-mono">$316,051</td>
+              <td class="p-3 font-mono">$316,883</td>
+              <td class="p-3 font-mono text-red-400">$1,782</td>
+              <td class="p-3 font-mono text-emerald-400">$293</td>
+              <td class="p-3 font-mono">$316,590</td>
             </tr>
             <tr class="bg-surface font-semibold">
               <td class="p-3 text-text-primary">Year 1 Total</td>
               <td class="p-3 font-mono">—</td>
-              <td class="p-3 font-mono text-red-400">$21,514</td>
-              <td class="p-3 font-mono text-emerald-400">$3,314</td>
-              <td class="p-3 font-mono text-text-primary">$316,686</td>
+              <td class="p-3 font-mono text-red-400">$21,496</td>
+              <td class="p-3 font-mono text-emerald-400">$3,410</td>
+              <td class="p-3 font-mono text-text-primary">$316,590</td>
             </tr>
           </tbody>
         </table>
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
-        After 12 payments totalling $24,828, your balance has only dropped by $3,314. That is not a scam or a trick. It is simply how interest on a large balance works: 87% of year one's payments went to interest. The ratio steadily improves from here — just slowly.
+        After 12 payments totalling $24,906, your balance has only dropped by $3,410. That is not a scam or a trick. It is simply how interest on a large balance works: 86% of year one's payments went to interest. The ratio steadily improves from here — just slowly.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. The Crossover Point — When Principal Overtakes Interest</h2>
@@ -520,18 +520,18 @@ export const BATCH_5_POSTS: BlogPost[] = [
           <thead class="bg-surface text-text-primary font-semibold border-b border-border">
             <tr>
               <th class="p-3">Year</th>
-              <th class="p-3">Approx. Balance Remaining</th>
+              <th class="p-3">Balance at Period End</th>
               <th class="p-3">Monthly Interest Portion</th>
               <th class="p-3">Monthly Principal Portion</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-border text-text-muted">
-            <tr><td class="p-3 text-text-primary font-medium">Year 1</td><td class="p-3 font-mono">~$317,000</td><td class="p-3 font-mono text-red-400">~$1,800</td><td class="p-3 font-mono text-emerald-400">~$270</td></tr>
-            <tr><td class="p-3 text-text-primary font-medium">Year 5</td><td class="p-3 font-mono">~$305,000</td><td class="p-3 font-mono text-red-400">~$1,716</td><td class="p-3 font-mono text-emerald-400">~$353</td></tr>
-            <tr><td class="p-3 text-text-primary font-medium">Year 10</td><td class="p-3 font-mono">~$284,000</td><td class="p-3 font-mono text-red-400">~$1,598</td><td class="p-3 font-mono text-emerald-400">~$471</td></tr>
-            <tr><td class="p-3 text-text-primary font-medium">Year 19 (crossover)</td><td class="p-3 font-mono">~$193,000</td><td class="p-3 font-mono text-red-400">~$1,085</td><td class="p-3 font-mono text-emerald-400">~$984</td></tr>
-            <tr><td class="p-3 text-text-primary font-medium">Year 25</td><td class="p-3 font-mono">~$115,000</td><td class="p-3 font-mono text-red-400">~$647</td><td class="p-3 font-mono text-emerald-400">~$1,422</td></tr>
-            <tr class="bg-surface font-semibold text-text-primary"><td class="p-3">Year 30 (final)</td><td class="p-3 font-mono">~$2,000</td><td class="p-3 font-mono text-red-400">~$11</td><td class="p-3 font-mono text-emerald-400">~$2,058</td></tr>
+            <tr><td class="p-3 text-text-primary font-medium">Year 1</td><td class="p-3 font-mono">~$316,590</td><td class="p-3 font-mono text-red-400">~$1,782</td><td class="p-3 font-mono text-emerald-400">~$293</td></tr>
+            <tr><td class="p-3 text-text-primary font-medium">Year 5</td><td class="p-3 font-mono">~$300,402</td><td class="p-3 font-mono text-red-400">~$1,692</td><td class="p-3 font-mono text-emerald-400">~$384</td></tr>
+            <tr><td class="p-3 text-text-primary font-medium">Year 10</td><td class="p-3 font-mono">~$272,963</td><td class="p-3 font-mono text-red-400">~$1,538</td><td class="p-3 font-mono text-emerald-400">~$537</td></tr>
+            <tr><td class="p-3 text-text-primary font-medium">Month 238 (crossover)</td><td class="p-3 font-mono">~$182,856</td><td class="p-3 font-mono text-red-400">~$1,034</td><td class="p-3 font-mono text-emerald-400">~$1,041</td></tr>
+            <tr><td class="p-3 text-text-primary font-medium">Year 25</td><td class="p-3 font-mono">~$105,445</td><td class="p-3 font-mono text-red-400">~$601</td><td class="p-3 font-mono text-emerald-400">~$1,474</td></tr>
+            <tr class="bg-surface font-semibold text-text-primary"><td class="p-3">Year 30 (final payment)</td><td class="p-3 font-mono">$0</td><td class="p-3 font-mono text-red-400">~$12</td><td class="p-3 font-mono text-emerald-400">~$2,064</td></tr>
           </tbody>
         </table>
       </div>
@@ -545,17 +545,17 @@ export const BATCH_5_POSTS: BlogPost[] = [
         <div class="p-4 bg-surface border border-border rounded-card">
           <h3 class="text-sm font-bold text-text-primary mb-2">$200/month extra</h3>
           <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
-            <li>Reduces 30-year term to approximately <strong>24.5 years</strong></li>
-            <li>Saves roughly <strong>$74,000 in total interest</strong></li>
+            <li>Reduces the 30-year term to <strong>280 months (about 23.3 years)</strong></li>
+            <li>Saves roughly <strong>$112,000 in total interest</strong></li>
             <li>No change to required monthly payment — you simply stop early</li>
           </ul>
         </div>
         <div class="p-4 bg-surface border border-border rounded-card">
           <h3 class="text-sm font-bold text-text-primary mb-2">One extra full payment per year</h3>
           <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
-            <li>Reduces 30-year term to approximately <strong>25.5–26 years</strong></li>
-            <li>Saves roughly <strong>$60,000–$70,000 in total interest</strong></li>
-            <li>Practical trick: divide your monthly payment by 12, add that amount each month</li>
+            <li>Reduces the 30-year term to <strong>290 months (about 24.2 years)</strong></li>
+            <li>Saves roughly <strong>$97,000 in total interest</strong></li>
+            <li>Practical trick: divide your monthly payment by 12 (about $173) and add it each month — that pays off in 288 months and saves about $101,000</li>
           </ul>
         </div>
       </div>

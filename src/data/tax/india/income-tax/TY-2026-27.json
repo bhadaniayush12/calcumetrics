@@ -15,15 +15,15 @@
     "Governed by the newly enacted Income-tax Act, 2025 taking effect 1 April 2026 for FY 2026-27 / AY 2027-28.",
     "Adopts the streamlined 'Tax Year' (TY) framework replacing Assessment Year terminology.",
     "Standard deduction of ₹75,000 for salaried employees and rebate up to ₹12,00,000 under Section 87A (zero tax up to ₹12.75 Lakh gross).",
-    "4% Health and Education Cess."
+    "Surcharge on taxable income above ₹50 Lakh (10%), ₹1 Crore (15%), ₹2 Crore (25%) and ₹5 Crore (37% Old Regime; capped at 25% New Regime), with marginal relief at each threshold.",
+    "4% Health and Education Cess on income tax plus surcharge."
   ],
   "limitations": [
     "Applies to FY 2026-27 / AY 2027-28 (TY 2026-27) onward under the statutory framework.",
-    "Surcharge on taxable income exceeding ₹50 Lakh (ranging from 10% to 25%) is not modeled.",
     "Excludes complex capital gains schedules, specific business exemptions, and presumptive schemes.",
     "Official Income-tax Rules should be referenced for finalized reporting formats."
   ],
-  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2026-27 / AY 2027-28 (TY 2026-27). Surcharge on income above ₹50 Lakh is not modeled. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal, tax, or filing advice.",
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2026-27 / AY 2027-28 (TY 2026-27). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal, tax, or filing advice.",
   "values": {
     "frameworkType": "Income-tax Act, 2025",
     "standardDeduction": 75000,

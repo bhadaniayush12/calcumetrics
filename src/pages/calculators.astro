@@ -246,7 +246,7 @@ const jsonld = {
             <button
               type="button"
               data-filter="all"
-              class="finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer"
+              class="finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-on-accent transition-standard cursor-pointer"
             >
               <span class="flex items-center gap-2">All Tools</span>
               <span class="text-[11px] font-mono opacity-80">{totalCount}</span>
@@ -355,7 +355,7 @@ const jsonld = {
                 <button
                   type="button"
                   data-region-filter="all"
-                  class="region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer"
+                  class="region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-on-accent transition-standard cursor-pointer"
                   aria-pressed="true"
                 >
                   All
@@ -424,7 +424,7 @@ const jsonld = {
           <button
             type="button"
             id="calc-empty-reset"
-            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-control text-xs font-semibold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer"
+            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-control text-xs font-semibold bg-accent text-on-accent hover:opacity-90 transition-standard cursor-pointer"
           >
             Clear Search &amp; Show All Tools
           </button>
@@ -636,7 +636,7 @@ const jsonld = {
           <a
             id="ql-open-btn"
             href="#"
-            class="px-4 py-2 rounded-control text-xs font-bold bg-accent text-white hover:opacity-90 transition-standard cursor-pointer flex items-center gap-1.5"
+            class="px-4 py-2 rounded-control text-xs font-bold bg-accent text-on-accent hover:opacity-90 transition-standard cursor-pointer flex items-center gap-1.5"
           >
             <span>Open Calculator</span>
             <span>&rarr;</span>
@@ -814,7 +814,7 @@ const jsonld = {
         sidebarBtns.forEach((b) => {
           const isActive = b.dataset.filter === activeCategory;
           if (isActive) {
-            b.className = 'finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer';
+            b.className = 'finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-semibold bg-accent text-on-accent transition-standard cursor-pointer';
           } else {
             b.className = 'finder-sidebar-btn w-full flex items-center justify-between px-2.5 py-1.5 rounded-control text-xs font-medium text-text-primary hover:bg-canvas transition-standard cursor-pointer';
           }
@@ -831,7 +831,7 @@ const jsonld = {
           const isActive = b.dataset.regionFilter === activeRegion;
           b.setAttribute('aria-pressed', String(isActive));
           if (isActive) {
-            b.className = 'region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-white transition-standard cursor-pointer';
+            b.className = 'region-filter-btn px-2.5 py-1 rounded-control text-xs font-semibold bg-accent text-on-accent transition-standard cursor-pointer';
           } else {
             b.className = 'region-filter-btn px-2.5 py-1 rounded-control text-xs font-medium text-text-muted hover:text-text-primary transition-standard cursor-pointer';
           }

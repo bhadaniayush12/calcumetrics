@@ -1,7 +1,7 @@
 {
   "jurisdiction": "IN",
   "taxDomain": "tds",
-  "effectiveFrom": "2024-04-01",
+  "effectiveFrom": "2025-04-01",
   "applicableTo": "2026-03-31",
   "financialYear": "FY 2025-26",
   "governingFramework": "Income-tax Act, 1961",
@@ -9,7 +9,14 @@
   "source": "Income Tax Department",
   "sourceUrl": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tds-compliance",
   "sourceTitle": "Income Tax Department — TDS Compliance FAQs",
-  "verifiedOn": "2026-09-23",
+  "verifiedOn": "2026-10-17",
+  "thresholdSources": [
+    { "sections": ["194", "194LA", "194J", "194I", "194H", "194D", "194A"], "title": "ClearTax — TDS and TCS changes from April 2025 (Finance Act 2025 threshold table)", "url": "https://cleartax.in/s/tds-and-tcs-changes-from-april-2025", "verifiedOn": "2026-10-17" },
+    { "sections": ["194J"], "title": "ClearTax — Section 194J (10% professional, 2% technical; ₹50,000)", "url": "https://cleartax.in/s/section-194j", "verifiedOn": "2026-10-17" },
+    { "sections": ["194I"], "title": "ClearTax — Section 194I (₹50,000 a month / ₹6 lakh a year)", "url": "https://cleartax.in/s/section-194i-tds-on-rent", "verifiedOn": "2026-10-17" },
+    { "sections": ["194H"], "title": "ClearTax — Section 194H (2%; ₹20,000 from 1 April 2025)", "url": "https://cleartax.in/s/section-194h-tds-on-commission-brokerage", "verifiedOn": "2026-10-17" },
+    { "sections": ["194D"], "title": "ClearTax — Section 194D (2% for persons other than a company; ₹20,000)", "url": "https://cleartax.in/s/section-194d-tds", "verifiedOn": "2026-10-17" }
+  ],
   "notes": "Statutory TDS rates and thresholds for individual payees furnishing PAN. For payments or credits credited on or before 31 March 2026, legacy Chapter XVII-B sections apply. For payments or credits from 1 April 2026, consult the corresponding sections (e.g. sections 392/393) under the Income-tax Act, 2025.",
   "assumptions": [
     "Payee is a resident individual who has furnished a valid Permanent Account Number (PAN) to the deductor.",
@@ -29,18 +36,18 @@
       "192": { "ratePct": 0, "threshold": 0, "description": "Salary — as per applicable slab rates" },
       "192A": { "ratePct": 10, "threshold": 50000, "description": "Premature EPF withdrawal (< 5 years of service)" },
       "193": { "ratePct": 10, "threshold": 10000, "description": "Interest on securities" },
-      "194": { "ratePct": 10, "threshold": 5000, "description": "Dividend from listed company" },
-      "194A": { "ratePct": 10, "threshold": 50000, "description": "Interest other than securities (banks/post office)" },
+      "194": { "ratePct": 10, "threshold": 10000, "description": "Dividend from listed company" },
+      "194A": { "ratePct": 10, "threshold": 50000, "seniorCitizenThreshold": 100000, "description": "Interest other than securities (banks/post office); ₹1,00,000 for senior citizens" },
       "194B": { "ratePct": 30, "threshold": 10000, "description": "Winnings from lotteries, crossword puzzles" },
       "194BB": { "ratePct": 30, "threshold": 10000, "description": "Winnings from horse races" },
       "194C": { "ratePct": 1, "threshold": 30000, "description": "Payments to contractors (individual/HUF)" },
-      "194D": { "ratePct": 5, "threshold": 15000, "description": "Insurance commission" },
-      "194H": { "ratePct": 5, "threshold": 15000, "description": "Commission or brokerage" },
-      "194I": { "ratePct": 10, "threshold": 240000, "description": "Rent of land/building/furniture" },
-      "194J": { "ratePct": 10, "threshold": 30000, "description": "Fees for professional or technical services" },
-      "194LA": { "ratePct": 10, "threshold": 250000, "description": "Compensation on compulsory acquisition of immovable property" },
+      "194D": { "ratePct": 2, "threshold": 20000, "description": "Insurance commission (payee other than a company); 2% from 1 April 2025" },
+      "194H": { "ratePct": 2, "threshold": 20000, "description": "Commission or brokerage; 2% from 1 October 2024" },
+      "194I": { "ratePct": 10, "threshold": 600000, "monthlyThreshold": 50000, "description": "Rent of land/building/furniture; ₹50,000 a month (₹6,00,000 a year)" },
+      "194J": { "ratePct": 10, "threshold": 50000, "description": "Fees for professional or technical services" },
+      "194LA": { "ratePct": 10, "threshold": 500000, "description": "Compensation on compulsory acquisition of immovable property" },
       "194N": { "ratePct": 2, "threshold": 2000000, "description": "Cash withdrawal exceeding ₹20 lakh / ₹1 crore" },
-      "194O": { "ratePct": 1, "threshold": 500000, "description": "Payment by e-commerce operator to e-commerce participant" },
+      "194O": { "ratePct": 0.1, "threshold": 500000, "description": "Payment by e-commerce operator to e-commerce participant" },
       "194Q": { "ratePct": 0.1, "threshold": 5000000, "description": "Purchase of goods exceeding ₹50 lakh" }
     }
   }

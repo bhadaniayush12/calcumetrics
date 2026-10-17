@@ -12,7 +12,7 @@ import { TOOLS } from '../../config/site';
 
 const DEFAULT = {
   monthlyVolume: 500000,
-  ticketSize: 1500,
+  ticketSize: 2500,
   chargeableShare: 20,
   mdrRate: 1.1,
   gstRate: 18,
@@ -115,7 +115,7 @@ const jsonld = {
 ---
 
 <Layout
-  title="UPI MDR Calculator: UPI MDR Charges & Net Settlement | Calcumetrics"
+  title="UPI MDR Calculator: Charges & Net Settlement | Calcumetrics"
   description="Free UPI MDR calculator. Compute mdr on upi transactions — interchange fees on PPI wallets & RuPay credit cards on UPI, 18% GST, and net bank settlement."
   canonical={canonicalUrl}
 >
@@ -139,13 +139,13 @@ const jsonld = {
         Governed by <a href="https://www.npci.org.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">NPCI Guidelines</a> &amp; Payment and Settlement Systems Act.
       </p>
 
-      <!-- Upcoming 15 October Regulation Notice -->
+      <!-- Proposed P2M MDR change: deferred, no new date notified -->
       <div class="mb-5 p-3.5 rounded-card bg-amber-500/10 border border-amber-500/30 text-xs text-text-primary">
         <strong class="font-bold flex items-center gap-1.5 text-amber-600 dark:text-amber-400 mb-1">
-          Upcoming NPCI Rule Update (Effective 15 October 2026):
+          Proposed NPCI change deferred (no new date yet)
         </strong>
         <p class="text-text-muted leading-relaxed">
-          NPCI has revised the merchant interchange framework taking effect <strong>15 October 2026</strong>: a standard <strong>0.4% MDR</strong> applies to commercial P2M transactions above ₹2,000 (capped at ₹300), flat ₹5 on essential utilities/fuel, while transactions up to ₹2,000 and small merchants (up to ₹1L/month) remain <strong>100% free (0% MDR)</strong>.
+          A revised merchant framework was proposed with a <strong>0.4% MDR</strong> on commercial P2M transactions above ₹2,000 (capped at ₹300), a flat ₹5 on essential utilities/fuel, and 0% for transactions up to ₹2,000 and small merchants (up to ₹1L/month). NPCI deferred it on 13 October 2026 to after Diwali; a new effective date has <strong>not yet been notified</strong>. This calculator uses the <strong>current rules</strong>.
         </p>
       </div>
 
@@ -174,6 +174,21 @@ const jsonld = {
         </div>
       </div>
 
+      <!-- Average Ticket Size -->
+      <div class="mb-5">
+        <Input
+          id="mdr-ticket"
+          label="Average Ticket Size"
+          prefix="₹"
+          value="2,500"
+          isNumeric={true}
+          localeFormat="indian"
+          helperText="PPI / RuPay interchange applies only above ₹2,000; at ₹2,000 or less it is 0"
+          inputmode="decimal"
+          aria-describedby="mdr-error-msg"
+        />
+      </div>
+
       <!-- Chargeable Share % -->
       <div class="mb-5">
         <Input
@@ -182,7 +197,7 @@ const jsonld = {
           suffix="%"
           value="20"
           isNumeric={true}
-          helperText="Percentage of volume from interchange-eligible methods (> ₹2,000)"
+          helperText="Percentage of volume paid via PPI wallets or RuPay credit cards on UPI"
           inputmode="decimal"
           aria-describedby="mdr-error-msg"
         />
@@ -287,7 +302,7 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3">
           <div class="space-y-1">
             <p class="font-bold text-text-primary text-sm">Step 1: Determine Chargeable Merchant Volume</p>
-            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Chargeable Volume = Total Monthly Volume × (Chargeable Share % ÷ 100)</p>
+            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Chargeable Volume = Total Monthly Volume × (Chargeable Share % ÷ 100), or 0 if the average ticket is ₹2,000 or less</p>
           </div>
           <div class="space-y-1 border-t border-border/50 pt-2">
             <p class="font-bold text-text-primary text-sm">Step 2: Compute Base Merchant Discount Rate (MDR)</p>
@@ -423,6 +438,7 @@ const jsonld = {
   function initMDRCalc() {
     const volInput = document.getElementById('mdr-volume') as HTMLInputElement | null;
     const shareInput = document.getElementById('mdr-share') as HTMLInputElement | null;
+    const ticketInput = document.getElementById('mdr-ticket') as HTMLInputElement | null;
     const rateInput = document.getElementById('mdr-rate') as HTMLInputElement | null;
     const gstInput = document.getElementById('mdr-gst') as HTMLInputElement | null;
 
@@ -447,7 +463,7 @@ const jsonld = {
     }
     volInput.dataset.bound = 'true';
 
-    const DEFAULTS = { vol: 500000, share: 20, rate: 1.1, gst: 18 };
+    const DEFAULTS = { vol: 500000, ticket: 2500, share: 20, rate: 1.1, gst: 18 };
     let timer: ReturnType<typeof setTimeout>;
 
     function showError(msg: string) {
@@ -461,26 +477,30 @@ const jsonld = {
     function recalc() {
       const numVol = parseSmartInput(volInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
       const numShare = parseSmartInput(shareInput!.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      const numTicket = ticketInput ? parseSmartInput(ticketInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) : DEFAULTS.ticket;
       const rawRate = rateInput ? String(parseSmartInput(rateInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '1.1';
       const rawGst = gstInput ? String(parseSmartInput(gstInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) ?? '') : '18';
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Monthly Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, decimal: true, label: 'Chargeable Share' });
+      const vTicket = validate(numTicket ?? '', { required: true, min: 1, decimal: true, label: 'Average Ticket Size' });
       const vRate = validate(rawRate ?? '', { required: true, min: 0.1, max: 5, decimal: true, label: 'MDR Rate' });
       const vGst = validate(rawGst ?? '', { required: true, min: 0, max: 28, decimal: true, label: 'GST Rate' });
 
       if (!vVol.valid) { showError(vVol.error!.message); return; }
+      if (!vTicket.valid) { showError(vTicket.error!.message); return; }
       if (!vShare.valid) { showError(vShare.error!.message); return; }
       if (!vRate.valid) { showError(vRate.error!.message); return; }
       if (!vGst.valid) { showError(vGst.error!.message); return; }
       clearError();
 
       const vol = vVol.value!;
+      const ticket = vTicket.value!;
       const share = vShare.value!;
       const rate = vRate.value!;
       const gst = vGst.value!;
 
-      const res = calcUPIMDR(vol, 1500, share, rate, gst);
+      const res = calcUPIMDR(vol, ticket, share, rate, gst);
 
       setResult({
         heroValue: fmtVal(res.netSettlement),
@@ -509,7 +529,7 @@ const jsonld = {
         if (valEls[1]) valEls[1].textContent = fmtVal(res.totalDeductions);
       }
 
-      currentHashState = { v: vol, s: share, r: rate, g: gst };
+      currentHashState = { v: vol, t: ticket, s: share, r: rate, g: gst };
     }
 
     function debounce() {
@@ -549,9 +569,16 @@ const jsonld = {
     sync(shareSlider, shareInput, false);
     sync(rateSlider, rateInput!, false);
 
+    ticketInput?.addEventListener('input', debounce);
+    ticketInput?.addEventListener('blur', () => {
+      const num = parseSmartInput(ticketInput.value, currLocale === 'de-DE' ? 'EUR' : undefined);
+      if (num !== null && !isNaN(num)) ticketInput.value = fmtLiveInput(String(num));
+    });
+
     document.getElementById('mdr-calculate')?.addEventListener('click', recalc);
     document.getElementById('mdr-reset')?.addEventListener('click', () => {
       volInput.value = fmtLiveInput(String(DEFAULTS.vol));
+      if (ticketInput) ticketInput.value = fmtLiveInput(String(DEFAULTS.ticket));
       shareInput.value = String(DEFAULTS.share);
       if (rateInput) rateInput.value = String(DEFAULTS.rate);
       if (gstInput) gstInput.value = String(DEFAULTS.gst);
@@ -574,7 +601,7 @@ const jsonld = {
       volInput.focus();
     });
 
-    [volInput, shareInput, rateInput, gstInput].forEach((el) => {
+    [volInput, ticketInput, shareInput, rateInput, gstInput].forEach((el) => {
       el?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') recalc();
       });
@@ -589,12 +616,14 @@ const jsonld = {
 
       const vVol = validate(numVol ?? '', { required: true, min: 1000, label: 'Volume' });
       const vShare = validate(numShare ?? '', { required: true, min: 0, max: 100, label: 'Share' });
+      const numTicket = ticketInput ? parseSmartInput(ticketInput.value, currLocale === 'de-DE' ? 'EUR' : undefined) : DEFAULTS.ticket;
+      const vTicket = validate(numTicket ?? '', { required: true, min: 1, label: 'Ticket' });
       const vRate = validate(rawRate ?? '', { required: true, min: 0.1, label: 'Rate' });
       const vGst = validate(rawGst ?? '', { required: true, min: 0, label: 'GST' });
 
-      if (!vVol.valid || !vShare.valid || !vRate.valid || !vGst.valid) return;
+      if (!vVol.valid || !vTicket.valid || !vShare.valid || !vRate.valid || !vGst.valid) return;
 
-      const res = calcUPIMDR(vVol.value!, 1500, vShare.value!, vRate.value!, vGst.value!);
+      const res = calcUPIMDR(vVol.value!, vTicket.value!, vShare.value!, vRate.value!, vGst.value!);
       const text = `UPI MDR: Volume ${fmtVal(vVol.value!)} (${vShare.value}% chargeable at ${vRate.value}%) => Fee+GST: ${fmtVal(res.totalDeductions)}, Net Settlement: ${fmtVal(res.netSettlement)}. ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
@@ -649,6 +678,8 @@ const jsonld = {
       if (restored.valid && restored.values.v && restored.values.s !== undefined && restored.values.r !== undefined && restored.values.g !== undefined) {
         volInput.value = fmtLiveInput(String(restored.values.v));
         shareInput.value = String(restored.values.s);
+        const t = Number(new URLSearchParams(readCurrentHash().replace(/^#/, '')).get('t'));
+        if (ticketInput && Number.isFinite(t) && t > 0) ticketInput.value = fmtLiveInput(String(t));
         if (rateInput) rateInput.value = String(restored.values.r);
         if (gstInput) gstInput.value = String(restored.values.g);
       }

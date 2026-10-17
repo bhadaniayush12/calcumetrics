@@ -28,11 +28,18 @@ const principalCompact = formatIndianCompact(DEFAULT.principal, '₹');
 const interestExact = fmt(result.interest);
 const interestCompact = formatIndianCompact(result.interest, '₹');
 
+// Quick Answer and worked example are rendered from the same engine result as the calculator.
+const FREQ_N = { monthly: 12, quarterly: 4, 'half-yearly': 2, annually: 1 }[DEFAULT.freq];
+const exPeriodRate = DEFAULT.rate / 100 / FREQ_N;
+const exPeriods = FREQ_N * DEFAULT.years;
+const exGrowth = result.maturity / DEFAULT.principal;
+const exRateText = DEFAULT.rate.toFixed(2);
+
 const RELATED_SLUGS = ['rd-calculator', 'compound-interest-calculator', 'ppf-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/fd-calculator';
-const pageTitle = 'FD Calculator: Fixed Deposit Interest & Returns | Calcumetrics';
+const pageTitle = 'FD Calculator: Fixed Deposit Interest & Returns';
 const pageDesc = 'Free FD calculator. Calculate bank fixed deposit maturity, compare fd interest calculator rates, quarterly compounding, and senior citizen returns.';
 
 const jsonld = {
@@ -93,7 +100,7 @@ const jsonld = {
           name: 'Is FD interest taxable, and what are the TDS limits?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹40,000 per financial year (₹50,000 for senior citizens).',
+            text: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹50,000 per financial year (₹1,00,000 for senior citizens).',
           },
         },
         {
@@ -365,7 +372,7 @@ const jsonld = {
       <!-- Tax & TDS Notice Box -->
       <div class="p-3 rounded-control bg-dark-border/40 border border-dark-border text-xs text-dark-text mb-4 space-y-1">
         <p class="leading-relaxed">
-          TDS under Section 194A applies if annual interest exceeds <strong>₹40,000</strong> (₹50,000 for senior citizens).
+          TDS under Section 194A applies if annual interest exceeds <strong>₹50,000</strong> (₹1,00,000 for senior citizens).
         </p>
       </div>
 
@@ -373,7 +380,7 @@ const jsonld = {
       <div class="space-y-2">
         <a
           id="fd-whatsapp-btn"
-          href="https://api.whatsapp.com/send?text=Check%20out%20my%20FD%20calculation:%20%E2%82%B91%20Lakh%20at%207.1%25%20for%205%20years%20matures%20to%20%E2%82%B91.42%20Lakh%20on%20Calcumetrics:%20https://calcumetrics.com/fd-calculator"
+          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out my FD calculation: ${principalCompact} at ${DEFAULT.rate}% for ${DEFAULT.years} years matures to ${heroCompact} on Calcumetrics: ${canonicalUrl}`)}`}
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
@@ -409,7 +416,7 @@ const jsonld = {
       <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
         <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
         <p class="text-sm text-text-primary leading-relaxed" id="fd-snippet-answer">
-          A fixed deposit of <strong>₹1.00 Lakh</strong> at an interest rate of <strong>7.10% p.a.</strong> with quarterly compounding over a <strong>5-year tenure</strong> yields a guaranteed maturity amount of <strong>₹1.42 Lakh</strong> (₹1,42,010). The total compound interest earned is <strong>₹42,010</strong>.
+          A fixed deposit of <strong>{principalCompact}</strong> at an interest rate of <strong>{exRateText}% p.a.</strong> with quarterly compounding over a <strong>{DEFAULT.years}-year tenure</strong> yields a guaranteed maturity amount of <strong>{heroCompact}</strong> ({heroExact}). The total compound interest earned is <strong>{interestExact}</strong>.
         </p>
       </div>
 
@@ -439,28 +446,28 @@ const jsonld = {
       <section aria-labelledby="fd-example" class="mb-10">
         <h2 id="fd-example" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Worked mathematical example</h2>
         <p class="text-sm text-text-muted mb-4">
-          Calculating maturity for a ₹1,00,000 deposit at 7.1% p.a. compounded quarterly for 5 years:
+          Calculating maturity for a {principalExact} deposit at {DEFAULT.rate}% p.a. compounded quarterly for {DEFAULT.years} years:
         </p>
         <div class="space-y-3 bg-surface border border-border rounded-card p-5 text-xs text-text-muted">
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 1:</span>
-            <span>Quarterly rate: <code>r / 4 = 0.071 / 4 = 0.01775</code></span>
+            <span>Quarterly rate: <code>r / {FREQ_N} = {DEFAULT.rate / 100} / {FREQ_N} = {exPeriodRate}</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 2:</span>
-            <span>Total compounding quarters: <code>n × t = 4 × 5 = 20 quarters</code></span>
+            <span>Total compounding quarters: <code>n × t = {FREQ_N} × {DEFAULT.years} = {exPeriods} quarters</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 3:</span>
-            <span>Compound growth factor: <code>(1 + 0.01775)²⁰ ≈ 1.42010</code></span>
+            <span>Compound growth factor: <code>(1 + {exPeriodRate})^{exPeriods} ≈ {exGrowth.toFixed(6)}</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 4:</span>
-            <span>Final maturity: <code>1,00,000 × 1.42010 = ₹1,42,010</code></span>
+            <span>Final maturity: <code>{formatIndian(DEFAULT.principal)} × {exGrowth.toFixed(6)} = {heroExact}</code></span>
           </div>
           <div class="pt-2 border-t border-border flex justify-between font-medium text-text-primary text-sm">
-            <span>Principal: ₹1,00,000</span>
-            <span class="text-accent font-bold">Interest Earned: ₹42,010</span>
+            <span>Principal: {principalExact}</span>
+            <span class="text-accent font-bold">Interest Earned: {interestExact}</span>
           </div>
         </div>
       </section>
@@ -480,7 +487,7 @@ const jsonld = {
             },
             {
               q: 'Is FD interest taxable, and what are the TDS limits?',
-              a: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹40,000 per financial year (₹50,000 for senior citizens).',
+              a: 'Yes, interest earned on fixed deposits is fully taxable under Income from Other Sources at your applicable income tax slab rate. Under Section 194A, banks deduct 10% TDS if cumulative FD interest across branches exceeds ₹50,000 per financial year (₹1,00,000 for senior citizens).',
             },
             {
               q: 'What is a 5-Year Tax-Saving Fixed Deposit?',

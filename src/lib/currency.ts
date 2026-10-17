@@ -116,8 +116,13 @@ export function getCurrencyConfig(code: unknown): CurrencyConfig {
  *   - Europe/London or en-GB -> GBP
  *   - Europe/Berlin, Europe/Paris, Europe/Madrid, Europe/Rome, or de/fr/es locales -> EUR
  *   - America/New_York, America/Chicago, America/Los_Angeles or en-US -> USD
- *   - Asia/Kolkata or en-IN or fallback -> INR
+ *   - Asia/Kolkata / Asia/Calcutta, or en-IN and Indian-language locales -> INR
+ *   - Anything else (Australia, New Zealand, Gulf, Asia, Africa, unknown) -> USD
+ * Only an Indian timezone or locale yields INR. SSR without hints still returns DEFAULT_CURRENCY.
  */
+/** Currency for visitors whose timezone/locale maps to none of the supported markets. */
+export const DETECTION_FALLBACK_CURRENCY: CurrencyCode = 'USD';
+
 export function detectUserCurrency(customTz?: string, customLocale?: string): CurrencyCode {
   if (typeof window === 'undefined' && customTz === undefined && customLocale === undefined) return DEFAULT_CURRENCY;
   try {
@@ -213,7 +218,7 @@ export function detectUserCurrency(customTz?: string, customLocale?: string): Cu
       }
     }
   } catch {}
-  return DEFAULT_CURRENCY;
+  return DETECTION_FALLBACK_CURRENCY;
 }
 
 /**
@@ -283,24 +288,33 @@ export function getJurisdictionCurrency(pathname: string): CurrencyCode | null {
   return null;
 }
 
+/** What every formatter renders for NaN / ±Infinity instead of "₹NaN" or "₹∞". */
+export const NON_FINITE_DISPLAY = '-';
+
 /**
  * Formats a numeric value into a display currency string using standard Intl.NumberFormat.
  * NEVER alters the underlying numeric value (Zero FX conversion invariant).
+ * The minus sign goes before the symbol (-₹1,250), values that round to zero
+ * never show a sign (₹0), and NaN / Infinity render as NON_FINITE_DISPLAY.
  */
 export function formatDisplayCurrency(
   value: number,
   currencyCode: unknown = DEFAULT_CURRENCY,
   decimals = 0
 ): string {
+  if (!Number.isFinite(value)) return NON_FINITE_DISPLAY;
   const config = getCurrencyConfig(currencyCode);
   const rounded = decimals === 0 ? Math.round(value) : value;
 
   const formattedNumber = new Intl.NumberFormat(config.locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
+    signDisplay: 'negative',
   }).format(rounded);
 
-  return `${config.symbol}${formattedNumber}`;
+  return formattedNumber.startsWith('-')
+    ? `-${config.symbol}${formattedNumber.slice(1)}`
+    : `${config.symbol}${formattedNumber}`;
 }
 
 /**
@@ -315,6 +329,7 @@ export function formatDisplayCurrency(
  *   >= 1,000         -> $5k (or $100k)
  */
 export function formatPresetChip(num: number, code: CurrencyCode = DEFAULT_CURRENCY, customSymbol?: string): string {
+  if (!Number.isFinite(num)) return NON_FINITE_DISPLAY;
   const sym = customSymbol || CURRENCY_CONFIG[code]?.symbol || '₹';
   if (code === 'INR') {
     if (num >= 10000000) {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcNPV, calcNPVDetails, calcIRR, calcDCF } from './corporate';
+import { calcNPV, calcNPVDetails, calcIRR, calcDCF, countSignChanges } from './corporate';
 import { validate } from '../validate';
 import { serializeHash, restoreFromHash } from '../url-state';
 
@@ -129,5 +129,43 @@ describe('calcDCF', () => {
 
   it('is valid when discount rate exceeds terminal growth', () => {
     expect(calcDCF([100, 110], 12, 3).valid).toBe(true);
+  });
+});
+
+describe('calcIRR — multiple sign changes', () => {
+  it('flags a conventional series (one sign change) as single-IRR', () => {
+    const res = calcIRR([-100000, 30000, 40000, 50000, 60000]);
+    expect(res.signChanges).toBe(1);
+    expect(res.multipleIRRsPossible).toBe(false);
+  });
+
+  it('flags a non-conventional series (− + −) as possibly having multiple IRRs', () => {
+    // Classic two-IRR case: −1,600 / +10,000 / −10,000 has IRRs at 25% and 400%
+    const res = calcIRR([-1600, 10000, -10000]);
+    expect(res.signChanges).toBe(2);
+    expect(res.multipleIRRsPossible).toBe(true);
+  });
+
+  it('ignores zero flows when counting sign changes', () => {
+    expect(countSignChanges([-100, 0, 50, 0, 80])).toBe(1);
+    expect(countSignChanges([-100, 60, 0, -20, 90])).toBe(3);
+  });
+});
+
+describe('calcNPVDetails — negative later cash flows', () => {
+  it('discounts a negative year-3 outflow like any other flow', () => {
+    // NPV @10% = −1,00,000 + 60,000/1.1 + 70,000/1.21 − 20,000/1.331 + 50,000/1.4641
+    const res = calcNPVDetails(10, 100000, [60000, 70000, -20000, 50000]);
+    const expected = -100000 + 60000 / 1.1 + 70000 / 1.21 - 20000 / 1.331 + 50000 / 1.4641;
+    expect(res.npv).toBeCloseTo(expected, 6);
+    expect(res.yearlyDiscounted[2].discounted).toBeCloseTo(-20000 / 1.331, 6);
+    expect(res.totalUndiscountedInflows).toBe(160000);
+  });
+
+  it('handles all-negative later flows (no viable project)', () => {
+    const res = calcNPVDetails(10, 100000, [-10000, -10000, 0, 0]);
+    expect(res.isViable).toBe(false);
+    expect(res.totalDiscountedInflows).toBeLessThan(0);
+    expect(res.profitabilityIndex).toBeLessThan(0);
   });
 });

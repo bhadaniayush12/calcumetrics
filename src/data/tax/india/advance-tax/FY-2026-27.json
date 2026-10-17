@@ -1,0 +1,47 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "advance-tax",
+  "effectiveFrom": "2026-04-01",
+  "applicableTo": "2027-03-31",
+  "financialYear": "FY 2026-27",
+  "governingFramework": "Income-tax Act, 2025",
+  "framework": "Income-tax Act, 2025 (advance tax schedule carried forward; Finance Act 2026)",
+  "source": "Income Tax Department",
+  "sourceUrl": "https://www.incometaxindia.gov.in/documents/20117/15766092/FAQs-Budget-2026+Updated.pdf/daf54d14-aca9-c4ea-b786-598fd2f8d4c4",
+  "sourceTitle": "CBDT FAQs on Budget 2026 (Finance Bill 2026)",
+  "verifiedOn": "2026-10-17",
+  "notes": "Finance Act 2026 made no change to the ₹10,000 advance tax threshold or the quarterly instalment schedule. Advance tax is payable when estimated annual tax liability after TDS/TCS exceeds ₹10,000. Instalments are due quarterly for non-corporate taxpayers.",
+  "assumptions": [
+    "Applicable to individual resident taxpayers whose estimated total income tax liability for the financial year (after deducting TDS and TCS) exceeds ₹10,000.",
+    "Follows the quarterly statutory schedule for non-corporate taxpayers: 15% by 15 June, 45% by 15 September, 75% by 15 December, and 100% by 15 March."
+  ],
+  "limitations": [
+    "Resident senior citizens (aged 60 years or older) having no business or professional income are entirely exempt from advance tax.",
+    "Does not calculate penal interest for default in payment of advance tax or for deferment of instalments.",
+    "Eligible presumptive taxation assessees paying 100% advance tax in a single installment by 15 March are not modeled.",
+    "Estimated schedule for planning purposes; consult official CBDT challan guidelines for tax deposit via e-Pay Tax."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department for FY 2026-27 (TY 2026-27). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
+  "values": {
+    "minimumLiabilityThreshold": 10000,
+    "schedule": [
+      {
+        "dueDate": "15 June",
+        "cumulativePct": 15
+      },
+      {
+        "dueDate": "15 September",
+        "cumulativePct": 45
+      },
+      {
+        "dueDate": "15 December",
+        "cumulativePct": 75
+      },
+      {
+        "dueDate": "15 March",
+        "cumulativePct": 100
+      }
+    ]
+  },
+  "taxYear": "TY 2026-27"
+}

@@ -9,6 +9,17 @@ import {
   METRO_CITIES,
   TDS_RATES,
 } from '../../lib/tax/india';
+import { INDIA_TAX_DATA } from './schema';
+
+describe('Finance Act 2025 dividend and acquisition thresholds', () => {
+  it.each([['194', 10000], ['194LA', 500000]] as const)(
+    '%s starts withholding only above its revised threshold', (section, threshold) => {
+      expect(calcTDS(threshold - 1, section).tdsAmount).toBe(0);
+      expect(calcTDS(threshold, section).tdsAmount).toBe(0);
+      expect(calcTDS(threshold + 1, section).tdsAmount).toBeCloseTo((threshold + 1) * 0.1, 2);
+    }
+  );
+});
 
 describe('calcGST', () => {
   it('exclusive mode: adds GST to base', () => {
@@ -108,6 +119,36 @@ describe('calcTDS', () => {
     expect(res.tdsAmount).toBeCloseTo(15000, 2);
   });
 
+  it('194A senior citizen: ₹1,00,000 threshold instead of ₹50,000', () => {
+    const general = calcTDS(75000, '194A');
+    const senior = calcTDS(75000, '194A', { seniorCitizen: true });
+    expect(general.threshold).toBe(50000);
+    expect(general.tdsAmount).toBeCloseTo(7500, 2);
+    expect(senior.threshold).toBe(100000);
+    expect(senior.thresholdMet).toBe(false);
+    expect(senior.tdsAmount).toBe(0);
+    // Above ₹1,00,000 a senior is deducted at the normal 10%
+    expect(calcTDS(120000, '194A', { seniorCitizen: true }).tdsAmount).toBeCloseTo(12000, 2);
+  });
+
+  it('senior citizen flag does not change other sections', () => {
+    expect(calcTDS(100000, '194J', { seniorCitizen: true }).threshold).toBe(50000);
+  });
+
+  it('194O e-commerce: 0.1% from 1 Oct 2024 (Finance (No.2) Act 2024)', () => {
+    const res = calcTDS(1000000, '194O');
+    expect(res.ratePct).toBe(0.1);
+    expect(res.tdsAmount).toBeCloseTo(1000, 2);
+  });
+
+  it('engine rate table matches tds/current.json', () => {
+    const sections = INDIA_TAX_DATA.tds.current.values.sections as Record<string, { ratePct: number; threshold: number }>;
+    for (const [sec, { ratePct, threshold }] of Object.entries(TDS_RATES)) {
+      expect(sections[sec]?.ratePct, sec).toBe(ratePct);
+      expect(sections[sec]?.threshold, sec).toBe(threshold);
+    }
+  });
+
   it('all sections have valid rate and threshold', () => {
     Object.values(TDS_RATES).forEach(({ ratePct, threshold }) => {
       expect(ratePct).toBeGreaterThanOrEqual(0);
@@ -167,6 +208,23 @@ describe('calcCapitalGains holding-period boundaries', () => {
     expect(calcCapitalGains(500000, 300000, 120, 'debt-fund').gainType).toBe('STCG');
   });
 
+  it('applies Section 50AA by acquisition date: on/after 1 Apr 2023 always STCG', () => {
+    const after = calcCapitalGains(500000, 300000, 36, 'debt-fund', { acquisitionDate: '2023-04-01' });
+    expect(after.gainType).toBe('STCG');
+    expect(after.section).toMatch(/50AA/);
+    expect(calcCapitalGains(500000, 300000, 40, 'debt-fund', { acquisitionDate: '2023-06-15' }).gainType).toBe('STCG');
+  });
+
+  it('debt-fund units acquired before 1 Apr 2023 use the 24-month rule', () => {
+    const lt = calcCapitalGains(500000, 300000, 30, 'debt-fund', { acquisitionDate: '2023-03-31' });
+    expect(lt.gainType).toBe('LTCG');
+    expect(lt.taxRatePct).toBe(12.5);
+    expect(lt.taxAmount).toBeCloseTo(25000, 2);
+    const st = calcCapitalGains(500000, 300000, 24, 'debt-fund', { acquisitionDate: '2022-01-10' });
+    expect(st.gainType).toBe('STCG');
+    expect(st.section).not.toMatch(/50AA/);
+  });
+
   it('applies 12.5% LTCG to other assets after Budget 2024', () => {
     expect(calcCapitalGains(500000, 300000, 36, 'other').taxRatePct).toBe(12.5);
   });
@@ -222,5 +280,56 @@ describe('calcSalaryCTC', () => {
   it('annual gross = CTC - employer EPF', () => {
     const res = calcSalaryCTC(1200000);
     expect(res.annualGrossSalary).toBeCloseTo(res.ctc - res.employerEPF, 2);
+  });
+});
+
+describe('calcCapitalGains — property acquired before 23 Jul 2024 (indexation option)', () => {
+  it('indexation wins: 20% on indexed gain is lower than 12.5% flat', () => {
+    // Bought 1 May 2010 (FY 2010-11, CII 167) for ₹20,00,000; held 197 months → sold Oct 2026 (FY 2026-27, CII 384) for ₹80,00,000
+    // Indexed cost = 20,00,000 × 384 / 167 = 45,98,802.40; indexed gain = 34,01,197.60
+    // With indexation: 20% × 34,01,197.60 = 6,80,239.52
+    // Without: 12.5% × 60,00,000 = 7,50,000 → indexation applied
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate', { acquisitionDate: '2010-05-01' });
+    expect(res.indexation?.ciiAcquisition).toBe(167);
+    expect(res.indexation?.ciiSale).toBe(384);
+    expect(res.indexation?.saleFY).toBe('2026-27');
+    expect(res.indexation?.indexedCost).toBeCloseTo((2000000 * 384) / 167, 4);
+    expect(res.indexation?.taxWithoutIndexation).toBeCloseTo(750000, 4);
+    expect(res.indexation?.taxWithIndexation).toBeCloseTo(680239.52, 1);
+    expect(res.indexation?.applied).toBe('with-indexation');
+    expect(res.taxRatePct).toBe(20);
+    expect(res.taxAmount).toBeCloseTo(680239.52, 1);
+    expect(res.cess).toBeCloseTo(680239.52 * 0.04, 1);
+  });
+
+  it('12.5% wins: flat rate is lower than 20% with indexation', () => {
+    // Bought 1 Jun 2020 (FY 2020-21, CII 301) for ₹50,00,000; held 76 months → sold Oct 2026 (CII 384) for ₹1,00,00,000
+    // Indexed cost = 50,00,000 × 384 / 301 = 63,78,737.54; indexed gain = 36,21,262.46
+    // With indexation: 20% × 36,21,262.46 = 7,24,252.49
+    // Without: 12.5% × 50,00,000 = 6,25,000 → 12.5% applied
+    const res = calcCapitalGains(10000000, 5000000, 76, 'real-estate', { acquisitionDate: '2020-06-01' });
+    expect(res.indexation?.taxWithIndexation).toBeCloseTo(724252.49, 1);
+    expect(res.indexation?.taxWithoutIndexation).toBeCloseTo(625000, 4);
+    expect(res.indexation?.applied).toBe('without-indexation');
+    expect(res.taxRatePct).toBe(12.5);
+    expect(res.taxAmount).toBeCloseTo(625000, 4);
+  });
+
+  it('explicit sale date overrides the derived one', () => {
+    // Sale in FY 2025-26 (CII 376) instead of the derived FY 2026-27
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate', { acquisitionDate: '2010-05-01', saleDate: '2026-03-15' });
+    expect(res.indexation?.ciiSale).toBe(376);
+  });
+
+  it('no indexation option for property acquired on or after 23 Jul 2024', () => {
+    const res = calcCapitalGains(8000000, 6000000, 30, 'real-estate', { acquisitionDate: '2024-07-23' });
+    expect(res.indexation).toBeUndefined();
+    expect(res.taxRatePct).toBe(12.5);
+  });
+
+  it('no acquisition date keeps the existing 12.5% behaviour', () => {
+    const res = calcCapitalGains(8000000, 2000000, 197, 'real-estate');
+    expect(res.indexation).toBeUndefined();
+    expect(res.taxAmount).toBeCloseTo(750000, 4);
   });
 });

@@ -37,6 +37,10 @@ const savingsCompact = formatIndianCompact(result.taxSavings, '₹');
 const RELATED_SLUGS = ['salary-ctc-calculator', 'hra-calculator', 'tds-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator';
+// Initial WhatsApp share text, built from the engine with the page defaults (same shape as the client update).
+const initialShareText = encodeURIComponent(
+  `Income Tax Comparison (FY 2025-26 & 2026-27):\nGross Income: ${fmt(DEFAULT.grossIncome)}\nNew Regime Tax: ${newTaxExact}\nOld Regime Tax: ${oldTaxExact}\nRecommended: ${result.recommendedRegime} (Save ${savingsExact})\nCalculate on Calcumetrics: ${canonicalUrl}`
+);
 const pageTitle = 'Income Tax Calculator FY 2026-27 / AY 2027-28 | Calcumetrics';
 const pageDesc = 'Free income tax calculator India (FY 2026-27). Compare income tax calculator new regime vs old regime with ₹75k standard deduction and ₹12L rebate.';
 
@@ -122,7 +126,7 @@ const jsonld = {
           name: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying Section 87A rebate and marginal relief under both regimes.',
+            text: 'Yes. A mandatory 4% Health and Education Cess is calculated on income tax (after the Section 87A rebate) plus any surcharge, after marginal relief, under both regimes.',
           },
         },
       ],
@@ -156,12 +160,6 @@ const jsonld = {
       <p class="text-xs text-text-muted mb-4">
         Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Succeeded legacy Income-tax Act 1961.
       </p>
-
-      <!-- Surcharge Disclaimer (§18) -->
-      <div class="mb-5 p-3 rounded-card bg-amber-500/10 border border-amber-500/20 text-xs text-text-muted leading-relaxed">
-        <strong class="text-amber-700 dark:text-amber-400 font-semibold block mb-0.5">Surcharge Disclaimer:</strong>
-        Computations model base statutory slab rates, ₹75,000 standard deduction, Section 87A rebate (zero tax up to ₹12.75 Lakh gross), and 4% Health & Education Cess. <strong>Surcharge on taxable income exceeding ₹50 Lakh (10% to 25%) is not modeled.</strong> Taxpayers with income above ₹50 Lakh should consult a tax professional for surcharge and marginal relief calculations.
-      </div>
 
       <!-- Old vs New Regime Explainer (collapsible) -->
       <details class="mb-5 rounded-card border border-accent/30 bg-accent/5 overflow-hidden group" id="it-regime-explainer">
@@ -399,7 +397,7 @@ const jsonld = {
       <div class="space-y-2">
         <a
           id="it-whatsapp-btn"
-          href="https://api.whatsapp.com/send?text=Compare%20Income%20Tax%20(Budget%202024):%20Gross%20%E2%82%B912%20Lakh%20yields%20New%20Regime%20Tax%20of%20%E2%82%B985,800%20vs%20Old%20Regime%20Tax%20of%20%E2%82%B91,06,600%20on%20Calcumetrics:%20https://calcumetrics.com/in/income-tax-calculator"
+          href={`https://api.whatsapp.com/send?text=${initialShareText}`}
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
@@ -549,7 +547,7 @@ const jsonld = {
             },
             {
               q: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
-              a: 'Yes. A mandatory 4% Health and Education Cess is calculated on the aggregate of income tax after applying the Section 87A rebate under both the New and Old Tax Regimes.',
+              a: 'Yes. A mandatory 4% Health and Education Cess is calculated on income tax (after the Section 87A rebate) plus any surcharge under both the New and Old Tax Regimes.',
             },
             {
               q: 'Can salaried individuals switch between Old and New Tax Regimes every year?',

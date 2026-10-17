@@ -42,6 +42,9 @@ export async function onRequest(context: PagesContext): Promise<Response> {
   }
 
   if (target.href !== url.href) {
+    // Any redirect on the canonical host also upgrades to https, so
+    // http://calcumetrics.com/sip-calculator/ is one hop, not two.
+    if (target.hostname === 'calcumetrics.com') target.protocol = 'https:';
     return new Response(null, {
       status: 301,
       statusText: 'Moved Permanently',

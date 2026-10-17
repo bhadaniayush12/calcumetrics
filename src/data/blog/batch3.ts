@@ -71,7 +71,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
     ],
@@ -170,7 +170,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
         Your employer calculates TDS under Section 192 based exclusively on the salary they pay you, plus any deductions or declared income you submit in Form 12BB. If you do not formally report your other earnings to payroll, the following income streams generate untaxed liability:
       </p>
       <ul class="space-y-2 text-sm text-text-muted mb-6 list-disc pl-5">
-        <li><strong>Bank Fixed Deposit Interest:</strong> Banks deduct only 10% TDS under Section 194A (or zero if under ₹40,000). If you sit in the 30% tax slab, you still owe a 20% tax shortfall plus cess on that interest.</li>
+        <li><strong>Bank Fixed Deposit Interest:</strong> Banks deduct only 10% TDS under Section 194A (or zero if under ₹50,000; ₹1,00,000 for senior citizens). If you sit in the 30% tax slab, you still owe a 20% tax shortfall plus cess on that interest.</li>
         <li><strong>Equity &amp; Mutual Fund Capital Gains:</strong> Asset management companies and stock brokers deduct <em>zero</em> TDS on domestic equity capital gains. All short-term and long-term gains must be self-assessed.</li>
         <li><strong>Consulting / Freelance Fees:</strong> Clients deduct 10% under Section 194J or 1% or 2% under Section 194C, leaving a massive tax deficit if your effective tax rate is 25% or 30%.</li>
       </ul>
@@ -199,7 +199,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-break-even-point',
     title: 'How to Calculate Your Break-Even Point: A Step-by-Step Guide with Realistic Examples',
-    seoTitle: 'Break-Even Point: How to Calculate with Formula | Calcumetrics',
+    seoTitle: 'How to Calculate Break-Even Point (Formula) | Calcumetrics',
     description:
       'Learn how to calculate break-even point in units and dollars. Master contribution margins, cost classification, and margin of safety calculations.',
     category: 'Business',
@@ -422,7 +422,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'economic-order-quantity-eoq-guide',
     title: 'Economic Order Quantity (EOQ) Explained: Finding the Perfect Balance Between Ordering and Holding Costs',
-    seoTitle: 'Economic Order Quantity (EOQ): Formula & Examples | Calcumetrics',
+    seoTitle: 'Economic Order Quantity (EOQ) Formula | Calcumetrics',
     description:
       'Master the Economic Order Quantity (EOQ) formula. Learn how balancing inventory holding costs with setup/ordering costs minimizes total logistics expenditure.',
     category: 'Business',
@@ -655,7 +655,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'straight-line-vs-reducing-balance-depreciation',
     title: 'Straight-Line vs. Written Down Value (WDV) Depreciation: Which Method Should Your Business Use?',
-    seoTitle: 'Straight-Line vs WDV Depreciation: Differences | Calcumetrics',
+    seoTitle: 'Straight-Line vs Reducing Balance Depreciation',
     description:
       'Compare Straight-Line vs Written Down Value (WDV) depreciation. Learn how tax shields, cash flow timing, and asset matching dictate the choice.',
     category: 'Business',
@@ -865,7 +865,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'dscr-ratio-for-business-loans',
     title: 'What Is DSCR? How Lenders Use the Debt Service Coverage Ratio to Approve Commercial Loans',
-    seoTitle: 'DSCR Ratio: How Lenders Approve Business Loans | Calcumetrics',
+    seoTitle: 'DSCR Ratio: How Lenders Approve Loans | Calcumetrics',
     description:
       'Learn how commercial banks calculate Debt Service Coverage Ratio (DSCR), evaluate Net Operating Income (NOI), and set loan covenants.',
     category: 'Business',
