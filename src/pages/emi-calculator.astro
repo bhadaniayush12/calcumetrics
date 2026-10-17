@@ -30,6 +30,14 @@ const interestCompact = formatIndianCompact(result.totalInterest, '₹');
 const totalPaymentExact = fmt(result.totalPayment);
 const totalPaymentCompact = formatIndianCompact(result.totalPayment, '₹');
 
+// Quick Answer, worked example and SSR share link are rendered from the same engine result.
+const exMonthlyRate = DEFAULT.rate / 1200;
+const exMonths = DEFAULT.years * 12;
+const exFactor = Math.pow(1 + exMonthlyRate, exMonths);
+const tenure10 = calcEMI(DEFAULT.principal, DEFAULT.rate, 10);
+const tenureFaqAnswer = `No. A longer tenure reduces your monthly EMI amount, but significantly increases the cumulative interest paid. For example, a ${principalCompact} loan at ${DEFAULT.rate}% p.a. over ${DEFAULT.years} years incurs ${interestCompact} in interest, whereas a 10-year tenure incurs only ${formatIndianCompact(tenure10.totalInterest, '₹')} in total interest.`;
+const shareHref = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Check out my Loan EMI calculation: ${principalCompact} at ${DEFAULT.rate}% for ${DEFAULT.years} years gives EMI of ${heroExact}/mo on Calcumetrics: https://calcumetrics.com/emi-calculator`)}`;
+
 const related = TOOLS.filter(
   (t) => (t.category === 'Loans' || t.category === 'Investments') && t.slug !== 'emi-calculator' && t.status === 'published'
 ).sort((a, b) => {
@@ -93,7 +101,7 @@ const jsonld = {
           name: 'Does a longer tenure reduce my total loan cost?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No. A longer tenure reduces your monthly EMI amount, but significantly increases the cumulative interest paid. For example, a ₹10 Lakh loan at 8.5% p.a. over 20 years incurs ₹10.83 Lakh in interest, whereas a 10-year tenure incurs only ₹4.88 Lakh in total interest.',
+            text: tenureFaqAnswer,
           },
         },
         {
@@ -372,7 +380,7 @@ const jsonld = {
       <div class="space-y-2">
         <a
           id="emi-whatsapp-btn"
-          href="https://api.whatsapp.com/send?text=Check%20out%20my%20Loan%20EMI%20calculation:%20%E2%82%B910%20Lakh%20at%208.5%25%20for%2020%20years%20gives%20EMI%20of%20%E2%82%B98,678/mo%20on%20Calcumetrics:%20https://calcumetrics.com/emi-calculator"
+          href={shareHref}
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"
@@ -412,7 +420,7 @@ const jsonld = {
       <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
         <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
         <p class="text-sm text-text-primary leading-relaxed" id="emi-snippet-answer">
-          A loan of <strong>₹10.00 Lakh</strong> at an interest rate of <strong>8.50% p.a.</strong> over a <strong>20-year tenure</strong> requires a monthly EMI of <strong>₹8,678</strong>. The total interest payable is <strong>₹10.83 Lakh</strong>, resulting in a total repayment amount of <strong>₹20.83 Lakh</strong>.
+          A loan of <strong>{principalCompact}</strong> at an interest rate of <strong>{DEFAULT.rate.toFixed(2)}% p.a.</strong> over a <strong>{DEFAULT.years}-year tenure</strong> requires a monthly EMI of <strong>{heroExact}</strong>. The total interest payable is <strong>{interestCompact}</strong>, resulting in a total repayment amount of <strong>{totalPaymentCompact}</strong>.
         </p>
       </div>
 
@@ -441,28 +449,28 @@ const jsonld = {
       <section aria-labelledby="emi-worked-example" class="mb-10">
         <h2 id="emi-worked-example" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Step-by-step worked example</h2>
         <p class="text-sm text-text-muted mb-4">
-          Here is how a ₹10,00,000 home loan at 8.5% p.a. for 20 years is mathematically computed:
+          Here is how a {principalExact} home loan at {DEFAULT.rate}% p.a. for {DEFAULT.years} years is mathematically computed:
         </p>
         <div class="space-y-3 bg-surface border border-border rounded-card p-5 text-xs text-text-muted">
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 1:</span>
-            <span>Monthly rate: <code>r = 8.5 / 1200 ≈ 0.00708333</code></span>
+            <span>Monthly rate: <code>r = {DEFAULT.rate} / 1200 ≈ {exMonthlyRate.toFixed(8)}</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 2:</span>
-            <span>Tenure in months: <code>n = 20 × 12 = 240 months</code></span>
+            <span>Tenure in months: <code>n = {DEFAULT.years} × 12 = {exMonths} months</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 3:</span>
-            <span>Compound factor: <code>(1 + r)²⁴⁰ = (1.00708333)²⁴⁰ ≈ 5.42095</code></span>
+            <span>Compound factor: <code>(1 + r)^{exMonths} = ({(1 + exMonthlyRate).toFixed(8)})^{exMonths} ≈ {exFactor.toFixed(5)}</code></span>
           </div>
           <div class="flex items-start gap-2">
             <span class="font-bold text-accent">Step 4:</span>
-            <span>Numerator / Denominator: <code>(10,00,000 × 0.00708333 × 5.42095) / (5.42095 − 1) ≈ ₹8,678</code></span>
+            <span>Numerator / Denominator: <code>({formatIndian(DEFAULT.principal)} × {exMonthlyRate.toFixed(8)} × {exFactor.toFixed(5)}) / ({exFactor.toFixed(5)} − 1) ≈ {heroExact}</code></span>
           </div>
           <div class="pt-2 border-t border-border flex justify-between font-medium text-text-primary text-sm">
-            <span>Monthly EMI: ₹8,678</span>
-            <span class="text-accent font-bold">Total Interest: ₹10,82,776</span>
+            <span>Monthly EMI: {heroExact}</span>
+            <span class="text-accent font-bold">Total Interest: {interestExact}</span>
           </div>
         </div>
       </section>
@@ -533,7 +541,7 @@ const jsonld = {
             },
             {
               q: 'Does a longer tenure reduce my total loan cost?',
-              a: 'No. A longer tenure reduces your monthly EMI amount, but significantly increases the cumulative interest paid. For example, a ₹10 Lakh loan at 8.5% p.a. over 20 years incurs ₹10.83 Lakh in interest, whereas a 10-year tenure incurs only ₹4.88 Lakh in total interest.',
+              a: tenureFaqAnswer,
             },
             {
               q: 'How can loan prepayments reduce my interest burden?',
