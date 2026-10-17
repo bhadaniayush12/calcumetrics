@@ -71,7 +71,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
     ],

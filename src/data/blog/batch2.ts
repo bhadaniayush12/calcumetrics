@@ -648,7 +648,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
       {
@@ -734,7 +734,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Breakdown: ₹15,00,000 CTC</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (FY 2025-27 parameters, ₹75,000 standard deduction):
+        The table below provides a realistic payroll breakdown for an annual CTC offer of ₹15,00,000 under the New Tax Regime (FY 2025-26 parameters, ₹75,000 standard deduction):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -875,7 +875,7 @@ export const BATCH_2_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Review statutory tax thresholds and personal deduction calculations.',
       },
       {

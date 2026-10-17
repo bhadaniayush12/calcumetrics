@@ -227,7 +227,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
       </div>
 
       <p class="text-sm text-text-muted leading-relaxed mb-4">
-        A 35% ratio is healthy. Most lenders would be comfortable here, assuming the couple also clears the LTI test: combined salary of £72,000 per year, a mortgage of £1,400/month at 5% over 25 years implies a loan of roughly £247,000 — an LTI of 3.43&times;, well inside the 4.5&times; cap.
+        A 35% ratio is healthy. Most lenders would be comfortable here, assuming the couple also clears the LTI test: combined salary of £72,000 per year, a mortgage of £1,400/month at 5% over 25 years implies a loan of roughly £239,484 — an LTI of 3.33&times;, well inside the 4.5&times; cap.
       </p>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Interest Rate Affordability Checks: The Hidden Limit</h2>

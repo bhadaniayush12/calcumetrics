@@ -529,10 +529,10 @@ export const PHASE_11_POSTS: BlogPost[] = [
   },
   {
     slug: 'old-vs-new-tax-regime',
-    title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+    title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
     seoTitle: 'Old vs New Tax Regime: Breakeven Deduction Formula',
     description:
-      'Breakeven deduction guide between Old and New Tax Regime for FY 2025-27, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
+      'Breakeven deduction guide between Old and New Tax Regime for FY 2025-26, including the ₹75,000 standard deduction and salary-by-salary deduction thresholds.',
     category: 'Taxes',
     publishDate: '2026-05-10',
     dateModified: '2026-09-24',
@@ -550,7 +550,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
       {
         name: 'Ministry of Finance, Government of India',
-        citation: 'Statutory Tax Slabs & Provisions in the Finance Bill (FY 2025-27)',
+        citation: 'Statutory Tax Slabs & Provisions in the Finance Bill (FY 2025-26)',
         url: 'https://www.indiabudget.gov.in',
       },
       {
@@ -596,7 +596,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     faqs: [
       {
         question: 'What is the breakeven deduction between Old and New Tax Regime for a ₹15 Lakh salary?',
-        answer: 'For a gross salary of ₹15,00,000 under the current statutory framework (FY 2025-27), the breakeven eligible deduction is ₹5,43,750 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹5,43,750, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
+        answer: 'For a gross salary of ₹15,00,000 under the current statutory framework (FY 2025-26), the breakeven eligible deduction is ₹5,43,750 (in addition to the ₹50,000 standard deduction under the Old Regime). If your total tax-saving deductions (Section 80C, 80D, HRA, home loan interest) exceed ₹5,43,750, the Old Regime saves you more tax; if they are below this amount, the New Regime is mathematically superior.',
       },
       {
         question: 'Is the standard deduction ₹75,000 in both Old and New Tax Regimes?',
@@ -629,7 +629,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         To run your exact salary, rent receipts, and Section 80C deductions through our verified engine, open the <a href="/in/income-tax-calculator" class="text-accent font-medium hover:underline">Income Tax Calculator</a> and compute your exact tax liability under both regimes in seconds.
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Current Statutory Framework &amp; Slabs (FY 2025-27)</h2>
+      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Current Statutory Framework &amp; Slabs (FY 2025-26)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         The statutory tax framework under Section 115BAC features key modifications specifically designed to make the New Tax Regime the default choice for the vast majority of middle- and upper-income taxpayers:
       </p>
@@ -735,7 +735,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. Master Breakeven Deduction Table by Salary Band</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
-        Here is the exact mathematical breakeven schedule for salaried individuals under the current statutory framework (FY 2025-27):
+        Here is the exact mathematical breakeven schedule for salaried individuals under the current statutory framework (FY 2025-26):
       </p>
 
       <div class="overflow-x-auto mb-6">
@@ -915,7 +915,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
     relatedArticles: [
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'How your total annual taxable income and tax regime choice interact with capital gains liabilities.',
       },
       {
@@ -2367,7 +2367,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
       {
         slug: 'old-vs-new-tax-regime',
-        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-27)',
+        title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Determine your baseline annual tax liability before scheduling quarterly advance tax payments.',
       },
     ],

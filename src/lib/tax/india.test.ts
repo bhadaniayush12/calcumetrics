@@ -11,6 +11,16 @@ import {
 } from '../../lib/tax/india';
 import { INDIA_TAX_DATA } from './schema';
 
+describe('Finance Act 2025 dividend and acquisition thresholds', () => {
+  it.each([['194', 10000], ['194LA', 500000]] as const)(
+    '%s starts withholding only above its revised threshold', (section, threshold) => {
+      expect(calcTDS(threshold - 1, section).tdsAmount).toBe(0);
+      expect(calcTDS(threshold, section).tdsAmount).toBe(0);
+      expect(calcTDS(threshold + 1, section).tdsAmount).toBeCloseTo((threshold + 1) * 0.1, 2);
+    }
+  );
+});
+
 describe('calcGST', () => {
   it('exclusive mode: adds GST to base', () => {
     const res = calcGST(1000, 18, 'exclusive');
