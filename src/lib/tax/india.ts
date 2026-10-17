@@ -177,7 +177,7 @@ export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number;
   '192A':  { ratePct: 10, threshold: 50000, description: 'PF withdrawal (< 5 yrs service)' },
   '193':   { ratePct: 10, threshold: 10000, description: 'Interest on securities' },
   '194':   { ratePct: 10, threshold: 5000, description: 'Dividend from listed company' },
-  '194A':  { ratePct: 10, threshold: 50000, description: 'Interest (bank/FD) — ₹50,000 for seniors' },
+  '194A':  { ratePct: 10, threshold: 50000, description: 'Interest (bank/FD) — ₹1,00,000 for senior citizens' },
   '194B':  { ratePct: 30, threshold: 10000, description: 'Lottery / crossword winnings' },
   '194BB': { ratePct: 30, threshold: 10000, description: 'Horse race winnings' },
   '194C':  { ratePct: 1, threshold: 30000, description: 'Contractor (individual/HUF); 2% for others' },
@@ -187,9 +187,20 @@ export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number;
   '194J':  { ratePct: 10, threshold: 30000, description: 'Professional services; 2% for technical services' },
   '194LA': { ratePct: 10, threshold: 250000, description: 'Compensation on compulsory acquisition' },
   '194N':  { ratePct: 2, threshold: 2000000, description: 'Cash withdrawal > ₹20 lakh' },
-  '194O':  { ratePct: 1, threshold: 500000, description: 'E-commerce operator payments' },
+  '194O':  { ratePct: 0.1, threshold: 500000, description: 'E-commerce operator payments (0.1% from 1 Oct 2024)' },
   '194Q':  { ratePct: 0.1, threshold: 5000000, description: 'Purchase of goods > ₹50 lakh' },
 };
+
+/**
+ * Section 194A threshold for resident senior citizens (60+) on interest from banks,
+ * co-operative banks and post offices, from 1 April 2025 (Finance Act 2025).
+ */
+export const TDS_194A_SENIOR_THRESHOLD = 100000;
+
+export interface TDSOptions {
+  /** Payee is a resident senior citizen (60+). Raises the 194A threshold to ₹1,00,000. */
+  seniorCitizen?: boolean;
+}
 
 export interface TDSResult {
   /** Gross amount before TDS. */
@@ -213,9 +224,12 @@ export interface TDSResult {
  *
  * @param grossAmount - Payment amount (₹).
  * @param section     - TDS section to apply.
+ * @param options     - Payee attributes that change the threshold (senior citizen for 194A).
  */
-export function calcTDS(grossAmount: number, section: TDSSection): TDSResult {
-  const { ratePct, threshold } = TDS_RATES[section];
+export function calcTDS(grossAmount: number, section: TDSSection, options: TDSOptions = {}): TDSResult {
+  const { ratePct } = TDS_RATES[section];
+  const threshold =
+    section === '194A' && options.seniorCitizen ? TDS_194A_SENIOR_THRESHOLD : TDS_RATES[section].threshold;
   const thresholdMet = grossAmount > threshold;
   const tdsAmount = thresholdMet ? (grossAmount * ratePct) / 100 : 0;
 

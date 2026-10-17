@@ -9,6 +9,7 @@ import {
   METRO_CITIES,
   TDS_RATES,
 } from '../../lib/tax/india';
+import { INDIA_TAX_DATA } from './schema';
 
 describe('calcGST', () => {
   it('exclusive mode: adds GST to base', () => {
@@ -106,6 +107,36 @@ describe('calcTDS', () => {
     const res = calcTDS(50000, '194B'); // threshold 10000
     expect(res.ratePct).toBe(30);
     expect(res.tdsAmount).toBeCloseTo(15000, 2);
+  });
+
+  it('194A senior citizen: ₹1,00,000 threshold instead of ₹50,000', () => {
+    const general = calcTDS(75000, '194A');
+    const senior = calcTDS(75000, '194A', { seniorCitizen: true });
+    expect(general.threshold).toBe(50000);
+    expect(general.tdsAmount).toBeCloseTo(7500, 2);
+    expect(senior.threshold).toBe(100000);
+    expect(senior.thresholdMet).toBe(false);
+    expect(senior.tdsAmount).toBe(0);
+    // Above ₹1,00,000 a senior is deducted at the normal 10%
+    expect(calcTDS(120000, '194A', { seniorCitizen: true }).tdsAmount).toBeCloseTo(12000, 2);
+  });
+
+  it('senior citizen flag does not change other sections', () => {
+    expect(calcTDS(100000, '194J', { seniorCitizen: true }).threshold).toBe(30000);
+  });
+
+  it('194O e-commerce: 0.1% from 1 Oct 2024 (Finance (No.2) Act 2024)', () => {
+    const res = calcTDS(1000000, '194O');
+    expect(res.ratePct).toBe(0.1);
+    expect(res.tdsAmount).toBeCloseTo(1000, 2);
+  });
+
+  it('engine rate table matches tds/current.json', () => {
+    const sections = INDIA_TAX_DATA.tds.current.values.sections as Record<string, { ratePct: number; threshold: number }>;
+    for (const [sec, { ratePct, threshold }] of Object.entries(TDS_RATES)) {
+      expect(sections[sec]?.ratePct, sec).toBe(ratePct);
+      expect(sections[sec]?.threshold, sec).toBe(threshold);
+    }
   });
 
   it('all sections have valid rate and threshold', () => {

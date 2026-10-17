@@ -30,7 +30,7 @@
       "192A": { "ratePct": 10, "threshold": 50000, "description": "Premature EPF withdrawal (< 5 years of service)" },
       "193": { "ratePct": 10, "threshold": 10000, "description": "Interest on securities" },
       "194": { "ratePct": 10, "threshold": 5000, "description": "Dividend from listed company" },
-      "194A": { "ratePct": 10, "threshold": 50000, "description": "Interest other than securities (banks/post office)" },
+      "194A": { "ratePct": 10, "threshold": 50000, "seniorCitizenThreshold": 100000, "description": "Interest other than securities (banks/post office); ₹1,00,000 for senior citizens" },
       "194B": { "ratePct": 30, "threshold": 10000, "description": "Winnings from lotteries, crossword puzzles" },
       "194BB": { "ratePct": 30, "threshold": 10000, "description": "Winnings from horse races" },
       "194C": { "ratePct": 1, "threshold": 30000, "description": "Payments to contractors (individual/HUF)" },
@@ -40,7 +40,7 @@
       "194J": { "ratePct": 10, "threshold": 30000, "description": "Fees for professional or technical services" },
       "194LA": { "ratePct": 10, "threshold": 250000, "description": "Compensation on compulsory acquisition of immovable property" },
       "194N": { "ratePct": 2, "threshold": 2000000, "description": "Cash withdrawal exceeding ₹20 lakh / ₹1 crore" },
-      "194O": { "ratePct": 1, "threshold": 500000, "description": "Payment by e-commerce operator to e-commerce participant" },
+      "194O": { "ratePct": 0.1, "threshold": 500000, "description": "Payment by e-commerce operator to e-commerce participant" },
       "194Q": { "ratePct": 0.1, "threshold": 5000000, "description": "Purchase of goods exceeding ₹50 lakh" }
     }
   }
