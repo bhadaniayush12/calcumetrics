@@ -374,7 +374,7 @@ const jsonld = {
 
 <script>
   import { parseSmartInput } from '../lib/formatters';
-  import { calcXIRR } from '../lib/calculators/xirr';
+  import { calcXIRR, encodeXIRRFlows, decodeXIRRFlows } from '../lib/calculators/xirr';
   import { validate } from '../lib/validate';
   import { setResult } from '../lib/result-bus';
 
@@ -545,9 +545,9 @@ const jsonld = {
 
     calcBtn?.addEventListener('click', recalc);
 
-    resetBtn?.addEventListener('click', () => {
-      container.innerHTML = '';
-      DEFAULT_DATA.forEach((cf, idx) => {
+    function renderRows(data: Array<{ amount: number; date: string }>) {
+      container!.innerHTML = '';
+      data.forEach((cf, idx) => {
         const row = document.createElement('div');
         row.className = 'flex items-center gap-2 p-2 rounded-control border border-border bg-surface xirr-row';
         row.setAttribute('data-index', String(idx));
@@ -558,9 +558,13 @@ const jsonld = {
           </div>
           <button type="button" class="xirr-remove-row text-text-muted hover:text-error-text h-9 w-9 flex items-center justify-center rounded border border-transparent hover:border-border transition-standard cursor-pointer" title="Remove cash flow" aria-label="Remove cash flow">✕</button>
         `;
-        container.appendChild(row);
+        container!.appendChild(row);
         wireRow(row);
       });
+    }
+
+    resetBtn?.addEventListener('click', () => {
+      renderRows(DEFAULT_DATA);
       clearError();
       recalc();
     });
@@ -591,11 +595,20 @@ const jsonld = {
     });
 
     document.getElementById('xirr-share-btn')?.addEventListener('click', async () => {
+      // Encode the rows exactly as entered (unsorted) so the link restores the user's table.
+      const rows = Array.from(container.querySelectorAll<HTMLElement>('.xirr-row'))
+        .map((row) => ({
+          date: row.querySelector<HTMLInputElement>('.xirr-date')?.value ?? '',
+          amount: parseFloat((row.querySelector<HTMLInputElement>('.xirr-amount')?.value ?? '').replace(/,/g, '').trim()),
+        }))
+        .filter((r) => r.date && Number.isFinite(r.amount));
+      const shareUrl = `${location.href.split('#')[0]}${rows.length >= 2 ? encodeXIRRFlows(rows) : ''}`;
+      if (rows.length >= 2) history.replaceState(null, '', shareUrl);
       try {
-        await navigator.clipboard.writeText(location.href);
+        await navigator.clipboard.writeText(shareUrl);
       } catch {
         const ta = document.createElement('textarea');
-        ta.value = location.href;
+        ta.value = shareUrl;
         ta.style.position = 'fixed';
         ta.style.opacity = '0';
         document.body.appendChild(ta);
@@ -610,6 +623,16 @@ const jsonld = {
         setTimeout(() => (btn.textContent = orig), 2000);
       }
     });
+
+    function applyHashFlows() {
+      const shared = decodeXIRRFlows(location.hash);
+      if (!shared) return;
+      renderRows(shared);
+      clearError();
+      recalc();
+    }
+    applyHashFlows();
+    window.addEventListener('hashchange', applyHashFlows);
 
     window.addEventListener('cm:currency-change', (e: any) => {
       if (e.detail?.symbol) {

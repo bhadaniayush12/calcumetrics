@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calcXIRR } from './xirr';
+import { calcXIRR, encodeXIRRFlows, decodeXIRRFlows } from './xirr';
 
 describe('calcXIRR', () => {
   it('solves a simple one-year doubling', () => {
@@ -44,5 +44,27 @@ describe('calcXIRR', () => {
     ]);
     if (res.valid) expect(Number.isFinite(res.xirr)).toBe(true);
     else expect(res.error).toBeDefined();
+  });
+});
+
+describe('XIRR share-link state', () => {
+  const rows = [
+    { date: '2023-01-01', amount: -100000 },
+    { date: '2023-07-01', amount: -50000.5 },
+    { date: '2025-01-01', amount: 185000 },
+  ];
+
+  it('round-trips rows through the URL hash', () => {
+    const hash = encodeXIRRFlows(rows);
+    expect(hash).toBe('#f=2023-01-01_-100000~2023-07-01_-50000.5~2025-01-01_185000');
+    expect(decodeXIRRFlows(hash)).toEqual(rows);
+  });
+
+  it('rejects malformed or unsafe state', () => {
+    expect(decodeXIRRFlows('')).toBeNull();
+    expect(decodeXIRRFlows('#f=2023-01-01_-100')).toBeNull(); // only one row
+    expect(decodeXIRRFlows('#f=2023-01-01_-100~2024-13-45_200')).toBeNull(); // bad date
+    expect(decodeXIRRFlows('#f=2023-01-01_-100~2024-01-01_abc')).toBeNull(); // bad amount
+    expect(decodeXIRRFlows('#f=2023-01-01_-100~"><img src=x>_200')).toBeNull();
   });
 });
