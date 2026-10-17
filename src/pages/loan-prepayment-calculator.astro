@@ -15,6 +15,12 @@ const initialResult = calcLoanPrepayment(DEFAULT.principal, DEFAULT.rate, DEFAUL
 
 const fmt = (n: number) => '₹' + formatIndian(n);
 
+// Worked example: both strategies computed by the same engine the calculator uses.
+const EX = { principal: DEFAULT.principal, rate: DEFAULT.rate, months: DEFAULT.months, prepay: DEFAULT.prepay };
+const exTenure = calcLoanPrepayment(EX.principal, EX.rate, EX.months, EX.prepay, 'reduce-tenure');
+const exEmi = calcLoanPrepayment(EX.principal, EX.rate, EX.months, EX.prepay, 'reduce-emi');
+const lakh = (n: number) => `₹${(n / 100000).toLocaleString('en-IN', { maximumFractionDigits: 2 })} Lakh`;
+
 const RELATED_SLUGS = ['home-loan-calculator', 'mortgage-calculator', 'loan-amortization-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
@@ -282,55 +288,55 @@ const jsonld = {
       </section>
 
       <section aria-labelledby="loan-prepayment-worked-example">
-        <h2 id="loan-prepayment-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: ₹30 Lakh Loan</h2>
+        <h2 id="loan-prepayment-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: {lakh(EX.principal)} Loan</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Consider an outstanding home loan balance of <strong>₹30,00,000</strong> at an annual interest rate of <strong>8.5%</strong> with <strong>180 months (15 years)</strong> remaining. The current monthly EMI is <strong>₹29,542</strong>, with a cumulative remaining interest obligation of <strong>₹23,17,498</strong>. You decide to make a <strong>₹3,00,000</strong> lump-sum prepayment:
+          Consider an outstanding home loan balance of <strong>{fmt(EX.principal)}</strong> at an annual interest rate of <strong>{EX.rate}%</strong> with <strong>{EX.months} months ({(EX.months / 12).toFixed(0)} years)</strong> remaining. The current monthly EMI is <strong>{fmt(exTenure.originalEMI)}</strong>, with a cumulative remaining interest obligation of <strong>{fmt(exTenure.originalTotalInterest)}</strong>. You decide to make a <strong>{fmt(EX.prepay)}</strong> lump-sum prepayment:
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
           <div class="flex justify-between border-b border-border/50 pb-2">
             <span>Outstanding Balance before Prepayment:</span>
-            <strong class="text-text-primary font-mono">₹30,00,000</strong>
+            <strong class="text-text-primary font-mono">{fmt(EX.principal)}</strong>
           </div>
           <div class="flex justify-between border-b border-border/50 pb-2">
             <span>Lump-Sum Prepayment Amount:</span>
-            <strong class="text-text-primary font-mono">₹3,00,000 (10% of balance)</strong>
+            <strong class="text-text-primary font-mono">{fmt(EX.prepay)} ({((EX.prepay / EX.principal) * 100).toFixed(0)}% of balance)</strong>
           </div>
           <div class="flex justify-between border-b border-border/50 pb-2">
             <span>Revised Principal Balance (P_new):</span>
-            <strong class="text-text-primary font-mono">₹27,00,000</strong>
+            <strong class="text-text-primary font-mono">{fmt(EX.principal - EX.prepay)}</strong>
           </div>
           <div class="flex justify-between border-b border-border/50 pb-2">
             <span>Original Monthly EMI:</span>
-            <strong class="text-text-primary font-mono">₹29,542</strong>
+            <strong class="text-text-primary font-mono">{fmt(exTenure.originalEMI)}</strong>
           </div>
           <div class="bg-canvas p-3 rounded space-y-2">
-            <span class="text-xs font-semibold uppercase tracking-wider text-accent block">Strategy A: Reduce Tenure (Keep EMI at ₹29,542)</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-accent block">Strategy A: Reduce Tenure (Keep EMI at {fmt(exTenure.originalEMI)})</span>
             <div class="flex justify-between text-xs">
               <span>New Remaining Tenure:</span>
-              <strong class="text-text-primary font-mono">148 months (12.3 years)</strong>
+              <strong class="text-text-primary font-mono">{exTenure.newMonthsRemaining} months ({(exTenure.newMonthsRemaining / 12).toFixed(1)} years)</strong>
             </div>
             <div class="flex justify-between text-xs">
               <span>Tenure Saved:</span>
-              <strong class="text-text-primary font-mono">32 months (2.7 years)</strong>
+              <strong class="text-text-primary font-mono">{exTenure.monthsSaved} months ({(exTenure.monthsSaved / 12).toFixed(1)} years)</strong>
             </div>
             <div class="flex justify-between text-xs">
               <span>Total Interest Saved:</span>
-              <strong class="text-accent font-mono font-bold">₹6,45,333</strong>
+              <strong class="text-accent font-mono font-bold">{fmt(exTenure.interestSaved)}</strong>
             </div>
           </div>
           <div class="bg-canvas p-3 rounded space-y-2">
-            <span class="text-xs font-semibold uppercase tracking-wider text-text-primary block">Strategy B: Reduce EMI (Keep Tenure at 180 Months)</span>
+            <span class="text-xs font-semibold uppercase tracking-wider text-text-primary block">Strategy B: Reduce EMI (Keep Tenure at {EX.months} Months)</span>
             <div class="flex justify-between text-xs">
               <span>Revised Monthly EMI:</span>
-              <strong class="text-text-primary font-mono">₹26,587 (saves ₹2,955/mo)</strong>
+              <strong class="text-text-primary font-mono">{fmt(exEmi.newEMI ?? 0)} (saves {fmt(exEmi.originalEMI - (exEmi.newEMI ?? 0))}/mo)</strong>
             </div>
             <div class="flex justify-between text-xs">
               <span>Total Interest Saved:</span>
-              <strong class="text-text-primary font-mono">₹5,31,750</strong>
+              <strong class="text-text-primary font-mono">{fmt(exEmi.interestSaved)}</strong>
             </div>
           </div>
           <p class="text-xs text-text-muted pt-1">
-            <strong>Key Comparison:</strong> Choosing tenure reduction saves an additional <strong>₹1,13,583</strong> in interest compared to EMI reduction because the debt is liquidated 32 months earlier.
+            <strong>Key Comparison:</strong> Choosing tenure reduction saves an additional <strong>{fmt(exTenure.interestSaved - exEmi.interestSaved)}</strong> in interest compared to EMI reduction because the debt is liquidated {exTenure.monthsSaved} months earlier.
           </p>
         </div>
       </section>
