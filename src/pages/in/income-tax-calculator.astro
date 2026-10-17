@@ -37,6 +37,10 @@ const savingsCompact = formatIndianCompact(result.taxSavings, '₹');
 const RELATED_SLUGS = ['salary-ctc-calculator', 'hra-calculator', 'tds-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/income-tax-calculator';
+// Initial WhatsApp share text, built from the engine with the page defaults (same shape as the client update).
+const initialShareText = encodeURIComponent(
+  `Income Tax Comparison (FY 2025-26 & 2026-27):\nGross Income: ${fmt(DEFAULT.grossIncome)}\nNew Regime Tax: ${newTaxExact}\nOld Regime Tax: ${oldTaxExact}\nRecommended: ${result.recommendedRegime} (Save ${savingsExact})\nCalculate on Calcumetrics: ${canonicalUrl}`
+);
 const pageTitle = 'Income Tax Calculator FY 2026-27 / AY 2027-28 | Calcumetrics';
 const pageDesc = 'Free income tax calculator India (FY 2026-27). Compare income tax calculator new regime vs old regime with ₹75k standard deduction and ₹12L rebate.';
 
@@ -393,7 +397,7 @@ const jsonld = {
       <div class="space-y-2">
         <a
           id="it-whatsapp-btn"
-          href="https://api.whatsapp.com/send?text=Compare%20Income%20Tax%20(Budget%202024):%20Gross%20%E2%82%B912%20Lakh%20yields%20New%20Regime%20Tax%20of%20%E2%82%B985,800%20vs%20Old%20Regime%20Tax%20of%20%E2%82%B91,06,600%20on%20Calcumetrics:%20https://calcumetrics.com/in/income-tax-calculator"
+          href={`https://api.whatsapp.com/send?text=${initialShareText}`}
           target="_blank"
           rel="noopener noreferrer"
           class="flex items-center justify-center gap-2 w-full h-10 text-xs font-semibold rounded-control bg-[#25D366] text-white hover:opacity-90 transition-standard focus-visible:outline-2 focus-visible:outline-white cursor-pointer"

@@ -170,7 +170,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
         Your employer calculates TDS under Section 192 based exclusively on the salary they pay you, plus any deductions or declared income you submit in Form 12BB. If you do not formally report your other earnings to payroll, the following income streams generate untaxed liability:
       </p>
       <ul class="space-y-2 text-sm text-text-muted mb-6 list-disc pl-5">
-        <li><strong>Bank Fixed Deposit Interest:</strong> Banks deduct only 10% TDS under Section 194A (or zero if under ₹40,000). If you sit in the 30% tax slab, you still owe a 20% tax shortfall plus cess on that interest.</li>
+        <li><strong>Bank Fixed Deposit Interest:</strong> Banks deduct only 10% TDS under Section 194A (or zero if under ₹50,000; ₹1,00,000 for senior citizens). If you sit in the 30% tax slab, you still owe a 20% tax shortfall plus cess on that interest.</li>
         <li><strong>Equity &amp; Mutual Fund Capital Gains:</strong> Asset management companies and stock brokers deduct <em>zero</em> TDS on domestic equity capital gains. All short-term and long-term gains must be self-assessed.</li>
         <li><strong>Consulting / Freelance Fees:</strong> Clients deduct 10% under Section 194J or 1% or 2% under Section 194C, leaving a massive tax deficit if your effective tax rate is 25% or 30%.</li>
       </ul>
