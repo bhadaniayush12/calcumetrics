@@ -10,12 +10,9 @@ describe('Blog SEO and Internal Linking Audit', () => {
   const validBlogSlugs = new Set(BLOG_POSTS.map((p) => p.slug));
   const validHubs = new Set(['/investments', '/loans', '/taxes', '/business', '/corporate-finance', '/calculators', '/about', '/methodology', '/contact', '/privacy-policy', '/terms', '/disclaimer', '/cookie-policy', '/']);
 
-  it('reports SEO title lengths and brand suffixes', () => {
+  it('keeps every SEO title within 60 characters', () => {
     for (const post of BLOG_POSTS) {
-      if (post.seoTitle.length > 80 || post.seoTitle.length < 40) {
-        console.log(`[TITLE ${post.seoTitle.length}] ${post.slug}: "${post.seoTitle}"`);
-      }
-      expect(post.seoTitle).toContain('Calcumetrics');
+      expect([...post.seoTitle].length, `${post.slug}: "${post.seoTitle}"`).toBeLessThanOrEqual(60);
     }
   });
 

@@ -199,7 +199,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'how-to-calculate-break-even-point',
     title: 'How to Calculate Your Break-Even Point: A Step-by-Step Guide with Realistic Examples',
-    seoTitle: 'Break-Even Point: How to Calculate with Formula | Calcumetrics',
+    seoTitle: 'How to Calculate Break-Even Point (Formula) | Calcumetrics',
     description:
       'Learn how to calculate break-even point in units and dollars. Master contribution margins, cost classification, and margin of safety calculations.',
     category: 'Business',
@@ -422,7 +422,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'economic-order-quantity-eoq-guide',
     title: 'Economic Order Quantity (EOQ) Explained: Finding the Perfect Balance Between Ordering and Holding Costs',
-    seoTitle: 'Economic Order Quantity (EOQ): Formula & Examples | Calcumetrics',
+    seoTitle: 'Economic Order Quantity (EOQ) Formula | Calcumetrics',
     description:
       'Master the Economic Order Quantity (EOQ) formula. Learn how balancing inventory holding costs with setup/ordering costs minimizes total logistics expenditure.',
     category: 'Business',
@@ -655,7 +655,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'straight-line-vs-reducing-balance-depreciation',
     title: 'Straight-Line vs. Written Down Value (WDV) Depreciation: Which Method Should Your Business Use?',
-    seoTitle: 'Straight-Line vs WDV Depreciation: Differences | Calcumetrics',
+    seoTitle: 'Straight-Line vs Reducing Balance Depreciation',
     description:
       'Compare Straight-Line vs Written Down Value (WDV) depreciation. Learn how tax shields, cash flow timing, and asset matching dictate the choice.',
     category: 'Business',
@@ -865,7 +865,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
   {
     slug: 'dscr-ratio-for-business-loans',
     title: 'What Is DSCR? How Lenders Use the Debt Service Coverage Ratio to Approve Commercial Loans',
-    seoTitle: 'DSCR Ratio: How Lenders Approve Business Loans | Calcumetrics',
+    seoTitle: 'DSCR Ratio: How Lenders Approve Loans | Calcumetrics',
     description:
       'Learn how commercial banks calculate Debt Service Coverage Ratio (DSCR), evaluate Net Operating Income (NOI), and set loan covenants.',
     category: 'Business',

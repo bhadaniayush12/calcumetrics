@@ -201,7 +201,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'traditional-vs-roth-401k',
     title: 'Traditional vs. Roth 401(k): How to Choose Based on Your Current and Future Tax Bracket',
-    seoTitle: 'Traditional vs Roth 401(k): Tax Decision Guide | Calcumetrics',
+    seoTitle: 'Traditional vs Roth 401(k): Tax Guide | Calcumetrics',
     description:
       'Compare upfront tax deductions against tax-free retirement withdrawals. Learn how marginal vs effective tax rates and employer match rules drive the decision.',
     category: 'Investments',
@@ -807,7 +807,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
   {
     slug: 'debt-to-income-ratio-for-mortgage',
     title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
-    seoTitle: 'Debt-to-Income Ratio for Mortgages: Limits & Formula | Calcumetrics',
+    seoTitle: 'Debt-to-Income Ratio for Mortgages: Limits & Formula',
     description:
       'Master the debt-to-income ratio calculations lenders use for mortgages. Learn the 28/36 rule, front-end vs back-end DTI, and steps to lower your ratio.',
     category: 'Loans',

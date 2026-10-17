@@ -4,7 +4,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
   {
     slug: 'debt-to-income-ratio-uk',
     title: 'Debt-to-Income Ratio in the UK: What Lenders Actually Look At (And How to Calculate Yours)',
-    seoTitle: 'Debt-to-Income Ratio UK: Mortgage Rules & Calculator | Calcumetrics',
+    seoTitle: 'Debt-to-Income Ratio UK: Mortgage Rules | Calcumetrics',
     description:
       'UK mortgage lenders use Loan-to-Income multiples and stress tests instead of DTI. Learn how affordability works and calculate your ratio under FCA rules.',
     category: 'Loans',
@@ -279,7 +279,7 @@ export const BATCH_5_POSTS: BlogPost[] = [
   {
     slug: 'how-mortgage-amortization-works',
     title: 'How Mortgage Amortization Works: Every Payment Explained (With the Exact Math)',
-    seoTitle: 'How Mortgage Amortization Works: Schedule & Formula Explained | Calcumetrics',
+    seoTitle: 'How Mortgage Amortization Works: Schedule & Formula',
     description:
       'See how mortgage payments split between principal and interest, why early payments are interest-heavy, and how extra payments cut your loan payoff date.',
     category: 'Loans',

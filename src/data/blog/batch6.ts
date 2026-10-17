@@ -5,7 +5,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
   {
     slug: 'rbi-repo-rate-hike-emi-impact',
     title: 'RBI Repo Rate Hike to 5.50%: How Much Will Your Home Loan EMI Increase?',
-    seoTitle: 'RBI Repo Rate Hike 5.50%: Home Loan EMI Impact 2026 | Calcumetrics',
+    seoTitle: 'RBI Repo Rate Hike 5.50%: Home Loan EMI Impact 2026',
     description:
       'The RBI repo rate hike to 5.50% increases home loan EMIs by ₹477 to ₹1,589 per month. Calculate your revised payment, extra interest, and tenure impact.',
     category: 'Loans',
@@ -273,7 +273,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
   {
     slug: 'increase-emi-or-extend-tenure-after-rate-hike',
     title: 'Rate Hike: Should You Increase Your EMI or Extend the Tenure? (Which Saves More)',
-    seoTitle: 'Increase EMI or Extend Tenure After Rate Hike: Which Saves More? | Calcumetrics',
+    seoTitle: 'Increase EMI or Extend Tenure After a Rate Hike?',
     description:
       'Should you increase your EMI or extend tenure after a rate hike? Compare the ₹3.48 lakh interest difference and see why raising EMI saves far more money.',
     category: 'Loans',
@@ -524,7 +524,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
   {
     slug: 'mortgage-rates-7-4-percent-buy-or-wait',
     title: 'Mortgage Rates Hit 7.4%: Should You Buy a Home Now or Wait?',
-    seoTitle: 'Mortgage Rates Hit 7.4%: Should You Buy a Home Now or Wait? | Calcumetrics',
+    seoTitle: 'Mortgage Rates at 7.4%: Buy a Home Now or Wait?',
     description:
       'With US mortgage rates hitting 7.4%, compare the $105,706 interest difference, analyze the buy vs wait debate, and run your debt-to-income affordability test.',
     category: 'Loans',
@@ -765,7 +765,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
   {
     slug: 'fd-rates-after-rbi-hike-lock-now-or-wait',
     title: 'FD Rates After the RBI Hike: Should You Lock Your FD Now or Wait?',
-    seoTitle: 'FD Rates After RBI Hike: Should You Lock In Now or Wait? | Calcumetrics',
+    seoTitle: 'FD Rates After RBI Hike: Lock In Now or Wait? | Calcumetrics',
     description:
       'Will bank FD rates rise after RBI’s October 2026 repo hike to 5.50%? Learn the deposit lag, master FD laddering with ₹5 lakh, and calculate real returns.',
     category: 'Investments',
@@ -1034,7 +1034,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
   {
     slug: 'upi-mdr-above-2000-merchant-charges',
     title: 'UPI MDR on Payments Above ₹2,000: What Merchants Will Actually Pay (2026)',
-    seoTitle: 'UPI MDR on Payments Above ₹2,000: Merchant Cost Guide 2026 | Calcumetrics',
+    seoTitle: 'UPI MDR Above ₹2,000: Merchant Charges 2026 | Calcumetrics',
     description:
       'Understand the UPI MDR rules on transactions above ₹2,000. See worked cost calculations on ₹10,000 sales, 18% GST rules, and protect merchant profit margins.',
     category: 'Business',
