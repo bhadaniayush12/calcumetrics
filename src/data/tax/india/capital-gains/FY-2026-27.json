@@ -1,0 +1,80 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "capital-gains",
+  "effectiveFrom": "2026-04-01",
+  "applicableTo": "2027-03-31",
+  "financialYear": "FY 2026-27",
+  "governingFramework": "Income-tax Act, 2025",
+  "framework": "Income-tax Act, 2025 (rates carried forward from Finance (No.2) Act 2024; Finance Act 2026)",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometaxindia.gov.in/documents/20117/15766092/FAQs-Budget-2026+Updated.pdf/daf54d14-aca9-c4ea-b786-598fd2f8d4c4",
+  "sourceTitle": "CBDT FAQs on Budget 2026 (Finance Bill 2026)",
+  "verifiedOn": "2026-10-17",
+  "notes": "Finance Act 2026 made no change to the STCG (20%), LTCG (12.5%) or ₹1,25,000 exemption rates; its capital gains change is the tax treatment of share buy-backs. For land or buildings acquired before 23 July 2024, resident individuals/HUFs pay the lower of 12.5% without indexation or 20% with indexation. Cost Inflation Index per CBDT (2026-27: 384). Cess is 4%.",
+  "assumptions": [
+    "Reflects statutory capital gains rates for FY 2026-27 (TY 2026-27); Finance Act 2026 did not change them.",
+    "Listed equity shares and equity-oriented mutual funds: Short-Term Capital Gains (STCG) taxed at 20%; Long-Term Capital Gains (LTCG) taxed at 12.5% on gains exceeding the ₹1,25,000 annual exemption.",
+    "Immovable property held for more than 24 months qualifies as LTCG and is taxed at 12.5% without indexation. If acquired before 23 July 2024, a resident individual/HUF pays the lower of 12.5% without indexation and 20% with indexation (CBDT Cost Inflation Index).",
+    "A mandatory 4% Health and Education Cess is added to computed tax."
+  ],
+  "limitations": [
+    "Does not calculate statutory rollover exemptions under Section 54, Section 54EC, or Section 54F for reinvestment into property or specified bonds.",
+    "Does not compute Fair Market Value (FMV) grandfathering adjustments for equity assets acquired prior to 1 February 2018.",
+    "Does not compute set-off of capital losses against capital gains or inter-year loss carry-forward balances under Section 70 and 71.",
+    "High-net-worth surcharge (>₹50L income) is excluded.",
+    "Estimated tax computation; consult Schedule CG of official ITR-2 form for definitive filing.",
+    "For property acquired before 1 April 2001, indexation uses CII 100 and the cost should be the fair market value as on 1 April 2001."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by Income Tax Department (CBDT) for FY 2026-27 (TY 2026-27). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
+  "values": {
+    "equitySTCGRatePct": 20,
+    "equityLTCGRatePct": 12.5,
+    "equityLTCGExemption": 125000,
+    "realEstateLTCGRatePct": 12.5,
+    "cessRatePct": 4,
+    "holdingMonthsThresholds": {
+      "equity": 12,
+      "equity-fund": 12,
+      "debt-fund": 24,
+      "real-estate": 24,
+      "gold": 24,
+      "other": 24
+    },
+    "realEstatePreJul2024IndexedRatePct": 20,
+    "indexationCutoffDate": "2024-07-23",
+    "costInflationIndex": {
+      "source": "CBDT notified Cost Inflation Index (Notification 70/2025 dated 01-07-2025; 2026-27 notified 15 July 2026)",
+      "sourceUrl": "https://www.incometaxindia.gov.in/w/view-all-cii",
+      "verifiedOn": "2026-10-17",
+      "table": {
+        "2001-02": 100,
+        "2002-03": 105,
+        "2003-04": 109,
+        "2004-05": 113,
+        "2005-06": 117,
+        "2006-07": 122,
+        "2007-08": 129,
+        "2008-09": 137,
+        "2009-10": 148,
+        "2010-11": 167,
+        "2011-12": 184,
+        "2012-13": 200,
+        "2013-14": 220,
+        "2014-15": 240,
+        "2015-16": 254,
+        "2016-17": 264,
+        "2017-18": 272,
+        "2018-19": 280,
+        "2019-20": 289,
+        "2020-21": 301,
+        "2021-22": 317,
+        "2022-23": 331,
+        "2023-24": 348,
+        "2024-25": 363,
+        "2025-26": 376,
+        "2026-27": 384
+      }
+    }
+  },
+  "taxYear": "TY 2026-27"
+}
