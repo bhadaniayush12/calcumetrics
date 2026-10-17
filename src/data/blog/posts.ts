@@ -7,7 +7,10 @@ import { BATCH_4_POSTS } from './batch4';
 import { BATCH_5_POSTS } from './batch5';
 import { BATCH_6_POSTS } from './batch6';
 
+import { JIO_IPO_POST } from './jio-platforms-ipo-listing-gains-tax';
+
 export const BLOG_POSTS: BlogPost[] = [
+  JIO_IPO_POST,
   ...PHASE_11_POSTS,
   ...BATCH_1_POSTS,
   ...BATCH_2_POSTS,
