@@ -15,7 +15,10 @@ import { SMALL_SAVINGS_POST } from './small-savings-rates-october-december-2026'
 
 import { DIWALI_BONUS_POST } from './diwali-bonus-2026-lump-sum-sip-or-prepay';
 
+import { NEW_TAX_ACT_POST } from './new-income-tax-act-2025-salaried-guide';
+
 export const BLOG_POSTS: BlogPost[] = [
+  NEW_TAX_ACT_POST,
   DIWALI_BONUS_POST,
   SMALL_SAVINGS_POST,
   SBI_OCTOBER_POST,
