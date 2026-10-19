@@ -307,6 +307,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
         Borrowers who take out a 20-year or 30-year mortgage routinely experience a rude awakening when reviewing their first annual mortgage statement: <em>"I paid $24,000 in mortgage payments this year, but my principal balance only dropped by $4,800. Where did the other $19,200 go?"</em>
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Enter your own amount, rate and term in the <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI calculator with a year-by-year repayment schedule</a> to see how the interest and principal portions change as the balance falls.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         There is no fraud or accounting trickery at play. This outcome is the direct mathematical result of <strong>loan amortization</strong>—the standard actuarial formula used by commercial banks worldwide to structure fixed-rate debt.
       </p>
@@ -509,6 +511,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         When securing a long-term loan—whether financing a residential home, expanding a business facility, or purchasing commercial equipment—borrowers face a fundamental strategic dilemma: <strong>Fixed Rate</strong> or <strong>Floating Rate</strong>?
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For a vehicle purchase, enter the quoted rate and your upfront payment in the <a href="/car-loan-calculator" class="text-accent font-medium hover:underline">car loan EMI and interest calculator</a>. You can compare separate rate scenarios; each estimate assumes that rate stays constant for the selected term.</p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         This choice is not simply a matter of personal risk tolerance. It is a decision that must be aligned with where central banks sit in the monetary policy cycle. Locking in a fixed rate at the bottom of an interest rate cycle protects your family for decades, while locking in a fixed rate at the cyclical peak can force you to pay above-market borrowing costs for years.
@@ -910,6 +914,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         When the Goods and Services Tax (GST) was introduced in India in 2017, its primary architectural promise was the complete elimination of the "tax-on-tax" cascading effect. The mechanism that makes this possible is <strong>Input Tax Credit (ITC)</strong>.
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Before reconciling credits, use the <a href="/in/gst-calculator" class="text-accent font-medium hover:underline">GST calculator for inclusive and exclusive invoice amounts</a> to check the base and tax at the invoice’s rate. That arithmetic check does not determine whether a purchase is eligible for ITC.</p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         For businesses, freelancers, and commercial enterprises, mastering ITC is not just an accounting technicality—it directly dictates cash flow and gross operating margins. Incorrectly passing up eligible ITC needlessly inflates operating expenses, while claiming ineligible or blocked ITC triggers steep 18% penal interest demands from the tax authorities.

@@ -103,6 +103,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Log into any investment brokerage account, portfolio tracker, or mutual fund dashboard, and you will encounter an alphabet soup of return metrics: <strong>Absolute Return</strong>, <strong>CAGR</strong>, and <strong>XIRR</strong>. Investors routinely run into this exact paradox: <em>"My portfolio dashboard reports an absolute gain of 38%, but my XIRR is 19.4%, and when I try to compute CAGR it gives an error. Which number actually measures my investment performance?"</em>
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Start with the <a href="/compound-interest-calculator" class="text-accent font-medium hover:underline">compound interest calculator for nominal growth</a> to estimate the balance before adjusting for inflation. Its result assumes interest remains invested and excludes taxes and fees.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         Choosing the wrong metric does not just create confusion—it distorts financial decisions. Comparing an SIP fund's XIRR to an FD's flat interest rate or a benchmark index's point-to-point CAGR compares apples to oranges. Understanding the mathematical mechanics of time-weighted vs. money-weighted returns is essential for evaluating your portfolio's true growth.
       </p>
@@ -386,6 +388,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         Whether you are managing a 30-year fixed mortgage internationally or an 8.5% floating home loan in India, the core dilemma is universal: <strong>"I have an extra monthly cash surplus. Should I prepay my mortgage to eliminate debt faster, or should I invest that money into a compounding equity index fund?"</strong>
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Once you have the reducing-balance quote, use the <a href="/car-loan-calculator" class="text-accent font-medium hover:underline">car loan calculator with a down payment</a> to compare monthly payments and total interest on the amount you actually need to borrow.</p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         One camp champions the mathematical compounding of the stock market, pointing out that long-term equity returns of 10%–12% outpace a 7%–8.5% borrowing cost. The other camp values peace of mind, arguing that eliminating debt provides a guaranteed, risk-free post-tax return while removing the threat of monthly debt obligations.
       </p>
@@ -1253,6 +1257,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Among retail store managers, e-commerce founders, and wholesale distributors, no financial error is more pervasive—or more quietly lethal to cash flow—than conflating <strong>markup</strong> with <strong>gross profit margin</strong>. While both metrics measure the difference between what an item costs and what it sells for, they measure that difference against two fundamentally different baselines.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Payment acceptance costs can change the margin left on a sale. The <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI merchant fee calculator</a> estimates deductions from an entered fee rate and payment mix so you can include them in your pricing assumptions.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         When an entrepreneur mixes them up, they do not merely commit an academic semantic error. They systematically underprice their products, underestimate break-even requirements, and inadvertently bleed working capital on every customer order.
       </p>
@@ -2092,6 +2098,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <p class="text-base text-text-muted leading-relaxed mb-6 font-normal">
         One of the most sobering realities in corporate finance is that <strong>profitable companies go bankrupt every single day</strong>. An income statement prepared on an accrual accounting basis can show impressive revenue growth, healthy gross margins, and robust net income—yet the company's bank accounts can be completely empty on payroll morning.
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For UPI collections, use the <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI MDR and net settlement calculator</a> to estimate the cash received after the fees in your merchant agreement. Compare that amount with gross sales when planning cash availability.</p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         The culprit is almost always a breakdown in <strong>working capital velocity</strong>. When money is tied up in slow-moving warehouse pallets and unpaid customer invoices while trade vendors demand payment, the business suffocates for lack of liquidity. The definitive tool to measure, manage, and cure this vulnerability is the <strong>Cash Conversion Cycle (CCC)</strong>.

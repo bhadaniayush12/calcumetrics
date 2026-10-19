@@ -31,6 +31,15 @@ const fmt = (n: number) => '₹' + formatIndian(Math.round(n));
 const RELATED_SLUGS = ['gst-calculator', 'profit-margin-calculator', 'break-even-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 const canonicalUrl = 'https://calcumetrics.com/in/upi-mdr-calculator';
+const faqs = [
+  { question: "What is MDR in UPI?", answer: "MDR is a merchant payment-acceptance fee. Interchange is a payment between participants in the payment system; it is not automatically the same as the fee shown on a merchant invoice. Use the fee your bank or payment provider actually quotes." },
+  { question: "Is normal bank-account UPI free?", answer: "NPCI’s bank-account UPI guidance distinguishes normal transfers from PPI wallet merchant transactions. The announced 2026 MDR rollout for select P2M payments was deferred until after Diwali. A payment gateway may still charge a separate platform fee; check its pricing and your agreement." },
+  { question: "Do customers pay UPI MDR?", answer: "NPCI’s PPI guidance says the interchange charge is not charged to customers. MDR is a merchant-side fee. Do not interpret the calculator’s deductions as an extra amount the customer must pay." },
+  { question: "How is GST calculated on a payment-processing fee?", answer: "Apply the GST percentage to the processing fee. The example uses 18%, consistent with Razorpay’s published explanation of GST on platform fees. Confirm the tax treatment on your own provider’s invoice." },
+  { question: "When will the new UPI MDR charges start?", answer: "The 13 October 2026 announcement deferred the rollout until after Diwali. The reports checked for this review say the new implementation date will be notified separately. The proposed rate is not applied automatically by this calculator." },
+  { question: "Does the ₹2,000 threshold apply to my whole month?", answer: "This model uses the average ticket size as a shortcut: at ₹2,000 or below it sets the chargeable volume to zero. A mixed month can still contain larger individual transactions. Reconcile transaction by transaction and check PPI, RuPay credit and merchant-category terms separately." }
+];
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -38,14 +47,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'UPI MDR Calculator',
       url: canonicalUrl,
-      description: 'Calculate UPI MDR charges — interchange fees on PPI wallets and RuPay credit cards on UPI, 18% GST deductions, and net bank settlement.',
+      description: 'Estimate merchant fees, GST on fees and net settlement using an assumed chargeable payment share and rate.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: '2026-10-19',
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -67,56 +76,18 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'Does a consumer ever pay MDR on UPI transactions in India?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'No. Per NPCI regulations, customers are never charged any fee or surcharge for paying via UPI, RuPay credit cards on UPI, or prepaid digital wallets. The MDR fee is strictly borne by the receiving merchant.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What UPI transactions are subject to MDR in India?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Normal peer-to-peer (P2P) and person-to-merchant (P2M) bank-to-bank UPI transfers carry zero MDR. Interchange fees apply to merchant transactions over ₹2,000 made via Prepaid Payment Instruments (wallets like Paytm/PhonePe Wallet) or RuPay Credit Cards linked to UPI.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can businesses claim Input Tax Credit (ITC) on the 18% GST charged on MDR?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. If your business has an active GST registration, you can claim the 18% GST charged by your payment aggregator on MDR fees as Input Tax Credit (ITC) in your monthly GSTR-3B filings.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the standard interchange rate for PPI wallet merchant transactions?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'NPCI guidelines prescribe an interchange fee of up to 1.1% on PPI merchant transactions above ₹2,000, depending on the merchant category code (MCC), with lower tiered rates for essential sectors like utilities, fuel, and education.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How does ticket size impact merchant interchange costs?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Small transactions of ₹2,000 or less have zero interchange fee for merchants under PPI wallet guidelines. Businesses with high-volume, low-ticket sales (like tea stalls or convenience stores) face effectively zero MDR costs.',
-          },
-        },
-      ],
+      mainEntity: faqs.map(({ question, answer }) => ({
+        '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
     },
   ],
 };
 ---
 
 <Layout
-  title="UPI MDR Calculator: Charges & Net Settlement | Calcumetrics"
-  description="Free UPI MDR calculator. Compute mdr on upi transactions — interchange fees on PPI wallets & RuPay credit cards on UPI, 18% GST, and net bank settlement."
+  title="UPI MDR Calculator: Estimate Fees & Settlement"
+  description="Estimate UPI merchant fees, GST on fees and net settlement from your payment mix. See a worked example and the limits of the monthly estimate."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -132,11 +103,11 @@ const jsonld = {
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl font-bold tracking-tight text-text-primary">UPI MDR Calculator</h1>
         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
+          Reviewed: 19 Oct 2026
         </span>
       </div>
       <p class="text-xs text-text-muted mb-3">
-        Governed by <a href="https://www.npci.org.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">NPCI Guidelines</a> &amp; Payment and Settlement Systems Act.
+        Fee estimate for India. Check your acquiring bank or payment provider’s merchant agreement.
       </p>
 
       <!-- Proposed P2M MDR change: deferred, no new date notified -->
@@ -145,7 +116,7 @@ const jsonld = {
           Proposed NPCI change deferred (no new date yet)
         </strong>
         <p class="text-text-muted leading-relaxed">
-          A revised merchant framework was proposed with a <strong>0.4% MDR</strong> on commercial P2M transactions above ₹2,000 (capped at ₹300), a flat ₹5 on essential utilities/fuel, and 0% for transactions up to ₹2,000 and small merchants (up to ₹1L/month). NPCI deferred it on 13 October 2026 to after Diwali; a new effective date has <strong>not yet been notified</strong>. This calculator uses the <strong>current rules</strong>.
+          As of 19 October 2026, the announced MDR rollout on select P2M UPI payments has been deferred until after Diwali, with the implementation date to be notified separately. See <a href="https://newsonair.gov.in/upi-mdr-to-be-implemented-after-diwali/" class="text-accent font-medium hover:underline">Akashvani’s 13 October report</a> and <a href="https://timesofindia.indiatimes.com/business/india-business/proposed-fees-on-upi-merchant-transactions-above-rs-2k-postpone-to-after-festivals/articleshow/134912161.cms" class="text-accent font-medium hover:underline">the implementation-date report</a>. The calculator below estimates a percentage fee on an entered payment mix; it does not implement the deferred framework’s category rules or caps.
         </p>
       </div>
 
@@ -183,7 +154,7 @@ const jsonld = {
           value="2,500"
           isNumeric={true}
           localeFormat="indian"
-          helperText="PPI / RuPay interchange applies only above ₹2,000; at ₹2,000 or less it is 0"
+          helperText="Model assumption: an average ticket of ₹2,000 or less sets the estimated fee to zero; see limitations below"
           inputmode="decimal"
           aria-describedby="mdr-error-msg"
         />
@@ -197,7 +168,7 @@ const jsonld = {
           suffix="%"
           value="20"
           isNumeric={true}
-          helperText="Percentage of volume paid via PPI wallets or RuPay credit cards on UPI"
+          helperText="Enter the percentage of volume that your provider actually charges"
           inputmode="decimal"
           aria-describedby="mdr-error-msg"
         />
@@ -214,7 +185,7 @@ const jsonld = {
           suffix="%"
           value="1.1"
           isNumeric={true}
-          helperText="Standard interchange fee rate (typically 0.9% to 1.1%)"
+          helperText="Use your provider’s applicable merchant fee; 1.1% is an illustrative input"
           inputmode="decimal"
           aria-describedby="mdr-error-msg"
         />
@@ -231,7 +202,7 @@ const jsonld = {
           suffix="%"
           value="18"
           isNumeric={true}
-          helperText="Standard statutory GST levied on payment processing services"
+          helperText="GST rate on the provider’s fee invoice; 18% is the example input"
           inputmode="decimal"
           aria-describedby="mdr-error-msg"
         />
@@ -290,111 +261,57 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Jurisdiction: India (INR locked). Compliant with NPCI circulars; zero surcharge can be passed onto consumers.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">India estimate in INR. Actual settlement depends on transaction-level charges and your provider’s agreement.</p>
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="mdr-calculator-how">
-        <h2 id="mdr-calculator-how" class="text-xl font-bold text-text-primary mb-4">How UPI MDR & interchange fees are calculated</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Under National Payments Corporation of India (NPCI) directives, standard peer-to-peer (P2P) and person-to-merchant (P2M) bank account transfers carry <strong>zero MDR</strong>. Interchange fees apply strictly when consumers pay merchants via Prepaid Payment Instruments (wallets like Paytm, PhonePe Wallet) or RuPay Credit Cards on UPI for transactions exceeding ₹2,000:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3">
-          <div class="space-y-1">
-            <p class="font-bold text-text-primary text-sm">Step 1: Determine Chargeable Merchant Volume</p>
-            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Chargeable Volume = Total Monthly Volume × (Chargeable Share % ÷ 100), or 0 if the average ticket is ₹2,000 or less</p>
-          </div>
-          <div class="space-y-1 border-t border-border/50 pt-2">
-            <p class="font-bold text-text-primary text-sm">Step 2: Compute Base Merchant Discount Rate (MDR)</p>
-            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Base MDR Fee = Chargeable Volume × (Interchange Rate % ÷ 100)</p>
-          </div>
-          <div class="space-y-1 border-t border-border/50 pt-2">
-            <p class="font-bold text-text-primary text-sm">Step 3: Levy Statutory 18% GST on Financial Services</p>
-            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">GST Amount = Base MDR Fee × 18%</p>
-          </div>
-          <div class="space-y-1 border-t border-border/50 pt-2">
-            <p class="font-bold text-text-primary text-sm">Step 4: Net Payout Credited to Business Account</p>
-            <p class="text-xs text-text-muted font-mono bg-canvas p-2 rounded">Net Bank Settlement = Total Monthly Volume − (Base MDR Fee + GST Amount)</p>
-          </div>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">A UPI MDR calculator estimates merchant fees by applying your provider’s rate to the chargeable part of your UPI collections. It then adds GST on that fee and subtracts both amounts to estimate net settlement. Use the applicable rate and payment mix from your merchant statement; the result is a planning estimate.</p><section aria-labelledby="mdr-calculator-how">
+        <h2 id="mdr-calculator-how" class="text-xl font-bold text-text-primary mb-4">UPI MDR formula: fee, GST and net settlement</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Let V be monthly collections, s the chargeable percentage, m the fee percentage and g the GST percentage. This calculator uses the following model when the average ticket exceeds ₹2,000:</p>
+        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm font-mono text-text-primary">
+          <p>Chargeable volume = V × s / 100</p>
+        <p>Merchant fee = Chargeable volume × m / 100</p>
+        <p>GST on fee = Merchant fee × g / 100</p>
+        <p>Net settlement = V − Merchant fee − GST on fee</p>
         </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">At an average ticket of ₹2,000 or less, the existing model sets chargeable volume to zero. This shortcut cannot identify individual payments above the threshold or distinguish all RuPay credit, PPI and merchant-category rules. It excludes fixed platform subscriptions, refunds and other adjustments.</p>
       </section>
 
       <section aria-labelledby="mdr-worked-example">
-        <h2 id="mdr-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example: Retail Merchant</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Consider a retail merchant in Pune processing <strong>₹5,00,000</strong> in total monthly digital collections through merchant QR codes. Customer payment analytics indicate that <strong>80%</strong> (₹4,00,000) are direct savings bank transfers (0% MDR), while <strong>20%</strong> (₹1,00,000) are paid using PPI wallets or RuPay credit cards on UPI at a standard <strong>1.1% interchange rate</strong>:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Total Monthly UPI Volume:</span>
-            <strong class="text-text-primary font-mono">₹5,00,000</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Free Bank-to-Bank Volume (80%):</span>
-            <strong class="text-text-primary font-mono">₹4,00,000 (₹0 fee)</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Chargeable Volume (20% via PPI / RuPay Credit):</span>
-            <strong class="text-text-primary font-mono">₹1,00,000</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Base MDR Fee (₹1,00,000 × 1.1%):</span>
-            <strong class="text-text-primary font-mono">₹1,100</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>GST on Processing Fee (18% × ₹1,100):</span>
-            <strong class="text-text-primary font-mono">₹198</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Total Payment Processing Deductions:</span>
-            <strong class="text-text-primary font-mono">₹1,298</strong>
-          </div>
-          <div class="flex justify-between pt-1">
-            <span>Net Monthly Bank Settlement:</span>
-            <strong class="text-accent font-mono font-bold">₹4,98,702</strong>
-          </div>
-          <p class="text-xs text-text-muted pt-1 border-t border-border/50">
-            <strong>Effective Acceptance Cost:</strong> ₹1,298 ÷ ₹5,00,000 = <strong>0.260%</strong>. This represents substantial operational savings compared to traditional card POS machines (which average 1.75% to 2.50%).
-          </p>
-        </div>
+        <h2 id="mdr-worked-example" class="text-xl font-bold text-text-primary mb-4">Worked example: monthly merchant collections</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Suppose monthly collections are {fmt(DEFAULT.monthlyVolume)}, the average ticket is {fmt(DEFAULT.ticketSize)}, and {DEFAULT.chargeableShare}% of collections attracts an assumed {DEFAULT.mdrRate}% fee. Using {DEFAULT.gstRate}% GST on that fee gives the following estimate. These are illustrative inputs, not a tariff promised by NPCI or a provider.</p>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Illustration using the calculator’s default inputs; amounts rounded to whole rupees</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Item</th><th scope="col" class="text-left py-2.5 px-3">Amount</th></tr></thead>
+          <tbody>{[
+          ['Monthly UPI collections', initialResult.monthlyVolume],
+          ['Chargeable volume', initialResult.chargeableVolume],
+          ['Volume outside the assumed fee', initialResult.exemptVolume],
+          ['Merchant fee', initialResult.baseMdrFee],
+          ['GST on the fee', initialResult.gstAmount],
+          ['Total deductions', initialResult.totalDeductions],
+          ['Estimated settlement', initialResult.netSettlement],
+        ].map(([label, value]) => (<tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">{label}</td><td class="py-2.5 px-3 text-text-primary">{fmt(Number(value))}</td></tr>))}</tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The effective deduction is {initialResult.effectiveRatePct.toFixed(3)}% of monthly collections. GST is applied to the fee amount, not to the entire sale: <a href="https://razorpay.com/blog/razorpay-payment-gateway-pricing-explained" class="text-accent font-medium hover:underline">Razorpay explains this treatment for its platform fees</a>.</p>
       </section>
 
       <section aria-labelledby="mdr-regulatory-rules">
-        <h2 id="mdr-regulatory-rules" class="text-xl font-bold text-text-primary mb-4">NPCI regulations, interchange tiers & tax rules</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted mb-4">
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Zero Surcharge on Consumers</h3>
-            <p>NPCI guidelines explicitly mandate that merchants cannot pass interchange costs onto buyers as convenience fees or checkout surcharges. Payment via UPI must remain 100% free for consumers.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">₹2,000 Ticket Size Threshold</h3>
-            <p>Wallet and prepaid instrument interchange fees apply exclusively to transactions strictly above ₹2,000. High-volume, low-ticket retail transactions remain completely exempt from MDR deductions.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Input Tax Credit (ITC) Recovery</h3>
-            <p>GST-registered merchants can claim the 18% GST levied on payment aggregator MDR invoices as Input Tax Credit (ITC) in their monthly GSTR-3B filings, offsetting taxes on outward goods or services.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Category Code (MCC) Concessions</h3>
-            <p>Merchants in government services, agriculture, utilities, fuel, and education enjoy capped or reduced interchange tiers (typically 0.5%–0.7%) compared to the standard 1.1% commercial cap.</p>
-          </div>
-        </div>
+        <h2 id="mdr-regulatory-rules" class="text-xl font-bold text-text-primary mb-4">Bank UPI, wallet interchange and gateway fees</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Different charges can appear on the same merchant statement</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Payment or charge</th><th scope="col" class="text-left py-2.5 px-3">What to check</th></tr></thead>
+          <tbody><tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Bank-account UPI</td><td class="py-2.5 px-3 text-text-primary">NPCI’s guidance says normal bank-to-bank UPI is free; the 2026 P2M rollout is deferred.</td></tr>
+            <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">PPI wallet / RuPay credit on UPI</td><td class="py-2.5 px-3 text-text-primary">Check instrument, merchant category and provider terms separately. A single percentage is only an estimate.</td></tr>
+            <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Gateway, QR or POS service</td><td class="py-2.5 px-3 text-text-primary">Platform, device and subscription costs depend on the contract and are not all included here.</td></tr></tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Sources: <a href="https://www.npci.org.in/PDF/npci/press-releases/2023/UPI-is-free-fast-secure-and-seamless-Every-month-over-8-billion-transactions-are-processed-free-for-customers-and-merchants-using-bank-accounts.pdf" class="text-accent font-medium hover:underline">NPCI’s bank-account and PPI clarification (29 March 2023)</a>; <a href="https://newsonair.gov.in/upi-mdr-to-be-implemented-after-diwali/" class="text-accent font-medium hover:underline">Akashvani’s deferred-rollout report (13 October 2026)</a>; <a href="https://razorpay.com/pricing/" class="text-accent font-medium hover:underline">Razorpay’s separate platform-fee explanation</a>.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">To compare a POS terminal with a QR service, add any device rental or subscription from each quote to its transaction fees. There is no single verified POS percentage that represents every merchant.</p>
       </section>
-
-      <div class="p-4 bg-surface border border-accent/30 rounded-card mb-8 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Managing commercial cash flow and working capital velocity?</strong>
-        Read our corporate liquidity analysis on <a href="/blog/cash-conversion-cycle" class="text-accent font-medium hover:underline">Cash Conversion Cycle (CCC): Working Capital Efficiency &amp; Liquidity Management</a> to learn how merchant collection speeds affect business solvency.
-      </div>
 
       <section aria-labelledby="mdr-calculator-faq">
         <h2 id="mdr-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {((jsonld['@graph'][2] as any)?.mainEntity || []).map((faq: any) => (
+          {faqs.map((faq) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-                {faq.acceptedAnswer.text}
-              </div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
             </details>
           ))}
         </div>

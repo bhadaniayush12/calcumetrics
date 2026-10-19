@@ -495,6 +495,8 @@ export const BATCH_1_POSTS: BlogPost[] = [
         Whether you are opening a high-yield savings account, reviewing a certificate of deposit, or reading the disclosures on a credit card statement, you will invariably encounter two acronyms: <strong>APR</strong> (Annual Percentage Rate) and <strong>APY</strong> (Annual Percentage Yield).
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Hold the principal, nominal rate and term constant in the <a href="/compound-interest-calculator" class="text-accent font-medium hover:underline">compound interest calculator with daily and monthly compounding</a> to see how changing only the frequency affects the final balance.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         While the two numbers may look almost identical at first glance, the mathematical mechanism separating them—<strong>compounding frequency</strong>—determines whether you are earning more on your savings or silently paying more on your debt.
       </p>

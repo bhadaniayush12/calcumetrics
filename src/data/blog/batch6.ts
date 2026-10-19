@@ -362,6 +362,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
         When your bank notifies you of an interest rate hike on your floating home loan, you face a critical financial fork: should you increase your monthly EMI or extend your repayment tenure? While extending your loan tenure seems painless because your current bank outflow does not change, it costs significantly more in compounding interest. On a ₹50 lakh home loan over 20 years experiencing a 25 basis point hike from 8.50% to 8.75%, opting to increase your monthly EMI by ₹794 saves approximately ₹3,48,885 in lifetime interest compared to extending the loan term.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Use the <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI calculator to compare repayment terms</a> with the same outstanding principal and new rate. Record both the monthly payment and total interest for each term before comparing the options.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         Most borrowers choose tenure extension simply because it represents the path of least resistance. In fact, many borrowers do not even realize their repayment horizon has been pushed back until they review their annual loan statement. Understanding the compounding mechanics that govern this decision is essential for anyone holding long-term amortizing debt.
       </p>
@@ -1117,6 +1119,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         UPI payments made from a bank account carry zero MDR, whatever the amount; a merchant charge applies only to payments above ₹2,000 made through a PPI wallet or a RuPay credit card on UPI, and consumers continue to pay zero fees. If you operate an enterprise or retail business, customers paying via UPI for high-ticket purchases will not bear the cost; instead, the merchant absorbs the MDR fee. On a ₹10,000 merchant sale, an illustrative MDR rate of 0.4% incurs a ₹40 merchant charge plus 18% GST (₹7.20), totaling ₹47.20 in payment processing costs.
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For a fee quoted before or after tax, the <a href="/in/gst-calculator" class="text-accent font-medium hover:underline">GST calculator to add or remove tax from a fee</a> helps check the invoice arithmetic. Use the fee as the amount when the provider is charging GST on its processing service.</p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         As digital payments account for an ever-increasing percentage of India’s commercial transaction volume, managing payment acquisition costs has transformed into a core operational discipline. For retailers, online direct-to-consumer (D2C) brands, and services businesses, understanding the mechanics of payment aggregator deductions, tax credits, and settlement timing is vital for preserving operating margins.

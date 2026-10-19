@@ -37,12 +37,23 @@ const byFreq = {
 };
 const fmtR = (n: number) => '₹' + formatIndian(Math.round(n));
 
+const exampleMoney = (n: number) => '₹' + n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const monthlyYear = calcLumpSum(DEFAULT.principal, DEFAULT.rate, 1, 'monthly');
+
 const fmt = (n: number) => '₹' + formatIndian(n);
 
 const RELATED_SLUGS = ['future-value-calculator', 'sip-calculator', 'simple-interest-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/compound-interest-calculator';
+const faqs = [
+  { question: "What is compound interest?", answer: "Compound interest adds earned interest to your balance so that later interest is calculated on both your original deposit and the interest already credited. Simple interest is calculated only on the original principal." },
+  { question: "How do you calculate compound interest?", answer: "For one deposit, use A = P × (1 + r/n)^(n × t). P is the starting amount, r is the annual rate as a decimal, n is the number of compounding periods per year and t is the number of years. Interest earned is A minus P." },
+  { question: "Is daily compounding better than monthly compounding?", answer: "For the same positive nominal annual rate and term, daily compounding gives a slightly higher balance because interest is added more often. Compare rates on the same basis: an effective annual yield already includes the effect of compounding." },
+  { question: "Can I calculate compound interest with monthly contributions?", answer: "This calculator models one initial deposit. Monthly contributions need a separate calculation because each deposit has a different time to grow. Use the linked SIP calculator to model regular monthly investments; do not add all future deposits to the opening balance." },
+  { question: "How long does compound interest take to double money?", answer: "The Rule of 72 estimates doubling time as 72 divided by the annual percentage return. It is an approximation. Use the calculator with your chosen rate and frequency to compare balances over different terms; an assumed investment return is not guaranteed." }
+];
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -57,7 +68,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: '2026-10-19',
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -79,56 +90,18 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'What is the difference between simple and compound interest?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the effective annual rate (EAR)?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'EAR = (1 + r/n)^n − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year. For example, 8% compounded monthly gives an EAR of about 8.30%.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How does compounding frequency affect returns?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'More frequent compounding yields higher returns because interest is added to the principal more often, creating a larger base for the next period. Daily compounding produces slightly more than monthly, which produces more than quarterly, and so on.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the Rule of 72?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'The Rule of 72 is a quick estimation: divide 72 by the annual interest rate to approximate how many years it takes to double your money with compound interest. At 8% annual compounding, your money approximately doubles in 72 ÷ 8 = 9 years.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Is the compound interest result guaranteed?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'No. This calculator provides a mathematical estimate based on a constant assumed rate. Actual returns from market-linked instruments vary. Fixed deposits offer guaranteed rates, but market-linked investments do not. The result is for information only and is not financial advice.',
-          },
-        },
-      ],
+      mainEntity: faqs.map(({ question, answer }) => ({
+        '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
     },
   ],
 };
 ---
 
 <Layout
-  title="Compound Interest Calculator: Daily & Annual | Calcumetrics"
-  description="Free compound interest calculator. Apply the compound interest formula: A = P(1+r/n)^(nt) with daily compound interest calculator options, charts & schedule."
+  title="Compound Interest Calculator: Daily, Monthly & Yearly"
+  description="Calculate future value and interest earned. Compare daily, monthly and yearly compounding with a worked example, formula and clear assumptions."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -212,7 +185,7 @@ const jsonld = {
       </div>
 
       <Alert variant="info" title="Compounding Rule">
-        More frequent compounding increases the effective yield. For example, monthly compounding on 8% yields an effective annual rate of 8.30%.
+        More frequent compounding increases the effective yield. For example, monthly compounding at {DEFAULT.rate}% gives an effective annual rate of {monthlyYear.gainPct.toFixed(2)}%.
       </Alert>
 
       <div class="flex gap-3 mt-6">
@@ -268,104 +241,67 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <!-- 1. Formula -->
-      <section aria-labelledby="ci-formula">
-        <h2 id="ci-formula" class="text-xl font-bold text-text-primary mb-4">How this calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Compound interest is calculated using the exponential growth formula where interest earned in each period is added to the principal balance for the next period:
-        </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">A compound interest calculator estimates how one deposit grows when earned interest stays invested. Enter the starting amount, annual rate, time and compounding frequency to see the future balance and interest earned. The estimate assumes the same rate throughout and excludes tax, fees and inflation.</p><section aria-labelledby="ci-formula">
+        <h2 id="ci-formula" class="text-xl font-bold text-text-primary mb-4">Compound interest formula</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For a single deposit, the compound interest formula is:</p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
           <p class="text-base font-mono text-text-primary mb-2">A = P × (1 + r / n)<sup>n × t</sup></p>
           <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">A</strong> — Final maturity amount (future value)</li>
-            <li><strong class="text-text-primary">P</strong> — Initial principal balance</li>
-            <li><strong class="text-text-primary">r</strong> — Annual nominal interest rate (as a decimal, e.g. 0.08 for 8%)</li>
-            <li><strong class="text-text-primary">n</strong> — Number of times interest is compounded per year</li>
-            <li><strong class="text-text-primary">t</strong> — Number of years</li>
+            <li><strong>P</strong>: initial deposit; <strong>A</strong>: final balance.</li>
+            <li><strong>r</strong>: nominal annual rate as a decimal, so 8% is 0.08.</li>
+            <li><strong>n</strong>: periods per year; <strong>t</strong>: years invested.</li>
+            <li><strong>Interest earned</strong> = A − P.</li>
           </ul>
         </div>
-        <p class="text-sm text-text-muted leading-relaxed">
-          The total interest earned is <strong class="text-text-primary">A − P</strong>. The effective annual rate (EAR) is <span class="font-mono">(1 + r/n)<sup>n</sup> − 1</span>, which shows the true annual yield accounting for compounding frequency.
-        </p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The daily compound interest formula uses n = 365; monthly uses 12, quarterly 4, semi-annual 2 and annual 1. These are this calculator’s conventions. Check the product’s accrual rules before comparing a bank statement with the estimate.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">An effective annual rate is (1 + r/n)<sup>n</sup> − 1. For the example’s {DEFAULT.rate}% nominal rate, monthly compounding gives {monthlyYear.gainPct.toFixed(2)}% over one year. <a href="https://www.investor.gov/additional-resources/information/youth/teachers-classroom-resources/what-compound-interest" class="text-accent font-medium hover:underline">Investor.gov explains why interest on accumulated interest grows the balance</a>.</p>
       </section>
 
-      <!-- 2. Worked Example -->
       <section aria-labelledby="ci-example">
-        <h2 id="ci-example" class="text-xl font-bold text-text-primary mb-4">Worked example</h2>
-        <div class="bg-surface border border-border rounded-card p-5">
-          <p class="text-sm text-text-muted leading-relaxed mb-3">
-            <strong class="text-text-primary">Given:</strong> P = ₹1,00,000, r = 8% (0.08), n = 1 (annual), t = 10 years
-          </p>
-          <div class="space-y-2 text-sm text-text-muted leading-relaxed">
-            <p><strong class="text-text-primary">Step 1:</strong> Calculate the growth factor</p>
-            <p class="font-mono pl-4">(1 + 0.08 / 1)<sup>1 × 10</sup> = 1.08<sup>10</sup> = 2.15892</p>
-            <p><strong class="text-text-primary">Step 2:</strong> Calculate the future value</p>
-            <p class="font-mono pl-4">A = 1,00,000 × 2.15892 = ₹2,15,892</p>
-            <p><strong class="text-text-primary">Step 3:</strong> Calculate interest earned</p>
-            <p class="font-mono pl-4">Interest = ₹2,15,892 − ₹1,00,000 = ₹1,15,892</p>
-            <p><strong class="text-text-primary">Step 4:</strong> Calculate total return</p>
-            <p class="font-mono pl-4">Return = (₹1,15,892 / ₹1,00,000) × 100 = 115.9%</p>
-          </div>
-          <p class="text-sm text-text-muted leading-relaxed mt-3">
-            If the same investment were compounded <strong class="text-text-primary">monthly</strong> instead of annually, the future value would be {fmtR(byFreq.monthly)} — an additional {fmtR(byFreq.monthly - byFreq.annually)} from more frequent compounding.
-          </p>
+        <h2 id="ci-example" class="text-xl font-bold text-text-primary mb-4">Worked example: one deposit over ten years</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Assume a {exampleMoney(DEFAULT.principal)} deposit earns {DEFAULT.rate}% a year, compounded annually, for {DEFAULT.years} years. The rate is an illustration, not a current savings or investment offer.</p>
+        <div class="bg-surface border border-border rounded-card p-5 space-y-3 text-sm text-text-muted">
+          <p>1. Annual compounding means one interest credit per year.</p>
+          <p>2. The growth factor is (1 + {DEFAULT.rate} / 100)<sup>{DEFAULT.years}</sup> = {(result.maturity / result.principal).toFixed(6)}.</p>
+          <p>3. Multiply the deposit by that factor: the final balance is <strong class="text-text-primary">{exampleMoney(result.maturity)}</strong>.</p>
+          <p>4. Subtract the original deposit: interest earned is <strong class="text-text-primary">{exampleMoney(result.gain)}</strong>, a total return of {result.gainPct.toFixed(2)}%.</p>
         </div>
       </section>
 
-      <!-- 3. Assumptions -->
-      <section aria-labelledby="ci-assumptions">
-        <h2 id="ci-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions</h2>
-        <ul class="space-y-2 text-sm text-text-muted leading-relaxed list-disc pl-5">
-          <li>The interest rate remains constant throughout the investment period.</li>
-          <li>Interest is reinvested at the same rate — no withdrawals during the tenure.</li>
-          <li>The calculation does not account for taxes on interest earned, fees, or inflation.</li>
-          <li>Compounding occurs at the selected frequency (annually, semi-annually, quarterly, monthly, or daily).</li>
-        </ul>
+      <section aria-labelledby="ci-frequency-comparison">
+        <h2 id="ci-frequency-comparison" class="text-xl font-bold text-text-primary mb-4">Daily, monthly, quarterly or annual compounding?</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Same illustrative deposit, nominal rate and term as the worked example; no additional deposits</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Frequency</th><th scope="col" class="text-left py-2.5 px-3">Final balance</th><th scope="col" class="text-left py-2.5 px-3">Interest earned</th></tr></thead>
+          <tbody>{Object.entries(byFreq).map(([frequency, maturity]) => (
+          <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">{frequency}</td><td class="py-2.5 px-3 text-text-primary">{exampleMoney(maturity)}</td><td class="py-2.5 px-3 text-text-primary">{exampleMoney(maturity - DEFAULT.principal)}</td></tr>
+        ))}</tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Monthly compounding adds {exampleMoney(byFreq.monthly - byFreq.annually)} to the final balance compared with annual compounding under these assumptions. More frequent compounding has no benefit if interest is withdrawn instead of reinvested.</p>
       </section>
 
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Confused about nominal rates vs. compounding frequencies?</strong>
-        Read our in-depth guide on <a href="/blog/apr-vs-apy-compounding-frequency" class="text-accent font-medium hover:underline">APR vs. APY: Why Compounding Frequency Changes Your Real Interest Rate</a> to see mathematical proofs, frequency tables, and disclosure traps across loans and savings products.
-      </div>
+      <section aria-labelledby="ci-contributions">
+        <h2 id="ci-contributions" class="text-xl font-bold text-text-primary mb-4">Compound interest with monthly contributions</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">A monthly contribution earns for fewer periods when it is deposited later. This page’s one-deposit formula cannot model that by adding all future deposits to the principal.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Use the <a href="/sip-calculator" class="text-accent font-medium hover:underline">SIP calculator for monthly investments</a> to model regular contributions, or the <a href="/savings-goal-calculator" class="text-accent font-medium hover:underline">savings goal calculator</a> to work out the monthly amount needed after allowing for existing savings. <a href="https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator" class="text-accent font-medium hover:underline">Investor.gov’s calculator</a> has separate inputs for an initial investment and monthly contributions.</p>
+      </section>
 
-      <!-- 4. FAQ -->
+      <section aria-labelledby="ci-assumptions">
+        <h2 id="ci-assumptions" class="text-xl font-bold text-text-primary mb-4">What the result assumes</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The example keeps the rate constant, reinvests every interest credit and makes no further deposits or withdrawals. It excludes taxes, charges and changes in purchasing power. Market-linked returns vary, so a smooth projection does not predict the path of an investment.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For rate terminology, read <a href="/blog/apr-vs-apy-compounding-frequency" class="text-accent font-medium hover:underline">APR vs APY and compounding frequency</a>. To compare a non-compounding calculation, use the <a href="/simple-interest-calculator" class="text-accent font-medium hover:underline">simple interest calculator</a>.</p>
+      </section>
+
       <section aria-labelledby="ci-faq">
         <h2 id="ci-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the difference between simple and compound interest?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              Simple interest is calculated only on the initial principal amount. Compound interest is calculated on both the principal and all accumulated interest from preceding periods. Over longer periods, compound interest grows much faster due to the snowball effect. For example, ₹1,00,000 at 8% for 10 years earns ₹80,000 with simple interest but {fmtR(byFreq.annually - DEFAULT.principal)} with annual compound interest.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the effective annual rate (EAR)?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              EAR = (1 + r/n)<sup>n</sup> − 1. It represents the true annual rate you earn when compounding happens more frequently than once a year. For example, a nominal rate of 8% compounded monthly gives an EAR of approximately 8.30%, meaning you effectively earn 8.30% per year rather than 8%.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">How does compounding frequency affect returns?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              More frequent compounding yields higher returns because interest is added to the principal more often, creating a larger base for the next period. For {fmtR(DEFAULT.principal)} at {DEFAULT.rate}% over {DEFAULT.years} years: annual compounding gives {fmtR(byFreq.annually)}, quarterly gives {fmtR(byFreq.quarterly)}, monthly gives {fmtR(byFreq.monthly)}, and daily gives {fmtR(byFreq.daily)}. The difference between annual and daily compounding is {fmtR(byFreq.daily - byFreq.annually)} — significant over larger amounts and longer periods.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">What is the Rule of 72?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              The Rule of 72 is a quick estimation method: divide 72 by the annual interest rate to approximate how many years it takes to double your money with compound interest. At 8% annual compounding, your money approximately doubles in 72 ÷ 8 = 9 years. The exact answer (using the formula) is 9.006 years, making the Rule of 72 remarkably accurate for typical interest rates.
-            </div>
-          </details>
-          <details class="border border-border rounded-card overflow-hidden">
-            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">Is the compound interest result guaranteed?</summary>
-            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-              No. This calculator provides a mathematical estimate based on a constant assumed rate. Fixed deposits and government bonds offer guaranteed rates, but market-linked instruments (mutual funds, equities) fluctuate and actual returns may differ substantially. The result is for educational and planning purposes only, not financial advice.
-            </div>
-          </details>
+          {faqs.map((faq) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
+            </details>
+          ))}
         </div>
       </section>
 
-      <!-- 5. Related calculators -->
       <section aria-labelledby="ci-related">
         <h2 id="ci-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">

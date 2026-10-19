@@ -31,9 +31,21 @@ const totalCompact = formatIndianCompact(initialResult.totalAmount, '₹');
 const RELATED_SLUGS = ['upi-mdr-calculator', 'profit-margin-calculator', 'income-tax-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
+const reverseExample = calcGST(initialResult.totalAmount, DEFAULT.slab, false, 'remove');
+const interStateExample = calcGST(DEFAULT.amount, DEFAULT.slab, true, 'add');
+
 const canonicalUrl = 'https://calcumetrics.com/in/gst-calculator';
-const pageTitle = 'GST Calculator India: 0%, 5%, 18% & 40% Slabs | Calcumetrics';
-const pageDesc = 'Free GST calculator India. Calculate gst online across 0%, 5%, 18% & 40% slabs, add or remove GST, and get exact CGST, SGST, and IGST tax splits.';
+const pageTitle = 'GST Calculator: Add or Remove GST & Check Tax Split';
+const pageDesc = 'Add GST to a price or remove it from an inclusive total. See CGST, SGST and IGST splits, reverse GST examples and the formula for checking an invoice.';
+
+const faqs = [
+  { question: "How do I calculate GST on a price?", answer: "For a price before GST, multiply the taxable base by the GST percentage divided by 100. Add that tax amount to the base to get the invoice total. Select Add GST in the calculator." },
+  { question: "How do I remove GST from an inclusive amount?", answer: "Divide the GST-inclusive total by 1 plus the GST rate divided by 100. The result is the taxable base; subtract it from the total to find the included GST. Select Remove GST rather than applying the percentage directly to the inclusive total." },
+  { question: "How do I calculate 18% GST?", answer: `At an assumed 18% rate, a base of ${fmt(DEFAULT.amount)} gives GST of ${fmt(initialResult.gstAmount)} and a total of ${fmt(initialResult.totalAmount)}. Removing 18% from that inclusive total returns a base of ${fmt(reverseExample.baseAmount)}. Use 18% only where it is the applicable invoice rate.` },
+  { question: "What is the difference between CGST, SGST and IGST?", answer: "For an ordinary taxable intra-state supply, GST is split into central and state components. An inter-state supply generally attracts IGST at the combined rate. The supplier’s location and legal place of supply determine this; imports, SEZ supplies and union territories need their applicable rules." },
+  { question: "Is reverse GST calculation the same as reverse charge?", answer: "No. Reverse GST calculation extracts tax from a total that already includes it. Reverse charge is a legal rule about who must pay the tax. This tool performs arithmetic and does not decide whether reverse charge applies." },
+  { question: "Can I use this GST calculator for an invoice?", answer: "Use it to check the taxable base, GST and total for one rate at a time. Confirm the item’s rate and place of supply first. It does not determine input tax credit, registration eligibility, cess or net tax payable on a return, and the displayed amounts are rounded to whole rupees." }
+];
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -49,7 +61,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en-IN',
-      dateModified: '2026-09-24',
+      dateModified: '2026-10-19',
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -71,48 +83,10 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'What are the current GST 2.0 slabs in India?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Following the GST 2.0 rationalization, India features four primary tax slabs: 0% (exempt essentials, life & health insurance), 5% (merit essentials, packaged food, medicines, and items merged from former 12%), 18% (standard rate for commercial services, IT, and consumer goods), and 40% (demerit and luxury slab replacing the former 28% + cess structure).',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What happened to the 12% and 28% GST slabs in GST 2.0?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Under the GST 2.0 reform, the 12% slab was rationalized—with mass-consumption essentials moved to 5% and remaining items aligned to 18%. The former 28% slab and associated compensation cesses were consolidated into the 40% luxury and demerit slab. Legacy 12% and 28% calculations remain available for historical invoice reconciliation.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the difference between CGST, SGST, and IGST?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'For intra-state transactions (buyer and seller in same state), GST is split equally into CGST (Central GST) and SGST (State GST). For inter-state transactions (across state borders), IGST (Integrated GST) is charged at the full combined rate to the Central Government and apportioned to destination states.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How do I remove GST from a GST-inclusive invoice total?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'To extract original base price from a GST-inclusive price: Base Price = (Total Gross Amount × 100) / (100 + GST Rate). The GST Amount is Total Gross Amount minus Base Price.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the mandatory threshold turnover for GST registration?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'For suppliers of goods, mandatory GST registration applies if annual aggregate turnover exceeds ₹40 lakh (₹20 lakh for special category states). For service providers, the registration threshold is ₹20 lakh (₹10 lakh for special category states).',
-          },
-        },
-      ],
+      mainEntity: faqs.map(({ question, answer }) => ({
+        '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
     },
   ],
 };
@@ -134,14 +108,14 @@ const jsonld = {
     <Fragment slot="inputs">
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
-          GST Calculator (GST 2.0)
+          GST Calculator India
         </h1>
         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
+          Reviewed: 19 Oct 2026
         </span>
       </div>
       <p class="text-xs text-text-muted mb-4">
-        Statutory source: <a href="https://www.cbic.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Central Board of Indirect Taxes and Customs (CBIC)</a> · Slabs: 0%, 5%, 18%, 40%.
+        Choose the rate applicable to your invoice. <a href="https://gstcouncil.gov.in/sites/default/files/2025-09/press_release_press_information_bureau_0.pdf" class="text-accent font-medium hover:underline">GST Council rate-reform guidance</a> is a starting point; the item’s classification, notification and supply date determine its treatment.
       </p>
 
       <!-- Amount Input + Presets -->
@@ -186,15 +160,15 @@ const jsonld = {
           id="gst-slab"
           label="GST Slab Rate"
           options={[
-            { value: '0', label: '0% (Exempt Essentials & Insurance)' },
-            { value: '5', label: '5% (Merit Essentials & Merged 12% Items)' },
-            { value: '18', label: '18% (Standard Rate — Services & Goods)' },
-            { value: '40', label: '40% (GST 2.0 Luxury & Demerit Goods)' },
-            { value: '12', label: '12% (Legacy Pre-Reform / Past Invoices)' },
-            { value: '28', label: '28% (Legacy Pre-Reform / Past Invoices)' },
+            { value: '0', label: '0% (Nil / Exempt)' },
+            { value: '5', label: '5%' },
+            { value: '18', label: '18%' },
+            { value: '40', label: '40%' },
+            { value: '12', label: '12%' },
+            { value: '28', label: '28%' },
           ]}
           value="18"
-          helperText="Select statutory GST 2.0 rate or legacy invoice slab"
+          helperText="Use the applicable rate from the invoice and relevant tax notification"
         />
         <!-- Slab quick chips -->
         <div class="flex items-center gap-1.5 mt-2 flex-wrap" aria-label="GST slab presets">
@@ -203,9 +177,9 @@ const jsonld = {
             { val: 0, label: '0%' },
             { val: 5, label: '5%' },
             { val: 18, label: '18%' },
-            { val: 40, label: '40% (Demerit)' },
-            { val: 12, label: '12% (Old)' },
-            { val: 28, label: '28% (Old)' },
+            { val: 40, label: '40%' },
+            { val: 12, label: '12%' },
+            { val: 28, label: '28%' },
           ].map((chip) => (
             <button
               type="button"
@@ -368,124 +342,58 @@ const jsonld = {
 
     <!-- ── BELOW THE FOLD (SEO CONTENT) ───────────────────────────────────────── -->
     <Fragment slot="below">
-
-      <!-- 1. Featured Snippet Direct Answer Box -->
-      <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
-        <p class="text-xs font-bold text-accent uppercase tracking-wider mb-1">Quick Answer / Summary</p>
-        <p class="text-sm text-text-primary leading-relaxed" id="gst-snippet-answer">
-          For a base price of <strong>₹10,000</strong> with <strong>18% GST (Exclusive)</strong>, the GST tax amount is <strong>₹1,800</strong>, resulting in a gross invoice total of <strong>₹11,800</strong>. For intra-state sales, this splits into <strong>CGST ₹900 (9%)</strong> and <strong>SGST ₹900 (9%)</strong>.
-        </p>
-      </div>
-
-      <!-- 2. Formula & Explanation -->
-      <section aria-labelledby="gst-how" class="mb-10">
-        <h2 id="gst-how" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How Indian GST is computed</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Under the Goods and Services Tax (GST) system in India, calculations fall under two primary methods:
-        </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-sm text-text-primary mb-1">1. Exclusive (Adding GST)</h3>
-            <p class="text-xs font-mono text-accent mb-2">GST = Base × (Rate / 100)</p>
-            <p class="text-xs font-mono text-accent">Total = Base + GST</p>
-            <p class="text-xs text-text-muted mt-2">Used when preparing quotes or billing goods at a pre-tax base price.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-sm text-text-primary mb-1">2. Inclusive (Removing GST)</h3>
-            <p class="text-xs font-mono text-accent mb-2">Base = (Total × 100) / (100 + Rate)</p>
-            <p class="text-xs font-mono text-accent">GST = Total − Base</p>
-            <p class="text-xs text-text-muted mt-2">Used to back-calculate tax when only the MRP or total invoice amount is known.</p>
-          </div>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">A GST calculator adds tax to a price before GST or extracts tax from a GST-inclusive total. Enter the amount and applicable rate, then choose the supply type to see a CGST/SGST or IGST split. It checks the arithmetic; you must establish the correct rate and place of supply for the invoice.</p>
+        <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
+          <p class="text-sm text-text-primary leading-relaxed" id="gst-snippet-answer">Adding {DEFAULT.slab}% GST to {baseExact} gives {heroExact} in tax and an invoice total of {totalExact}. The intra-state split is CGST {fmt(initialResult.cgst ?? 0)} and SGST {fmt(initialResult.sgst ?? 0)}.</p>
         </div>
+
+      <section aria-labelledby="gst-how">
+        <h2 id="gst-how" class="text-xl font-bold text-text-primary mb-4">GST calculation formula: inclusive and exclusive prices</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Choose the calculation mode to match the price you entered</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Price you have</th><th scope="col" class="text-left py-2.5 px-3">Calculation</th></tr></thead>
+          <tbody><tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Before GST (exclusive)</td><td class="py-2.5 px-3 text-text-primary">GST = Base × Rate / 100; Total = Base + GST</td></tr>
+            <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Including GST (inclusive)</td><td class="py-2.5 px-3 text-text-primary">Base = Total × 100 / (100 + Rate); GST = Total − Base</td></tr></tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">When removing GST, the percentage applies to the underlying base. Subtracting the rate directly from the inclusive total gives a different result because that total already contains tax.</p>
       </section>
 
-      <!-- 3. Statutory GST Slabs Table -->
-      <section aria-labelledby="gst-slabs" class="mb-10">
-        <h2 id="gst-slabs" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Statutory GST 2.0 slabs in India (September 2026)</h2>
-        <div class="overflow-x-auto bg-surface border border-border rounded-card">
-          <table class="w-full text-xs sm:text-sm border-collapse">
-            <thead>
-              <tr class="border-b border-border text-text-muted">
-                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Rate</th>
-                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Classification</th>
-                <th class="text-left py-2.5 px-3 uppercase text-[11px] font-semibold">Goods & Services Covered</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="border-b border-border/50">
-                <td class="py-2.5 px-3 font-bold text-text-primary">0% (Nil)</td>
-                <td class="py-2.5 px-3 text-text-muted">Exempt Essentials</td>
-                <td class="py-2.5 px-3 text-text-muted">Unbranded food grains, fresh produce, milk, life & health insurance premiums, public health services.</td>
-              </tr>
-              <tr class="border-b border-border/50">
-                <td class="py-2.5 px-3 font-bold text-accent">5%</td>
-                <td class="py-2.5 px-3 text-text-muted">Standard Merit Rate</td>
-                <td class="py-2.5 px-3 text-text-muted">Packaged food, essential pharmaceuticals, economy travel, and items rationalized from former 12% slab.</td>
-              </tr>
-              <tr class="border-b border-border/50">
-                <td class="py-2.5 px-3 font-bold text-accent">18%</td>
-                <td class="py-2.5 px-3 text-text-muted">Standard Rate</td>
-                <td class="py-2.5 px-3 text-text-muted">Most commercial services (IT, telecom, consulting, banking), consumer electronics, capital machinery.</td>
-              </tr>
-              <tr class="border-b border-border/50">
-                <td class="py-2.5 px-3 font-bold text-text-primary">40%</td>
-                <td class="py-2.5 px-3 text-text-muted">Luxury & Demerit</td>
-                <td class="py-2.5 px-3 text-text-muted">Motor vehicles (>350cc), pan masala, tobacco, sugary aerated beverages (replaces former 28% + cess).</td>
-              </tr>
-              <tr class="border-b border-border/50 bg-canvas/30">
-                <td class="py-2.5 px-3 font-bold text-text-muted">12% (Legacy)</td>
-                <td class="py-2.5 px-3 text-text-muted">Pre-GST 2.0 Invoices</td>
-                <td class="py-2.5 px-3 text-text-muted">Processed food, diagnostic kits (now rationalized into 5% or 18% under GST 2.0). Supported for past billing.</td>
-              </tr>
-              <tr class="bg-canvas/30">
-                <td class="py-2.5 px-3 font-bold text-text-muted">28% (Legacy)</td>
-                <td class="py-2.5 px-3 text-text-muted">Pre-GST 2.0 Invoices</td>
-                <td class="py-2.5 px-3 text-text-muted">Former standard luxury & automobile rate (now restructured under the 40% demerit slab).</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <section aria-labelledby="gst-worked-example">
+        <h2 id="gst-worked-example" class="text-xl font-bold text-text-primary mb-4">Worked example: add 18% GST and reverse it</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Assume {DEFAULT.slab}% is the applicable rate for a taxable base of {fmt(DEFAULT.amount)}. The figures below use an ordinary intra-state supply for the split; this example does not establish the rate for any particular product.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Step 1: multiply {fmt(DEFAULT.amount)} by {DEFAULT.slab} / 100 to get {fmt(initialResult.gstAmount)} of GST. Step 2: add it to the base to get {fmt(initialResult.totalAmount)}. To reverse the calculation, enter that total, choose Remove GST and divide by 1 + {DEFAULT.slab} / 100: the base is {fmt(reverseExample.baseAmount)} and included tax is {fmt(reverseExample.gstAmount)}.</p>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">The same transaction viewed from its exclusive and inclusive amounts</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Scenario</th><th scope="col" class="text-left py-2.5 px-3">Taxable base</th><th scope="col" class="text-left py-2.5 px-3">GST</th><th scope="col" class="text-left py-2.5 px-3">Invoice total</th></tr></thead>
+          <tbody><tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Add GST</td><td class="py-2.5 px-3 text-text-primary">{fmt(initialResult.baseAmount)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(initialResult.gstAmount)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(initialResult.totalAmount)}</td></tr>
+            <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Remove GST from that total</td><td class="py-2.5 px-3 text-text-primary">{fmt(reverseExample.baseAmount)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(reverseExample.gstAmount)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(reverseExample.totalAmount)}</td></tr></tbody>
+        </table></div>
       </section>
 
-      <!-- 4. Real FAQs -->
-      <section aria-labelledby="gst-faq" class="mb-10">
-        <h2 id="gst-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <section aria-labelledby="gst-supply-split">
+        <h2 id="gst-supply-split" class="text-xl font-bold text-text-primary mb-4">CGST and SGST versus IGST</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Same taxable base and combined GST rate</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Supply in the example</th><th scope="col" class="text-left py-2.5 px-3">CGST</th><th scope="col" class="text-left py-2.5 px-3">SGST</th><th scope="col" class="text-left py-2.5 px-3">IGST</th></tr></thead>
+          <tbody><tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Intra-state</td><td class="py-2.5 px-3 text-text-primary">{fmt(initialResult.cgst ?? 0)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(initialResult.sgst ?? 0)}</td><td class="py-2.5 px-3 text-text-primary">—</td></tr>
+            <tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">Inter-state</td><td class="py-2.5 px-3 text-text-primary">—</td><td class="py-2.5 px-3 text-text-primary">—</td><td class="py-2.5 px-3 text-text-primary">{fmt(interStateExample.igst ?? 0)}</td></tr></tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For ordinary taxable supplies, compare the supplier’s location with the legal place of supply. The <a href="https://cbic-gst.gov.in/hindi/IGST-bill-e.html" class="text-accent font-medium hover:underline">IGST Act, sections 7 and 8</a> defines inter-state and intra-state supplies and lists exceptions, including SEZ supplies. A buyer’s address alone is not enough for every case. The calculator does not separately label UTGST.</p>
+      </section>
+
+      <section aria-labelledby="gst-slabs">
+        <h2 id="gst-slabs" class="text-xl font-bold text-text-primary mb-4">Choose the GST rate for the invoice</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The <a href="https://gstcouncil.gov.in/sites/default/files/2025-09/press_release_press_information_bureau_0.pdf" class="text-accent font-medium hover:underline">56th GST Council recommendations, dated 3 September 2025</a> describe a broad 5% merit rate, 18% standard rate and a special 40% rate for selected supplies, alongside exemptions. This is not an exhaustive item-by-item rate list. Check the relevant notification and HSN/SAC classification for the date of supply.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The preset percentages are calculation options, not a classification service. Do not assume every former 28% item moved to 40%, or that an insurance exemption covers every policy. This calculator does not calculate compensation cess or input tax credit.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For invoice checks, use one rate at a time and compare the calculation with the supplier’s breakdown. <a href="https://cleartax.in/s/gst-calculator" class="text-accent font-medium hover:underline">ClearTax’s GST calculation guide</a> also distinguishes inclusive and exclusive prices.</p>
+      </section>
+
+      <section aria-labelledby="gst-faq">
+        <h2 id="gst-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            {
-              q: 'What are the current GST 2.0 slabs in India?',
-              a: 'Following the GST 2.0 rationalization, India features four primary tax slabs: 0% (exempt essentials, life & health insurance), 5% (merit essentials, packaged food, medicines, and items merged from former 12%), 18% (standard rate for commercial services, IT, and consumer goods), and 40% (demerit and luxury slab replacing the former 28% + cess structure).',
-            },
-            {
-              q: 'What happened to the 12% and 28% GST slabs in GST 2.0?',
-              a: 'Under the GST 2.0 reform, the 12% slab was rationalized—with mass-consumption essentials moved to 5% and remaining items aligned to 18%. The former 28% slab and associated compensation cesses were consolidated into the 40% luxury and demerit slab. Legacy 12% and 28% calculations remain available on Calcumetrics for historical invoice reconciliation.',
-            },
-            {
-              q: 'What is the difference between CGST, SGST, and IGST?',
-              a: 'For intra-state transactions (buyer and seller in same state), GST is split equally into CGST (Central GST) and SGST (State GST). For inter-state transactions (across state borders), IGST (Integrated GST) is charged at the full combined rate to the Central Government and apportioned to destination states.',
-            },
-            {
-              q: 'How do I remove GST from a GST-inclusive invoice total?',
-              a: 'To extract original base price from a GST-inclusive price: Base Price = (Total Gross Amount × 100) / (100 + GST Rate). The GST Amount is Total Gross Amount minus Base Price.',
-            },
-            {
-              q: 'What is the mandatory threshold turnover for GST registration?',
-              a: 'For suppliers of goods, mandatory GST registration applies if annual aggregate turnover exceeds ₹40 lakh (₹20 lakh for special category states). For service providers, the registration threshold is ₹20 lakh (₹10 lakh for special category states).',
-            },
-          ].map((item) => (
-            <details class="border border-border rounded-card overflow-hidden bg-surface">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-                {item.q}
-              </summary>
-              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
-                {item.a}
-              </div>
+          {faqs.map((faq) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
             </details>
           ))}
         </div>
       </section>
 
-      <!-- 5. Related Calculators -->
       <section aria-labelledby="gst-related" class="mb-10">
         <h2 id="gst-related" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Related taxation calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -505,9 +413,9 @@ const jsonld = {
       <!-- 6. Authoritative Footer Review -->
       <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
         <div>
-          <span>Last updated: <strong>September 2026</strong></span>
+          <span>Content reviewed: <strong>19 October 2026</strong></span>
           <span class="mx-2">·</span>
-          <span>Verified against statutory CBIC GST 2.0 notifications</span>
+          <span>Sources and calculation assumptions are linked above</span>
         </div>
         <div>
           <a href="/methodology" class="hover:text-accent underline transition-standard">View formula methodology</a>
