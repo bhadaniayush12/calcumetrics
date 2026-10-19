@@ -18,7 +18,7 @@ export const DIWALI_BONUS_POST: BlogPost = {
   title: 'Diwali Bonus 2026: Invest a Lump Sum, Start a SIP or Prepay?',
   seoTitle: 'Diwali Bonus 2026: Lump Sum, SIP or Home Loan Prepay?',
   description: 'Compare a ₹1 lakh Diwali bonus as a lump sum, a 12-month SIP or a home-loan prepayment, with engine-calculated results, timing and risk explained.',
-  category: 'Investments', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Calcumetrics Editorial Team', type: 'Hybrid',
+  category: 'Investments', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Dev', type: 'Hybrid',
   quickAnswer: 'Diwali falls on 8 November 2026. A ₹1 lakh bonus can fund immediate investment, 12 monthly instalments or a loan prepayment. The right comparison depends on liquidity, risk and time: assumed investment growth is uncertain, while prepayment reduces future interest under the loan’s rate assumptions.',
   summary: 'A finite-bonus comparison that keeps the SIP contribution total at ₹1 lakh, uses a consistent investment compounding convention and models prepayment after 24 EMIs.',
   sources: [

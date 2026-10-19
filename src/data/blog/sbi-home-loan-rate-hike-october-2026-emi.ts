@@ -7,7 +7,7 @@ export const SBI_OCTOBER_POST: BlogPost = {
   title: 'SBI Home Loan Rate Hike, October 2026: EMI or Longer Tenure?',
   seoTitle: 'SBI Home Loan Rate Hike: October 2026 EMI Comparison',
   description: 'SBI home loans start at 7.50% from 15 October 2026. Compare 20-year EMIs on ₹30 lakh and ₹50 lakh, total interest and floating-rate borrower options.',
-  category: 'Loans', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Calcumetrics Editorial Team', type: 'Trending',
+  category: 'Loans', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Dev', type: 'Trending',
   quickAnswer: `SBI advertises home loans from 7.50% from 15 October 2026. In a 7.25% to 7.50% illustration over 20 years, EMI rises from ${money(loans[0].before.emi)} to ${money(loans[0].after.emi)} on ₹30 lakh. Existing floating loans change according to their benchmark, spread and reset date; the advertised floor is not everyone’s rate.`,
   summary: 'Separate SBI’s advertised starting rate from its lending benchmarks, then compare the monthly and lifetime cost of a rate reset using the site’s EMI engine.',
   sources: [

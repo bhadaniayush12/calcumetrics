@@ -13,7 +13,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     publishDate: '2026-10-11',
     dateModified: '2026-10-11',
     readTime: '8 min read',
-    author: 'Calcumetrics Editorial Team',
+    author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'On October 7, 2026, the RBI raised the policy repo rate by 25 bps from 5.25% to 5.50%. For an existing borrower with a 20-year floating home loan, a full 0.25% transmission increases monthly EMI by ₹477 on a ₹30 lakh loan, ₹794 on a ₹50 lakh loan, and ₹1,589 on a ₹1 crore loan. Over 20 years, this adds ₹1.14 lakh to ₹3.81 lakh in cumulative interest if tenure is kept unchanged.',
@@ -281,7 +281,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     publishDate: '2026-10-11',
     dateModified: '2026-10-11',
     readTime: '8 min read',
-    author: 'Calcumetrics Editorial Team',
+    author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'Increasing your EMI saves far more money than extending your tenure. On a ₹50 lakh home loan at 8.50% increased to 8.75%, raising your monthly EMI by ₹794 (to ₹44,186) keeps your loan at 20 years and costs ₹56,04,529 in total interest. In contrast, keeping your EMI flat extends your tenure by ~12.4 months and drives total interest to ₹59,53,414 — costing you an extra ₹3,48,885 in avoidable interest.',
@@ -534,7 +534,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     publishDate: '2026-10-11',
     dateModified: '2026-10-11',
     readTime: '8 min read',
-    author: 'Calcumetrics Editorial Team',
+    author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'On October 8, 2026, Freddie Mac reported that 30-year fixed mortgage rates jumped to 7.40%, up from 7.28% the prior week and marking the seventh consecutive weekly rise. On a $400,000 loan, monthly principal and interest now costs $2,769.52 — adding $293.63 each month and $105,706 more in lifetime interest compared to October 2025 rates (6.3%). Buyers should prioritize strict debt-to-income ratios over market timing.',
@@ -775,7 +775,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     publishDate: '2026-10-11',
     dateModified: '2026-10-11',
     readTime: '8 min read',
-    author: 'Calcumetrics Editorial Team',
+    author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'Commercial banks do not increase retail fixed deposit (FD) interest rates immediately after an RBI repo rate hike. While the repo rate rose 25 bps to 5.50% on October 7, 2026, retail deposit rates usually adjust with a lag, and only if individual banks need deposits — it is not guaranteed. Rather than locking an entire corpus into a single long-term tenor today, depositors may consider an FD ladder, which preserves liquidity and lets part of the money be reinvested if rates rise.',
@@ -1044,7 +1044,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     publishDate: '2026-10-11',
     dateModified: '2026-10-17',
     readTime: '8 min read',
-    author: 'Calcumetrics Editorial Team',
+    author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer:
       'UPI payments made from a bank account carry zero MDR at any amount; a merchant charge applies only when the customer pays more than ₹2,000 through a PPI wallet or a RuPay credit card linked to UPI, and consumers pay no fee either way. All person-to-person (P2P) transfers and merchant transactions up to ₹2,000 remain 100% free. On a ₹10,000 transaction, an illustrative MDR fee of 0.4% equals ₹40, plus 18% GST (₹7.20), totaling ₹47.20 in processing costs.',

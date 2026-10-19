@@ -8,7 +8,7 @@ export const NEW_TAX_ACT_POST: BlogPost = {
   title: 'Income-tax Act 2025: A Salaried Employee’s Guide from April 2026',
   seoTitle: 'Income-tax Act 2025: Salaried Guide for 2026–27',
   description: 'Understand tax year 2026–27, ten old-to-new section mappings, salary TDS and what stayed unchanged in slabs, standard deduction and rebate.',
-  category: 'Taxes', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Calcumetrics Editorial Team', type: 'Hybrid',
+  category: 'Taxes', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Dev', type: 'Hybrid',
   quickAnswer: 'The Income-tax Act, 2025 applies from 1 April 2026. Tax year 2026–27 covers 1 April 2026 to 31 March 2027. Salary provisions have new references, including standard deduction under section 19 and salary TDS under section 392(1), while the existing slabs and rebate framework continue.',
   summary: 'A practical guide to reading payroll documents after the new Act took effect, with ten verified section mappings and a salary-only calculator example.',
   sources: [

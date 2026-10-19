@@ -1,0 +1,26 @@
+---
+import type { Founder } from '../../data/founders';
+import { formatDisplayDate } from '../../lib/formatters';
+import FounderAvatar from './FounderAvatar.astro';
+
+interface Props {
+  founder: Founder;
+  dateModified: string;
+}
+
+const { founder, dateModified } = Astro.props;
+---
+
+<section aria-label="About the author" class="mt-12 p-6 bg-surface border border-border rounded-card flex items-start gap-5">
+  <FounderAvatar founder={founder} />
+  <div class="flex-1 min-w-0">
+    <h2 class="text-sm font-bold text-text-primary mb-0.5">
+      <a href={`/about#${founder.id}`} class="text-accent hover:underline">{founder.name}</a>
+    </h2>
+    <span class="text-[11px] text-accent font-semibold uppercase tracking-wider">{founder.role}</span>
+    <p class="text-xs text-text-muted leading-relaxed mt-2">{founder.bio}</p>
+    <p class="text-[11px] text-text-muted mt-3">
+      Last reviewed <time datetime={dateModified} class="text-text-primary font-medium">{formatDisplayDate(dateModified)}</time>
+    </p>
+  </div>
+</section>
