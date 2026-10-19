@@ -21,25 +21,37 @@ const FLAT_PCT = 5.5;
 const flatEmi = (initialLoan * (1 + (FLAT_PCT / 100) * DEFAULT.years)) / (DEFAULT.years * 12);
 const flatReducing = calcImpliedRate(initialLoan, flatEmi, DEFAULT.years).annualRatePct;
 
+const downPaymentExamples = [200000, 300000, 400000].map((down) => ({
+  down, ...calcEMI(DEFAULT.price - down, DEFAULT.rate, DEFAULT.years),
+}));
+
 const RELATED_SLUGS = ['emi-calculator', 'loan-affordability-calculator', 'loan-amortization-calculator'];
 const related = RELATED_SLUGS.map((slug) => TOOLS.find((t) => t.slug === slug)).filter(Boolean);
 
 const canonicalUrl = 'https://calcumetrics.com/car-loan-calculator';
+const faqs = [
+  { question: "How is car loan EMI calculated?", answer: "Subtract your down payment from the amount being financed, then enter the annual reducing-balance rate and tenure. The calculator estimates equal monthly payments covering principal and interest. Separately paid fees are not included." },
+  { question: "How does a down payment affect my car loan?", answer: "For the same car price, rate and term, a larger down payment reduces the amount borrowed, the EMI and total interest. The comparison table shows the effect of changing the down payment while holding the other inputs constant." },
+  { question: "Is a longer car loan tenure better?", answer: "A longer term lowers the monthly payment for the same loan and positive rate, but increases total interest. Compare both figures with the cash you can afford each month; a lower EMI alone does not mean a cheaper loan." },
+  { question: "Can I use this calculator for a used car?", answer: "Yes, if the offer has equal monthly payments and a reducing-balance interest rate. Enter the used-car price, actual down payment and the lender’s quoted rate and term. Balloon payments and irregular repayment plans are not modelled." },
+  { question: "Does the car loan EMI include insurance and other fees?", answer: "Only amounts included in the entered vehicle price and financed balance affect the estimate. It does not add processing fees, registration costs, insurance or future running costs automatically. Use an itemised quote to avoid omitting or counting a cost twice." }
+];
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'WebApplication',
-      name: 'Car Loan EMI Calculator',
+      name: 'Car Loan Calculator',
       url: canonicalUrl,
-      description: 'Free car loan calculator to compute car loan payment amounts, interest rate charges, down payments, and loan amortization schedules.',
+      description: 'Estimate car loan EMI and total interest after a down payment, with a worked example and down-payment comparison.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: '2026-10-19',
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -61,69 +73,31 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'What is a recommended tenure for a car loan?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Financial advisors generally recommend keeping auto loan tenures between 3 to 5 years (36 to 60 months). Because vehicles depreciate rapidly, extended tenures (such as 7 or 8 years) increase the risk of becoming upside down on your loan, where you owe more than the car is worth.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Are car loan interest rates fixed or floating?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Unlike home loans which are predominantly floating, most vehicle loans are issued on fixed interest rates. A fixed rate locks your monthly EMI throughout the tenure, protecting against benchmark rate hikes.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How much down payment should I make when buying a car?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'A standard financial recommendation is to put down at least 15% to 20% of the vehicle on-road price. A larger down payment reduces total interest burden, decreases monthly EMI, and protects against depreciation losses.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the difference between ex-showroom price and on-road price?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Ex-showroom price is the dealer base cost. On-road price includes mandatory state registration and road tax (RTO), motor insurance, municipal taxes, and dealer handling charges. Lenders often finance 85% to 100% of the ex-showroom price.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can I foreclose or prepay my car loan early?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes, most banks permit loan foreclosure or partial prepayments after an initial lock-in period (typically 6 months). For fixed-rate car loans, check if your lender levies a foreclosure penalty (often 2% to 5% on the remaining balance).',
-          },
-        },
-      ],
+      mainEntity: faqs.map(({ question, answer }) => ({
+        '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
     },
   ],
 };
 ---
 
 <Layout
-  title="Car Loan Calculator: Payments & Interest | Calcumetrics"
-  description="Free car loan calculator. Compute car loan payment amounts, auto loan interest rate costs, down payment splits, and full amortization schedule."
+  title="Car Loan Calculator: EMI, Interest & Down Payment"
+  description="Estimate car loan EMI and total interest after your down payment. Compare upfront payments, see a worked example and understand the cost of financing."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
 
   <CalculatorLayout
-    toolName="Car Loan EMI Calculator"
+    toolName="Car Loan Calculator"
     category="Loans"
     categoryHref="/loans"
     heroValue={fmt(initialResult.emiRounded)}
     heroLabel="Monthly EMI"
   >
     <Fragment slot="inputs">
-      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Car Loan EMI Calculator</h1>
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary mb-1">Car Loan Calculator</h1>
       <p class="text-sm text-text-muted mb-6">Estimate your vehicle loan EMI, down payment impact, and total interest.</p>
 
       <!-- Error alert -->
@@ -260,114 +234,62 @@ const jsonld = {
     </Fragment>
 
     <Fragment slot="below">
-      <section aria-labelledby="car-loan-calculator-how">
-        <h2 id="car-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">How car loan EMI is computed</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Vehicle loans are amortized using the standard reducing balance method, where interest is charged each month only on the remaining unpaid loan balance. The monthly equated instalment is determined by:
-        </p>
+      <p class="text-sm text-text-muted leading-relaxed mb-4">A car loan calculator estimates your monthly EMI from the vehicle price, down payment, annual interest rate and repayment term. The loan amount is the price minus the down payment, and each EMI repays principal plus interest. Compare total interest alongside the monthly payment before choosing a term.</p><section aria-labelledby="car-loan-calculator-how">
+        <h2 id="car-loan-calculator-how" class="text-xl font-bold text-text-primary mb-4">Car loan EMI formula</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">This calculator uses monthly reducing-balance interest:</p>
         <div class="bg-surface border border-border rounded-card p-5 mb-4">
-          <p class="text-base font-mono text-text-primary mb-2">EMI = [P × r × (1 + r)^n] / [(1 + r)^n − 1]</p>
-          <ul class="space-y-1 text-sm text-text-muted">
-            <li><strong class="text-text-primary">P</strong> — Net loan principal = On-road vehicle price − Down payment</li>
-            <li><strong class="text-text-primary">r</strong> — Monthly interest rate = Annual interest rate / 12 / 100</li>
-            <li><strong class="text-text-primary">n</strong> — Total repayment tenure in months = Years × 12</li>
-          </ul>
+          <p class="text-base font-mono text-text-primary mb-2">EMI = P × r × (1 + r)<sup>n</sup> / ((1 + r)<sup>n</sup> − 1)</p>
+          <ul class="space-y-1 text-sm text-text-muted"><li>P = Vehicle price − Down payment</li>
+            <li>r = Annual interest rate / 1200</li>
+            <li>n = Years × 12 monthly payments</li>
+            <li>Total interest = Unrounded EMI × n − P</li></ul>
         </div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Enter the lender’s reducing-balance interest rate. APR can include charges as well as interest, so it is useful for comparing the full cost but may not reproduce the contractual EMI when entered as the interest rate. <a href="https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12663&Mode=0" class="text-accent font-medium hover:underline">RBI’s Key Facts Statement circular</a> explains that distinction.</p>
       </section>
 
       <section aria-labelledby="car-loan-worked-example">
-        <h2 id="car-loan-worked-example" class="text-xl font-bold text-text-primary mb-4">Step-by-step worked example</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Suppose you purchase a new vehicle with an on-road price of <strong>₹12,00,000</strong>. You pay a down payment of <strong>₹2,00,000</strong> (16.67%) upfront from savings and finance the remainder at an annual interest rate of <strong>9.0%</strong> over a <strong>5-year</strong> tenure:
-        </p>
-        <div class="bg-surface border border-border rounded-card p-5 mb-4 space-y-3 text-sm text-text-muted">
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>On-Road Vehicle Price:</span>
-            <strong class="text-text-primary font-mono">₹12,00,000</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Upfront Down Payment:</span>
-            <strong class="text-text-primary font-mono">₹2,00,000</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Net Financed Principal (P):</span>
-            <strong class="text-text-primary font-mono">₹10,00,000</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Periodic Monthly Rate (r):</span>
-            <strong class="text-text-primary font-mono">9.0% / 12 = 0.75% (0.0075)</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Total Repayment Periods (n):</span>
-            <strong class="text-text-primary font-mono">5 × 12 = 60 months</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Calculated Monthly EMI:</span>
-            <strong class="text-text-primary font-mono">₹20,758</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Total Interest Payable over 5 Years:</span>
-            <strong class="text-text-primary font-mono">₹2,45,501</strong>
-          </div>
-          <div class="flex justify-between border-b border-border/50 pb-2">
-            <span>Total Loan Repayment (Principal + Interest):</span>
-            <strong class="text-text-primary font-mono">₹12,45,501</strong>
-          </div>
-          <div class="flex justify-between pt-1">
-            <span>Total Vehicle Acquisition Cost (Down Payment + Repayment):</span>
-            <strong class="text-accent font-mono font-bold">₹14,45,501</strong>
-          </div>
-        </div>
+        <h2 id="car-loan-worked-example" class="text-xl font-bold text-text-primary mb-4">Worked example: price, down payment and EMI</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Suppose the vehicle costs {fmt(DEFAULT.price)} and you pay {fmt(DEFAULT.down)} upfront. That leaves {fmt(initialLoan)} to borrow at an illustrative {DEFAULT.rate}% a year for {DEFAULT.years} years. The rate is an assumption, not a bank offer.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The monthly rate is {DEFAULT.rate} / 1200 = {(DEFAULT.rate / 1200).toFixed(4)} and the term is {DEFAULT.years * 12} months. Apply the formula to get the monthly payment, then total the repayments and subtract the principal to find interest.</p>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Illustrative costs, rounded to whole rupees</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Item</th><th scope="col" class="text-left py-2.5 px-3">Amount</th></tr></thead>
+          <tbody>{[
+          ['Vehicle price', DEFAULT.price], ['Down payment', DEFAULT.down],
+          ['Amount borrowed', initialLoan], ['Monthly EMI', initialResult.emiRounded],
+          ['Total interest', initialResult.totalInterest], ['Total loan repayment', initialResult.totalPayment],
+          ['Down payment plus loan repayment', DEFAULT.down + initialResult.totalPayment],
+        ].map(([label, value]) => (<tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">{label}</td><td class="py-2.5 px-3 text-text-primary">{fmt(Number(value))}</td></tr>))}</tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Totals use the unrounded monthly payment internally. Multiplying the displayed rounded EMI can give a slightly different total. The acquisition-cost line excludes charges not included in the entered vehicle price.</p>
+      </section>
+
+      <section aria-labelledby="car-loan-down-payment">
+        <h2 id="car-loan-down-payment" class="text-xl font-bold text-text-primary mb-4">How a larger down payment changes the EMI</h2>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Same vehicle price, rate and term as the worked example</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Down payment</th><th scope="col" class="text-left py-2.5 px-3">Loan amount</th><th scope="col" class="text-left py-2.5 px-3">Monthly EMI</th><th scope="col" class="text-left py-2.5 px-3">Total interest</th></tr></thead>
+          <tbody>{downPaymentExamples.map((row) => (<tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">{fmt(row.down)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.principal)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.emiRounded)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.totalInterest)}</td></tr>))}</tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The table isolates the borrowing-cost effect. A larger upfront payment also leaves less cash available for other expenses. <a href="https://www.consumerfinance.gov/ask-cfpb/how-does-a-down-payment-affect-my-auto-loan-en-773/" class="text-accent font-medium hover:underline">The CFPB explains how a down payment reduces the financed amount</a>.</p>
       </section>
 
       <section aria-labelledby="car-loan-interpretation">
-        <h2 id="car-loan-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting auto loan metrics & dealer quotes</h2>
-        <div class="space-y-4 text-sm text-text-muted leading-relaxed">
-          <p>
-            <strong class="text-text-primary">Depreciation vs. Loan Amortization:</strong> Automobiles are depreciating consumer assets, commonly shedding 15% to 20% of their market value during the first year and approximately 10% annually thereafter. Choosing a longer tenure (e.g., 7 or 8 years) lowers your monthly EMI but causes the outstanding loan principal to decline much slower than the car's resale value. This results in negative equity (being "underwater" on your loan), leaving you owing more than the vehicle is worth if it is sold or totaled in an accident.
-          </p>
-          <p>
-            <strong class="text-text-primary">Flat Rate vs. Reducing Balance Trap:</strong> Auto dealerships frequently quote attractive "flat interest rates" (for instance, {FLAT_PCT}% flat). In a flat rate structure, interest is calculated on the original {fmt(initialLoan)} principal throughout all {DEFAULT.years} years, even when most of the principal has been repaid. A {FLAT_PCT}% flat rate translates to an effective reducing rate of approximately {flatReducing.toFixed(2)}% p.a. Always ask the financier for the reducing balance annual percentage rate (APR) to compare offers accurately.
-          </p>
-        </div>
+        <h2 id="car-loan-interpretation" class="text-xl font-bold text-text-primary mb-4">Comparing dealer quotes and bank loans</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">A flat rate charges interest on the original principal for the full term. For this example’s loan, an illustrative {FLAT_PCT}% flat rate produces an EMI of {fmt(flatEmi)} and an equivalent nominal reducing-balance rate of about {flatReducing.toFixed(2)}%. That conversion excludes fees; it is not an all-in APR.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Compare the contractual interest rate, processing charges and APR in the <a href="https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12663&Mode=0" class="text-accent font-medium hover:underline">lender’s Key Facts Statement</a>. Read <a href="/blog/flat-vs-reducing-interest-rate" class="text-accent font-medium hover:underline">how flat and reducing interest rates differ</a> before comparing two quotes stated on different bases.</p>
       </section>
 
       <section aria-labelledby="car-loan-assumptions">
-        <h2 id="car-loan-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions & practical limitations</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Fixed Rate Model</h3>
-            <p>Calculations assume a fixed interest rate with equal monthly instalments throughout the selected tenure without mid-term rate fluctuations.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Ancillary Financing Fees</h3>
-            <p>Estimates exclude lender loan origination/processing fees (usually 0.5%–2% + taxes), hypothecation charges, and documentation fees added to disbursement.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Ownership Operating Expenses</h3>
-            <p>The EMI covers only debt financing. Annual comprehensive motor insurance renewals, road taxes, routine servicing, consumables, and fuel are not included.</p>
-          </div>
-          <div class="bg-surface border border-border rounded-card p-4">
-            <h3 class="font-bold text-text-primary mb-1">Foreclosure & Prepayment Fees</h3>
-            <p>Unlike floating rate home loans, banks and non-banking financial companies (NBFCs) often levy foreclosure penalties (2%–5% on outstanding balance) for early settlement.</p>
-          </div>
-        </div>
+        <h2 id="car-loan-assumptions" class="text-xl font-bold text-text-primary mb-4">New and used cars: what to include</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Use the amount being financed from the itemised quote. Registration, initial insurance and other purchase costs belong in that amount only if they are being financed. The tool does not add them automatically, and it has no separate trade-in or old-loan payoff field.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">The same payment formula can model a new or used car with equal monthly instalments. It assumes a constant rate, no missed payments and no balloon balance. Budget separately for fuel, maintenance and insurance renewals; check the agreement for any prepayment conditions.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For a repayment breakdown, open the <a href="/loan-amortization-calculator" class="text-accent font-medium hover:underline">loan amortization schedule calculator</a>. <a href="https://www.consumerfinance.gov/consumer-tools/auto-loans/answers/key-terms/" class="text-accent font-medium hover:underline">CFPB’s auto-loan glossary</a> explains why a longer term can increase total interest and leave a borrower owing more than the vehicle is worth.</p>
       </section>
-
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted">
-        <strong class="text-text-primary text-sm block mb-1">Offered a Dealer Flat Interest Rate?</strong>
-        Auto dealerships and NBFCs frequently quote deceptively low flat rates. Read our worked breakdown: <a href="/blog/flat-vs-reducing-interest-rate" class="text-accent font-medium hover:underline">Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR</a> to see how an 8.5% dealer flat loan actually costs more than a 14% bank loan.
-      </div>
 
       <section aria-labelledby="car-loan-calculator-faq">
         <h2 id="car-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {jsonld['@graph'][2].mainEntity.map((faq: any) => (
+          {faqs.map((faq) => (
             <details class="border border-border rounded-card overflow-hidden">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
-              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">
-                {faq.acceptedAnswer.text}
-              </div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
             </details>
           ))}
         </div>

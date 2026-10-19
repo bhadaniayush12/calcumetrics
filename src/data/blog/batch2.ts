@@ -510,6 +510,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
         When securing a long-term loan—whether financing a residential home, expanding a business facility, or purchasing commercial equipment—borrowers face a fundamental strategic dilemma: <strong>Fixed Rate</strong> or <strong>Floating Rate</strong>?
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For a vehicle purchase, enter the quoted rate and your upfront payment in the <a href="/car-loan-calculator" class="text-accent font-medium hover:underline">car loan EMI and interest calculator</a>. You can compare separate rate scenarios; each estimate assumes that rate stays constant for the selected term.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         This choice is not simply a matter of personal risk tolerance. It is a decision that must be aligned with where central banks sit in the monetary policy cycle. Locking in a fixed rate at the bottom of an interest rate cycle protects your family for decades, while locking in a fixed rate at the cyclical peak can force you to pay above-market borrowing costs for years.
       </p>

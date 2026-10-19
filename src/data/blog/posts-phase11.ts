@@ -388,6 +388,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         Whether you are managing a 30-year fixed mortgage internationally or an 8.5% floating home loan in India, the core dilemma is universal: <strong>"I have an extra monthly cash surplus. Should I prepay my mortgage to eliminate debt faster, or should I invest that money into a compounding equity index fund?"</strong>
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Once you have the reducing-balance quote, use the <a href="/car-loan-calculator" class="text-accent font-medium hover:underline">car loan calculator with a down payment</a> to compare monthly payments and total interest on the amount you actually need to borrow.</p>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         One camp champions the mathematical compounding of the stock market, pointing out that long-term equity returns of 10%–12% outpace a 7%–8.5% borrowing cost. The other camp values peace of mind, arguing that eliminating debt provides a guaranteed, risk-free post-tax return while removing the threat of monthly debt obligations.
       </p>
