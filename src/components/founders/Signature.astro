@@ -1,0 +1,31 @@
+---
+interface Props {
+  text: string;
+  class?: string;
+}
+
+const { text, class: className } = Astro.props;
+---
+
+<p class:list={['signature text-2xl sm:text-3xl text-ink -rotate-2 origin-left', className]}>{text}</p>
+
+<style is:global>
+  /* Reenie Beanie (OFL, see /fonts/reenie-beanie/OFL.txt). Bundled only with pages that render a signature. */
+  @font-face {
+    font-family: 'Reenie Beanie';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/reenie-beanie/reenie-beanie-latin-400.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+
+  /* Single line with a unitless line-height and fixed height, so the swap from fallback to Reenie Beanie never shifts layout. */
+  .signature {
+    font-family: 'Reenie Beanie', 'Bradley Hand', 'Segoe Print', cursive;
+    font-weight: 400;
+    line-height: 1.2;
+    height: 1.2em;
+    white-space: nowrap;
+  }
+</style>

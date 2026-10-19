@@ -14,7 +14,7 @@ export const JIO_IPO_POST: BlogPost = {
   seoTitle: 'Jio Platforms IPO: Listing Gains Tax Explained',
   description: 'Check Jio IPO dates, price band and lot size, then calculate listing gains tax, cess and the difference between short-term and long-term gains.',
   category: 'Taxes', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17',
-  readTime: '8 min read', author: 'Calcumetrics Editorial Team', type: 'Trending',
+  readTime: '8 min read', author: 'Dev', type: 'Trending',
   quickAnswer: 'Jio Platforms’ IPO is scheduled for 21–23 October 2026, with a ₹1,065–₹1,119 band and 12-share lot. Eligible listed-equity gains on sales within 12 months attract 20% base tax; after 12 months, 12.5% applies above the shared ₹1.25 lakh annual LTCG exemption. Cess and any surcharge are additional.',
   summary: 'A calculation-led guide to the tax on a possible Jio IPO sale, separating the issue price, hypothetical sale price, taxable gain and cash left after tax.',
   sources: [

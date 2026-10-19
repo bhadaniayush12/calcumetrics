@@ -9,7 +9,7 @@ export const SMALL_SAVINGS_POST: BlogPost = {
   title: 'Small Savings Rates: October–December 2026 (Q3 FY27)',
   seoTitle: 'Small Savings Rates: October–December 2026',
   description: 'See the Oct–Dec 2026 rates for PPF, NSC, SCSS, SSY, KVP, Post Office TD, RD and MIS, with calculator examples and clear compounding assumptions.',
-  category: 'Investments', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Calcumetrics Editorial Team', type: 'Trending',
+  category: 'Investments', market: 'India-Only', publishDate: '2026-10-17', dateModified: '2026-10-17', readTime: '8 min read', author: 'Dev', type: 'Trending',
   quickAnswer: 'Small-savings rates are unchanged for 1 October–31 December 2026 under the 30 September memorandum: PPF 7.1%, NSC 7.7%, SCSS and SSY 8.2%, KVP 7.5%, RD 6.7%, MIS 7.4%, and Post Office time deposits 6.9%–7.5% depending on term. These are annual rates.',
   summary: 'The Q3 FY 2026-27 rate table, a PPF projection and a Post Office RD estimate, with an explanation of payout versus compounding and what a quarterly announcement can establish.',
   sources: [

@@ -29,6 +29,12 @@ describe('Blog posts data integrity', () => {
     }
   });
 
+  it('attributes every post to Dev, the founder shown in the author box', () => {
+    for (const post of BLOG_POSTS) {
+      expect(post.author).toBe('Dev');
+    }
+  });
+
   it('ensures every post links to at least 2 valid published calculators in TOOLS', () => {
     for (const post of BLOG_POSTS) {
       expect(post.relatedCalculators.length).toBeGreaterThanOrEqual(2);

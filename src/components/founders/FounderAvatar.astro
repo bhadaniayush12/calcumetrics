@@ -1,0 +1,17 @@
+---
+import type { Founder } from '../../data/founders';
+
+interface Props {
+  founder: Founder;
+  class?: string;
+}
+
+const { founder, class: className = 'w-14 h-14' } = Astro.props;
+---
+
+<span
+  role="img"
+  aria-label={founder.avatarAlt}
+  class:list={['block shrink-0 overflow-hidden rounded-2xl [&>svg]:block [&>svg]:w-full [&>svg]:h-full', className]}
+  set:html={founder.avatarSvg}
+/>
