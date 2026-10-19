@@ -1253,6 +1253,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Among retail store managers, e-commerce founders, and wholesale distributors, no financial error is more pervasive—or more quietly lethal to cash flow—than conflating <strong>markup</strong> with <strong>gross profit margin</strong>. While both metrics measure the difference between what an item costs and what it sells for, they measure that difference against two fundamentally different baselines.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Payment acceptance costs can change the margin left on a sale. The <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI merchant fee calculator</a> estimates deductions from an entered fee rate and payment mix so you can include them in your pricing assumptions.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         When an entrepreneur mixes them up, they do not merely commit an academic semantic error. They systematically underprice their products, underestimate break-even requirements, and inadvertently bleed working capital on every customer order.
       </p>
@@ -2092,6 +2094,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
       <p class="text-base text-text-muted leading-relaxed mb-6 font-normal">
         One of the most sobering realities in corporate finance is that <strong>profitable companies go bankrupt every single day</strong>. An income statement prepared on an accrual accounting basis can show impressive revenue growth, healthy gross margins, and robust net income—yet the company's bank accounts can be completely empty on payroll morning.
       </p>
+
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For UPI collections, use the <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI MDR and net settlement calculator</a> to estimate the cash received after the fees in your merchant agreement. Compare that amount with gross sales when planning cash availability.</p>
 
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         The culprit is almost always a breakdown in <strong>working capital velocity</strong>. When money is tied up in slow-moving warehouse pallets and unpaid customer invoices while trade vendors demand payment, the business suffocates for lack of liquidity. The definitive tool to measure, manage, and cure this vulnerability is the <strong>Cash Conversion Cycle (CCC)</strong>.
