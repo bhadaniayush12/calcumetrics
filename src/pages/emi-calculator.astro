@@ -47,9 +47,24 @@ const related = TOOLS.filter(
   return 0;
 }).slice(0, 4);
 
+const personalExample = { principal: 500000, rate: 12, years: 3 };
+const personalResult = calcEMI(personalExample.principal, personalExample.rate, personalExample.years);
+const personalTenures = [2, 3, 5].map((years) => ({
+  years, ...calcEMI(personalExample.principal, personalExample.rate, years),
+}));
+
 const canonicalUrl = 'https://calcumetrics.com/emi-calculator';
-const pageTitle = 'EMI Calculator: Home, Car & Personal Loan EMI | Calcumetrics';
-const pageDesc = 'Free loan emi calculator. Calculate emi, total interest payable, and monthly amortization schedule with interactive sliders and repayment charts.';
+const pageTitle = 'EMI Calculator: Monthly Payments & Total Interest';
+const pageDesc = 'Calculate loan EMI, total interest and repayment totals. Compare tenures, see a personal loan example and follow the year-by-year amortization schedule.';
+
+const faqs = [
+  { question: "What does EMI mean?", answer: "EMI means Equated Monthly Instalment. It is a regular payment that repays part of the principal and the interest due on a loan. This calculator models equal monthly payments with a constant interest rate." },
+  { question: "How is EMI calculated?", answer: "EMI = P × r × (1+r)^n / ((1+r)^n − 1), where P is the loan principal, r is the annual percentage interest rate divided by 1200 and n is the number of monthly payments. Total interest is the sum of the unrounded payments minus the principal." },
+  { question: "Does increasing the tenure reduce EMI?", answer: tenureFaqAnswer },
+  { question: "How does prepayment affect EMI or loan tenure?", answer: "A payment applied to principal reduces the balance on which future interest is calculated. Depending on the lender’s terms, it can shorten the term or reduce the instalment. Use the prepayment calculator for that comparison and check any charges in the loan agreement." },
+  { question: "Are processing fees included in EMI?", answer: "This calculation includes principal and interest only. Charges paid separately do not appear in the result. RBI’s Key Facts Statement includes APR and an amortization schedule, so compare those disclosures with the estimate before accepting a loan." },
+  { question: "What is the difference between flat rate and reducing balance?", answer: "Flat-rate interest is calculated on the original loan amount throughout the term. Reducing-balance interest is calculated on the outstanding principal as repayments reduce it. This EMI calculator uses the reducing-balance method, so a flat-rate quote cannot be entered as though it were the same rate." }
+];
 
 const jsonld = {
   '@context': 'https://schema.org',
@@ -65,7 +80,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en-IN',
-      dateModified: '2026-09-24',
+      dateModified: '2026-10-19',
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -87,56 +102,10 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'What is EMI and how is it calculated in India?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'An Equated Monthly Instalment (EMI) is a fixed payment amount made by a borrower to a lender at a specified date each month. It is computed using the formula: EMI = P × r × (1 + r)^n / ((1 + r)^n − 1), where P is principal, r is the monthly interest rate, and n is total months.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Does a longer tenure reduce my total loan cost?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: tenureFaqAnswer,
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How can loan prepayments reduce my interest burden?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Every partial prepayment directly reduces your outstanding loan principal balance. Since daily interest is calculated on outstanding principal, prepayments either shorten your remaining tenure or lower your monthly EMI.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What is the difference between fixed and floating rate loans?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'A fixed-rate loan maintains an unchanging interest rate throughout the loan period. A floating-rate loan is benchmarked to the RBI Repo Rate (RLLR or MCLR) and fluctuates as central bank monetary policy changes.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Are there prepayment penalties on home loans in India?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Per RBI guidelines, banks and Housing Finance Companies (HFCs) cannot charge prepayment or foreclosure penalties on floating-rate home loans availed by individual borrowers.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'What should my ideal Debt-to-Income (DTI) ratio be?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Financial planners recommend keeping total monthly EMI commitments under 40% to 50% of your net monthly take-home salary to ensure adequate room for living expenses, emergency reserves, and long-term investments.',
-          },
-        },
-      ],
+      mainEntity: faqs.map(({ question, answer }) => ({
+        '@type': 'Question', name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
     },
   ],
 };
@@ -415,6 +384,7 @@ const jsonld = {
 
     <!-- ── BELOW THE FOLD (SEO DEPTH) ─────────────────────────────────────────── -->
     <Fragment slot="below">
+      <p class="text-sm text-text-muted leading-relaxed mb-4">An EMI calculator estimates the fixed monthly payment needed to repay a loan from its amount, annual interest rate and term. Each payment covers interest and part of the principal, while the result also shows total interest and total repayments. The estimate assumes a constant reducing-balance rate and excludes separately paid fees.</p>
 
       <!-- 1. Featured Snippet Direct Answer Box -->
       <div class="p-5 bg-surface border-l-4 border-accent rounded-r-card mb-8 shadow-sm">
@@ -428,7 +398,7 @@ const jsonld = {
       <section aria-labelledby="emi-how" class="mb-10">
         <h2 id="emi-how" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How the EMI calculation works</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          An Equated Monthly Instalment (EMI) represents a fixed monthly payment covering both accrued interest and a portion of the original borrowed principal. Loans in India follow the reducing balance method, where interest is charged only on the outstanding balance at the end of each month.
+          An Equated Monthly Instalment (EMI) represents a fixed monthly payment covering both accrued interest and a portion of the original borrowed principal. This calculator uses monthly reducing-balance interest on the opening outstanding balance before each payment. Actual lender schedules can differ because of payment dates, rate resets and rounding.
         </p>
 
         <!-- Formula block -->
@@ -449,7 +419,7 @@ const jsonld = {
       <section aria-labelledby="emi-worked-example" class="mb-10">
         <h2 id="emi-worked-example" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">Step-by-step worked example</h2>
         <p class="text-sm text-text-muted mb-4">
-          Here is how a {principalExact} home loan at {DEFAULT.rate}% p.a. for {DEFAULT.years} years is mathematically computed:
+          Illustration: a {principalExact} loan at an assumed {DEFAULT.rate}% p.a. for {DEFAULT.years} years. This is an example rate, not a current lender offer:
         </p>
         <div class="space-y-3 bg-surface border border-border rounded-card p-5 text-xs text-text-muted">
           <div class="flex items-start gap-2">
@@ -476,22 +446,20 @@ const jsonld = {
       </section>
 
       <!-- 4. How to use -->
-      <section aria-labelledby="emi-guide" class="mb-10">
-        <h2 id="emi-guide" class="text-xl sm:text-2xl font-bold text-text-primary mb-3">How to plan your loan borrowing</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { step: '1', title: 'Input Loan Principal', desc: 'Enter the sanctioned or required loan amount after deducting your personal down payment.' },
-            { step: '2', title: 'Check Bank Interest', desc: 'Use current repo-linked benchmark rates (e.g. 8.4%–9.0% for home loans, 9%–11% for car loans).' },
-            { step: '3', title: 'Optimize Loan Tenure', desc: 'Shorter tenures increase EMI but dramatically decrease total cumulative interest.' },
-            { step: '4', title: 'Simulate Prepayments', desc: 'Check our prepayment calculator to see how annual partial payments slash your tenure.' },
-          ].map((item) => (
-            <div class="p-4 bg-surface border border-border rounded-card">
-              <span class="w-6 h-6 rounded-full bg-accent/10 text-accent font-bold text-xs flex items-center justify-center mb-2">{item.step}</span>
-              <h3 class="font-bold text-sm text-text-primary mb-1">{item.title}</h3>
-              <p class="text-xs text-text-muted leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
-        </div>
+      <section aria-labelledby="emi-personal-example">
+        <h2 id="emi-personal-example" class="text-xl font-bold text-text-primary mb-4">Personal loan EMI for 5 lakh: compare repayment terms</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For an illustrative {fmt(personalExample.principal)} loan at {personalExample.rate}% a year over {personalExample.years} years, the monthly EMI is {fmt(personalResult.emiRounded)} and total interest is {fmt(personalResult.totalInterest)}. The table changes only the tenure; the rate is an assumption, not a bank quote.</p>
+        <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Same illustrative principal and rate; rounded to whole rupees</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Tenure</th><th scope="col" class="text-left py-2.5 px-3">Monthly EMI</th><th scope="col" class="text-left py-2.5 px-3">Total interest</th><th scope="col" class="text-left py-2.5 px-3">Total repayments</th></tr></thead>
+          <tbody>{personalTenures.map((row) => (<tr class="border-b border-border/50"><td class="py-2.5 px-3 text-text-primary">{row.years} years</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.emiRounded)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.totalInterest)}</td><td class="py-2.5 px-3 text-text-primary">{fmt(row.totalPayment)}</td></tr>))}</tbody>
+        </table></div>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">A longer term spreads repayments across more months but leaves interest running for longer. Totals use the unrounded EMI, so multiplying the rounded displayed payment may produce a small difference.</p>
+      </section>
+
+      <section aria-labelledby="emi-guide">
+        <h2 id="emi-guide" class="text-xl font-bold text-text-primary mb-4">Use your loan quote to choose the inputs</h2>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">Enter the amount actually being financed and the contractual reducing-balance interest rate. Choose the proposed repayment term, then compare the instalment with the monthly amount you can set aside after other commitments.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For eligible retail term loans, <a href="https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12663&Mode=0" class="text-accent font-medium hover:underline">RBI’s Key Facts Statement requirements</a> provide an APR calculation and amortization schedule. APR includes loan charges as well as interest; do not substitute it for the contractual rate and expect the same EMI.</p>
+        <p class="text-sm text-text-muted leading-relaxed mb-4">For an existing loan, the <a href="/loan-prepayment-calculator" class="text-accent font-medium hover:underline">loan prepayment calculator</a> compares reducing the EMI with reducing the term. The <a href="/blog/flat-vs-reducing-interest-rate" class="text-accent font-medium hover:underline">flat versus reducing interest rate guide</a> explains why the two rate quotes cannot be compared directly.</p>
       </section>
 
       <!-- 5. Year-by-year Amortization -->
@@ -531,42 +499,13 @@ const jsonld = {
       </section>
 
       <!-- 6. Real FAQs -->
-      <section aria-labelledby="emi-faq" class="mb-10">
-        <h2 id="emi-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <section aria-labelledby="emi-faq">
+        <h2 id="emi-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            {
-              q: 'What is EMI and how is it calculated in India?',
-              a: 'An Equated Monthly Instalment (EMI) is a fixed payment amount made by a borrower to a lender at a specified date each month. It is computed using the formula: EMI = P × r × (1 + r)^n / ((1 + r)^n − 1), where P is principal, r is the monthly interest rate, and n is total months.',
-            },
-            {
-              q: 'Does a longer tenure reduce my total loan cost?',
-              a: tenureFaqAnswer,
-            },
-            {
-              q: 'How can loan prepayments reduce my interest burden?',
-              a: 'Every partial prepayment directly reduces your outstanding loan principal balance. Since daily interest is calculated on outstanding principal, prepayments either shorten your remaining tenure or lower your monthly EMI.',
-            },
-            {
-              q: 'What is the difference between fixed and floating rate loans?',
-              a: 'A fixed-rate loan maintains an unchanging interest rate throughout the loan period. A floating-rate loan is benchmarked to the RBI Repo Rate (RLLR or MCLR) and fluctuates as central bank monetary policy changes.',
-            },
-            {
-              q: 'Are there prepayment penalties on home loans in India?',
-              a: 'Per RBI guidelines, banks and Housing Finance Companies (HFCs) cannot charge prepayment or foreclosure penalties on floating-rate home loans availed by individual borrowers.',
-            },
-            {
-              q: 'What should my ideal Debt-to-Income (DTI) ratio be?',
-              a: 'Financial planners recommend keeping total monthly EMI commitments under 40% to 50% of your net monthly take-home salary to ensure adequate room for living expenses, emergency reserves, and long-term investments.',
-            },
-          ].map((item) => (
-            <details class="border border-border rounded-card overflow-hidden bg-surface">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-                {item.q}
-              </summary>
-              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
-                {item.a}
-              </div>
+          {faqs.map((faq) => (
+            <details class="border border-border rounded-card overflow-hidden">
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
             </details>
           ))}
         </div>

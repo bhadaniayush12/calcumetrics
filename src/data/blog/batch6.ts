@@ -362,6 +362,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
         When your bank notifies you of an interest rate hike on your floating home loan, you face a critical financial fork: should you increase your monthly EMI or extend your repayment tenure? While extending your loan tenure seems painless because your current bank outflow does not change, it costs significantly more in compounding interest. On a ₹50 lakh home loan over 20 years experiencing a 25 basis point hike from 8.50% to 8.75%, opting to increase your monthly EMI by ₹794 saves approximately ₹3,48,885 in lifetime interest compared to extending the loan term.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Use the <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI calculator to compare repayment terms</a> with the same outstanding principal and new rate. Record both the monthly payment and total interest for each term before comparing the options.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         Most borrowers choose tenure extension simply because it represents the path of least resistance. In fact, many borrowers do not even realize their repayment horizon has been pushed back until they review their annual loan statement. Understanding the compounding mechanics that govern this decision is essential for anyone holding long-term amortizing debt.
       </p>

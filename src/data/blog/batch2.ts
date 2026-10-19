@@ -307,6 +307,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
         Borrowers who take out a 20-year or 30-year mortgage routinely experience a rude awakening when reviewing their first annual mortgage statement: <em>"I paid $24,000 in mortgage payments this year, but my principal balance only dropped by $4,800. Where did the other $19,200 go?"</em>
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Enter your own amount, rate and term in the <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI calculator with a year-by-year repayment schedule</a> to see how the interest and principal portions change as the balance falls.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         There is no fraud or accounting trickery at play. This outcome is the direct mathematical result of <strong>loan amortization</strong>—the standard actuarial formula used by commercial banks worldwide to structure fixed-rate debt.
       </p>
