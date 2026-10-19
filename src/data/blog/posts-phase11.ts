@@ -103,6 +103,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Log into any investment brokerage account, portfolio tracker, or mutual fund dashboard, and you will encounter an alphabet soup of return metrics: <strong>Absolute Return</strong>, <strong>CAGR</strong>, and <strong>XIRR</strong>. Investors routinely run into this exact paradox: <em>"My portfolio dashboard reports an absolute gain of 38%, but my XIRR is 19.4%, and when I try to compute CAGR it gives an error. Which number actually measures my investment performance?"</em>
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Start with the <a href="/compound-interest-calculator" class="text-accent font-medium hover:underline">compound interest calculator for nominal growth</a> to estimate the balance before adjusting for inflation. Its result assumes interest remains invested and excludes taxes and fees.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         Choosing the wrong metric does not just create confusion—it distorts financial decisions. Comparing an SIP fund's XIRR to an FD's flat interest rate or a benchmark index's point-to-point CAGR compares apples to oranges. Understanding the mathematical mechanics of time-weighted vs. money-weighted returns is essential for evaluating your portfolio's true growth.
       </p>
