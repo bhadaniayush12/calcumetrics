@@ -915,6 +915,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
         When the Goods and Services Tax (GST) was introduced in India in 2017, its primary architectural promise was the complete elimination of the "tax-on-tax" cascading effect. The mechanism that makes this possible is <strong>Input Tax Credit (ITC)</strong>.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">Before reconciling credits, use the <a href="/in/gst-calculator" class="text-accent font-medium hover:underline">GST calculator for inclusive and exclusive invoice amounts</a> to check the base and tax at the invoice’s rate. That arithmetic check does not determine whether a purchase is eligible for ITC.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         For businesses, freelancers, and commercial enterprises, mastering ITC is not just an accounting technicality—it directly dictates cash flow and gross operating margins. Incorrectly passing up eligible ITC needlessly inflates operating expenses, while claiming ineligible or blocked ITC triggers steep 18% penal interest demands from the tax authorities.
       </p>

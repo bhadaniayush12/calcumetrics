@@ -1120,6 +1120,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
         UPI payments made from a bank account carry zero MDR, whatever the amount; a merchant charge applies only to payments above ₹2,000 made through a PPI wallet or a RuPay credit card on UPI, and consumers continue to pay zero fees. If you operate an enterprise or retail business, customers paying via UPI for high-ticket purchases will not bear the cost; instead, the merchant absorbs the MDR fee. On a ₹10,000 merchant sale, an illustrative MDR rate of 0.4% incurs a ₹40 merchant charge plus 18% GST (₹7.20), totaling ₹47.20 in payment processing costs.
       </p>
 
+      <p class="text-sm text-text-muted leading-relaxed mb-4">For a fee quoted before or after tax, the <a href="/in/gst-calculator" class="text-accent font-medium hover:underline">GST calculator to add or remove tax from a fee</a> helps check the invoice arithmetic. Use the fee as the amount when the provider is charging GST on its processing service.</p>
+
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         As digital payments account for an ever-increasing percentage of India’s commercial transaction volume, managing payment acquisition costs has transformed into a core operational discipline. For retailers, online direct-to-consumer (D2C) brands, and services businesses, understanding the mechanics of payment aggregator deductions, tax credits, and settlement timing is vital for preserving operating margins.
       </p>
