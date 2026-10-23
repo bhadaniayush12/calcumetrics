@@ -6,8 +6,8 @@ describe('Blog posts data integrity', () => {
   const publishedTools = getPublishedTools();
   const validToolPaths = new Set(publishedTools.map((t) => t.path));
 
-  it('contains exactly 50 evidenced blog posts', () => {
-    expect(BLOG_POSTS.length).toBe(50);
+  it('contains exactly 51 evidenced blog posts', () => {
+    expect(BLOG_POSTS.length).toBe(51);
   });
 
   it('ensures every post has unique slugs and required metadata', () => {
@@ -77,7 +77,7 @@ describe('Blog posts data integrity', () => {
       expect(['Global', 'India-Only', 'Both']).toContain(post.market);
       counts[post.market]++;
     }
-    expect(counts['Global']).toBe(21);
+    expect(counts['Global']).toBe(22);
     expect(counts['India-Only']).toBe(20);
     expect(counts['Both']).toBe(9);
   });

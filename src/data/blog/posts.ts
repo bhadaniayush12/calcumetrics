@@ -28,6 +28,7 @@ import { WDV_DEPRECIATION_NUMERICAL_POST } from './wdv-depreciation-numerical-wi
 import { DSCR_BANK_LOAN_EXAMPLE_POST } from './dscr-calculation-bank-loan-example';
 import { BREAK_EVEN_SOLVED_EXAMPLE_POST } from './break-even-point-solved-example-class-12';
 import { ADVANCE_TAX_EXAMPLE_POST } from './advance-tax-due-dates-calculation-example';
+import { EOQ_CARRYING_COST_EXAMPLE_POST } from './eoq-carrying-cost-percentage-solved-example';
 
 export const BLOG_POSTS: BlogPost[] = [
   SECTION_87A_MARGINAL_RELIEF_POST,
@@ -35,6 +36,7 @@ export const BLOG_POSTS: BlogPost[] = [
   DSCR_BANK_LOAN_EXAMPLE_POST,
   BREAK_EVEN_SOLVED_EXAMPLE_POST,
   ADVANCE_TAX_EXAMPLE_POST,
+  EOQ_CARRYING_COST_EXAMPLE_POST,
   DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   RBI_FD_NEWS_POST,
