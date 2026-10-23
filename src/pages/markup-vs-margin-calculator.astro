@@ -394,7 +394,7 @@ const jsonld = {
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions & Pricing Limitations</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-            <li><strong>Pre-Tax Transaction Modeling:</strong> Computations model unit direct cost and net price excluding sales tax, value-added tax (VAT), or Goods and Services Tax (GST). Taxes collected from customers must not be counted as markup or margin.</li>
+            <li data-currency-lock="INR"><strong>Pre-Tax Transaction Modeling:</strong> Computations model unit direct cost and net price excluding sales tax, value-added tax (VAT), or Goods and Services Tax (GST). Taxes collected from customers must not be counted as markup or margin.</li>
             <li><strong>Exclusion of Indirect Operating Overheads:</strong> Gross margin only accounts for direct cost of goods sold (COGS). Total enterprise profitability requires subtracting all sales, general, and administrative (SG&A) overhead.</li>
             <li><strong>Zero Price Elasticity Consideration:</strong> This calculator converts between mathematical rates; it does not predict whether consumer demand will soften at higher recommended selling prices.</li>
             <li><strong>Inventory Holding Cost & Shrinkage:</strong> Realized gross margins are typically 2% to 5% lower than initial target margins due to clearance markdowns, customer returns, breakage, and warehouse spoilage.</li>
@@ -425,7 +425,7 @@ const jsonld = {
         <h2 id="mvm-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
               <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>

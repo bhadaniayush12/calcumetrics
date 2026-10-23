@@ -350,7 +350,7 @@ const jsonld = {
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Analytical Limitations</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
             <li><strong>Two-Point Average Distortion:</strong> Using only beginning and ending balances can skew ratios if a business experiences seasonal peaks (e.g., Diwali or holiday stocking) or intentionally dumps stock prior to fiscal year-end. Monthly 12-point averages provide superior accuracy.</li>
-            <li><strong>Inventory Valuation Rule (FIFO vs. Weighted Average):</strong> Under inflation, FIFO produces a higher ending inventory and slightly lower turnover ratio than Weighted Average costing. (LIFO is prohibited under IFRS and Indian AS 2).</li>
+            <li data-currency-lock="INR"><strong>Inventory Valuation Rule (FIFO vs. Weighted Average):</strong> Under inflation, FIFO produces a higher ending inventory and slightly lower turnover ratio than Weighted Average costing. (LIFO is prohibited under IFRS and Indian AS 2).</li>
             <li><strong>Product-Mix Aggregation:</strong> Blended turnover can mask critical operational imbalances where top-selling items turn 30 times a year while obsolete SKUs linger on shelves for 400 days without moving.</li>
           </ul>
         </div>
@@ -377,7 +377,7 @@ const jsonld = {
 
       <section aria-labelledby="it-calculator-related">
         <h2 id="it-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
       </section>
     </Fragment>
   </CalculatorLayout>

@@ -401,7 +401,7 @@ const jsonld = {
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">Banking Norms &amp; Underwriting Covenants</h3>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Reserve Bank of India (RBI) Credit Norms:</strong> Under traditional Tandon Committee and Chore Committee guidelines for working capital financing (MPBF), banks mandate a minimum Current Ratio of <strong>1.33x</strong>. A ratio below 1.33x triggers credit freezes or punitive interest penalties.</li>
+              <li data-currency-lock="INR"><strong>Reserve Bank of India (RBI) Credit Norms:</strong> Under traditional Tandon Committee and Chore Committee guidelines for working capital financing (MPBF), banks mandate a minimum Current Ratio of <strong>1.33x</strong>. A ratio below 1.33x triggers credit freezes or punitive interest penalties.</li>
               <li><strong>Commercial Debt Covenants:</strong> Institutional corporate lenders require maintenance of a minimum 1.0x Quick Ratio and 1.25x Current Ratio to prevent technical loan default.</li>
               <li><strong>Rating Agency Thresholds:</strong> Moody's, S&amp;P, and CRISIL penalize companies whose cash ratios fall below 0.15x during cyclical industry downturns.</li>
             </ul>
@@ -450,7 +450,7 @@ const jsonld = {
 
       <section aria-labelledby="lr-calculator-related">
         <h2 id="lr-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">{related.map((tool) => (<a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent"><span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span><h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3><p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p></a>))}</div>
       </section>
     </Fragment>
   </CalculatorLayout>

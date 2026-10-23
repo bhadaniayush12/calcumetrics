@@ -317,13 +317,13 @@ const jsonld = {
       <section aria-labelledby="home-loan-calculator-assumptions">
         <h2 id="home-loan-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
         <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
-          <li>
+          <li data-currency-lock="INR">
             <strong class="text-text-primary">Fixed Interest Rate Assumption:</strong> Models a steady 8.5% annual rate. Most consumer home loans operate on floating rates pegged to benchmark external rates (e.g. RBI repo rate via EBLR in India, or SOFR in the US); adjustments will alter future EMI amounts or tenure.
           </li>
           <li>
             <strong class="text-text-primary">Incidental Costs Excluded:</strong> Calculation covers loan principal and interest only. It does not include stamp duty (typically 5%–7%), registration fees, bank processing fees, mortgage insurance, or property taxes.
           </li>
-          <li>
+          <li data-currency-lock="INR">
             <strong class="text-text-primary">Tax Relief Caveats:</strong> Tax benefits under Section 24(b) (up to ₹2 lakh interest deduction) and Section 80C (up to ₹1.5 lakh principal deduction) apply under India's Old Tax Regime for self-occupied properties and are subject to statutory eligibility rules.
           </li>
         </ul>
@@ -340,7 +340,7 @@ const jsonld = {
         </div>
       </div>
 
-      <section aria-labelledby="home-loan-calculator-faq">
+      <section data-currency-lock="INR" aria-labelledby="home-loan-calculator-faq">
         <h2 id="home-loan-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           {jsonld['@graph'][2].mainEntity.map((faq: any) => (
@@ -358,7 +358,7 @@ const jsonld = {
         <h2 id="home-loan-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
               <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>

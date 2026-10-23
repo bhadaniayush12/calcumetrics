@@ -370,7 +370,7 @@ const jsonld = {
       </div>
 
       <!-- Tax & TDS Notice Box -->
-      <div class="p-3 rounded-control bg-dark-border/40 border border-dark-border text-xs text-dark-text mb-4 space-y-1">
+      <div data-currency-lock="INR" class="p-3 rounded-control bg-dark-border/40 border border-dark-border text-xs text-dark-text mb-4 space-y-1">
         <p class="leading-relaxed">
           TDS under Section 194A applies if annual interest exceeds <strong>₹50,000</strong> (₹1,00,000 for senior citizens).
         </p>
@@ -473,7 +473,7 @@ const jsonld = {
       </section>
 
       <!-- 4. Real FAQs -->
-      <section aria-labelledby="fd-faq" class="mb-10">
+      <section data-currency-lock="INR" aria-labelledby="fd-faq" class="mb-10">
         <h2 id="fd-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           {[
@@ -520,7 +520,8 @@ const jsonld = {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
             <a
-              href={tool.path}
+              data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
+            href={tool.path}
               class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
             >
               <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
