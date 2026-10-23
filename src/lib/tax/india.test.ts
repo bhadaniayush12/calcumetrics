@@ -231,7 +231,7 @@ describe('calcCapitalGains holding-period boundaries', () => {
 });
 
 describe('calcAdvanceTax', () => {
-  it('returns required=false when liability ≤ 10000', () => {
+  it('returns required=false when liability < 10000', () => {
     const res = calcAdvanceTax(8000);
     expect(res.required).toBe(false);
   });
@@ -240,6 +240,11 @@ describe('calcAdvanceTax', () => {
     const res = calcAdvanceTax(50000);
     expect(res.required).toBe(true);
   });
+
+  it.each([[9999, false], [10000, true], [10001, true]] as const)(
+    'liability of %i gives required=%s (₹10,000 or more is liable)', (liability, required) => {
+      expect(calcAdvanceTax(liability).required).toBe(required);
+    });
 
   it('instalment schedule sums to 100% of liability', () => {
     const res = calcAdvanceTax(100000);
