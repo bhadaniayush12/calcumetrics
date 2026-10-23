@@ -23,7 +23,10 @@ import { IPO_WEEK_NEWS_POST } from './ipo-oct-nov-2026-lot-size-money-needed-tax
 
 import { ITR_AUDIT_NEWS_POST } from './itr-due-date-21-november-2026-late-fee-interest';
 
+import { DHANTERAS_NEWS_POST } from './dhanteras-2026-gold-vs-sip';
+
 export const BLOG_POSTS: BlogPost[] = [
+  DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   IPO_WEEK_NEWS_POST,
   RBI_FD_NEWS_POST,
