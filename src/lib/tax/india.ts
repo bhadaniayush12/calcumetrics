@@ -495,8 +495,9 @@ export function calcCapitalGains(
 // ── Advance Tax ───────────────────────────────────────────────────────────────
 
 /**
- * Advance tax instalment schedule (Section 208 of IT Act 1961).
- * Applicable when estimated tax liability > ₹10,000.
+ * Advance tax instalment schedule (section 404/408 of the Income-tax Act, 2025;
+ * sections 208/211 of the 1961 Act for FY 2025-26 and earlier).
+ * Applicable when estimated tax liability is ₹10,000 or more.
  *
  * Instalments (for non-corporate taxpayers):
  *   15 June   — 15%
@@ -504,13 +505,13 @@ export function calcCapitalGains(
  *   15 Dec    — 75% (cumulative)
  *   15 March  — 100% (cumulative)
  *
- * Source: Section 208, 209, 211 Income Tax Act 1961.
- * Rates last verified: September 2026.
+ * Source: sections 404, 405, 408 Income-tax Act 2025 (sections 208, 209, 211 of the 1961 Act).
+ * Rates last verified: October 2026.
  */
 export interface AdvanceTaxResult {
   /** Estimated annual tax liability (₹). */
   annualTaxLiability: number;
-  /** Whether advance tax is required (liability > ₹10,000). */
+  /** Whether advance tax is required (liability ₹10,000 or more). */
   required: boolean;
   /** Instalment schedule. */
   instalments: Array<{
@@ -528,7 +529,7 @@ export interface AdvanceTaxResult {
  *                             Does not include cess (caller should include cess in this figure).
  */
 export function calcAdvanceTax(annualTaxLiability: number): AdvanceTaxResult {
-  const required = annualTaxLiability > 10000;
+  const required = annualTaxLiability >= 10000;
 
   const schedule = [
     { dueDate: '15 June',    cumulativePct: 15 },

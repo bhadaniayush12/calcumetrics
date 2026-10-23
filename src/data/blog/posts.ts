@@ -23,7 +23,22 @@ import { ITR_AUDIT_NEWS_POST } from './itr-due-date-21-november-2026-late-fee-in
 
 import { DHANTERAS_NEWS_POST } from './dhanteras-2026-gold-vs-sip';
 
+import { SECTION_87A_MARGINAL_RELIEF_POST } from './section-87a-marginal-relief-new-regime-example';
+import { WDV_DEPRECIATION_NUMERICAL_POST } from './wdv-depreciation-numerical-with-solution';
+import { DSCR_BANK_LOAN_EXAMPLE_POST } from './dscr-calculation-bank-loan-example';
+import { BREAK_EVEN_SOLVED_EXAMPLE_POST } from './break-even-point-solved-example-class-12';
+import { ADVANCE_TAX_EXAMPLE_POST } from './advance-tax-due-dates-calculation-example';
+import { EOQ_CARRYING_COST_EXAMPLE_POST } from './eoq-carrying-cost-percentage-solved-example';
+import { HRA_LEAST_OF_THREE_POST } from './hra-exemption-least-of-three-solved-example';
+
 export const BLOG_POSTS: BlogPost[] = [
+  SECTION_87A_MARGINAL_RELIEF_POST,
+  WDV_DEPRECIATION_NUMERICAL_POST,
+  DSCR_BANK_LOAN_EXAMPLE_POST,
+  BREAK_EVEN_SOLVED_EXAMPLE_POST,
+  ADVANCE_TAX_EXAMPLE_POST,
+  EOQ_CARRYING_COST_EXAMPLE_POST,
+  HRA_LEAST_OF_THREE_POST,
   DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   RBI_FD_NEWS_POST,
