@@ -27,12 +27,14 @@ import { SECTION_87A_MARGINAL_RELIEF_POST } from './section-87a-marginal-relief-
 import { WDV_DEPRECIATION_NUMERICAL_POST } from './wdv-depreciation-numerical-with-solution';
 import { DSCR_BANK_LOAN_EXAMPLE_POST } from './dscr-calculation-bank-loan-example';
 import { BREAK_EVEN_SOLVED_EXAMPLE_POST } from './break-even-point-solved-example-class-12';
+import { ADVANCE_TAX_EXAMPLE_POST } from './advance-tax-due-dates-calculation-example';
 
 export const BLOG_POSTS: BlogPost[] = [
   SECTION_87A_MARGINAL_RELIEF_POST,
   WDV_DEPRECIATION_NUMERICAL_POST,
   DSCR_BANK_LOAN_EXAMPLE_POST,
   BREAK_EVEN_SOLVED_EXAMPLE_POST,
+  ADVANCE_TAX_EXAMPLE_POST,
   DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   RBI_FD_NEWS_POST,
