@@ -1,6 +1,6 @@
 # October–November 2026 news content audit
 
-Checked: 23 October 2026. Branch: `content/news-oct-nov-2026`, created from local `main` at `34253fb`. Updated per review: remove the incomplete issue roundup, compare equal investment budgets, rebase onto GitHub main and push the branch only. No merge or deployment is authorised. Existing untracked `audit-reports/` and `scratch/` material was left untouched; only this report and the requested Fed draft are staged from those directories.
+Checked: 23 October 2026. Branch: `content/news-oct-nov-2026`, originally created from local `main` at `34253fb`, now rebased onto fetched `origin/main` at `5568dcb` (PR #8). Updated per review: remove the incomplete issue roundup, compare equal investment budgets, rebase onto GitHub main and deliver with `git push -u origin content/news-oct-nov-2026` only. No merge or deployment is authorised. Existing untracked `audit-reports/` and `scratch/` material was left untouched; only this report and the requested Fed draft are staged from those directories.
 
 ## Delivery status
 
@@ -12,7 +12,10 @@ The source rule is applied to factual claims. User-specified example amounts, ex
 
 ## Verification
 
-- Final build and test results: pending verification after the requested rebase.
+- `npm run build`: PASS, zero errors; 121 pages built. Build-time metadata check passed.
+- `npm test`: PASS, 44 test files and 1,105 tests, including all-post Dev authorship and two focused equal-budget/timing regression checks.
+- Rebase: PASS; `origin/main` at `5568dcb` is an ancestor of this branch. PR #8’s founders/author changes are preserved without conflicts. All 45 registered blog posts retain author Dev.
+- Removal audit: PASS; the removed roundup has no remaining file, link, import, registry entry, sitemap entry or OpenGraph image in `src`, `public` or rebuilt `dist`. The new post count is 45, including the three retained news articles.
 - Rendered-output audit: PASS for all three articles. Parsed JSON-LD includes Article, FAQPage with four entries and BreadcrumbList; Article author is Dev. All three URLs appear in the built blog index and `sitemap-pages.xml`. Related calculators and posts are present in rendered HTML. Each title and SEO title is at most 60 characters, each description at most 155 characters, and each article has three to five calculators and one to two related posts.
 - Word counts below count rendered HTML text with tags removed and whitespace split. “Body” includes table text and the last-updated line. “Article” adds the direct answer and FAQ questions/answers, excluding shared navigation, author box, sources and related-link cards. Both counts meet the requested range.
 - Calculations are imported directly from the same engine modules used by the calculators; no copied finance formula or manually computed result is embedded in article prose.
@@ -30,7 +33,7 @@ The source rule is applied to factual claims. User-specified example amounts, ex
 
 URL: [https://calcumetrics.com/blog/rbi-repo-rate-5-50-fd-returns-october-2026](https://calcumetrics.com/blog/rbi-repo-rate-5-50-fd-returns-october-2026)
 
-Words: **982 body / 1125 article**. Title: 52 characters. Meta description: 142 characters. Local commit: `f5cf56e`.
+Words: **982 body / 1125 article**. Title: 52 characters. Meta description: 142 characters. Rebased article commit: `fb1217f`.
 
 Sources opened and linked:
 
@@ -72,7 +75,7 @@ Rendered numerical token inventory (repeated tokens deduplicated; trailing punct
 
 URL: [https://calcumetrics.com/blog/itr-due-date-21-november-2026-late-fee-interest](https://calcumetrics.com/blog/itr-due-date-21-november-2026-late-fee-interest)
 
-Words: **977 body / 1134 article**. Title: 58 characters. Meta description: 151 characters. Local commit: `580bf50`.
+Words: **977 body / 1134 article**. Title: 58 characters. Meta description: 151 characters. Rebased article commit: `42e39b6`.
 
 Sources opened and linked:
 
@@ -106,7 +109,7 @@ Rendered numerical token inventory (repeated tokens deduplicated; trailing punct
 
 URL: [https://calcumetrics.com/blog/dhanteras-2026-gold-vs-sip](https://calcumetrics.com/blog/dhanteras-2026-gold-vs-sip)
 
-Words: pending recount after correction. Title: 56 characters. Meta description: 148 characters. Local commit: `1db5323`.
+Words: **1097 body / 1261 article**. Title: 56 characters. Meta description: 148 characters. Rebased article commit: `38aa1da`; budget correction: `994ab8c`.
 
 Sources opened and linked:
 
@@ -130,7 +133,7 @@ Numerical provenance:
 - **Hypothetical inputs:** **₹50,000** for both options and a **5-year** endpoint; the SIP spreads that exact budget over **12** beginning-of-month contributions, then remains invested for **4** further years with no new contributions. **₹4,167/month** is rounded for display only; the engine receives **50000 / 12**, approximately **₹4,166.67**, without rounding each contribution. **0%, 5%, 10%** are assumed nominal annual rates with monthly compounding for both options. They are not forecasts or historical/product-return claims.
 - **Outputs:** `calcSIP(50000 / 12, rate, 1).invested` confirms exactly **₹50,000** contributed. Its first-year maturity is carried through `calcLumpSum(firstYear.maturity, rate, 4, 'monthly')`. The immediate lump sum is `calcLumpSum(50000, rate, 5, 'monthly')`. `calcCAGR(50000, lump.maturity, 5)` gives effective lump-sum CAGRs of **0.00%, 5.12%, 10.47%**, rounded for display; this is not a SIP cash-flow return. SEBI supports the risk discussion, not the hypothetical rates.
 
-| Assumed rate | Lump-sum maturity | SIP maturity | Lump-sum CAGR |
+| Assumed nominal rate | Lump-sum maturity at 5 years | SIP maturity at 5 years | Lump-sum effective CAGR |
 | --- | --- | --- | --- |
 | 0% | ₹50,000 | ₹50,000 | 0.00% |
 | 5% | ₹64,168 | ₹62,724 | 5.12% |
@@ -138,9 +141,16 @@ Numerical provenance:
 
 Rendered numerical token inventory (repeated tokens deduplicated; trailing punctuation retained by extraction):
 
-Numerical inventory will be regenerated after verification.
+`2026`, `₹50,000`, `6`, `5`, `0%`, `5%`, `10%`, `12`, `₹4,167`, `12,`, `₹4,166.67`, `4`, `0.00%`, `₹64,168`, `₹62,724`, `5.12%`, `₹82,265`, `₹78,627`, `10.47%`, `23`.
+
+
+The first-year SIP corpus is ₹50,000 at the flat assumed rate, ₹51,375.07 at the assumed 5% nominal rate, and ₹52,792.84 at the assumed 10% nominal rate (displayed to paise). Those amounts come from `calcSIP`; the exact unrounded amounts are held for four further years through `calcLumpSum`. No additional contributions are made during that hold. The article displays only the common-endpoint values, rounded to whole rupees.
 
 ## Fed draft numerical provenance and remaining release work
 
 The official [Federal Reserve calendar](https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm), opened 23 October 2026, schedules **27–28 October 2026**; no statement was linked for that meeting at this check. **$300,000** is the user-requested hypothetical principal, not a reported mortgage. All post-meeting policy rates, mortgage quotes, terms, payment outputs and total-interest outputs remain placeholders. Code guard constants are validation boundaries, not claimed financial outcomes. The draft does not invoke the calculator.
 
+
+## Branch delivery
+
+Requested push command: `git push -u origin content/news-oct-nov-2026`. No main merge and no deployment command is part of this delivery. Compare: https://github.com/bhadaniayush12/calcumetrics/compare/main...content/news-oct-nov-2026
