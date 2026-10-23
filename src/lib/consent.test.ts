@@ -15,24 +15,20 @@ describe('consent', () => {
   beforeEach(() => {
     store = {};
     cookieWrites = [];
-    (globalThis as any).localStorage = {
+    vi.stubGlobal('localStorage', {
       getItem: (k: string) => store[k] ?? null,
       setItem: (k: string, v: string) => { store[k] = v; },
       removeItem: (k: string) => { delete store[k]; },
-    };
-    (globalThis as any).window = { gtag: vi.fn() };
-    (globalThis as any).location = { hostname: 'www.calcumetrics.com' };
-    (globalThis as any).document = {
+    });
+    vi.stubGlobal('window', { gtag: vi.fn() });
+    vi.stubGlobal('location', { hostname: 'www.calcumetrics.com' });
+    vi.stubGlobal('document', {
       get cookie() { return '_ga=GA1.1.1; _ga_ABC=GS1; cm_other=1'; },
       set cookie(v: string) { cookieWrites.push(v); },
-    };
+    });
   });
 
-  afterEach(() => {
-    delete (globalThis as any).window;
-    delete (globalThis as any).document;
-    delete (globalThis as any).location;
-  });
+  afterEach(() => vi.unstubAllGlobals());
 
   it('treats Europe/* and EEA Atlantic zones as consent regions', () => {
     expect(isConsentRegionTimezone('Europe/Berlin')).toBe(true);

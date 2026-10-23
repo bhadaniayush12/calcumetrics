@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   formatDisplayCurrency,
   getStoredCurrency,
@@ -24,7 +24,7 @@ describe('Methodology Sandbox Currency Synchronization', () => {
 
   beforeEach(() => {
     windowListeners = {};
-    (global as any).window = {
+    vi.stubGlobal('window', {
       addEventListener: (event: string, handler: (e: any) => void) => {
         windowListeners[event] = windowListeners[event] || [];
         windowListeners[event].push(handler);
@@ -46,7 +46,7 @@ describe('Methodology Sandbox Currency Synchronization', () => {
         getItem: vi.fn().mockReturnValue(null),
         setItem: vi.fn(),
       },
-    };
+    });
 
     dom = {
       pInput: { value: '500000', addEventListener: vi.fn() },
@@ -61,6 +61,8 @@ describe('Methodology Sandbox Currency Synchronization', () => {
 
     currentCurrency = getStoredCurrency();
   });
+
+  afterEach(() => vi.unstubAllGlobals());
 
   function simulateSandboxUpdate(currency: CurrencyCode) {
     const P = parseFloat(dom.pInput.value) || 500000;

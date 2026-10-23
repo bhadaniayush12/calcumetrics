@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
 import {
   CURRENCY_CONFIG,
   CURRENCY_STORAGE_KEY,
@@ -166,6 +166,21 @@ describe('Phase 9: Currency Display / Locale System', () => {
   });
 
   // ── 6. Storage & SSR Safety (Section 6 & 15) ──────────────────────────────
+  // Empty storage falls back to detectUserCurrency(), which reads the runner's
+  // timezone and navigator languages; pin both so CI (UTC, en-US) matches IST.
+  const resolved = Intl.DateTimeFormat.prototype.resolvedOptions;
+  function stubRegion(timeZone: string, language: string) {
+    vi.spyOn(Intl.DateTimeFormat.prototype, 'resolvedOptions').mockImplementation(function (this: Intl.DateTimeFormat) {
+      return { ...resolved.call(this), timeZone };
+    });
+    vi.stubGlobal('navigator', { language, languages: [language] });
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
   it('safely handles storage operations with fallback and never persists unsupported currencies', () => {
     // Mock minimal localStorage
     const store: Record<string, string> = {};
@@ -174,35 +189,30 @@ describe('Phase 9: Currency Display / Locale System', () => {
       setItem: (k: string, v: string) => { store[k] = v; },
     };
 
-    const origWindow = globalThis.window;
-    const origStorage = globalThis.localStorage;
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('localStorage', mockStorage);
 
-    try {
-      (globalThis as any).window = {};
-      (globalThis as any).localStorage = mockStorage;
+    // Initial read with empty storage: India detects INR, US detects USD
+    stubRegion('Asia/Kolkata', 'en-IN');
+    expect(getStoredCurrency()).toBe('INR');
+    stubRegion('America/New_York', 'en-US');
+    expect(getStoredCurrency()).toBe('USD');
 
-      // Initial read with empty storage
-      expect(getStoredCurrency()).toBe('INR');
+    // Valid save
+    const savedUSD = saveCurrency('USD');
+    expect(savedUSD).toBe('USD');
+    expect(mockStorage.getItem(CURRENCY_STORAGE_KEY)).toBe('$ USD');
+    expect(getStoredCurrency()).toBe('USD');
 
-      // Valid save
-      const savedUSD = saveCurrency('USD');
-      expect(savedUSD).toBe('USD');
-      expect(mockStorage.getItem(CURRENCY_STORAGE_KEY)).toBe('$ USD');
-      expect(getStoredCurrency()).toBe('USD');
+    // Attempted save of unsupported currency
+    const savedInvalid = saveCurrency('CAD');
+    expect(savedInvalid).toBe('INR'); // normalized to default
+    expect(mockStorage.getItem(CURRENCY_STORAGE_KEY)).toBe('₹ INR');
+    expect(getStoredCurrency()).toBe('INR');
 
-      // Attempted save of unsupported currency
-      const savedInvalid = saveCurrency('CAD');
-      expect(savedInvalid).toBe('INR'); // normalized to default
-      expect(mockStorage.getItem(CURRENCY_STORAGE_KEY)).toBe('₹ INR');
-      expect(getStoredCurrency()).toBe('INR');
-
-      // Corrupted storage entry
-      mockStorage.setItem(CURRENCY_STORAGE_KEY, 'CORRUPTED_VALUE');
-      expect(getStoredCurrency()).toBe('INR'); // safe fallback
-    } finally {
-      (globalThis as any).window = origWindow;
-      (globalThis as any).localStorage = origStorage;
-    }
+    // Corrupted storage entry
+    mockStorage.setItem(CURRENCY_STORAGE_KEY, 'CORRUPTED_VALUE');
+    expect(getStoredCurrency()).toBe('INR'); // safe fallback
   });
 
   it('is completely SSR safe when window and localStorage are undefined', () => {
