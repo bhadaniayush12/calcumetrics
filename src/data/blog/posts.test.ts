@@ -6,8 +6,8 @@ describe('Blog posts data integrity', () => {
   const publishedTools = getPublishedTools();
   const validToolPaths = new Set(publishedTools.map((t) => t.path));
 
-  it('contains exactly 47 evidenced blog posts', () => {
-    expect(BLOG_POSTS.length).toBe(47);
+  it('contains exactly 48 evidenced blog posts', () => {
+    expect(BLOG_POSTS.length).toBe(48);
   });
 
   it('ensures every post has unique slugs and required metadata', () => {
@@ -79,7 +79,7 @@ describe('Blog posts data integrity', () => {
     }
     expect(counts['Global']).toBe(20);
     expect(counts['India-Only']).toBe(19);
-    expect(counts['Both']).toBe(8);
+    expect(counts['Both']).toBe(9);
   });
 
   it('keeps Indian legal and product rules out of the Global classification', () => {
