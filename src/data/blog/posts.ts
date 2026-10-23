@@ -17,7 +17,16 @@ import { DIWALI_BONUS_POST } from './diwali-bonus-2026-lump-sum-sip-or-prepay';
 
 import { NEW_TAX_ACT_POST } from './new-income-tax-act-2025-salaried-guide';
 
+import { RBI_FD_NEWS_POST } from './rbi-repo-rate-5-50-fd-returns-october-2026';
+
+import { ITR_AUDIT_NEWS_POST } from './itr-due-date-21-november-2026-late-fee-interest';
+
+import { DHANTERAS_NEWS_POST } from './dhanteras-2026-gold-vs-sip';
+
 export const BLOG_POSTS: BlogPost[] = [
+  DHANTERAS_NEWS_POST,
+  ITR_AUDIT_NEWS_POST,
+  RBI_FD_NEWS_POST,
   NEW_TAX_ACT_POST,
   DIWALI_BONUS_POST,
   SMALL_SAVINGS_POST,

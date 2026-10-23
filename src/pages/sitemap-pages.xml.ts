@@ -6,7 +6,7 @@ export const GET: APIRoute = async () => {
   const staticPages = [
     { path: '/',               lastmod: '2026-09-24' },
     { path: '/calculators',   lastmod: '2026-09-24' },
-    { path: '/blog',          lastmod: '2026-09-24' },
+    { path: '/blog',          lastmod: '2026-10-23' },
     { path: '/about',         lastmod: '2026-10-11' },
     { path: '/privacy-policy',lastmod: '2026-10-11' },
     { path: '/cookie-policy', lastmod: '2026-10-11' },
