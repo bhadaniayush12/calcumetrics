@@ -3,10 +3,18 @@ import { calcLumpSum } from '../../lib/calculators/lumpsum';
 import { calcSIP } from '../../lib/calculators/sip';
 import { calcCAGR } from '../../lib/calculators/cagr';
 const money = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+// Equal budget, identical monthly compounding and a common five-year endpoint.
+// Keep the exact contribution internally: ₹4,167 is only the rounded display.
+export const GOLD_BUDGET = 50000;
+export const GOLD_SIP_MONTHS = 12;
+export const GOLD_HORIZON_YEARS = 5;
 export const goldRows = [0, 5, 10].map(rate => {
-  const lump = calcLumpSum(50000, rate, 5, 'annually');
-  const sip = calcSIP(1000, rate, 5);
-  return { rate, lump, sip, cagr: calcCAGR(50000, lump.maturity, 5) };
+  const lump = calcLumpSum(GOLD_BUDGET, rate, GOLD_HORIZON_YEARS, 'monthly');
+  // Beginning-of-month contributions during the first year only.
+  const sipContributions = calcSIP(GOLD_BUDGET / GOLD_SIP_MONTHS, rate, 1);
+  // Carry the first-year corpus to the same endpoint, with no further deposits.
+  const sip = calcLumpSum(sipContributions.maturity, rate, GOLD_HORIZON_YEARS - 1, 'monthly');
+  return { rate, lump, sipContributions, sip, cagr: calcCAGR(GOLD_BUDGET, lump.maturity, GOLD_HORIZON_YEARS) };
 });
 export const DHANTERAS_NEWS_POST: BlogPost = {
   "slug": "dhanteras-2026-gold-vs-sip",
@@ -43,7 +51,7 @@ export const DHANTERAS_NEWS_POST: BlogPost = {
     {
       "name": "SIP Calculator",
       "path": "/sip-calculator",
-      "description": "Model recurring contributions from future income."
+      "description": "Model equal contributions during the first year."
     },
     {
       "name": "CAGR Calculator",
@@ -74,7 +82,7 @@ export const DHANTERAS_NEWS_POST: BlogPost = {
     },
     {
       "question": "Does the SIP use the same capital as the lump sum?",
-      "answer": "No. The lump sum uses ₹50,000 now; the illustrative SIP contributes ₹1,000 monthly for 5 years, totalling ₹60,000 from continuing income."
+      "answer": "Yes. Both invest exactly ₹50,000 and are valued 5 years from today. The SIP spreads the budget evenly over the first 12 months, then stays invested without further contributions. ₹4,167/month is rounded for display; calculations use ₹50,000 ÷ 12, about ₹4,166.67, without rounding each contribution."
     },
     {
       "question": "Is SIP a different asset from gold?",
@@ -91,17 +99,17 @@ export const DHANTERAS_NEWS_POST: BlogPost = {
 <p class="text-sm text-text-muted leading-relaxed mb-4">For physical gold, ask for the full purchase price and the terms on which you could sell the item. For a market-linked product, read its scheme information, costs and redemption rules. The cash you receive on sale may differ from a headline market value. This guide does not insert an assumed making charge, tax deduction or buyback discount into the projections.</p>
 <p class="text-sm text-text-muted leading-relaxed mb-4">SEBI’s <a href="https://investor.sebi.gov.in/pdf/reference-material/MFunds.pdf" class="text-accent font-medium hover:underline">mutual fund investor guidance</a> warns that market values move and returns are not guaranteed. An automated contribution does not remove that uncertainty. Use the calculator to understand a scenario, then assess whether the actual product and risk suit the purpose of the money.</p>
 <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Example: what ₹50,000 could become under assumed growth</h2>
-<p class="text-sm text-text-muted leading-relaxed mb-4">The following Example starts with a hypothetical ₹50,000 lump sum held for 5 years. It uses assumed annual growth of 0%, 5% or 10%, with annual compounding. These inputs are deliberately selected illustrations. None is a forecast, historical gold return, current gold quote or expected mutual fund performance.</p>
-<p class="text-sm text-text-muted leading-relaxed mb-4">To illustrate recurring investing separately, the same table shows a hypothetical SIP of ₹1,000 at the start of each month for 5 years. That SIP invests ₹60,000 in total from continuing income, so its final corpus must not be compared with the lump sum as if both used the same capital. It is not a plan for stretching the original ₹50,000 into those contributions.</p>
-<p class="text-sm text-text-muted leading-relaxed mb-4">Our lump-sum engine calculates the lump-sum column; the SIP engine calculates the recurring-investment column using its monthly annuity-due convention. The CAGR engine independently annualises each lump-sum endpoint. The rate input has different compounding conventions in the SIP model, so the table is an illustration of cash-flow patterns rather than a product ranking. Amounts are rounded only for display and exclude costs and tax.</p>
-<div class="overflow-x-auto mb-6"><table class="w-full text-xs text-left border border-border rounded-card overflow-hidden"><caption class="text-xs text-text-muted text-left p-3 bg-surface border-b border-border">Example — assumed growth only, 5 years; SIP invests ₹60,000 versus ₹50,000 lump sum</caption><thead class="bg-surface text-text-primary font-semibold border-b border-border"><tr><th scope="col" class="p-3">Assumed rate input</th><th scope="col" class="p-3">₹50,000 lump sum: final value</th><th scope="col" class="p-3">₹1,000/month SIP: final value</th><th scope="col" class="p-3">Lump-sum CAGR</th></tr></thead><tbody class="divide-y divide-border text-text-muted">${goldRows.map(row => `<tr><td class="p-3">${row.rate}%</td><td class="p-3 font-mono">${money(row.lump.maturity)}</td><td class="p-3 font-mono">${money(row.sip.maturity)}</td><td class="p-3 font-mono">${row.cagr.cagrPct.toFixed(2)}%</td></tr>`).join('')}</tbody></table></div>
+<p class="text-sm text-text-muted leading-relaxed mb-4">The following Example starts with a hypothetical ₹50,000 lump sum held for 5 years. Both options use assumed annual nominal growth inputs of 0%, 5% or 10%, with monthly compounding throughout. These inputs are deliberately selected illustrations. None is a forecast, historical gold return, current gold quote or expected mutual fund performance.</p>
+<p class="text-sm text-text-muted leading-relaxed mb-4">The comparison invests exactly ₹50,000 either as a lump sum today or through equal SIP contributions at the start of each of the first 12 months. The SIP is shown as ₹4,167/month, rounded to the nearest rupee; the calculation uses ₹50,000 ÷ 12, approximately ₹4,166.67, at full precision. The monthly label is not an instruction to deposit the rounded amount every time. No more money is added after the first year, and both options are valued 5 years from today. Cash waiting to be invested is assumed to earn nothing.</p>
+<p class="text-sm text-text-muted leading-relaxed mb-4">Our lump-sum engine calculates the immediate investment over 5 years. The SIP engine calculates the first year using its beginning-of-month convention; the lump-sum engine then grows that corpus for the remaining 4 years with no new contributions. Both use the same monthly compounding and assumed rate input. The CAGR engine annualises the immediate lump-sum endpoint; this effective annual return differs from the nominal input when growth is positive. It is not the SIP’s cash-flow return. Amounts are rounded only for display and exclude costs and tax.</p>
+<div class="overflow-x-auto mb-6"><table class="w-full text-xs text-left border border-border rounded-card overflow-hidden"><caption class="text-xs text-text-muted text-left p-3 bg-surface border-b border-border">Example — ₹50,000 total each; common 5-year endpoint; assumed nominal rates, monthly compounding</caption><thead class="bg-surface text-text-primary font-semibold border-b border-border"><tr><th scope="col" class="p-3">Assumed rate input</th><th scope="col" class="p-3">₹50,000 lump sum: final value</th><th scope="col" class="p-3">SIP over first 12 months: final value</th><th scope="col" class="p-3">Lump-sum effective CAGR</th></tr></thead><tbody class="divide-y divide-border text-text-muted">${goldRows.map(row => `<tr><td class="p-3">${row.rate}%</td><td class="p-3 font-mono">${money(row.lump.maturity)}</td><td class="p-3 font-mono">${money(row.sip.maturity)}</td><td class="p-3 font-mono">${row.cagr.cagrPct.toFixed(2)}%</td></tr>`).join('')}</tbody></table></div>
 <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Read the scenarios without turning them into predictions</h2>
-<p class="text-sm text-text-muted leading-relaxed mb-4">The flat-growth row is a useful reminder that contributions themselves build a corpus. In the positive-growth rows, both the money contributed and the time it remains invested affect the endpoint. Real markets can also fall. The selected rows do not place a floor under your investment or show the full range of possible results.</p>
+<p class="text-sm text-text-muted leading-relaxed mb-4">The flat-growth row returns the same ₹50,000 for both options. With positive assumed growth, the lump sum has more time invested because its full budget enters immediately; each later SIP contribution spends less time in the market. The contribution period is 12 months, not the whole 5-year holding horizon. Real markets can also fall. The selected rows do not place a floor under your investment or show the full range of possible results.</p>
 <p class="text-sm text-text-muted leading-relaxed mb-4">A smooth assumed annual rate hides the path taken along the way. An investor who needs to sell during a weak period can receive less than a long-horizon illustration suggests. A SIP also purchases at changing prices in real life, while the calculator applies a constant monthly growth assumption to isolate the mathematics.</p>
 <p class="text-sm text-text-muted leading-relaxed mb-4">Use the table to test whether your savings plan depends on an optimistic return. If a future purchase is essential, consider how you would fund it if the investment disappointed. Lowering a calculator input is a planning exercise; it cannot make a market-linked asset behave like a guaranteed payment.</p>
 <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Recreate the calculation with your own budget</h2>
 <p class="text-sm text-text-muted leading-relaxed mb-4">Open the <a href="/lump-sum-calculator" class="text-accent font-medium hover:underline">lump-sum calculator</a> with the cash already available and your intended holding period. Run several assumptions and keep a note of what each one means. If you are modelling an asset whose sale costs are uncertain, keep those costs outside the gross projection until you have an actual quote.</p>
-<p class="text-sm text-text-muted leading-relaxed mb-4">Use the <a href="/sip-calculator" class="text-accent font-medium hover:underline">SIP calculator</a> for contributions you expect to fund from future income. Check that the monthly amount remains affordable after normal spending and cash reserves. A lump sum available today and a promise of future contributions place different demands on your finances.</p>
+<p class="text-sm text-text-muted leading-relaxed mb-4">Use the <a href="/sip-calculator" class="text-accent font-medium hover:underline">SIP calculator</a> for the first 12 months using the exact monthly budget and chosen rate. Transfer that first-year value to the lump-sum calculator for 4 further years, selecting monthly compounding and the same rate. A SIP running for the full 5 years would add more capital and would not reproduce this comparison. Check that actual contribution rounding preserves your intended total budget.</p>
 <p class="text-sm text-text-muted leading-relaxed mb-4">The <a href="/cagr-calculator" class="text-accent font-medium hover:underline">CAGR calculator</a> helps translate a starting value and final value into annualised growth. It does not identify which asset will produce that growth. For dated contributions and withdrawals, the <a href="/xirr-calculator" class="text-accent font-medium hover:underline">XIRR calculator</a> is more appropriate for reviewing realised cash flows once those records exist.</p>
 <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Turn the festival budget into a deliberate choice</h2>
 <p class="text-sm text-text-muted leading-relaxed mb-4">Write down the purpose, the amount you can commit and the earliest date you may need the money back. Then decide which part, if any, is a consumption purchase and which part belongs in an investment plan. There is no need to describe the whole festival purchase as an investment to justify its personal importance.</p>
