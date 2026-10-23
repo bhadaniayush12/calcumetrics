@@ -24,6 +24,7 @@
     "esbuild": true
   },
   "devDependencies": {
+    "happy-dom": "^21.0.4",
     "vitest": "^5.0.1",
     "wrangler": "^4.138.0"
   }

@@ -11,7 +11,8 @@
  *   - Strictly skips jurisdiction-locked routes (/in/*, /us/*, /uk/*).
  *   - Zero FX conversions: display/grouping formatting only.
  *   - SSR safe: all DOM operations guarded by window/document checks.
- *   - Fast: wraps matching text nodes once on mount, updates spans in O(N) on change.
+ *   - Respects data-currency-lock on any ancestor; statutory amounts stay factual.
+ *   - Indexes once per mounted main/root, updates cached spans in O(N) on change.
  */
 
 import type { CurrencyCode } from './currency';
@@ -201,7 +202,7 @@ export function shouldSkipElement(el: Element): boolean {
   }
   if (
     el.closest(
-      'form, [data-calculator-form], #header-currency-menu, #current-currency-btn, #mobile-currency-select, #control-center-popover, #search-modal, [data-no-dynamic-currency], [data-preserve-currency], [data-jurisdiction-locked], [data-jurisdiction="IN"], [data-jurisdiction="US"], [data-jurisdiction="UK"]'
+      'form, [data-calculator-form], #header-currency-menu, #current-currency-btn, #mobile-currency-select, #control-center-popover, #search-modal, [data-currency-lock], [data-currency-notice], [data-no-dynamic-currency], [data-preserve-currency], [data-jurisdiction-locked], [data-jurisdiction="IN"], [data-jurisdiction="US"], [data-jurisdiction="UK"]'
     )
   ) {
     return true;
@@ -221,6 +222,7 @@ export function shouldSkipElement(el: Element): boolean {
  * Splits a text node containing currency/Indian numbers into text and span nodes.
  */
 export function processTextNode(node: Text): Node[] | null {
+  if (node.parentElement && shouldSkipElement(node.parentElement)) return null;
   const text = node.nodeValue;
   if (!text || (!text.includes('₹') && !text.includes('$') && !/\d,\d{2},\d{3}/.test(text))) {
     return null;
@@ -297,72 +299,95 @@ export function processTextNode(node: Text): Node[] | null {
   return fragments;
 }
 
-/**
- * Updates text content of all existing [data-cm-currency-text] spans on the page.
- */
-export function updateAllCurrencySpans(targetCode: CurrencyCode): void {
-  if (typeof document === 'undefined') return;
-  const spans = document.querySelectorAll<HTMLElement>('[data-cm-currency-text]');
-  spans.forEach((span) => {
-    try {
-      const dataStr = span.getAttribute('data-cm-data');
-      if (dataStr) {
-        const data: CurrencyTokenData = JSON.parse(dataStr);
-        span.textContent = formatConvertedToken(data, targetCode);
-      }
-    } catch {}
-  });
+/** One index per mounted main/root. Currency switches never walk the DOM again. */
+interface CurrencyTextIndex {
+  spans: HTMLElement[];
+  notice: HTMLElement | null;
+  code?: CurrencyCode;
+}
+const indexes = new WeakMap<Element, CurrencyTextIndex>();
+const tokenCache = new WeakMap<HTMLElement, CurrencyTokenData>();
+
+export const INDIA_CURRENCY_NOTICE = 'Amounts are in Indian rupees (₹) because this guide covers Indian rules.';
+export const EXAMPLE_CURRENCY_NOTICE = 'Example amounts are shown in your selected currency and are not converted at exchange rates.';
+
+function updateIndex(index: CurrencyTextIndex, targetCode: CurrencyCode): void {
+  if (index.code === targetCode) return;
+  for (const span of index.spans) {
+    // Recheck locks in case a previously indexed block was subsequently locked.
+    if (span.closest('[data-currency-lock]')) continue;
+    let data = tokenCache.get(span);
+    if (!data) {
+      try { data = JSON.parse(span.getAttribute('data-cm-data') || 'null'); } catch { continue; }
+      if (!data) continue;
+      tokenCache.set(span, data);
+    }
+    const next = formatConvertedToken(data, targetCode);
+    if (span.textContent !== next) span.textContent = next;
+  }
+  if (index.notice) index.notice.hidden = targetCode === 'INR';
+  index.code = targetCode;
 }
 
-/**
- * Scans the root element, wraps all matching currency text nodes into spans,
- * and updates them to the target currency.
- */
+/** Updates the mounted page; also used for external currency-change events. */
+export function updateAllCurrencySpans(targetCode: CurrencyCode): void {
+  initDOMCurrencyText(targetCode);
+}
+
+/** Index once, then perform one O(n) pass over currency tokens per switch. No observer. */
 export function initDOMCurrencyText(targetCode: CurrencyCode = 'INR', root?: Element): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
-  if (typeof window.location !== 'undefined' && isJurisdictionLocked(window.location.pathname)) return;
-
+  if (isJurisdictionLocked(window.location.pathname)) return;
   const container = root || document.querySelector('main') || document.body;
   if (!container) return;
-
-  // Walk all text nodes
-  const walker = document.createTreeWalker(
-    container,
-    NodeFilter.SHOW_TEXT,
-    {
-      acceptNode(node: Text) {
-        const parent = node.parentElement;
-        if (!parent || shouldSkipElement(parent)) {
-          return NodeFilter.FILTER_REJECT;
-        }
-        const val = node.nodeValue;
-        if (!val || (!val.includes('₹') && !/\d,\d{2},\d{3}/.test(val))) {
-          return NodeFilter.FILTER_SKIP;
-        }
-        return NodeFilter.FILTER_ACCEPT;
-      },
-    }
-  );
-
-  const nodesToProcess: Text[] = [];
-  let curr = walker.nextNode();
-  while (curr) {
-    nodesToProcess.push(curr as Text);
-    curr = walker.nextNode();
+  const existing = indexes.get(container);
+  if (existing) {
+    updateIndex(existing, targetCode);
+    return;
   }
 
-  nodesToProcess.forEach((textNode) => {
-    const parent = textNode.parentNode;
-    if (!parent) return;
-
-    const fragments = processTextNode(textNode);
-    if (fragments && fragments.length > 0) {
-      const frag = document.createDocumentFragment();
-      fragments.forEach((f) => frag.appendChild(f));
-      parent.replaceChild(frag, textNode);
-    }
+  // Reject whole locked/excluded subtrees, rather than visiting every descendant text.
+  const walker = document.createTreeWalker(container, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (node.nodeType === 1) return shouldSkipElement(node as Element)
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_SKIP;
+      const parent = node.parentElement;
+      if (!parent || shouldSkipElement(parent)) return NodeFilter.FILTER_REJECT;
+      const value = node.nodeValue || '';
+      return value.includes('₹') || /\d,\d{2},\d{3}/.test(value)
+        ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    },
   });
+  const nodes: Text[] = [];
+  if (!shouldSkipElement(container)) {
+    let node: Node | null;
+    while ((node = walker.nextNode())) nodes.push(node as Text);
+  }
+  const spans: HTMLElement[] = [];
+  for (const node of nodes) {
+    const fragments = processTextNode(node);
+    if (!fragments) continue;
+    const frag = document.createDocumentFragment();
+    for (const part of fragments) {
+      if (part.nodeType === 1) spans.push(part as HTMLElement);
+      frag.appendChild(part);
+    }
+    node.parentNode?.replaceChild(frag, node);
+  }
 
-  // Apply target currency formatting
-  updateAllCurrencySpans(targetCode);
+  // Notices are client-only: the original INR HTML and SEO text stay intact.
+  const indiaArticle = container.matches('[data-currency-article="india"]')
+    ? container : container.querySelector('[data-currency-article="india"]');
+  let notice: HTMLElement | null = null;
+  if (indiaArticle || spans.length) {
+    notice = document.createElement('p');
+    notice.dataset.currencyNotice = indiaArticle ? 'india' : 'examples';
+    notice.className = 'text-xs text-text-muted my-3';
+    notice.textContent = indiaArticle ? INDIA_CURRENCY_NOTICE : EXAMPLE_CURRENCY_NOTICE;
+    notice.hidden = true;
+    (indiaArticle || container).prepend(notice);
+  }
+  const index = { spans, notice };
+  indexes.set(container, index);
+  updateIndex(index, targetCode);
 }
