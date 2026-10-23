@@ -176,7 +176,7 @@ const jsonld = {
           {initialResult.dscr.toFixed(2)}x
         </div>
         <p id="dscr-plain-translation" class="text-xs text-dark-muted mt-1.5 leading-relaxed">
-          You generate <strong class="text-dark-text">₹{initialResult.dscr.toFixed(2)} in operating income</strong> for every ₹1 of loan payments due
+          You generate <strong class="text-dark-text">{initialResult.dscr.toFixed(2)}× the operating income</strong> needed to cover your loan payments
         </p>
       </div>
 
@@ -462,9 +462,9 @@ const jsonld = {
       const plainEl = document.getElementById('dscr-plain-translation');
       if (plainEl) {
         if (res.dscr >= 1.0) {
-          plainEl.innerHTML = `You generate <strong class="text-dark-text">${currSym}${res.dscr.toFixed(2)} in operating income</strong> for every ${currSym}1 of loan payments due`;
+          plainEl.innerHTML = `You generate <strong class="text-dark-text">${res.dscr.toFixed(2)}× the operating income</strong> needed to cover your loan payments`;
         } else {
-          plainEl.innerHTML = `Operating income falls short — you only generate <strong class="text-dark-text">${currSym}${res.dscr.toFixed(2)}</strong> for every ${currSym}1 of debt due`;
+          plainEl.innerHTML = `Operating income falls short — you generate <strong class="text-dark-text">${res.dscr.toFixed(2)}× the amount</strong> needed for debt payments`;
         }
       }
 

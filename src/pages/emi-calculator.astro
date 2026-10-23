@@ -446,7 +446,7 @@ const jsonld = {
       </section>
 
       <!-- 4. How to use -->
-      <section aria-labelledby="emi-personal-example">
+      <section data-currency-lock="INR" aria-labelledby="emi-personal-example">
         <h2 id="emi-personal-example" class="text-xl font-bold text-text-primary mb-4">Personal loan EMI for 5 lakh: compare repayment terms</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">For an illustrative {fmt(personalExample.principal)} loan at {personalExample.rate}% a year over {personalExample.years} years, the monthly EMI is {fmt(personalResult.emiRounded)} and total interest is {fmt(personalResult.totalInterest)}. The table changes only the tenure; the rate is an assumption, not a bank quote.</p>
         <div class="overflow-x-auto bg-surface border border-border rounded-card"><table class="w-full text-xs sm:text-sm border-collapse"><caption class="text-left p-3 text-text-muted">Same illustrative principal and rate; rounded to whole rupees</caption><thead><tr class="border-b border-border text-text-muted"><th scope="col" class="text-left py-2.5 px-3">Tenure</th><th scope="col" class="text-left py-2.5 px-3">Monthly EMI</th><th scope="col" class="text-left py-2.5 px-3">Total interest</th><th scope="col" class="text-left py-2.5 px-3">Total repayments</th></tr></thead>
@@ -455,7 +455,7 @@ const jsonld = {
         <p class="text-sm text-text-muted leading-relaxed mb-4">A longer term spreads repayments across more months but leaves interest running for longer. Totals use the unrounded EMI, so multiplying the rounded displayed payment may produce a small difference.</p>
       </section>
 
-      <section aria-labelledby="emi-guide">
+      <section data-currency-lock="INR" aria-labelledby="emi-guide">
         <h2 id="emi-guide" class="text-xl font-bold text-text-primary mb-4">Use your loan quote to choose the inputs</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">Enter the amount actually being financed and the contractual reducing-balance interest rate. Choose the proposed repayment term, then compare the instalment with the monthly amount you can set aside after other commitments.</p>
         <p class="text-sm text-text-muted leading-relaxed mb-4">For eligible retail term loans, <a href="https://www.rbi.org.in/Scripts/NotificationUser.aspx?Id=12663&Mode=0" class="text-accent font-medium hover:underline">RBI’s Key Facts Statement requirements</a> provide an APR calculation and amortization schedule. APR includes loan charges as well as interest; do not substitute it for the contractual rate and expect the same EMI.</p>
@@ -499,7 +499,7 @@ const jsonld = {
       </section>
 
       <!-- 6. Real FAQs -->
-      <section aria-labelledby="emi-faq">
+      <section data-currency-lock="INR" aria-labelledby="emi-faq">
         <h2 id="emi-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           {faqs.map((faq) => (
@@ -517,7 +517,8 @@ const jsonld = {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
             <a
-              href={tool.path}
+              data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
+            href={tool.path}
               class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
             >
               <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>

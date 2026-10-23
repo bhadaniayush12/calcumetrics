@@ -286,6 +286,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
     quickAnswer:
       'Increasing your EMI saves far more money than extending your tenure. On a ₹50 lakh home loan at 8.50% increased to 8.75%, raising your monthly EMI by ₹794 (to ₹44,186) keeps your loan at 20 years and costs ₹56,04,529 in total interest. In contrast, keeping your EMI flat extends your tenure by ~12.4 months and drives total interest to ₹59,53,414 — costing you an extra ₹3,48,885 in avoidable interest.',
     type: 'Hybrid',
+    summaryCurrencyLock: 'INR',
     summary:
       'When central banks hike interest rates, commercial lenders typically extend loan tenure by default to preserve the borrower’s nominal monthly payment. While extending tenure avoids immediate monthly cash flow strain, it quietly inflates total interest burden over the life of the loan. Borrowers with financial headroom can save lakhs of rupees or thousands of dollars by opting to increase their monthly EMI or making disciplined partial prepayments.',
     sources: [
@@ -337,11 +338,13 @@ export const BATCH_6_POSTS: BlogPost[] = [
     ],
     faqs: [
       {
+        currencyLock: 'INR',
         question: 'Why do banks extend tenure instead of increasing EMI by default?',
         answer:
           'Banks extend tenure by default primarily to prevent payment defaults and avoid customer friction. An unexpected increase in monthly deductions could cause NACH mandate rejections, bank bounce charges, and administrative inquiries from cash-strapped borrowers.',
       },
       {
+        currencyLock: 'INR',
         question: 'How much extra interest do I pay if I keep my EMI unchanged?',
         answer:
           'On a 20-year ₹50 lakh loan facing a 25 bps hike (8.50% to 8.75%), keeping your EMI unchanged adds approximately 12 to 13 months of payments and ₹3,48,885 in extra cumulative interest compared to raising the EMI to clear the loan in 20 years.',
@@ -358,7 +361,7 @@ export const BATCH_6_POSTS: BlogPost[] = [
       },
     ],
     content: `
-      <p class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
+      <p data-currency-lock="INR" class="lead text-base sm:text-lg text-text-primary leading-relaxed font-normal mb-6">
         When your bank notifies you of an interest rate hike on your floating home loan, you face a critical financial fork: should you increase your monthly EMI or extend your repayment tenure? While extending your loan tenure seems painless because your current bank outflow does not change, it costs significantly more in compounding interest. On a ₹50 lakh home loan over 20 years experiencing a 25 basis point hike from 8.50% to 8.75%, opting to increase your monthly EMI by ₹794 saves approximately ₹3,48,885 in lifetime interest compared to extending the loan term.
       </p>
 
@@ -377,7 +380,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Silent Trap: Why Banks Extend Tenure by Default</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Silent Trap: Why Banks Extend Tenure by Default</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Whenever central banks increase policy rates — such as the RBI’s October 2026 hike lifting the repo rate to 5.50% — commercial lenders must adjust floating portfolios. In the overwhelming majority of cases, lenders automatically increase your loan tenure and leave your monthly payment unchanged.
       </p>
@@ -388,7 +392,10 @@ export const BATCH_6_POSTS: BlogPost[] = [
         To address this opacity, regulatory guidelines (such as the RBI’s circular on <em>Reset of Floating Interest Rate on Personal Loans</em>) explicitly mandate that banks must communicate rate increases promptly to borrowers, offering them clear options: enhance the EMI, lengthen the loan tenure, switch to a fixed-rate regime, or make partial prepayments. Yet despite these disclosure rules, the automated default remains tenure extension. For an inattentive borrower, this default operates as a silent wealth drain.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Mathematical Comparison: Table B Worked Numbers</h2>
+      <section data-currency-lock="INR">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Mathematical Comparison: Table B Worked Numbers</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Let us analyze the concrete numbers behind this decision. Consider a borrower with a ₹50 lakh home loan over a 20-year term (240 months). The loan rate increases by 25 basis points from 8.50% to 8.75% (applied from the start for simplified direct comparison).
       </p>
@@ -447,8 +454,10 @@ export const BATCH_6_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Mechanism: Why Extending Tenure Costs So Much</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Mechanism: Why Extending Tenure Costs So Much</h2>
+      <p data-currency-lock="INR" class="text-sm text-text-muted leading-relaxed mb-4">
         Why does an apparently minor 12-month tenure extension create nearly ₹3.5 lakh in additional interest? The answer lies in the mechanics of reducing-balance amortization schedules, which we detail in our deep-dive on <a href="/blog/how-loan-amortization-works" class="text-accent font-medium hover:underline">How Loan Amortization Works</a>.
       </p>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
@@ -501,7 +510,8 @@ export const BATCH_6_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">6. How to Instruct Your Lender to Increase EMI</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">6. How to Instruct Your Lender to Increase EMI</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         If your budget allows you to absorb the higher monthly payment, taking action is straightforward:
       </p>
@@ -512,13 +522,18 @@ export const BATCH_6_POSTS: BlogPost[] = [
         <li><strong>Alternative Prepayment Route:</strong> If changing your formal mandate is administratively cumbersome, keep the nominal EMI flat but schedule an automatic monthly recurring prepayment for the difference. This achieves the exact same interest savings without paperwork.</li>
       </ol>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">7. The Bottom Line for Managing Rate Resets</h2>
+      <section data-currency-lock="INR">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">7. The Bottom Line for Managing Rate Resets</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Defaulting to a tenure extension provides immediate comfort at a heavy long-term price. Whenever interest rates rise, aim to increase your monthly EMI or execute targeted prepayments to defend your payoff date. Saving ₹3.48 lakh on a ₹50 lakh loan by adding less than ₹800 to your monthly payment is one of the highest-leverage financial moves a borrower can make.
       </p>
       <p class="text-xs text-text-muted italic mt-6">
         Disclaimer: This guide is provided for educational purposes and should not be construed as individualized financial, legal, or investment advice. Always verify specific loan terms, reset dates, and processing charges directly with your lending institution.
       </p>
+</section>
+
     `,
   },
 

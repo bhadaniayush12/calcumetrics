@@ -662,7 +662,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
     publishDate: '2026-09-18',
     dateModified: '2026-09-22',
     readTime: '8 min read',
-    market: 'Global',
+    market: 'Both',
     author: 'Dev',
     reviewer: 'Methodology reviewed by the Calcumetrics team',
     quickAnswer: 'Straight-Line depreciates an asset evenly each year; Reducing Balance charges higher depreciation in early years, reducing early taxable income.',
@@ -738,6 +738,7 @@ export const BATCH_3_POSTS: BlogPost[] = [
           'Depreciation is a non-cash expense that reduces taxable operating income. Taking larger depreciation deductions in Year 1 and Year 2 reduces tax liability upfront, allowing the company to retain cash earlier. Because of the time value of money, paying less tax today and more tax in Year 5 increases the Net Present Value of the investment.',
       },
       {
+        currencyLock: 'INR',
         question: 'Can a company use Straight-Line for shareholder financial statements and Accelerated/WDV for tax filings?',
         answer:
           'Yes. In many jurisdictions (including the United States and India), companies maintain two separate sets of books. GAAP/IFRS books often use Straight-Line depreciation to present steady, higher net income to investors, while statutory tax returns use accelerated schedules (like MACRS in the US or Section 32 WDV blocks in India) to maximize immediate tax deductions, resulting in deferred tax liabilities (DTL).',

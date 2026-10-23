@@ -368,7 +368,7 @@ const jsonld = {
       <section aria-labelledby="loan-prepayment-assumptions">
         <h2 id="loan-prepayment-assumptions" class="text-xl font-bold text-text-primary mb-4">Assumptions & practical considerations</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-text-muted">
-          <div class="bg-surface border border-border rounded-card p-4">
+          <div data-currency-lock="INR" class="bg-surface border border-border rounded-card p-4">
             <h3 class="font-bold text-text-primary mb-1">Prepayment Penalty Rules</h3>
             <p>Under Reserve Bank of India (RBI) regulations, banks and HFCs cannot levy foreclosure or prepayment charges on floating-rate individual home loans. However, fixed-rate loans and commercial facilities may carry penalties (2%–4%).</p>
           </div>
@@ -378,7 +378,7 @@ const jsonld = {
           </div>
           <div class="bg-surface border border-border rounded-card p-4">
             <h3 class="font-bold text-text-primary mb-1">Tax Shield Considerations</h3>
-            <p>Under the Old Tax Regime in India, Section 24(b) permits interest deduction up to ₹2,00,000 for self-occupied property. Substantially shrinking loan interest reduces this tax shield, which should be factored into net savings.</p>
+            <p data-currency-lock="INR">Under the Old Tax Regime in India, Section 24(b) permits interest deduction up to ₹2,00,000 for self-occupied property. Substantially shrinking loan interest reduces this tax shield, which should be factored into net savings.</p>
           </div>
           <div class="bg-surface border border-border rounded-card p-4">
             <h3 class="font-bold text-text-primary mb-1">Guaranteed vs. Equity Returns</h3>
@@ -387,7 +387,7 @@ const jsonld = {
         </div>
       </section>
 
-      <div class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted space-y-3">
+      <div data-currency-lock="INR" class="p-4 bg-surface border border-accent/30 rounded-card my-6 text-xs text-text-muted space-y-3">
         <div>
           <strong class="text-text-primary text-sm block mb-1">Debating whether to prepay your home loan or invest in mutual funds?</strong>
           Read our in-depth research guide on <a href="/blog/home-loan-prepayment-vs-sip" class="text-accent font-medium hover:underline">Home Loan Prepayment vs. SIP: Which Builds More Wealth?</a> to see the 20-year net wealth math, tax impacts, and the 5-year hybrid repayment framework.
@@ -398,7 +398,7 @@ const jsonld = {
         </div>
       </div>
 
-      <section aria-labelledby="loan-prepayment-calculator-faq">
+      <section data-currency-lock="INR" aria-labelledby="loan-prepayment-calculator-faq">
         <h2 id="loan-prepayment-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           {jsonld['@graph'][2].mainEntity.map((faq: any) => (
@@ -416,7 +416,7 @@ const jsonld = {
         <h2 id="loan-prepayment-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
               <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>

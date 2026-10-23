@@ -189,7 +189,7 @@ const jsonld = {
         />
       </div>
 
-      <Alert variant="info" title="Tax vs Book Accounting">
+      <Alert data-currency-lock="INR" variant="info" title="Tax vs Book Accounting">
         Indian Income Tax Act requires the <strong>Written Down Value (WDV)</strong> method for most block of assets, while Companies Act allows both SLM and WDV for financial reporting. With a ₹0 salvage value, WDV assumes the Schedule II residual of 5% of cost, since a declining balance never reaches zero.
       </Alert>
 
@@ -246,7 +246,7 @@ const jsonld = {
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Follows Companies Act 2013 Schedule II useful-life methods (SLM / WDV) for book depreciation. Tax depreciation under the Income-tax Act uses block-of-assets WDV rates and is not computed here.</p>
+      <p data-currency-lock="INR" class="text-xs text-dark-muted mt-4 leading-relaxed">Follows Companies Act 2013 Schedule II useful-life methods (SLM / WDV) for book depreciation. Tax depreciation under the Income-tax Act uses block-of-assets WDV rates and is not computed here.</p>
     </Fragment>
 
     <Fragment slot="below">
@@ -383,8 +383,8 @@ const jsonld = {
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">Statutory Accounting vs. Taxation Standards</h3>
             <ul class="text-xs text-text-muted space-y-1.5 list-disc pl-4 leading-relaxed">
-              <li><strong>Indian Income Tax Act (Section 32):</strong> Strictly mandates the Written Down Value (WDV) method computed on a consolidated "Block of Assets" basis (Plant &amp; Machinery 15%, Computers 40%, Furniture 10%, Buildings 10%).</li>
-              <li><strong>Companies Act 2013 (Schedule II):</strong> Permits either SLM or WDV based on the asset's true pattern of economic consumption. Companies must also practice component depreciation for major subsystems.</li>
+              <li data-currency-lock="INR"><strong>Indian Income Tax Act (Section 32):</strong> Strictly mandates the Written Down Value (WDV) method computed on a consolidated "Block of Assets" basis (Plant &amp; Machinery 15%, Computers 40%, Furniture 10%, Buildings 10%).</li>
+              <li data-currency-lock="INR"><strong>Companies Act 2013 (Schedule II):</strong> Permits either SLM or WDV based on the asset's true pattern of economic consumption. Companies must also practice component depreciation for major subsystems.</li>
               <li><strong>Deferred Tax Asset / Liability:</strong> Divergence between book depreciation (SLM) and tax depreciation (WDV) creates timing differences recorded as Deferred Tax Liabilities (DTL).</li>
             </ul>
           </div>
@@ -423,7 +423,7 @@ const jsonld = {
         <h2 id="dep-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
               <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>

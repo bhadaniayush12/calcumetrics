@@ -182,7 +182,7 @@ const jsonld = {
       <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-3">
         All Financial Calculators: Investments, Loans, Taxes &amp; Business
       </h1>
-      <p class="text-sm text-neutral-600 dark:text-neutral-300 max-w-3xl leading-relaxed mb-4">
+      <p data-currency-lock="INR" class="text-sm text-neutral-600 dark:text-neutral-300 max-w-3xl leading-relaxed mb-4">
         Explore Calcumetrics’ full suite of precision financial calculators. Whether you are projecting wealth accumulation through mutual fund SIPs, calculating loan repayment schedules, applying India's GST 2.0 rationalized slabs (0%, 5%, 18%, 40%), or comparing the New and Old Income Tax regimes for FY 2025-27, every calculation runs instantly and entirely inside your browser. No sign-ups, no spam, and complete data privacy.
       </p>
     </header>
@@ -198,6 +198,7 @@ const jsonld = {
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
         {mostUsedTools.map((tool) => tool && (
           <a
+            data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
             href={tool.path}
             class="group p-3 rounded-control border border-border/70 bg-canvas/40 hover:bg-canvas hover:border-accent hover:-translate-y-0.5 transition-all duration-150 flex flex-col justify-between"
           >
@@ -480,6 +481,7 @@ const jsonld = {
                         data-tool-region={tool.region}
                         data-tool-desc={tool.description}
                         data-tool-preview={preview || ''}
+                        data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
                         data-tool-path={tool.path}
                         tabindex="0"
                         class="tool-card group relative flex flex-col justify-between bg-surface border border-border/80 rounded-card p-4 hover:border-accent hover:-translate-y-0.5 hover:shadow-mac-subtle transition-all duration-150 focus-visible:outline-accent select-none"
@@ -525,7 +527,7 @@ const jsonld = {
                           </div>
 
                           <!-- Tool Name -->
-                          <a href={tool.path} class="font-bold text-sm sm:text-base text-text-primary group-hover:text-accent transition-colors block mb-1 leading-snug">
+                          <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="font-bold text-sm sm:text-base text-text-primary group-hover:text-accent transition-colors block mb-1 leading-snug">
                             {tool.name}
                           </a>
 
@@ -544,7 +546,7 @@ const jsonld = {
                           ) : (
                             <span class="text-text-muted">Instant calculation</span>
                           )}
-                          <a href={tool.path} class="text-text-muted group-hover:text-accent group-hover:translate-x-1 transition-all font-bold shrink-0">
+                          <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="text-text-muted group-hover:text-accent group-hover:translate-x-1 transition-all font-bold shrink-0">
                             &rarr;
                           </a>
                         </div>
@@ -561,13 +563,13 @@ const jsonld = {
         <footer class="mt-12 pt-6 border-t border-border/70 text-xs text-text-muted space-y-3">
           <div class="bg-surface p-5 rounded-card border border-border/70">
             <h3 class="text-sm font-bold text-text-primary mb-2">Why Calcumetrics Calculators Are Different</h3>
-            <p class="leading-relaxed text-neutral-700 dark:text-neutral-300 mb-2">
+            <p data-currency-lock="INR" class="leading-relaxed text-neutral-700 dark:text-neutral-300 mb-2">
               Financial decisions shouldn't rely on black-box tools or outdated statutory rates. Calcumetrics calculators are mathematically auditable, built to adhere to published guidelines from the Reserve Bank of India (RBI), Central Board of Direct Taxes (CBDT), and CBIC GST notifications, and execute entirely on the client side using pure JavaScript. Whether you are computing compound interest compounding quarterly, calculating exact Section 87A marginal relief on salary income, or extracting net base amounts from a GST-inclusive invoice, your inputs stay confidential in your browser.
             </p>
             <div class="flex flex-wrap gap-4 text-[11px] pt-1 text-text-muted">
               <span>✓ Verified statutory rates (September 2026)</span>
               <span>✓ Your calculator inputs never leave your browser</span>
-              <span>✓ Formatted with Indian numbering system (Lakhs &amp; Crores)</span>
+              <span data-currency-lock="INR">✓ Formatted with Indian numbering system (Lakhs &amp; Crores)</span>
               <span>✓ URL hash sharing for instant team collaboration</span>
             </div>
           </div>

@@ -1,6 +1,7 @@
 import type { Category } from '../../config/site';
 
 export interface BlogFaq {
+  currencyLock?: 'INR';
   question: string;
   answer: string;
 }
@@ -40,6 +41,7 @@ export interface BlogPost {
   isFeatured?: boolean;
   type: 'Evergreen' | 'Trending' | 'Hybrid';
   summary: string;
+  summaryCurrencyLock?: 'INR';
   sources?: BlogSource[];
   relatedCalculators: RelatedCalculatorLink[];
   relatedArticles: RelatedArticleLink[];

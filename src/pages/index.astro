@@ -292,6 +292,7 @@ const jsonld = {
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {popularTools.map((tool) => tool && (
           <a
+            data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
             href={tool.path}
             class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
           >
@@ -359,7 +360,7 @@ const jsonld = {
   </section>
 
   <!-- From the Blog -->
-  <section class="py-12 bg-canvas border-b border-border" aria-labelledby="blog-preview-heading">
+  <section data-currency-lock="INR" class="py-12 bg-canvas border-b border-border" aria-labelledby="blog-preview-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
         <div>

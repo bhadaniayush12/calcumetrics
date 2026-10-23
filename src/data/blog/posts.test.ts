@@ -20,6 +20,8 @@ describe('Blog posts data integrity', () => {
       expect(post.title).toBeTruthy();
       expect(post.description).toBeTruthy();
       expect(post.category).toBeTruthy();
+      expect(Object.hasOwn(post, 'market'), post.slug).toBe(true);
+      expect(['India-Only', 'Global', 'Both'], post.slug).toContain(post.market);
       expect(post.publishDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(post.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(post.content).toBeTruthy();
@@ -75,9 +77,16 @@ describe('Blog posts data integrity', () => {
       expect(['Global', 'India-Only', 'Both']).toContain(post.market);
       counts[post.market]++;
     }
-    expect(counts['Global']).toBe(21);
+    expect(counts['Global']).toBe(20);
     expect(counts['India-Only']).toBe(18);
-    expect(counts['Both']).toBe(6);
+    expect(counts['Both']).toBe(7);
+  });
+
+  it('keeps Indian legal and product rules out of the Global classification', () => {
+    const indiaRule = /\b(?:RBI|SEBI|CBDT|GST|TDS|PPF|EPF|ELSS|DICGC)\b|Section (?:32|80C|87A|115BAC)|New Tax Regime/i;
+    for (const post of BLOG_POSTS.filter(p => p.market === 'Global')) {
+      expect(indiaRule.test(post.content + JSON.stringify(post.faqs)), post.slug).toBe(false);
+    }
   });
 
   it('verifies Phase 11 Addendum authoritative sources and E-E-A-T signals', () => {

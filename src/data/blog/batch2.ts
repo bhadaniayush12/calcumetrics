@@ -492,11 +492,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
           'Lenders charge a risk premium for fixed-rate loans because the institution absorbs the risk of future central bank rate hikes. With a floating-rate loan, the borrower assumes that interest rate risk, allowing the lender to offer a lower starting margin.',
       },
       {
+        currencyLock: 'INR',
         question: 'What happens to my EMI when floating interest rates increase?',
         answer:
           'In many banking systems (such as India), banks default to extending the loan tenure rather than increasing the monthly EMI payment. However, if rate increases are severe, the loan can enter "negative amortization" where the EMI no longer covers the monthly interest, forcing the bank to sharply raise the monthly EMI amount.',
       },
       {
+        currencyLock: 'INR',
         question: 'Are there prepayment penalties on floating rate home loans?',
         answer:
           'In many jurisdictions, financial regulators have explicitly banned prepayment penalties on floating-rate individual retail home loans (for example, the Reserve Bank of India strictly prohibits foreclosure charges on floating retail housing loans). Conversely, fixed-rate loans often carry prepayment penalty clauses of 1% to 3%.',
@@ -527,7 +529,8 @@ export const BATCH_2_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Direct Comparison: Key Structural Factors</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Direct Comparison: Key Structural Factors</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Before evaluating macroeconomic conditions, understand the structural terms that define both products:
       </p>
@@ -566,7 +569,9 @@ export const BATCH_2_POSTS: BlogPost[] = [
         </table>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Monetary Policy Decision Framework</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The Monetary Policy Decision Framework</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         To determine which option serves your household or enterprise best, identify where the prevailing economic cycle currently stands:
       </p>
@@ -586,10 +591,13 @@ export const BATCH_2_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Prepayment Advantage of Floating Rates</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Prepayment Advantage of Floating Rates</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-6">
         For proactive borrowers who intend to pay down their debt aggressively using annual bonuses or surplus savings, floating-rate loans carry a decisive structural edge: regulatory protection against prepayment fees. Because floating loans allow borrowers to prepay lump sums at any time without penalty, disciplined borrowers can shorten a 20-year loan down to 7 or 8 years, effectively eliminating interest rate risk through accelerated principal reduction.
       </p>
+</section>
+
     `,
   },
   {

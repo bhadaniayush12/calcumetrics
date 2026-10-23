@@ -484,7 +484,8 @@ const totalToolsCount = getToolCount();
 
 <script>
   import { CURRENCY_CONFIG, normalizeCurrency, detectUserCurrency, isJurisdictionLocked } from '../lib/currency';
-  import { initDOMCurrencyText, updateAllCurrencySpans } from '../lib/dynamic-currency-text';
+  import { initDOMCurrencyText } from '../lib/dynamic-currency-text';
+  import { applyCurrencyVisibility } from '../lib/page-currency';
 
   function syncNumberSystemUI(sys: string) {
     const ccPopover = document.getElementById('control-center-popover');
@@ -544,9 +545,10 @@ const totalToolsCount = getToolCount();
 
     if (!isJurisdictionLocked(window.location.pathname)) {
       document.querySelectorAll('[data-currency-prefix]').forEach((el) => {
-        el.textContent = config.symbol;
+        if (!el.closest('[data-currency-lock]')) el.textContent = config.symbol;
       });
       initDOMCurrencyText(config.code);
+      applyCurrencyVisibility(config.code);
     }
 
     if (broadcast) {
@@ -1042,7 +1044,9 @@ const totalToolsCount = getToolCount();
         (window as any).__cmCurrencyTextBound = true;
         window.addEventListener('cm:currency-change', (e: any) => {
           if (e.detail?.code && !isJurisdictionLocked(window.location.pathname)) {
-            updateAllCurrencySpans(e.detail.code);
+            // Calculator-local selectors also broadcast. The cached code makes
+            // the Header's own broadcast a no-op after applyCurrency's update.
+            initDOMCurrencyText(e.detail.code);
           }
         });
       }

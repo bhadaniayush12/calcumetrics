@@ -338,7 +338,7 @@ const jsonld = {
               Upfront processing fees secretly inflate borrowing costs far beyond the contract rate:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Processing Fee Haircut:</strong> If the lender deducts a {FEE_PCT}% processing fee ({fmtCurrency(DEFAULT.principal * FEE_PCT / 100)} + GST = {fmtCurrency(feeWithGst)}), you only receive <strong>{fmtCurrency(netDisbursed)}</strong> in hand.</li>
+              <li data-currency-lock="INR"><strong>Processing Fee Haircut:</strong> If the lender deducts a {FEE_PCT}% processing fee ({fmtCurrency(DEFAULT.principal * FEE_PCT / 100)} + GST = {fmtCurrency(feeWithGst)}), you only receive <strong>{fmtCurrency(netDisbursed)}</strong> in hand.</li>
               <li><strong>True Net APR:</strong> Entering {fmtCurrency(netDisbursed)} net principal with the same {fmtCurrency(DEFAULT.emi)} EMI solves to a <strong>{netApr.toFixed(2)}% Net APR</strong>, against {result.annualRatePct.toFixed(2)}% on the full {fmtCurrency(DEFAULT.principal)}.</li>
               <li>Always compute implied rate using net disbursed proceeds to identify the real cost of debt.</li>
             </ul>

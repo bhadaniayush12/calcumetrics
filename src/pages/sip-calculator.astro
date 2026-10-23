@@ -638,7 +638,7 @@ const jsonld = {
         <p class="text-sm text-text-muted leading-relaxed mb-4">
           A Systematic Investment Plan (SIP) enables disciplined rupee-cost averaging by investing a fixed sum on a scheduled day every month into mutual fund units. Each installment earns compound interest over its remaining tenure. Because units are bought each month across market highs and lows, your average acquisition cost stabilizes over long horizons.
         </p>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
+        <p data-currency-lock="INR" class="text-sm text-text-muted leading-relaxed mb-4">
           Calcumetrics computes SIP maturity using the standard <strong>annuity-due formula</strong> with monthly compounding. Annuity-due assumes installments are credited at the beginning of each month (matching the banking auto-debit schedule of Indian mutual fund AMCs):
         </p>
 
@@ -763,7 +763,7 @@ const jsonld = {
             <h3 class="font-bold text-text-primary text-sm mb-1.5">Inflation Impact</h3>
             <p class="leading-relaxed">This calculator outputs nominal values. A ₹1.26 Cr corpus 15 years from now has a real purchasing power of ~₹52.6 Lakh at 6% inflation.</p>
           </div>
-          <div class="p-4 bg-surface border border-border rounded-card">
+          <div data-currency-lock="INR" class="p-4 bg-surface border border-border rounded-card">
             <h3 class="font-bold text-text-primary text-sm mb-1.5">Budget 2024 Tax Rules</h3>
             <p class="leading-relaxed">Equity fund LTCG held > 12 months is taxed at 12.5% on gains exceeding ₹1.25 Lakh per financial year.</p>
           </div>
@@ -771,46 +771,13 @@ const jsonld = {
       </section>
 
       <!-- 7. Real FAQs (PAA) -->
-      <section aria-labelledby="sip-faq" class="mb-10">
+      <section data-currency-lock="INR" aria-labelledby="sip-faq" class="mb-10">
         <h2 id="sip-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            {
-              q: 'What is a SIP calculator and how does it work?',
-              a: 'A SIP calculator computes the estimated maturity corpus and capital gains of a Systematic Investment Plan. It applies compound interest on regular monthly contributions debited at the start of each month using the annuity-due mathematical formula.',
-            },
-            {
-              q: 'Is a 12% return realistic for mutual fund SIPs in India?',
-              a: 'Historically, diversified Indian equity mutual funds (large-cap, flexi-cap, and index funds tracking Nifty 50 or Sensex) have delivered 11% to 14% CAGR over rolling 10 to 15-year periods. However, equity returns are subject to market volatility and are not guaranteed.',
-            },
-            {
-              q: 'What formula does this SIP calculator use?',
-              a: 'This calculator uses the standard annuity-due formula: FV = P × [((1 + i)^n − 1) / i] × (1 + i), where P is the monthly investment amount, i is the monthly interest rate (annual rate / 12 / 100), and n is total months (years × 12).',
-            },
-            {
-              q: 'SIP vs Lumpsum: which is better for wealth creation?',
-              a: 'SIP is ideal for salaried individuals as it enforces investing discipline and leverages Rupee Cost Averaging to buy more units when markets dip. Lumpsum investing can generate higher returns when markets are undervalued, but carries higher entry timing risk.',
-            },
-            {
-              q: 'What happens if I miss a monthly SIP installment?',
-              a: 'If your bank account lacks sufficient balance, the fund house does not penalize or cancel your folio, though your bank may levy an auto-debit bounce charge. If three consecutive monthly debits fail, the mutual fund AMC may automatically pause the mandate.',
-            },
-            {
-              q: 'Are mutual fund SIP returns tax-free in India?',
-              a: 'No. Under Budget 2024 tax rules, Long-Term Capital Gains (LTCG) on equity mutual funds held for more than 12 months are taxed at 12.5% on capital gains exceeding ₹1.25 lakh per financial year. Short-Term Capital Gains (STCG) on units held up to 12 months are taxed at 20%.',
-            },
-            {
-              q: 'What is a Step-Up SIP?',
-              a: 'A Step-Up (or Top-Up) SIP automatically increases your monthly installment amount periodically (typically 5% to 10% each year in line with annual salary increments). This accelerates corpus accumulation significantly over long investment horizons.',
-            },
-          ].map((item) => (
+          {jsonld['@graph'].find((entry) => entry['@type'] === 'FAQPage')!.mainEntity.map((faq: any) => (
             <details class="border border-border rounded-card overflow-hidden bg-surface">
-              <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
-                {item.q}
-              </summary>
-              <div class="px-5 pb-4 pt-1 text-xs sm:text-sm text-text-muted leading-relaxed">
-                {item.a}
-              </div>
+              <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.name}</summary>
+              <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.acceptedAnswer.text}</div>
             </details>
           ))}
         </div>
@@ -822,7 +789,8 @@ const jsonld = {
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {related.map((tool) => (
             <a
-              href={tool.path}
+              data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined}
+            href={tool.path}
               class="group block bg-surface border border-border rounded-card p-4 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
             >
               <span class="text-[11px] font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>

@@ -183,7 +183,7 @@ const jsonld = {
         </div>
       </div>
 
-      <Alert variant="info" title="Quarterly Compounding">
+      <Alert data-currency-lock="INR" variant="info" title="Quarterly Compounding">
         Indian banks calculate RD interest compounded quarterly on all monthly installments per Indian Banks' Association guidelines.
       </Alert>
 
@@ -243,7 +243,7 @@ const jsonld = {
       <!-- 1. How it works -->
       <section aria-labelledby="rd-calculator-how">
         <h2 id="rd-calculator-how" class="text-xl font-bold text-text-primary mb-4">How the RD calculator works</h2>
-        <p class="text-sm text-text-muted leading-relaxed mb-4">
+        <p data-currency-lock="INR" class="text-sm text-text-muted leading-relaxed mb-4">
           A Recurring Deposit (RD) is a disciplined savings scheme where you deposit a fixed sum of money every month over a predetermined tenure. Per Indian Banks' Association (IBA) regulations, commercial banks compound interest on recurring deposits on a <strong>quarterly basis</strong>.
         </p>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
@@ -280,7 +280,7 @@ const jsonld = {
       </section>
 
       <!-- 3. Interpreting Your Results -->
-      <section aria-labelledby="rd-calculator-interpretation">
+      <section data-currency-lock="INR" aria-labelledby="rd-calculator-interpretation">
         <h2 id="rd-calculator-interpretation" class="text-xl font-bold text-text-primary mb-4">Interpreting your results</h2>
         <div class="space-y-3 text-sm text-text-muted leading-relaxed">
           <p>
@@ -296,7 +296,7 @@ const jsonld = {
       <section aria-labelledby="rd-calculator-assumptions">
         <h2 id="rd-calculator-assumptions" class="text-xl font-bold text-text-primary mb-4">Key assumptions and limitations</h2>
         <ul class="list-disc pl-5 space-y-2 text-sm text-text-muted leading-relaxed">
-          <li>
+          <li data-currency-lock="INR">
             <strong class="text-text-primary">Quarterly Compounding Standard:</strong> Calculation follows the standard Indian Banks' Association (IBA) quarterly compounding schedule.
           </li>
           <li>
@@ -305,7 +305,7 @@ const jsonld = {
           <li>
             <strong class="text-text-primary">Fixed Interest Rate:</strong> The interest rate remains uniform throughout the entire contracted duration.
           </li>
-          <li>
+          <li data-currency-lock="INR">
             <strong class="text-text-primary">TDS Excluded:</strong> Displays gross pre-tax maturity value. Banks deduct 10% TDS (with PAN) if total interest earned across deposits in a financial year exceeds ₹50,000 (₹1,00,000 for senior citizens).
           </li>
         </ul>
@@ -317,7 +317,7 @@ const jsonld = {
       </div>
 
       <!-- 5. Frequently Asked Questions -->
-      <section aria-labelledby="rd-calculator-faq">
+      <section data-currency-lock="INR" aria-labelledby="rd-calculator-faq">
         <h2 id="rd-calculator-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
           {[
@@ -339,7 +339,7 @@ const jsonld = {
         <h2 id="rd-calculator-related" class="text-xl font-bold text-text-primary mb-4">Related calculators</h2>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {related.map((tool) => (
-            <a href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+            <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
               <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.category}</span>
               <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{tool.name}</h3>
               <p class="text-xs text-text-muted mt-1 leading-relaxed">{tool.description}</p>
