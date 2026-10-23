@@ -17,7 +17,10 @@ import { DIWALI_BONUS_POST } from './diwali-bonus-2026-lump-sum-sip-or-prepay';
 
 import { NEW_TAX_ACT_POST } from './new-income-tax-act-2025-salaried-guide';
 
+import { RBI_FD_NEWS_POST } from './rbi-repo-rate-5-50-fd-returns-october-2026';
+
 export const BLOG_POSTS: BlogPost[] = [
+  RBI_FD_NEWS_POST,
   NEW_TAX_ACT_POST,
   DIWALI_BONUS_POST,
   SMALL_SAVINGS_POST,
