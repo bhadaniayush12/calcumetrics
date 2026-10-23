@@ -24,9 +24,11 @@ import { ITR_AUDIT_NEWS_POST } from './itr-due-date-21-november-2026-late-fee-in
 import { DHANTERAS_NEWS_POST } from './dhanteras-2026-gold-vs-sip';
 
 import { SECTION_87A_MARGINAL_RELIEF_POST } from './section-87a-marginal-relief-new-regime-example';
+import { WDV_DEPRECIATION_NUMERICAL_POST } from './wdv-depreciation-numerical-with-solution';
 
 export const BLOG_POSTS: BlogPost[] = [
   SECTION_87A_MARGINAL_RELIEF_POST,
+  WDV_DEPRECIATION_NUMERICAL_POST,
   DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   RBI_FD_NEWS_POST,
