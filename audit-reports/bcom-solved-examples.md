@@ -1,7 +1,16 @@
 # B.Com solved-example posts: audit
 
 Branch: `content/bcom-solved-examples` (from `origin/main` at 3c9eb3d). Not merged, not deployed.
-Date: 23 October 2026. Author field: Dev. Schema: Article + FAQPage + BreadcrumbList (rendered by `src/pages/blog/[slug].astro`, verified in `dist/`).
+Date: 23 October 2026 (revised the same day, see "Revision 1"). Author field: Dev. Schema: Article + FAQPage + BreadcrumbList (rendered by `src/pages/blog/[slug].astro`, verified in `dist/`).
+
+## Revision 1 (23 October 2026)
+
+1. **Advance tax post moved to FY 2026-27 / tax year 2026-27 under the Income-tax Act, 2025.** Provisions read in the Act text (incometaxindia.gov.in PDF, as amended by Finance Act 2026) and the Department's FAQs: s.404 (old 208, ₹10,000 or more), s.405 (computation, tax less TDS/TCS), s.408(1) (15/45/75/100% by 15 Jun/Sep/Dec/Mar) and s.408(2) (presumptive s.58 by 15 March), s.424 (old 234B, 1% a month, 90%), s.425 (old 234C, 3% of shortfall for the first three dates, 1% for 15 March; s.425(2) 12%/36% margins; s.425(5) tax due on returned income). Old section numbers appear once in brackets. Figures re-run through the engine (unchanged: ₹540 + ₹300 = ₹840). Title is now "Advance Tax Due Dates FY 2026-27: Solved Example"; OG card regenerated.
+   - Dropped: the ₹100 / ₹10 rounding FAQ and step. Under the 1961 Act that came from Rule 119A; I could not find the equivalent for tax year 2026-27 on an official page, so it is not claimed. Example figures are already round.
+2. **HRA post:** direct answer, an intro paragraph, a new FAQ and a common-mistakes bullet now say HRA exemption is not available under the new regime (s.115BAC), and both examples state the employee opted for the old regime. Sources: incometax.gov.in "FAQs on New Tax vs Old Tax Regime" (Q4: "this exemption is not available in the new tax regime") and the CBDT ITR-1 validation rules for AY 2026-27 (v1.0, 15 May 2026), rule 165: under the new regime, exempt allowance u/s 10(13A) "should not be more than 0".
+3. **PPF post `ppf-interest-before-5th-rule-example` dropped:** file, OG image, `posts.ts` entry and `/in/ppf-calculator` link removed; post counts back to 52 total / 21 India-Only. `ppf-interest-calculation-5th-day-rule` untouched. Section 8 below is kept for the record only.
+4. **87A post:** one sentence added near the top: rules are for FY 2025-26 (AY 2026-27) returns being filed now, linked to the e-filing portal's AY 2026-27 salaried page (existing source).
+5. **Engine:** `calcAdvanceTax` now uses `>= 10000`; tests added for ₹9,999 (false), ₹10,000 (true), ₹10,001 (true). `/in/advance-tax-calculator` note changed from "exceeds ₹10,000" to "is ₹10,000 or more" (the formula box already said ≥); its link to the post now uses the new title. The rest of that page still cites the 1961 sections; not changed (out of scope).
 
 ## How numbers were produced
 
@@ -120,23 +129,22 @@ Back-links were added to the related-guides box on 7 calculator pages. `/in/inco
 
 - URL: https://calcumetrics.com/blog/advance-tax-due-dates-calculation-example
 - Market: India-Only
-- Words: 1,249 visible / 1,030 body
-- Year: FY 2025-26 under the 1961 Act. The post says the Income-tax Act 2025 applies from 1 April 2026 and that the corresponding provisions were not checked.
-- Sources opened:
-  - https://www.incometaxindia.gov.in/w/who-is-liable-to-pay-advance-tax- (s.208, ₹10,000 or more after TDS; salary-only exemption)
-  - https://www.incometaxindia.gov.in/w/interest-and-fees (15/45/75/100%; 44AD/44ADA by 15 March; 12%/36% thresholds; assessed-tax meaning; 234B 1%/90%; rounding to ₹100 / ₹10)
-  - https://www.incometaxindia.gov.in/w/how-to-calculate-interest-under-section-234c- (3 months / 1 month; base 15/45/75/100%)
+- Year: tax year 2026-27 (FY 2026-27), Income-tax Act 2025. FY 2025-26 stays under the 1961 Act (transition FAQ Q2.16-Q2.17), stated once at the end.
+- Sources opened (incometaxindia.gov.in returns 403 to plain fetches; read through a browser-rendering fetcher):
+  - https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf (ss.404, 405, 408, 424, 425 read in full)
+  - https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments (FAQ 14-20: no policy change; s.404 ₹10,000 or more; s.408(2); 424 ↔ 234B, 425 ↔ 234C)
+  - https://www.incometaxindia.gov.in/documents/81799/11848482/Updated-FQAs-on-Interplay%26Transitions.pdf/... (Q2.14-Q2.21, same content; TY 2026-27 advance tax under the new Act)
 
 | Number | Origin |
 |---|---|
-| Due dates, percentages, ₹10,000, 12%/36%, 1% a month, periods, rounding | [official] |
+| Due dates, 15/45/75/100%, ₹10,000, 12%/36%, 3% / 1%, 90%, 1% a month | [official] Act 2025 ss.404, 408, 424, 425 |
 | Liability ₹1,20,000; payments nil / 54,000 / 80,000 / 1,20,000 | [input] |
 | Cumulative 18,000 / 54,000 / 90,000 / 1,20,000; instalments 18,000 / 36,000 / 36,000 / 30,000 | [engine] `calcAdvanceTax(120000)` |
 | 12% and 36% thresholds ₹14,400 / ₹43,200 | [arith] |
-| June interest ₹540; December interest ₹300 | [engine] `calcSimpleInterest(18000, 12, 3/12)`, `calcSimpleInterest(10000, 12, 3/12)` |
-| Total 234C interest ₹840 | [arith] sum of engine outputs |
+| June interest ₹540; December interest ₹300 (3% of shortfall) | [engine] `calcSimpleInterest(18000, 12, 3/12)`, `calcSimpleInterest(10000, 12, 3/12)` |
+| Total s.425 interest ₹840 | [arith] sum of engine outputs |
 
-Engine note: `calcAdvanceTax` sets `required` when liability is **> ₹10,000**, while the official FAQ says **₹10,000 or more**. The example (₹1,20,000) is unaffected, but the engine is wrong at exactly ₹10,000. Not fixed (out of scope).
+Engine note: fixed in Revision 1 (`>= 10000`).
 
 ## 6. EOQ with carrying cost percentage
 
@@ -159,7 +167,8 @@ Engine note: `calcAdvanceTax` sets `required` when liability is **> ₹10,000**,
 - URL: https://calcumetrics.com/blog/hra-exemption-least-of-three-solved-example
 - Market: India-Only
 - Words: 1,156 visible / 946 body
-- Year: FY 2025-26, s.10(13A) read with Rule 2A, 1961 Act. The post notes that from tax year 2026-27 the 2025 Act applies.
+- Year: FY 2025-26, s.10(13A) read with Rule 2A, 1961 Act, old regime only. The post notes that from tax year 2026-27 the 2025 Act applies.
+- New regime: not available (s.115BAC). Sources: https://www.incometax.gov.in/iec/foportal/help/new-tax-vs-old-tax-regime-faqs (Q4) and https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-05/CBDT_e-Filing_ITR%201_Validation%20Rules_AY%202026-27.pdf (rule 165).
 - Sources opened: https://www.incometaxindia.gov.in/w/income-from-salary (three limits; four cities; salary = basic + DA if retirement benefit + turnover commission; own-house note; landlord PAN above ₹1,00,000)
 
 | Number | Origin |
@@ -172,7 +181,7 @@ Engine note: `calcAdvanceTax` sets `required` when liability is **> ₹10,000**,
 | Ex 2 basic 50,000; DA 5,000 (not retirement); HRA 30,000; rent 25,000; Mumbai | [input] |
 | Limits 3,60,000 / 2,40,000 / 3,00,000; exempt 2,40,000; taxable 1,20,000 | [engine] `calcHRA(600000, 360000, 300000, true)` |
 
-## 8. PPF interest: deposit before the 5th
+## 8. PPF interest: deposit before the 5th (DROPPED in Revision 1, not published)
 
 - URL: https://calcumetrics.com/blog/ppf-interest-before-5th-rule-example
 - Market: India-Only
@@ -200,17 +209,17 @@ Engine note: `calcAdvanceTax` sets `required` when liability is **> ₹10,000**,
 ## Other changes
 
 - `src/data/blog/solved-example-markup.ts`: shared Tailwind markup (h2, formula block, solved-example box, table) for the series.
-- `src/data/blog/posts.test.ts`: post count 45 → 53; market counts Global 20→22, India-Only 18→22, Both 7→9.
-- `public/og/articles/<slug>.png` generated for the 8 posts with `scripts/generate-og-images.ts`. The script also re-rendered every existing card with byte differences; those were reverted, so only the 8 new PNGs are added.
+- `src/data/blog/posts.test.ts`: post count 45 → 52; market counts Global 20→22, India-Only 18→21, Both 7→9 (after dropping the PPF post).
+- `public/og/articles/<slug>.png` generated for the posts with `scripts/generate-og-images.ts`. The script also re-rendered every existing card with byte differences; those were reverted, so only the new PNGs are added (7 after the PPF post was dropped; the advance tax card was regenerated for its new title).
 - Blog index and `sitemap-pages.xml` pick up the posts automatically from `BLOG_POSTS` (verified in `dist/`).
 
 ## Overlap with existing posts
 
-Several topics sit next to existing guides: `ppf-interest-calculation-5th-day-rule`, `how-to-calculate-break-even-point`, `economic-order-quantity-eoq-guide`, `dscr-ratio-for-business-loans`, `advance-tax-guide`, `straight-line-vs-reducing-balance-depreciation`. The new posts target the "solved example / numerical" query and link to the older guide both ways. The PPF pair is the closest match, so it is the one most likely to compete in search.
+Several topics sit next to existing guides: `ppf-interest-calculation-5th-day-rule`, `how-to-calculate-break-even-point`, `economic-order-quantity-eoq-guide`, `dscr-ratio-for-business-loans`, `advance-tax-guide`, `straight-line-vs-reducing-balance-depreciation`. The new posts target the "solved example / numerical" query and link to the older guide both ways. The PPF pair was the closest match; that post has been dropped.
 
 ## Verification
 
-- `npm test`: 46 files, 1,136 tests passed.
-- `TZ=UTC LANG=en_US.UTF-8 npm test`: 46 files, 1,136 tests passed.
+- `npm test`: 46 files, 1,139 tests passed (Revision 1; 1,136 before + 3 threshold tests).
+- `TZ=UTC LANG=en_US.UTF-8 npm test`: 46 files, 1,139 tests passed.
 - `npm run build`: completed with no errors. The `seo-meta-limits` integration reports all titles ≤ 60 and descriptions ≤ 160.
 - Rendered pages checked in `dist/blog/*.html`: key figures present, no `NaN`/`undefined`/`Infinity`, three schema types present, INR lock sections present on Both posts.
