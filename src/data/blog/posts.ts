@@ -19,7 +19,10 @@ import { NEW_TAX_ACT_POST } from './new-income-tax-act-2025-salaried-guide';
 
 import { RBI_FD_NEWS_POST } from './rbi-repo-rate-5-50-fd-returns-october-2026';
 
+import { IPO_WEEK_NEWS_POST } from './ipo-oct-nov-2026-lot-size-money-needed-tax';
+
 export const BLOG_POSTS: BlogPost[] = [
+  IPO_WEEK_NEWS_POST,
   RBI_FD_NEWS_POST,
   NEW_TAX_ACT_POST,
   DIWALI_BONUS_POST,
