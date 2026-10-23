@@ -26,6 +26,8 @@ const limitRows = (r: typeof example1, label: string) => [
 ];
 
 const SALARY_PAGE = 'https://www.incometaxindia.gov.in/w/income-from-salary';
+const REGIME_FAQ = 'https://www.incometax.gov.in/iec/foportal/help/new-tax-vs-old-tax-regime-faqs';
+const ITR1_RULES_AY_2026_27 = 'https://www.incometax.gov.in/iec/foportal/sites/default/files/2026-05/CBDT_e-Filing_ITR%201_Validation%20Rules_AY%202026-27.pdf';
 
 export const HRA_LEAST_OF_THREE_POST: BlogPost = {
   slug: 'hra-exemption-least-of-three-solved-example',
@@ -40,10 +42,12 @@ export const HRA_LEAST_OF_THREE_POST: BlogPost = {
   readTime: '7 min read',
   author: 'Dev',
   type: 'Evergreen',
-  quickAnswer: `Under section 10(13A) read with Rule 2A, the exempt HRA is the least of: actual HRA received; rent paid minus 10% of salary; and 50% of salary in Mumbai, Kolkata, Delhi or Chennai or 40% elsewhere. "Salary" means basic plus DA that forms part of retirement benefits plus turnover-based commission. In Example 1, the exemption is ${money(example1.exemption)} and ${money(example1.taxableHRA)} of HRA is taxable.`,
-  summary: `Under section 10(13A) read with Rule 2A, the exempt HRA is the least of: actual HRA received; rent paid minus 10% of salary; and 50% of salary in Mumbai, Kolkata, Delhi or Chennai or 40% elsewhere. "Salary" means basic plus DA that forms part of retirement benefits plus turnover-based commission. In Example 1, the exemption is ${money(example1.exemption)} and ${money(example1.taxableHRA)} of HRA is taxable.`,
+  quickAnswer: `Under section 10(13A) read with Rule 2A, the exempt HRA is the least of: actual HRA received; rent paid minus 10% of salary; and 50% of salary in Mumbai, Kolkata, Delhi or Chennai or 40% elsewhere. "Salary" means basic plus DA that forms part of retirement benefits plus turnover-based commission. HRA exemption is not available under the new tax regime (section 115BAC), so these examples apply only if you file under the old regime. In Example 1, the exemption is ${money(example1.exemption)} and ${money(example1.taxableHRA)} of HRA is taxable.`,
+  summary: `Under section 10(13A) read with Rule 2A, the exempt HRA is the least of: actual HRA received; rent paid minus 10% of salary; and 50% of salary in Mumbai, Kolkata, Delhi or Chennai or 40% elsewhere. "Salary" means basic plus DA that forms part of retirement benefits plus turnover-based commission. HRA exemption is not available under the new tax regime (section 115BAC), so these examples apply only if you file under the old regime. In Example 1, the exemption is ${money(example1.exemption)} and ${money(example1.taxableHRA)} of HRA is taxable.`,
   sources: [
     { name: 'Income Tax Department', url: SALARY_PAGE, citation: 'Income from salary: section 10(13A) read with Rule 2A, the three limits, definition of salary, notes on own house and landlord PAN' },
+    { name: 'Income Tax Department e-filing portal', url: REGIME_FAQ, citation: 'FAQs on new vs old tax regime: HRA exemption under section 10(13A) is not available in the new tax regime' },
+    { name: 'Income Tax Department e-filing portal', url: ITR1_RULES_AY_2026_27, citation: 'ITR-1 validation rules for AY 2026-27, rule 165: under the new tax regime, exempt allowance u/s 10(13A) should not be more than zero' },
     { name: 'Calcumetrics HRA Exemption Calculator', url: 'https://calcumetrics.com/in/hra-calculator', citation: 'calcHRA engine: three limits, exemption and taxable HRA used for every figure here' },
   ],
   relatedCalculators: [
@@ -64,6 +68,10 @@ export const HRA_LEAST_OF_THREE_POST: BlogPost = {
       answer: 'The Income Tax Department’s salary page defines it as basic salary, plus dearness allowance if it forms part of retirement benefits, plus commission based on a fixed percentage of turnover.',
     },
     {
+      question: 'Can I claim HRA exemption under the new tax regime?',
+      answer: 'No. The e-filing portal’s FAQs on the new and old regimes say the section 10(13A) HRA exemption is not available in the new tax regime under section 115BAC, and the ITR-1 validation rules for AY 2026-27 require exempt HRA to be zero when the new regime is selected. The examples in this post apply to the old regime only.',
+    },
+    {
       question: 'Is Bengaluru a metro city for HRA?',
       answer: 'No. The 50% limit applies only to houses in Mumbai, Kolkata, Delhi and Chennai. Bengaluru, Hyderabad, Pune and every other city use the 40% limit.',
     },
@@ -74,6 +82,7 @@ export const HRA_LEAST_OF_THREE_POST: BlogPost = {
   ],
   content: `
 ${p(`An HRA exemption calculation is really three calculations and a comparison. The Income-tax Act lists three limits and only the lowest is exempt, so an exam answer has to show all three before picking one. This post covers the formula, the definition of salary that trips most students up, and two solved numericals for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961. The figures come from our ${link('/in/hra-calculator', 'HRA exemption calculator')}.`)}
+${p(`<strong>The HRA exemption is available only under the old tax regime.</strong> The e-filing portal’s ${link(REGIME_FAQ, 'FAQs on the new and old tax regimes')} state that the section 10(13A) exemption is not available in the new tax regime under section 115BAC, and the ${link(ITR1_RULES_AY_2026_27, 'ITR-1 validation rules for AY 2026-27')} require exempt HRA to be zero when the new regime is selected. Both examples below assume the employee has opted for the old regime.`)}
 
 ${h2('The rule under section 10(13A) and Rule 2A')}
 ${p(`The Income Tax Department’s ${link(SALARY_PAGE, 'page on income from salary')} lists house rent allowance under section 10(13A) read with Rule 2A. The least of the following is exempt: actual HRA received; 40% of salary, or 50% if the house is in Mumbai, Calcutta (Kolkata), Delhi or Chennai; and rent paid minus 10% of salary.`)}
@@ -87,7 +96,7 @@ ${formulaBlock('HRA exemption under Rule 2A', 'Exempt HRA = MIN( Actual HRA , Re
 ${h2('Solved numericals')}
 ${solvedExample(
   'Example 1: non-metro city (Bengaluru)',
-  `Mr D works in Bengaluru. His monthly pay is: basic ${money(ex1.basic)}, DA ${money(ex1.da)} (forming part of retirement benefits) and HRA ${money(ex1.hra)}. He pays rent of ${money(ex1.rent)} a month for the whole of FY 2025-26. Calculate his exempt and taxable HRA.`,
+  `Mr D works in Bengaluru. His monthly pay is: basic ${money(ex1.basic)}, DA ${money(ex1.da)} (forming part of retirement benefits) and HRA ${money(ex1.hra)}. He pays rent of ${money(ex1.rent)} a month for the whole of FY 2025-26 and has opted for the old tax regime. Calculate his exempt and taxable HRA.`,
   [
     `Salary for HRA = (${money(ex1.basic)} + ${money(ex1.da)}) × 12 = <strong>${money(ex1Salary)}</strong>. DA counts because it forms part of retirement benefits.`,
     `Limit 1, actual HRA received = ${money(ex1.hra)} × 12 = <strong>${money(example1.actualHRA)}</strong>.`,
@@ -100,7 +109,7 @@ ${solvedExample(
 ${table('Example 1 — Bengaluru, FY 2025-26 (annual figures)', ['Limit', 'Amount'], limitRows(example1, '40%'))}
 ${solvedExample(
   'Example 2: metro city with DA outside retirement benefits',
-  `Ms E lives and works in Mumbai. Her monthly pay is: basic ${money(ex2.basic)}, DA ${money(ex2.daNotRetirement)} (not forming part of retirement benefits) and HRA ${money(ex2.hra)}. Her rent is ${money(ex2.rent)} a month for the whole year. Calculate her exempt and taxable HRA for FY 2025-26.`,
+  `Ms E lives and works in Mumbai. Her monthly pay is: basic ${money(ex2.basic)}, DA ${money(ex2.daNotRetirement)} (not forming part of retirement benefits) and HRA ${money(ex2.hra)}. Her rent is ${money(ex2.rent)} a month for the whole year. She has opted for the old tax regime. Calculate her exempt and taxable HRA for FY 2025-26.`,
   [
     `Salary for HRA = ${money(ex2.basic)} × 12 = <strong>${money(ex2Salary)}</strong>. Her DA does not form part of retirement benefits, so it is left out.`,
     `Limit 1, actual HRA received = ${money(ex2.hra)} × 12 = <strong>${money(example2.actualHRA)}</strong>.`,
@@ -124,10 +133,11 @@ ${bullets([
   'Treating Bengaluru, Hyderabad or Pune as metro cities and applying 50% instead of 40%.',
   'Deducting 10% of HRA, or 10% of rent, instead of 10% of salary in limit 2.',
   'Mixing monthly and annual figures across the three limits.',
+  'Claiming the exemption under the new tax regime, where section 115BAC does not allow it.',
 ])}
 
 ${h2('Check your answer')}
-${p(`Enter annual salary (basic plus qualifying DA), HRA received and rent paid in the ${link('/in/hra-calculator', 'HRA calculator')}, and choose metro or non-metro. It shows each limit next to the exemption, which is the layout examiners expect. Whether the exemption is available also depends on the tax regime you file under, so check that before relying on the saving; our ${link('/blog/old-vs-new-tax-regime', 'old vs new tax regime comparison')} walks through that decision.`)}
+${p(`Enter annual salary (basic plus qualifying DA), HRA received and rent paid in the ${link('/in/hra-calculator', 'HRA calculator')}, and choose metro or non-metro. It shows each limit next to the exemption, which is the layout examiners expect. The exemption counts only if you file under the old regime, so compare the two before relying on the saving; our ${link('/blog/old-vs-new-tax-regime', 'old vs new tax regime comparison')} walks through that decision.`)}
 ${p('This is an educational example for FY 2025-26. From tax year 2026-27 the Income-tax Act, 2025 applies, and section and rule numbers may differ, so confirm the current provisions on the Income Tax Department’s website.')}
 ${lastUpdated('23 October 2026')}
 `,
