@@ -30,7 +30,6 @@ import { BREAK_EVEN_SOLVED_EXAMPLE_POST } from './break-even-point-solved-exampl
 import { ADVANCE_TAX_EXAMPLE_POST } from './advance-tax-due-dates-calculation-example';
 import { EOQ_CARRYING_COST_EXAMPLE_POST } from './eoq-carrying-cost-percentage-solved-example';
 import { HRA_LEAST_OF_THREE_POST } from './hra-exemption-least-of-three-solved-example';
-import { PPF_BEFORE_5TH_EXAMPLE_POST } from './ppf-interest-before-5th-rule-example';
 
 export const BLOG_POSTS: BlogPost[] = [
   SECTION_87A_MARGINAL_RELIEF_POST,
@@ -40,7 +39,6 @@ export const BLOG_POSTS: BlogPost[] = [
   ADVANCE_TAX_EXAMPLE_POST,
   EOQ_CARRYING_COST_EXAMPLE_POST,
   HRA_LEAST_OF_THREE_POST,
-  PPF_BEFORE_5TH_EXAMPLE_POST,
   DHANTERAS_NEWS_POST,
   ITR_AUDIT_NEWS_POST,
   RBI_FD_NEWS_POST,
