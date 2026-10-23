@@ -197,9 +197,12 @@ const jsonld = {
         </div>
       </div>
 
-      <Alert variant="info" title="Tax Benefit">
-        Repayment of principal qualifies for deduction under Section 80C (up to ₹1.5L), while interest paid is deductible under Section 24(b) (up to ₹2L/year).
-      </Alert>
+      <!-- India-only tax note: hidden outside INR, and its statutory ₹ limits are never converted -->
+      <div data-inr-only data-currency-lock="INR" class="hidden">
+        <Alert variant="info" title="Tax Benefit">
+          Repayment of principal qualifies for deduction under Section 80C (up to ₹1.5L), while interest paid is deductible under Section 24(b) (up to ₹2L/year).
+        </Alert>
+      </div>
 
       <div class="flex gap-3 mt-6">
         <Button variant="primary" id="hl-calculate" type="button">Reveal My Home Loan EMI</Button>

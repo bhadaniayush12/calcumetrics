@@ -485,6 +485,7 @@ const totalToolsCount = getToolCount();
 <script>
   import { CURRENCY_CONFIG, normalizeCurrency, detectUserCurrency, isJurisdictionLocked } from '../lib/currency';
   import { initDOMCurrencyText } from '../lib/dynamic-currency-text';
+  import { applyCurrencyVisibility } from '../lib/page-currency';
 
   function syncNumberSystemUI(sys: string) {
     const ccPopover = document.getElementById('control-center-popover');
@@ -547,6 +548,7 @@ const totalToolsCount = getToolCount();
         if (!el.closest('[data-currency-lock]')) el.textContent = config.symbol;
       });
       initDOMCurrencyText(config.code);
+      applyCurrencyVisibility(config.code);
     }
 
     if (broadcast) {

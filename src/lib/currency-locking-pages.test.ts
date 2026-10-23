@@ -6,6 +6,7 @@ import { buildSync } from 'esbuild';
 import { resolve } from 'node:path';
 import { BLOG_POSTS } from '../data/blog/posts';
 import { initDOMCurrencyText } from './dynamic-currency-text';
+import { applyCurrencyVisibility } from './page-currency';
 
 let activeWindow: Window | undefined;
 let dscrClient = '';
@@ -169,6 +170,24 @@ describe('built Astro currency locking', () => {
     const shortfall = w.document.querySelector('#dscr-plain-translation')!.textContent;
     expect(shortfall).toContain('0.75× the amount');
     expect(shortfall).not.toMatch(/[₹$€£]/);
+  });
+
+  it('hides the India-only home loan tax note in USD and never converts its limits', () => {
+    const w = render('home-loan-calculator');
+    // Same steps as Header.applyCurrency on a non-jurisdiction route.
+    initDOMCurrencyText('USD');
+    applyCurrencyVisibility('USD');
+    const main = w.document.querySelector('main')!;
+    expect(main.textContent).not.toContain('$150k');
+    expect(main.textContent).not.toContain('$200k');
+    const notes = [...main.querySelectorAll('[role="status"]')].filter(el => el.textContent.includes('Section 80C'));
+    expect(notes.length).toBe(1);
+    const note = notes[0];
+    expect(note.closest('.hidden')).not.toBeNull();
+    expect(note.textContent).toContain('₹1.5L');
+    expect(note.textContent).toContain('₹2L/year');
+    applyCurrencyVisibility('INR');
+    expect(note.closest('.hidden')).toBeNull();
   });
 
   it('swaps unlocked calculator examples and shows their notice', () => {
