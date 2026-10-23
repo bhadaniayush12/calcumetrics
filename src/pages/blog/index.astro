@@ -87,7 +87,7 @@ const jsonld = {
 
     <!-- Featured / Most Read Article Card (§4) -->
     {featuredPost && (
-      <section aria-label="Featured Guide" class="mb-12">
+      <section data-currency-lock={featuredPost.market !== 'Global' ? 'INR' : undefined} aria-label="Featured Guide" class="mb-12">
         <div class="relative overflow-hidden bg-gradient-to-br from-surface to-surface/80 border-2 border-accent/40 rounded-card p-6 sm:p-8 shadow-sm hover:border-accent transition-standard">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
             <div class="flex items-center gap-2">
@@ -208,7 +208,7 @@ const jsonld = {
         const primaryCalc = post.relatedCalculators[0];
         const icon = categoryIcons[post.category] || '📄';
         return (
-          <article
+          <article data-currency-lock={post.market !== 'Global' ? 'INR' : undefined}
             class="blog-card bg-surface border border-border rounded-card flex flex-col justify-between hover:border-accent transition-standard focus-within:border-accent overflow-hidden"
             data-category={post.category}
             data-search={`${post.title} ${post.description} ${post.quickAnswer || ''} ${post.category}`.toLowerCase()}

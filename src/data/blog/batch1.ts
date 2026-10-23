@@ -685,6 +685,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
     ],
     faqs: [
       {
+        currencyLock: 'INR',
         question: 'Can you lose money in an RD?',
         answer:
           'In nominal terms, you cannot lose principal in a commercial bank RD up to regulatory insurance limits (such as ₹5 lakh under DICGC in India or $250,000 under FDIC in the US). However, in real terms, if the post-tax interest rate is lower than inflation, your purchasing power will systematically decline over time.',
@@ -695,6 +696,7 @@ export const BATCH_1_POSTS: BlogPost[] = [
           'Financial planners recommend an investment horizon of at least 5 years, and ideally 7 to 10 years, for equity SIPs. Over rolling 1-year to 3-year periods, equities carry notable risk of negative returns, but over 7+ year rolling horizons, diversified broad-market indices have historically demonstrated near-zero probability of negative returns.',
       },
       {
+        currencyLock: 'INR',
         question: 'How are RDs taxed compared to mutual fund SIPs?',
         answer:
           'RD interest is categorized as income from other sources and taxed annually at your marginal income tax slab (which can reach 30% or more plus surcharges), with TDS applicable above statutory thresholds. Equity mutual fund SIPs are taxed only upon redemption under capital gains tax rules, which offer preferential rates and annual exemption allowances on long-term gains.',
@@ -723,7 +725,8 @@ export const BATCH_1_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Head-to-Head Comparison: Structural Drivers</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. Head-to-Head Comparison: Structural Drivers</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         The table below breaks down the fundamental economic and operational differences between an RD and a mutual fund SIP:
       </p>
@@ -767,7 +770,10 @@ export const BATCH_1_POSTS: BlogPost[] = [
         </table>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The 10-Year Wealth Divergence: A Worked Model</h2>
+      <section data-currency-lock="INR">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. The 10-Year Wealth Divergence: A Worked Model</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Consider an investor contributing 10,000 per month over a 10-year horizon (total principal invested = 12,00,000):
       </p>
@@ -795,7 +801,9 @@ export const BATCH_1_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Horizon-Based Allocation Rule</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Horizon-Based Allocation Rule</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Because financial risk is intrinsically tied to time, choose between an RD and an SIP based on when you will spend the accumulated money:
       </p>

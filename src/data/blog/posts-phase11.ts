@@ -256,7 +256,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       </div>
 
       <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The 3 Dangerous Traps When Reading XIRR</h2>
-      
+
       <div class="space-y-4 mb-6">
         <div class="p-4 bg-canvas border border-border rounded-card">
           <h3 class="text-sm font-semibold text-text-primary mb-1">1. The Short-Tenure Annualization Trap</h3>
@@ -320,6 +320,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
       },
     ],
     type: 'Hybrid',
+    summaryCurrencyLock: 'INR',
     summary:
       'Borrowers are perpetually torn between the emotional freedom of becoming debt-free and the mathematical compounding of equity index investing. This guide analyzes the net post-tax return spread under the New Tax Regime, models a ₹50L loan with ₹10,000 monthly surplus, and outlines the optimal hybrid repayment strategy.',
     relatedCalculators: [
@@ -364,6 +365,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
           'Yes. Prepaying a loan provides a 100% risk-free, guaranteed return equal to the effective interest rate of your loan. For example, if your home loan interest rate is 8.50%, every rupee you prepay saves you 8.50% compounded annual interest. Very few risk-free fixed-income instruments offer a post-tax yield of 8.50%.',
       },
       {
+        currencyLock: 'INR',
         question: 'How does the current New Tax Regime change the home loan prepayment calculation?',
         answer:
           'Under the Old Tax Regime, Section 24(b) allowed a deduction of up to ₹2,00,000 on home loan interest for self-occupied properties, which effectively reduced an 8.50% borrowing rate down to ~5.95% for individuals in the 30% tax slab. However, under the default New Tax Regime (Section 115BAC), Section 24(b) deductions are eliminated for self-occupied homes. Your effective borrowing cost is now the full nominal rate (8.50%), making prepayment substantially more attractive than in previous years.',
@@ -379,6 +381,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
           'The hybrid strategy splits surplus cash: during the first 5 to 7 years of a 20-year mortgage (when interest constitutes 65% to 75% of every monthly EMI), allocate 60-70% of surplus cash toward principal prepayment. Once the remaining tenure drops below 10 years and principal repayment dominates the EMI, redirect 100% of future surplus into high-growth equity SIPs.',
       },
       {
+        currencyLock: 'INR',
         question: 'Are there any prepayment penalty charges on home loans in India?',
         answer:
           'Under Reserve Bank of India (RBI) regulations, banks and housing finance companies (HFCs) are strictly prohibited from levying any prepayment or foreclosure penalties on floating-rate home loans sanctioned to individual borrowers. Fixed-rate home loans, however, may still carry prepayment penalties depending on the lender agreement.',
@@ -408,7 +411,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Tax Reality: How Tax Shields Alter the Equation (Global vs. India)</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">1. The Tax Reality: How Tax Shields Alter the Equation (Global vs. India)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         In mortgage analysis worldwide, debt payoff math hinges on whether interest is tax-deductible. In the United States, homeowners who itemize deductions on Schedule A can deduct mortgage interest on the first $750,000 of debt, lowering their effective interest rate. In India, a major statutory overhaul has completely flipped this dynamic:
       </p>
@@ -423,7 +427,10 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <strong>The Statutory New Tax Regime Shift:</strong> Under the default <strong>New Tax Regime (Section 115BAC)</strong>, Section 24(b) deductions for self-occupied homes and Section 80C principal deductions are <em>completely disallowed</em>. Unless you actively opt for the Old Regime with substantial deductions, your home loan cost is the full, unshielded <strong>8.50%</strong>. A guaranteed 8.50% post-tax return is vastly harder for fixed-income assets to match.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Comparison: Indian Home Loan Case Study (₹50 Lakh Loan Over 20 Years)</h2>
+      <section data-currency-lock="INR">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">2. Step-by-Step Worked Comparison: Indian Home Loan Case Study (₹50 Lakh Loan Over 20 Years)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-3">
         Let us run the exact math for a borrower with the following parameters:
       </p>
@@ -477,7 +484,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <strong>The Math Verdict:</strong> Investing ₹10,000 monthly into an equity index fund generating 12% over 20 years creates <strong>₹99.91 Lakh</strong>. Path A saves ₹21.79 Lakh of interest and then builds about ₹71.7 Lakh from Year 12.9 to Year 20. Both paths leave the house fully paid at Year 20, so the comparison is the two portfolios: the SIP path ends roughly <strong>₹28 Lakh ahead before tax, or about ₹22 Lakh ahead after 12.5% LTCG</strong> (applying the ₹1.25 lakh exemption once).
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Critical Non-Mathematical Risks</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Critical Non-Mathematical Risks</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         While the spreadsheet favors equity SIPs, spreadsheets ignore real-world emotional and behavioral pitfalls:
       </p>
@@ -1831,6 +1840,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         answer: 'Flat rates are a marketing tactic designed to make expensive consumer loans appear cheap. An advertisement promoting a "7% flat rate" sounds significantly more affordable to an average borrower than a bank offering a "13% reducing rate," even though both loans carry nearly identical monthly instalments and total interest outgoes.',
       },
       {
+        currencyLock: 'INR',
         question: 'What is the RBI Key Facts Statement (KFS) mandate?',
         answer: 'The Reserve Bank of India (RBI) mandates that all commercial banks and Non-Banking Financial Companies (NBFCs) provide every borrower with a standardized Key Facts Statement (KFS) prior to loan execution. The KFS must explicitly disclose the true Annual Percentage Rate (APR), including all interest, processing fees, documentation charges, and upfront insurance costs.',
       },
@@ -1987,7 +1997,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <strong>The Counter-Intuitive Outcome:</strong> The dealership's "8.5%" loan costs <strong>₹28,905 MORE in interest</strong> than the bank's "14.0%" loan, and requires a higher monthly EMI (₹23,750 vs ₹23,268). A consumer who did not understand the difference would eagerly pick Offer A, believing they saved 5.5% on interest.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Regulatory Defense: RBI's Key Facts Statement (KFS)</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. The Regulatory Defense: RBI's Key Facts Statement (KFS)</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         To curb misleading flat-rate marketing, the Reserve Bank of India issued updated guidelines mandating that all commercial banks, non-banking financial companies (NBFCs), and digital lending apps provide borrowers with a standardized <strong>Key Facts Statement (KFS)</strong>.
       </p>
@@ -1995,7 +2006,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Before signing any loan contract, inspect the KFS document for the <strong>Annual Percentage Rate (APR)</strong>. Under RBI rules, the APR must reflect the reducing-balance equivalent interest rate including processing fees, documentation charges, and mandatory insurance premiums. Never finalize a loan based solely on the sales brochure rate.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Four Rules to Protect Yourself Before Signing Any Loan Agreement</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Four Rules to Protect Yourself Before Signing Any Loan Agreement</h2>
       <p class="text-sm text-text-muted leading-relaxed">
         Flat interest rates are a marketing mechanism engineered to make high borrowing costs look deceptively affordable. Whenever a lender quotes a flat rate, apply the 1.8x multiplier rule or calculate the exact monthly repayment using our <a href="/emi-calculator" class="text-accent font-medium hover:underline">EMI Calculator</a> to ensure you never overpay for credit.
       </p>
@@ -2639,6 +2652,7 @@ export const PHASE_11_POSTS: BlogPost[] = [
         answer: 'The exact formula is the Fisher Equation: Real Rate = [ (1 + Nominal Rate) / (1 + Inflation Rate) ] - 1. While many people use the rough approximation (Nominal Rate - Inflation Rate), this simple subtraction introduces significant compounding errors over longer investment horizons or in moderate-to-high inflation environments.',
       },
       {
+        currencyLock: 'INR',
         question: 'How do income taxes reduce the real return of a fixed deposit?',
         answer: 'Fixed deposit interest is categorized as "Income from Other Sources" and taxed at your marginal slab rate (up to 30% plus cess and surcharge). If you earn 7% nominal interest in the 30% slab, your post-tax nominal return is only 7% × (1 - 0.30) = 4.90%. If annual inflation is 6%, your real post-tax return is (1.049 / 1.06) - 1 = -1.04% annually.',
       },
@@ -2647,10 +2661,12 @@ export const PHASE_11_POSTS: BlogPost[] = [
         answer: 'The money illusion occurs because people look at the nominal face value of currency rather than its real purchasing power. Seeing a ₹10,00,000 fixed deposit mature into ₹19,67,000 after 10 years creates the psychological feeling of wealth doubling, even if a basket of consumer goods that cost ₹10 Lakhs a decade ago now costs ₹21 Lakhs due to inflation.',
       },
       {
+        currencyLock: 'INR',
         question: 'Can fixed deposits ever generate a positive real return in India?',
         answer: 'Yes, but primarily for individuals in the 0% tax bracket (retirees or low-income earners with total income below basic exemption limits) during periods when the Reserve Bank of India (RBI) maintains tight monetary policy with real policy rates 1% to 2% above Consumer Price Index (CPI) inflation.',
       },
       {
+        currencyLock: 'INR',
         question: 'Which investment instruments protect purchasing power from inflation and taxes?',
         answer: 'Historically, diversified equity mutual funds (SIPs), Sovereign Gold Bonds (SGBs, which offer capital gains tax exemptions on maturity), Public Provident Fund (PPF, with Exempt-Exempt-Exempt tax status), and commercial real estate have consistently delivered positive post-tax real rates of return over 10- to 20-year horizons.',
       },
@@ -2715,7 +2731,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Double Squeeze: Tax Slabs &amp; Inflation Matrix</h2>
+      <section data-currency-lock="INR">
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">3. The Double Squeeze: Tax Slabs &amp; Inflation Matrix</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Fixed deposit interest is categorized as "Income from Other Sources" and taxed at your marginal slab rate—with zero indexation benefit. The table below illustrates the true <strong>annual post-tax real return</strong> of a <strong>7.0% nominal fixed deposit</strong> across different tax brackets and inflation rates:
       </p>
@@ -2773,7 +2790,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <strong>The Shocking Reality:</strong> For any individual in the 30% tax bracket, a 7.0% fixed deposit yields a <strong>negative real return (-1.04%)</strong> whenever Indian inflation averages 6.0%. Every year your money remains locked in that fixed deposit, you lose approximately 1% of your real economic purchasing power.
       </p>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Worked 10-Year Case Studies: Global Fixed Income vs. Indian Deposit</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">4. Worked 10-Year Case Studies: Global Fixed Income vs. Indian Deposit</h2>
       <div class="mb-6 p-4 bg-surface border border-border rounded-card text-xs text-text-muted space-y-2">
         <strong class="text-text-primary text-sm block">Global Benchmark Case Study ($100,000 Capital):</strong>
         <p>An international investor holds $100,000 in a 10-year Treasury note or corporate bond yielding <strong>5.20% nominal</strong>. In a 24% marginal tax bracket with <strong>3.20% annual CPI inflation</strong>:</p>
@@ -2781,7 +2800,8 @@ export const PHASE_11_POSTS: BlogPost[] = [
         <p>• Exact Real Rate (Fisher Equation): $(1 + 0.03952) / (1 + 0.032) - 1 = mathbf{+0.73%}$</p>
         <p>Over 10 years, real purchasing power expands modestly by ~7.5%.</p>
       </div>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">
+      <section data-currency-lock="INR">
+<p class="text-sm text-text-muted leading-relaxed mb-4">
         To see the compounding devastation of negative real returns over time, track a <strong>₹10,00,000 fixed deposit</strong> invested by a professional in the 30% tax slab over a 10-year horizon with 6% annual inflation:
       </p>
 
@@ -2809,7 +2829,10 @@ export const PHASE_11_POSTS: BlogPost[] = [
         </div>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. How to Build an Inflation-Defeating Portfolio</h2>
+      <section data-currency-lock="INR">
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">5. How to Build an Inflation-Defeating Portfolio</h2>
       <p class="text-sm text-text-muted leading-relaxed mb-4">
         Fixed deposits remain valuable for <strong>emergency funds</strong> and capital needed within 6 to 24 months, where nominal capital preservation is non-negotiable. But for money with a horizon of 5 years or longer, wealth preservation requires inflation-beating instruments:
       </p>
@@ -2825,7 +2848,9 @@ export const PHASE_11_POSTS: BlogPost[] = [
         Real estate rents and replacement construction costs escalate with inflation, providing built-in purchasing power defenses.</p>
       </div>
 
-      <h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Asset Allocation Strategies to Defend Your Real Purchasing Power</h2>
+
+</section>
+<h2 class="text-xl sm:text-2xl font-bold text-text-primary mt-8 mb-4">Asset Allocation Strategies to Defend Your Real Purchasing Power</h2>
       <p class="text-sm text-text-muted leading-relaxed">
         True financial wealth is never measured by the nominal face value printed on an account statement, but by the tangible goods, services, and independence that wealth can command. By evaluating every investment through the lens of the Fisher Equation and building an asset allocation that outpaces the twin headwinds of taxes and inflation, you ensure your hard-earned savings continue to build real, lasting generational wealth.
       </p>
