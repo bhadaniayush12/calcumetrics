@@ -70,6 +70,7 @@ export const SECTION_87A_MARGINAL_RELIEF_POST: BlogPost = {
   ],
   content: `
 ${p(`The ₹12 lakh limit is the easy part of section 87A. The marginal relief calculation just above it is where answers go wrong. This post works through the calculation the way a tax exam answer would: formula first, then two solved numericals for FY 2025-26 (AY 2026-27) under the Income-tax Act, 1961. The examples use salaried individuals because our ${link('/in/income-tax-calculator', 'India income tax calculator')} models salary income with the standard deduction.`)}
+${p(`These rules are for FY 2025-26 (AY 2026-27) returns, the ones being filed now, as set out on the e-filing portal’s ${link(SALARIED_AY_2026_27, 'page for salaried individuals for AY 2026-27')}.`)}
 
 ${h2('The rule in plain words')}
 ${p(`The ${link(INCOME_TAX_FAQ_87A, 'Income Tax Department’s FAQ on section 87A for FY 2025-26')} says a resident individual taxed under section 115BAC(1A) gets a rebate of up to ₹60,000 where total income does not exceed ₹12,00,000. It adds that where total income exceeds ₹12,00,000 and the tax payable exceeds the difference between total income and ₹12,00,000, the person can claim a rebate with marginal relief. The relief is the difference between the tax payable and that excess income.`)}
