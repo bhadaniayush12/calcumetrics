@@ -44,6 +44,33 @@ const initialShareText = encodeURIComponent(
 const pageTitle = 'Income Tax Calculator FY 2026-27 / AY 2027-28 | Calcumetrics';
 const pageDesc = 'Free income tax calculator India (FY 2026-27). Compare income tax calculator new regime vs old regime with ₹75k standard deduction and ₹12L rebate.';
 
+const FAQS = [
+  {
+    q: 'What are the current New Tax Regime slabs for FY 2025-26 and FY 2026-27?',
+    a: 'Under the current New Tax Regime, the standard deduction for salaried individuals is ₹75,000 and the slabs are: ₹0-₹4 Lakh (Nil), ₹4-₹8 Lakh (5%), ₹8-₹12 Lakh (10%), ₹12-₹16 Lakh (15%), ₹16-₹20 Lakh (20%), ₹20-₹24 Lakh (25%), and above ₹24 Lakh (30%).',
+  },
+  {
+    q: 'How does the Section 87A tax rebate work in the New Tax Regime?',
+    a: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹12,00,000 receive a 100% tax rebate under Section 87A (rebate up to ₹60,000). Combined with the ₹75,000 standard deduction, salaried employees earning gross income up to ₹12,75,000 pay zero income tax, with marginal relief protecting against tax cliffs for income slightly exceeding ₹12 Lakh.',
+  },
+  {
+    q: 'Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?',
+    a: 'No. Chapter VI-A deductions such as Section 80C (EPF, PPF, ELSS), Section 80D (health insurance), Section 24(b) (home loan interest on self-occupied property), and HRA exemptions are only available under the Old Tax Regime.',
+  },
+  {
+    q: 'When is the Old Tax Regime still better than the New Regime?',
+    a: 'The Old Tax Regime only comes out ahead for taxpayers with large deductions and exemptions. For salaried gross income between ₹13 lakh and ₹50 lakh, the break-even is roughly ₹5 lakh to ₹8 lakh of deductions on top of the ₹50,000 standard deduction (for example the ₹1.5L 80C cap, ₹2L home loan interest, up to ₹1L health insurance under 80D, and large HRA exemptions). Enter your own figures above to compare both regimes.',
+  },
+  {
+    q: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
+    a: 'Yes. A mandatory 4% Health and Education Cess is calculated on income tax (after the Section 87A rebate) plus any surcharge under both the New and Old Tax Regimes.',
+  },
+  {
+    q: 'Can salaried individuals switch between Old and New Tax Regimes every year?',
+    a: 'Yes. Individuals with salaried income (no business or professional income) can choose the more advantageous regime every financial year while filing their ITR on the Income Tax e-filing portal.',
+  },
+];
+
 const jsonld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -80,56 +107,11 @@ const jsonld = {
     },
     {
       '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'What are the current New Tax Regime slabs for FY 2025-26 and FY 2026-27?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Under the current New Tax Regime, the slabs are: ₹0-₹4 Lakh (Nil), ₹4-₹8 Lakh (5%), ₹8-₹12 Lakh (10%), ₹12-₹16 Lakh (15%), ₹16-₹20 Lakh (20%), ₹20-₹24 Lakh (25%), and above ₹24 Lakh (30%). Salaried taxpayers also receive an automatic ₹75,000 standard deduction.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How does the Section 87A rebate work and why is ₹12.75 Lakh tax-free?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Section 87A provides a 100% tax rebate (up to ₹60,000) for resident individuals with taxable income up to ₹12,00,000. Combined with the ₹75,000 standard deduction for salaried employees, gross income up to ₹12,75,000 attracts zero income tax under the New Regime.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'How does marginal relief work under Section 87A?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Marginal relief ensures that if your taxable income slightly exceeds ₹12,00,000, your tax payable cannot exceed the amount by which your taxable income exceeds ₹12,00,000. This eliminates the tax cliff.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'No. Chapter VI-A deductions such as Section 80C (EPF, PPF, ELSS), Section 80D (health insurance), Section 24(b) (home loan interest on self-occupied property), and HRA exemptions are only available under the Old Tax Regime.',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'When is the Old Tax Regime still better than the New Regime?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'With the New Regime basic exemption at ₹4 Lakh and zero tax up to ₹12.75 Lakh gross salary, the Old Tax Regime is rarely beneficial unless you have very high deductions exceeding ₹4.5 Lakh to ₹5 Lakh (e.g. combined 80C, 80D, high home loan interest, and large HRA).',
-          },
-        },
-        {
-          '@type': 'Question',
-          name: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: 'Yes. A mandatory 4% Health and Education Cess is calculated on income tax (after the Section 87A rebate) plus any surcharge, after marginal relief, under both regimes.',
-          },
-        },
-      ],
+      mainEntity: FAQS.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: item.a },
+      })),
     },
   ],
 };
@@ -528,32 +510,7 @@ const jsonld = {
       <section aria-labelledby="it-faq" class="mb-10">
         <h2 id="it-faq" class="text-xl sm:text-2xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
         <div class="space-y-3">
-          {[
-            {
-              q: 'What are the current New Tax Regime slabs for FY 2025-26 and FY 2026-27?',
-              a: 'Under the current New Tax Regime, the standard deduction for salaried individuals is ₹75,000 and the slabs are: ₹0-₹4 Lakh (Nil), ₹4-₹8 Lakh (5%), ₹8-₹12 Lakh (10%), ₹12-₹16 Lakh (15%), ₹16-₹20 Lakh (20%), ₹20-₹24 Lakh (25%), and above ₹24 Lakh (30%).',
-            },
-            {
-              q: 'How does the Section 87A tax rebate work in the New Tax Regime?',
-              a: 'Under the New Tax Regime, resident individuals with total taxable income up to ₹12,00,000 receive a 100% tax rebate under Section 87A (rebate up to ₹60,000). Combined with the ₹75,000 standard deduction, salaried employees earning gross income up to ₹12,75,000 pay zero income tax, with marginal relief protecting against tax cliffs for income slightly exceeding ₹12 Lakh.',
-            },
-            {
-              q: 'Can I claim deductions like 80C, 80D, and HRA in the New Tax Regime?',
-              a: 'No. Chapter VI-A deductions such as Section 80C (EPF, PPF, ELSS), Section 80D (health insurance), Section 24(b) (home loan interest on self-occupied property), and HRA exemptions are only available under the Old Tax Regime.',
-            },
-            {
-              q: 'When is the Old Tax Regime still better than the New Regime?',
-              a: 'The Old Tax Regime can be advantageous for taxpayers who claim substantial deductions exceeding ₹3.75 lakh to ₹4.25 lakh, such as the ₹1.5L 80C cap, ₹2L home loan interest, ₹50k-₹1L health insurance, and large HRA exemptions.',
-            },
-            {
-              q: 'Is the 4% Health and Education Cess applicable to both tax regimes?',
-              a: 'Yes. A mandatory 4% Health and Education Cess is calculated on income tax (after the Section 87A rebate) plus any surcharge under both the New and Old Tax Regimes.',
-            },
-            {
-              q: 'Can salaried individuals switch between Old and New Tax Regimes every year?',
-              a: 'Yes. Individuals with salaried income (no business or professional income) can choose the more advantageous regime every financial year while filing their ITR on the Income Tax e-filing portal.',
-            },
-          ].map((item) => (
+          {FAQS.map((item) => (
             <details class="border border-border rounded-card overflow-hidden bg-surface">
               <summary class="px-5 py-3.5 cursor-pointer text-sm font-semibold text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">
                 {item.q}
