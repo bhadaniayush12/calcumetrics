@@ -24,6 +24,8 @@ import type { HTMLAttributes } from 'astro/types';
 import AdSlot from '../ui/AdSlot.astro';
 import IndiaTaxSourceNotice from './IndiaTaxSourceNotice.astro';
 import IndiaTaxAdviceNote from './IndiaTaxAdviceNote.astro';
+import FreshnessNote from '../FreshnessNote.astro';
+import { getFreshness } from '../../data/page-freshness';
 import { getCalculatorType } from '../../lib/analytics';
 import { getEmbedForPage } from '../../lib/embed';
 import { ADS_ENABLED } from '../../config/site';
@@ -56,6 +58,7 @@ const {
 
 const calculatorType = getCalculatorType(Astro.url.pathname);
 const embedWidget = getEmbedForPage(Astro.url.pathname);
+const freshness = getFreshness(Astro.url.pathname);
 ---
 
 <!-- Breadcrumb & Inspector Bar: Home › Category › Tool | [Get Info ⌘I] -->
@@ -111,6 +114,13 @@ const embedWidget = getEmbedForPage(Astro.url.pathname);
     </a>
   </div>
 </div>
+
+<!-- Last reviewed (pages with rates, thresholds or laws; src/data/page-freshness.ts) -->
+{freshness && (
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-3">
+    <FreshnessNote />
+  </div>
+)}
 
 <!-- Main calculator split (no overflow:hidden on ancestors) -->
 <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 pb-8" data-calc-type={calcType} data-calculator-type={calculatorType}>

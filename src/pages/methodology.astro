@@ -1,6 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
+import { getFreshness } from '../data/page-freshness';
+import FreshnessNote from '../components/FreshnessNote.astro';
+
+const freshness = getFreshness('/methodology')!;
 
 const canonicalUrl = 'https://calcumetrics.com/methodology';
 
@@ -13,7 +17,7 @@ const jsonld = {
       url: canonicalUrl,
       description: 'Transparent mathematical formulas, statutory conventions, worked test fixture proofs, and regulatory data sources governing Calcumetrics calculators.',
       publisher: { '@id': 'https://calcumetrics.com/#org' },
-      dateModified: '2026-09-24',
+      dateModified: freshness.lastReviewed,
     },
     {
       '@type': 'BreadcrumbList',
@@ -51,8 +55,6 @@ const jsonld = {
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-accent/10 text-accent">
           Mathematical Transparency
         </span>
-        <span class="text-xs text-text-muted">Last updated: 11 October 2026</span>
-        <span class="text-xs text-text-muted">·</span>
         <a href="/about#corrections-log" class="text-xs text-accent hover:underline font-medium">
           View Corrections Log →
         </a>
@@ -60,6 +62,7 @@ const jsonld = {
       <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary mb-4">
         Methodology: Plain-Language Principles, Formulas &amp; Statutory Conventions
       </h1>
+      <FreshnessNote path="/methodology" class="mb-4" />
       <p class="text-base text-text-muted leading-relaxed">
         Financial tools should never be black boxes. Whether you are a commerce student cross-checking an examination problem, a Chartered Accountant auditing a loan schedule, or an everyday investor planning a retirement corpus, you have a right to inspect the exact math, conventions, and regulatory baselines behind your results.
       </p>

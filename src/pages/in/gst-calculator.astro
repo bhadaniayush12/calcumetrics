@@ -16,6 +16,9 @@ import Alert from '../../components/ui/Alert.astro';
 import { calcGST } from '../../lib/calculators/taxes';
 import { formatIndian, formatIndianCompact, parseSmartInput } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/gst-calculator')!;
 
 const DEFAULT = { amount: 10000, slab: 18, isInterState: false, direction: 'add' as const };
 const initialResult = calcGST(DEFAULT.amount, DEFAULT.slab, DEFAULT.isInterState, DEFAULT.direction);
@@ -61,7 +64,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en-IN',
-      dateModified: '2026-10-19',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',

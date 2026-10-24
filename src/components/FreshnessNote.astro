@@ -1,0 +1,27 @@
+---
+/**
+ * FreshnessNote.astro — "Last reviewed: <date> — <what changed>" from src/data/page-freshness.ts.
+ * Renders nothing for pages without an entry. Lines that quote rupee amounts are INR-locked so the
+ * currency switcher never rewrites a statutory figure.
+ */
+import { getFreshness } from '../data/page-freshness';
+import { formatDisplayDate } from '../lib/formatters';
+
+interface Props {
+  path?: string;
+  class?: string;
+}
+
+const { path = Astro.url.pathname, class: className = '' } = Astro.props;
+const entry = getFreshness(path);
+---
+
+{entry && (
+  <p
+    data-freshness
+    data-currency-lock={entry.whatChanged.includes('₹') ? 'INR' : undefined}
+    class={`text-xs text-text-muted leading-relaxed ${className}`}
+  >
+    <span class="font-semibold text-text-primary">Last reviewed:</span>{' '}<time datetime={entry.lastReviewed}>{formatDisplayDate(entry.lastReviewed)}</time> — {entry.whatChanged}
+  </p>
+)}

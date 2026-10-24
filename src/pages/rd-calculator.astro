@@ -9,6 +9,9 @@ import Alert from '../components/ui/Alert.astro';
 import { calcRD } from '../lib/calculators/rd';
 import { formatIndian } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+import { getFreshness } from '../data/page-freshness';
+
+const freshness = getFreshness('/rd-calculator')!;
 
 const DEFAULT = { monthly: 5000, rate: 7.0, months: 60 };
 const result = calcRD(DEFAULT.monthly, DEFAULT.rate, DEFAULT.months / 12);
@@ -36,7 +39,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',

@@ -10,6 +10,9 @@ import Alert from '../../components/ui/Alert.astro';
 import { calcHRA } from '../../lib/calculators/taxes';
 import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/hra-calculator')!;
 
 const DEFAULT = { basicSalary: 600000, hraReceived: 240000, rentPaid: 180000, isMetro: true };
 const initialResult = calcHRA(DEFAULT.basicSalary, DEFAULT.hraReceived, DEFAULT.rentPaid, DEFAULT.isMetro);
@@ -33,7 +36,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -119,9 +122,6 @@ const jsonld = {
     <Fragment slot="inputs">
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl font-bold tracking-tight text-text-primary">HRA Exemption Calculator: Tax Year 2026-27</h1>
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
-        </span>
       </div>
       <p class="text-sm text-text-muted mb-2 leading-relaxed">Use this HRA calculator to work out how much of your house rent allowance is exempt from tax under Schedule III (Table Sl. No. 11) of the Income-tax Act, 2025 [old section 10(13A)] and how much stays taxable. FY 2025-26 stays under the Income-tax Act, 1961, where only four cities got the 50% limit.</p>
       <p class="text-xs text-text-muted mb-4">
