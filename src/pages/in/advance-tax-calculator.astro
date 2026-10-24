@@ -26,7 +26,7 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'Advance Tax Calculator India',
       url: canonicalUrl,
-      description: 'Free advance tax calculator India to compute quarterly advance income tax liability and statutory due dates under Section 208/211.',
+      description: 'Free advance tax calculator India to compute quarterly advance income tax liability and statutory due dates under sections 404 and 408 of the Income-tax Act, 2025.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
@@ -61,7 +61,7 @@ const jsonld = {
           name: 'Who is required to pay advance tax in India?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Under Section 208 of the Income-tax Act, 1961, every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the financial year (after deducting TDS and TCS) is ₹10,000 or more is required to pay advance tax.',
+            text: 'For FY 2026-27, section 404 of the Income-tax Act, 2025 requires every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the year (after deducting TDS and TCS) is ₹10,000 or more to pay advance tax.',
           },
         },
         {
@@ -69,7 +69,7 @@ const jsonld = {
           name: 'Are senior citizens exempt from paying advance tax?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. Under Section 207(2), a resident senior citizen (aged 60 years or above) who does not have any income chargeable under the head "Profits and gains of business or profession" is fully exempt from paying advance tax.',
+            text: 'Yes. A resident senior citizen (aged 60 years or above) who does not have any income chargeable under the head "Profits and gains of business or profession" is fully exempt from paying advance tax.',
           },
         },
         {
@@ -77,7 +77,7 @@ const jsonld = {
           name: 'What interest penalty is levied for missing advance tax deadlines?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Failure to pay installments or paying less than statutory percentages attracts simple interest at 1% per month under Section 234C. If less than 90% of assessed tax is paid by 31st March, interest at 1% per month is also charged under Section 234B from 1st April of the assessment year until full payment.',
+            text: 'Failure to pay installments or paying less than statutory percentages attracts simple interest at 1% per month under section 425. If less than 90% of assessed tax is paid by 31st March, interest at 1% per month is also charged under section 424 from 1st April following the tax year until full payment.',
           },
         },
         {
@@ -104,7 +104,7 @@ const jsonld = {
 
 <Layout
   title="Advance Tax Calculator India (FY 2026-27) | Calcumetrics"
-  description="Free advance tax calculator India. Use this advance income tax calculator to compute quarterly installment schedules and due dates under Section 208/211."
+  description="Free advance tax calculator for FY 2026-27: quarterly instalments and due dates under sections 404 and 408 of the Income-tax Act, 2025."
   canonical={canonicalUrl}
 >
   <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
@@ -124,7 +124,7 @@ const jsonld = {
         </span>
       </div>
       <p class="text-xs text-text-muted mb-4">
-        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Sections 208, 209, 211.
+        Statutory source: <a href="https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income-tax Act, 2025</a> (sections 404, 405, 408, 424, 425) · <a href="https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">e-filing tax payments FAQ</a> · <a href="https://www.incometaxindia.gov.in/documents/81799/11848482/Updated-FQAs-on-Interplay%26Transitions.pdf/e10ad2b6-9495-de90-58d3-20606d8954ae?t=1775128640970" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">CBDT transition FAQs</a>.
       </p>
 
       <!-- Surcharge Disclaimer (§18) -->
@@ -204,22 +204,22 @@ const jsonld = {
       <section aria-labelledby="at-calculator-how">
         <h2 id="at-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Advance Tax Works in India (Pay-As-You-Earn Scheme)</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Advance tax, governed by Sections 207 to 219 of the Income-tax Act, 1961, is India's "pay-as-you-earn" direct taxation mechanism. Under this scheme, taxpayers must discharge their income tax liability in periodic quarterly installments throughout the financial year in which income is earned, rather than deferring the entire tax payment until the annual return filing date.
+          Advance tax for FY 2026-27 is governed by the Income-tax Act, 2025: section 404 (old section 208) sets who pays, section 405 computes the amount, section 408 (old section 211) sets the instalments, and sections 424 and 425 (old sections 234B and 234C) charge interest. Advance tax for FY 2025-26 (AY 2026-27) stays under the Income-tax Act, 1961. It is India's "pay-as-you-earn" direct taxation mechanism. Under this scheme, taxpayers must discharge their income tax liability in periodic quarterly installments throughout the financial year in which income is earned, rather than deferring the entire tax payment until the annual return filing date.
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <p class="text-sm text-text-muted leading-relaxed font-mono">
-            <strong>1. Mandatory Payment Condition (Section 208):</strong><br />
+            <strong>1. Mandatory Payment Condition (Section 404):</strong><br />
             Advance Tax is Required IF: Estimated Annual Tax Payable &minus; (TDS + TCS + Tax Credits) &ge; ₹10,000<br /><br />
-            <strong>2. Statutory Quarterly Installment Schedule (Section 211):</strong><br />
+            <strong>2. Statutory Quarterly Installment Schedule (Section 408):</strong><br />
             &bull; Installment 1 (On or before 15 June): 15% of estimated total tax liability<br />
             &bull; Installment 2 (On or before 15 September): 45% cumulative &minus; amount previously paid (incremental 30%)<br />
             &bull; Installment 3 (On or before 15 December): 75% cumulative &minus; amounts previously paid (incremental 30%)<br />
             &bull; Installment 4 (On or before 15 March): 100% cumulative &minus; amounts previously paid (incremental 25%)<br /><br />
-            <strong>3. Presumptive Taxation Exception (Sec 44AD / 44ADA):</strong><br />
+            <strong>3. Presumptive Taxation Exception (Sections 58 and 408(2)):</strong><br />
             Eligible businesses and professionals opting for presumptive taxation pay 100% of advance tax in a single installment on or before 15 March.<br /><br />
             <strong>4. Statutory Interest Penalties for Delay or Shortfall:</strong><br />
-            &bull; Section 234C: 1% simple interest per month for 3 months on quarterly installment shortfalls.<br />
-            &bull; Section 234B: 1% simple interest per month from 1 April if cumulative advance tax paid is &lt;90% of assessed tax.
+            &bull; Section 425: 1% simple interest per month for 3 months on quarterly installment shortfalls.<br />
+            &bull; Section 424: 1% simple interest per month from 1 April if cumulative advance tax paid is &lt;90% of assessed tax.
           </p>
         </div>
 
@@ -237,7 +237,7 @@ const jsonld = {
                 <th class="py-2.5 px-4">Cumulative Target (₹)</th>
                 <th class="py-2.5 px-4">Quarterly Payment Due</th>
                 <th class="py-2.5 px-4">Safe-Harbor Threshold</th>
-                <th class="py-2.5 px-4">Section 234C Consequence</th>
+                <th class="py-2.5 px-4">Section 425 Consequence</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-border text-text-muted">
@@ -279,7 +279,7 @@ const jsonld = {
                 <td class="py-3 px-4 font-mono">₹1,00,000</td>
                 <td class="py-3 px-4 font-mono font-bold text-text-primary">₹1,00,000 (100%)</td>
                 <td class="py-3 px-4 font-mono">&ge;90% by 31 March</td>
-                <td class="py-3 px-4">Zero interest penalty under Section 234B and Section 234C.</td>
+                <td class="py-3 px-4">Zero interest penalty under section 424 and section 425.</td>
               </tr>
             </tbody>
           </table>
@@ -289,22 +289,22 @@ const jsonld = {
           <div class="bg-surface border border-border rounded-card p-5">
             <h3 class="text-base font-bold text-text-primary mb-2">Statutory Exemptions &amp; Special Rules</h3>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Senior Citizens Exemption (Sec 207(2)):</strong> Resident individuals aged <strong>60 years or older</strong> who do not have any income from business or profession are entirely exempt from advance tax.</li>
-              <li><strong>Salaried Employees:</strong> If salary is the sole income source and the employer appropriately deducts TDS under Section 192, standalone advance tax payment is unnecessary. However, non-salary income (rent, capital gains, interest) exceeding TDS deductions triggers advance tax obligations.</li>
-              <li><strong>Capital Gains &amp; Dividend Influx:</strong> Since capital gains and dividend income cannot be accurately forecasted, the proviso to Section 234C waives interest penalties provided the tax is deposited in remaining installments after the date of realization.</li>
+              <li><strong>Senior Citizens Exemption:</strong> Resident individuals aged <strong>60 years or older</strong> who do not have any income from business or profession are entirely exempt from advance tax.</li>
+              <li><strong>Salaried Employees:</strong> If salary is the sole income source and the employer appropriately deducts TDS on salary, standalone advance tax payment is unnecessary. However, non-salary income (rent, capital gains, interest) exceeding TDS deductions triggers advance tax obligations.</li>
+              <li><strong>Capital Gains &amp; Dividend Influx:</strong> Since capital gains and dividend income cannot be accurately forecasted, the rules waive interest penalties provided the tax is deposited in remaining installments after the date of realization.</li>
               <li><strong>Payment Mechanism:</strong> Advance tax is deposited online through the Income Tax e-filing portal via <strong>Challan 280 / e-Pay Tax</strong> selecting "Advance Tax (100)" as the type of payment.</li>
             </ul>
           </div>
 
           <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">Penal Interest Mechanics (Sections 234B &amp; 234C)</h3>
+            <h3 class="text-base font-bold text-text-primary mb-2">Penal Interest Mechanics (Sections 424 &amp; 425)</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
               The Income-tax Act enforces strict compliance through compounding interest charges on late or inadequate payments:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Section 234C (Deferment Interest):</strong> Charged at <strong>1% simple interest per month</strong> for 3 months each on shortfalls at the June 15, Sept 15, and Dec 15 gates (1 month for March 15).</li>
-              <li><strong>Safe-Harbor Gateways:</strong> Taxpayers are protected from 234C interest if they pay at least <strong>12%</strong> by 15 June and at least <strong>36%</strong> by 15 September.</li>
-              <li><strong>Section 234B (Shortfall at Year-End):</strong> If cumulative advance tax paid by 31 March is less than <strong>90%</strong> of the final assessed tax liability, interest at <strong>1% per month</strong> runs from 1 April of the Assessment Year until the date of actual payment.</li>
+              <li><strong>Section 425 (Deferment Interest):</strong> Charged at <strong>1% simple interest per month</strong> for 3 months each on shortfalls at the June 15, Sept 15, and Dec 15 gates (1 month for March 15).</li>
+              <li><strong>Safe-Harbor Gateways:</strong> Taxpayers are protected from section 425 interest if they pay at least <strong>12%</strong> by 15 June and at least <strong>36%</strong> by 15 September.</li>
+              <li><strong>Section 424 (Shortfall at Year-End):</strong> If cumulative advance tax paid by 31 March is less than <strong>90%</strong> of the final assessed tax liability, interest at <strong>1% per month</strong> runs from 1 April following the tax year until the date of actual payment.</li>
             </ul>
           </div>
         </div>
@@ -321,7 +321,7 @@ const jsonld = {
         </div>
         <div class="pt-2 border-t border-border">
           <strong class="text-text-primary block mb-0.5">Booked profits on stocks, mutual funds, or property?</strong>
-          Learn how revised capital gains tax rules work and how Section 234C protects windfalls in our guide: <a href="/blog/capital-gains-tax-rules" class="text-accent font-medium hover:underline">Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule</a>.
+          Learn how revised capital gains tax rules work and how windfall gains affect advance tax in our guide: <a href="/blog/capital-gains-tax-rules" class="text-accent font-medium hover:underline">Capital Gains Tax in India (Post-Budget 2024): Rates, Holding Periods, and the Real Estate Indexation Rule</a>.
         </div>
         <div class="pt-2 border-t border-border">
           <strong class="text-text-primary block mb-0.5">Studying for CA Foundation?</strong>
