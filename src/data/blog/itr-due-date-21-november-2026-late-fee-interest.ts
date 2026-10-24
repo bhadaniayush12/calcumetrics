@@ -55,6 +55,11 @@ export const ITR_AUDIT_NEWS_POST: BlogPost = {
       "slug": "new-income-tax-act-2025-salaried-guide",
       "title": "Income-tax Act transition guide",
       "description": "Understand assessment-year terminology."
+    },
+    {
+      "slug": "section-87a-marginal-relief-new-regime-example",
+      "title": "Check your 87A rebate before filing",
+      "description": "A solved example of the rebate and marginal relief for incomes just above ₹12 lakh."
     }
   ],
   "faqs": [

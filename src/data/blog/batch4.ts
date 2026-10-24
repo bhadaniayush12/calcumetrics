@@ -69,6 +69,11 @@ export const BATCH_4_POSTS: BlogPost[] = [
         title: 'What Is DSCR? How Lenders Use the Debt Service Coverage Ratio to Approve Commercial Loans',
         description: 'Learn how commercial banks calculate Debt Service Coverage Ratios for business loans.',
       },
+      {
+        slug: 'dscr-calculation-bank-loan-example',
+        title: 'Solved DSCR numerical',
+        description: 'Calculating debt service coverage for a term loan, step by step.',
+      },
     ],
     faqs: [
       {
@@ -266,6 +271,16 @@ export const BATCH_4_POSTS: BlogPost[] = [
         slug: 'how-to-calculate-break-even-point',
         title: 'How to Calculate Your Break-Even Point: A Step-by-Step Guide with Realistic Examples',
         description: 'Master fixed costs, variable costs per unit, and contribution margin ratios.',
+      },
+      {
+        slug: 'break-even-point-solved-example-class-12',
+        title: 'Practice: break-even numericals with solutions',
+        description: 'Exam-style problems that use fixed costs, variable costs and contribution margin.',
+      },
+      {
+        slug: 'wdv-depreciation-numerical-with-solution',
+        title: 'Written-down value depreciation, solved',
+        description: 'Year-by-year WDV depreciation with the closing book value each year.',
       },
     ],
     faqs: [

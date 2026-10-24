@@ -74,6 +74,11 @@ export const BATCH_3_POSTS: BlogPost[] = [
         title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Analyze slab rates, Section 87A rebates, and the exact deduction threshold for Indian taxpayers.',
       },
+      {
+        slug: 'advance-tax-due-dates-calculation-example',
+        title: 'Solved example: advance tax after TDS',
+        description: 'How to work out each instalment once TDS is subtracted from your estimated tax.',
+      },
     ],
     faqs: [
       {
@@ -263,6 +268,11 @@ export const BATCH_3_POSTS: BlogPost[] = [
         slug: 'cash-conversion-cycle',
         title: 'The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency',
         description: 'Discover how working capital velocity and cash flow cycles impact operating liquidity.',
+      },
+      {
+        slug: 'break-even-point-solved-example-class-12',
+        title: 'Break-even point: solved Class 12 numericals',
+        description: 'Step-by-step break-even and margin-of-safety problems with answers.',
       },
     ],
     faqs: [
@@ -486,6 +496,11 @@ export const BATCH_3_POSTS: BlogPost[] = [
         slug: 'markup-vs-margin',
         title: 'Markup vs. Margin: The Math Mistake That Silently Erases Business Profits',
         description: 'Learn the critical pricing difference between cost markups and gross margins.',
+      },
+      {
+        slug: 'eoq-carrying-cost-percentage-solved-example',
+        title: 'EOQ when carrying cost is a percentage',
+        description: 'Solved EOQ problems where holding cost is given as a percentage of unit price.',
       },
     ],
     faqs: [
@@ -720,6 +735,11 @@ export const BATCH_3_POSTS: BlogPost[] = [
         title: 'NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting',
         description: 'Analyze capital budgeting metrics and time value of money discounting.',
       },
+      {
+        slug: 'wdv-depreciation-numerical-with-solution',
+        title: 'WDV depreciation numerical with solution',
+        description: 'A solved written-down-value depreciation problem, year by year.',
+      },
     ],
     faqs: [
       {
@@ -930,6 +950,16 @@ export const BATCH_3_POSTS: BlogPost[] = [
         slug: 'cash-conversion-cycle',
         title: 'The Cash Conversion Cycle: How Working Capital Velocity Drives Business Solvency',
         description: 'Discover how working capital velocity and cash flow cycles impact operating liquidity.',
+      },
+      {
+        slug: 'current-ratio-vs-quick-ratio',
+        title: 'Liquidity check: current and quick ratios',
+        description: 'How lenders read short-term liquidity alongside debt service coverage.',
+      },
+      {
+        slug: 'dscr-calculation-bank-loan-example',
+        title: 'DSCR worked example for a bank loan',
+        description: 'A full DSCR calculation from a business\'s accounts, as a bank would run it.',
       },
     ],
     faqs: [

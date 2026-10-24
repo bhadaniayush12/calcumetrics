@@ -26,6 +26,11 @@ export const SMALL_SAVINGS_POST: BlogPost = {
   relatedArticles: [
     { slug: 'ppf-interest-calculation-5th-day-rule', title: 'PPF Interest and the Fifth-Day Rule', description: 'Understand how deposit timing affects interest.' },
     { slug: 'fd-rates-after-rbi-hike-lock-now-or-wait', title: 'FD Rates After the RBI Hike', description: 'Read the separate discussion of bank-deposit timing.' },
+    {
+      slug: 'rbi-repo-rate-5-50-fd-returns-october-2026',
+      title: 'RBI repo rate and your FD interest',
+      description: 'Why bank FD rates follow the repo rate, with maturity examples for October 2026.',
+    },
   ],
   faqs: [
     { question: 'Did PPF rates increase for October–December 2026?', answer: 'No. PPF remains at 7.1% a year for this quarter. The 30 September 2026 memorandum leaves small-savings rates unchanged from the preceding quarter.' },

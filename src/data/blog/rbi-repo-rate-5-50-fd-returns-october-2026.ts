@@ -67,6 +67,11 @@ export const RBI_FD_NEWS_POST: BlogPost = {
       "slug": "diwali-bonus-2026-lump-sum-sip-or-prepay",
       "title": "Diwali bonus planning",
       "description": "Compare uses for available cash."
+    },
+    {
+      "slug": "fd-rates-after-rbi-hike-lock-now-or-wait",
+      "title": "Lock an FD now or wait?",
+      "description": "Weighing today's FD rate against the chance of higher rates later."
     }
   ],
   "faqs": [

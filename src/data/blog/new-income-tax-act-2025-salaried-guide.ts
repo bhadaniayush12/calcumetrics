@@ -23,7 +23,23 @@ export const NEW_TAX_ACT_POST: BlogPost = {
     { name: 'Salary CTC Calculator', path: '/in/salary-ctc-calculator', description: 'Separate cost to company from salary and estimated take-home pay.' },
     { name: 'TDS Calculator', path: '/in/tds-calculator', description: 'Check withholding categories; salary TDS needs an annual income-tax calculation.' },
   ],
-  relatedArticles: [{ slug: 'old-vs-new-tax-regime', title: 'Old vs New Tax Regime', description: 'Compare the regimes after identifying the right tax year and income inputs.' }],
+  relatedArticles: [{ slug: 'old-vs-new-tax-regime', title: 'Old vs New Tax Regime', description: 'Compare the regimes after identifying the right tax year and income inputs.' },
+    {
+      slug: 'itr-due-date-21-november-2026-late-fee-interest',
+      title: 'ITR due date 21 November 2026: late fee and interest',
+      description: 'Who the extended due date covers, and what late filing fee and interest cost if you miss it.',
+    },
+    {
+      slug: 'section-87a-marginal-relief-new-regime-example',
+      title: 'Rebate and marginal relief near ₹12 lakh',
+      description: 'Worked numbers for the rebate cliff and the marginal relief that smooths it.',
+    },
+    {
+      slug: 'hra-exemption-least-of-three-solved-example',
+      title: 'Worked HRA exemption numericals',
+      description: 'Step-by-step calculation of exempt and taxable HRA.',
+    },
+  ],
   faqs: [
     { question: 'What is tax year 2026–27?', answer: 'It is the period from 1 April 2026 to 31 March 2027 under the Income-tax Act, 2025. It identifies the income period directly. Earlier-year matters remain governed by the transition provisions.' },
     { question: 'Did the new Act remove the standard deduction?', answer: 'No. Section 19(1), table serial number 2, provides a salary standard deduction capped at ₹75,000 under the new regime and ₹50,000 otherwise, or salary if lower.' },

@@ -279,6 +279,11 @@ export const BATCH_2_POSTS: BlogPost[] = [
         title: 'Flat vs. Reducing Interest Rate: Why a 10% Flat Loan Actually Costs 18% APR',
         description: 'Examine nominal flat loan quotes compared to true reducing-balance annual percentage rates.',
       },
+      {
+        slug: 'debt-avalanche-vs-snowball',
+        title: 'Debt avalanche vs snowball, compared',
+        description: 'Interest saved and months to debt-free under each repayment strategy.',
+      },
     ],
     faqs: [
       {
@@ -484,6 +489,11 @@ export const BATCH_2_POSTS: BlogPost[] = [
         title: 'Debt-to-Income (DTI) Ratio: What Lenders Look for and How to Qualify for a Mortgage',
         description: 'Master the underwriting formulas and DTI benchmarks mortgage lenders use to approve loans.',
       },
+      {
+        slug: 'mortgage-rates-7-4-percent-buy-or-wait',
+        title: 'Rates at 7.4%: the buy-or-wait maths',
+        description: 'A worked comparison for borrowers deciding whether to lock a mortgage now.',
+      },
     ],
     faqs: [
       {
@@ -667,6 +677,11 @@ export const BATCH_2_POSTS: BlogPost[] = [
         slug: 'advance-tax-guide',
         title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
         description: 'Quarterly advance tax calendar for taxpayers and businesses. Section 208 thresholds, 234B & 234C penal interest rules, and windfall safe harbors.',
+      },
+      {
+        slug: 'hra-exemption-least-of-three-solved-example',
+        title: 'HRA exemption: least-of-three solved example',
+        description: 'Worked numericals for the three HRA limits, metro and non-metro.',
       },
     ],
     faqs: [
@@ -894,6 +909,11 @@ export const BATCH_2_POSTS: BlogPost[] = [
         slug: 'advance-tax-guide',
         title: 'Advance Tax in India: The Quarterly Calendar and How to Avoid Section 234B & 234C Penal Interest',
         description: 'Track statutory quarterly advance tax deadlines and compliance requirements.',
+      },
+      {
+        slug: 'upi-mdr-above-2000-merchant-charges',
+        title: 'UPI MDR on payments above ₹2,000',
+        description: 'What merchants pay on larger UPI payments and how it hits margins.',
       },
     ],
     faqs: [
