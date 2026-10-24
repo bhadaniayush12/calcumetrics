@@ -1,6 +1,7 @@
 ---
 import { getPublishedTools, getToolCount, SHOW_BLOG_NAV } from '../config/site';
 import SearchModal from './ui/SearchModal.astro';
+import { HUBS } from '../data/hubs';
 
 interface Props {
   currentPath?: string;
@@ -8,15 +9,13 @@ interface Props {
 
 const { currentPath = Astro.url.pathname } = Astro.props;
 
-// Dynamic category links — counts come from the published tool registry
-const allTools = getPublishedTools();
-const toolCategories = [
-  { label: 'Investments', href: '/investments', count: String(allTools.filter(t => t.category === 'Investments').length) },
-  { label: 'Loans', href: '/loans', count: String(allTools.filter(t => t.category === 'Loans').length) },
-  { label: 'Taxes', href: '/taxes', count: String(allTools.filter(t => t.category === 'Taxes').length) },
-  { label: 'Business', href: '/business', count: String(allTools.filter(t => t.category === 'Business').length) },
-  { label: 'Corporate Finance', href: '/corporate-finance', count: String(allTools.filter(t => t.category === 'Corporate Finance').length) },
-];
+// Topic hub links — counts are the published tools each hub lists (src/data/hubs.ts)
+const publishedPaths = new Set(getPublishedTools().map((t) => t.path));
+const toolCategories = HUBS.map((hub) => ({
+  label: hub.name,
+  href: hub.href,
+  count: String(new Set(hub.groups.flatMap((g) => g.tools).filter((path) => publishedPaths.has(path))).size),
+}));
 
 const totalToolsCount = getToolCount();
 ---

@@ -6,6 +6,7 @@ import { formatDisplayDate } from '../../lib/formatters';
 import { FOUNDERS, founderPerson } from '../../data/founders';
 import AuthorBox from '../../components/founders/AuthorBox.astro';
 import Signature from '../../components/founders/Signature.astro';
+import { hubForCategory } from '../../data/hubs';
 
 export function getStaticPaths() {
   return BLOG_POSTS.map((post) => ({
@@ -21,6 +22,7 @@ interface Props {
 const { post } = Astro.props;
 const canonicalUrl = `https://calcumetrics.com/blog/${post.slug}`;
 const articleOgImage = `/og/articles/${post.slug}.png`;
+const hub = hubForCategory(post.category);
 const articleOgImageUrl = `https://calcumetrics.com${articleOgImage}`;
 const author = Object.values(FOUNDERS).find((f) => f.name === post.author) ?? FOUNDERS.dev;
 
@@ -233,6 +235,11 @@ const jsonld = {
         </div>
       </section>
     )}
+
+    <!-- Topic hub back-link -->
+    <p class="mt-10 text-sm text-text-muted" data-hub-backlink>
+      More in <a href={hub.href} class="text-accent hover:underline font-medium">{hub.name}</a>: every calculator and guide on this topic.
+    </p>
 
     <!-- Related Articles Section -->
     {post.relatedArticles.length > 0 && (

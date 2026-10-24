@@ -1,22 +1,23 @@
 import type { APIRoute } from 'astro';
-import { CATEGORIES, getToolsByCategory } from '../config/site';
+import { getPublishedTools } from '../config/site';
+import { HUBS } from '../data/hubs';
 
 export const GET: APIRoute = async () => {
-  const toolsByCategory = getToolsByCategory();
+  const toolsByPath = new Map(getPublishedTools().map((t) => [t.path, t]));
 
   // Include only hubs with >= 4 published tools (Section 17 & 26.4: <4 tools gets noindex & omitted from sitemap)
-  const eligibleCategories = CATEGORIES.filter((cat) => {
-    const list = toolsByCategory.get(cat.name) ?? [];
-    return list.length >= 4;
-  });
-
-  const urls = eligibleCategories
-    .map((cat) => {
-      const list = toolsByCategory.get(cat.name) ?? [];
-      const dates = list.map((t) => t.dateModified).filter(Boolean);
-      const latest = dates.length ? dates.sort().reverse()[0] : '2026-09-20';
+  const urls = HUBS.map((hub) => {
+    const list = [...new Set(hub.groups.flatMap((g) => g.tools))]
+      .map((path) => toolsByPath.get(path))
+      .filter((t) => t !== undefined);
+    return { hub, list };
+  })
+    .filter(({ list }) => list.length >= 4)
+    .map(({ hub, list }) => {
+      const dates = [hub.updated, ...list.map((t) => t.dateModified)].filter(Boolean);
+      const latest = dates.sort().reverse()[0];
       return `  <url>
-    <loc>https://calcumetrics.com${cat.href}</loc>
+    <loc>https://calcumetrics.com${hub.href}</loc>
     <lastmod>${latest}</lastmod>
   </url>`;
     })

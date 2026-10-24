@@ -1,0 +1,150 @@
+---
+/**
+ * HubPage.astro — topic hub template, rendered from src/data/hubs.ts.
+ *
+ * Intro → grouped calculators and guides → optional page-specific guide (default slot) → FAQs.
+ * Emits CollectionPage, ItemList, BreadcrumbList and FAQPage JSON-LD from the same data the page shows.
+ * India-only hubs sit entirely inside data-currency-lock="INR"; on other hubs only /in/ tools and
+ * India-only posts are locked.
+ */
+import Layout from '../layouts/Layout.astro';
+import { getPublishedTools, SITE_URL } from '../config/site';
+import { BLOG_POSTS } from '../data/blog/posts';
+import { getHub, type HubId } from '../data/hubs';
+
+interface Props {
+  hubId: HubId;
+}
+
+const hub = getHub(Astro.props.hubId);
+const toolsByPath = new Map(getPublishedTools().map((t) => [t.path, t]));
+const postsBySlug = new Map(BLOG_POSTS.map((p) => [p.slug, p]));
+
+const groups = hub.groups.map((g) => ({
+  heading: g.heading,
+  tools: g.tools.map((path) => toolsByPath.get(path)).filter((t) => t !== undefined),
+  posts: g.posts.map((slug) => postsBySlug.get(slug)).filter((p) => p !== undefined),
+}));
+const toolCount = new Set(groups.flatMap((g) => g.tools.map((t) => t.path))).size;
+const postCount = new Set(groups.flatMap((g) => g.posts.map((p) => p.slug))).size;
+const parent = hub.parent ? getHub(hub.parent) : undefined;
+const noindex = toolCount < 4;
+const url = `${SITE_URL}${hub.href}`;
+
+const itemUrls = [
+  ...new Set(groups.flatMap((g) => [...g.tools.map((t) => t.path), ...g.posts.map((p) => `/blog/${p.slug}`)])),
+];
+const names = new Map<string, string>([
+  ...groups.flatMap((g) => g.tools.map((t) => [t.path, t.name] as [string, string])),
+  ...groups.flatMap((g) => g.posts.map((p) => [`/blog/${p.slug}`, p.title] as [string, string])),
+]);
+const crumbs = [
+  { name: 'Home', href: '/' },
+  ...(parent ? [{ name: parent.name, href: parent.href }] : []),
+  { name: hub.name, href: hub.href },
+];
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'CollectionPage', name: hub.h1, url, description: hub.description, dateModified: hub.updated },
+    {
+      '@type': 'ItemList',
+      itemListElement: itemUrls.map((path, i) => ({ '@type': 'ListItem', position: i + 1, url: `${SITE_URL}${path}`, name: names.get(path) })),
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: `${SITE_URL}${c.href === '/' ? '/' : c.href}` })),
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: hub.faqs.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })),
+    },
+  ],
+};
+const lockIndia = (india: boolean) => (!hub.indiaOnly && india ? 'INR' : undefined);
+---
+
+<Layout
+  title={hub.title}
+  description={hub.description}
+  canonical={url}
+  robots={noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large'}
+  ogImage={hub.ogImage}
+  ogImageAlt={hub.ogImageAlt}
+>
+  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
+  <div data-currency-lock={hub.indiaOnly ? 'INR' : undefined} data-hub={hub.id} class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <nav aria-label="Breadcrumb" class="mb-6">
+      <ol class="flex items-center gap-1.5 text-xs text-text-muted flex-wrap">
+        {crumbs.map((c, i) => (
+          <Fragment>
+            {i > 0 && <li aria-hidden="true">›</li>}
+            {i < crumbs.length - 1
+              ? <li><a href={c.href} class="hover:text-accent transition-standard">{c.name}</a></li>
+              : <li class="text-text-primary font-medium" aria-current="page">{c.name}</li>}
+          </Fragment>
+        ))}
+      </ol>
+    </nav>
+
+    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">{hub.h1}</h1>
+    <p class="text-xs text-text-muted mb-5">{toolCount} calculators · {postCount} guides</p>
+    <div class="max-w-3xl space-y-3 mb-10" data-hub-intro>
+      {hub.intro.map((para) => <p class="text-sm text-text-muted leading-relaxed">{para}</p>)}
+      {parent && (
+        <p class="text-sm text-text-muted leading-relaxed">
+          Part of the <a href={parent.href} class="text-accent hover:underline font-medium">{parent.name} hub</a>.
+        </p>
+      )}
+    </div>
+
+    <div class="space-y-12">
+      {groups.map((g, gi) => (
+        <section aria-labelledby={`hub-group-${gi}`} data-hub-group>
+          <h2 id={`hub-group-${gi}`} class="text-xl font-bold text-text-primary mb-4">{g.heading}</h2>
+          {g.tools.length > 0 && (
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+              {g.tools.map((tool) => (
+                <a data-currency-lock={lockIndia(tool.region === 'IN')} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
+                  <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.region}</span>
+                  <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h3>
+                  <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
+                </a>
+              ))}
+            </div>
+          )}
+          {g.posts.length > 0 && (
+            <div>
+              <h3 class="text-sm font-semibold text-text-primary mb-2">Guides</h3>
+              <ul class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {g.posts.map((post) => (
+                  <li data-currency-lock={lockIndia(post.market === 'India-Only')}>
+                    <a href={`/blog/${post.slug}`} class="group block h-full border border-border rounded-card px-4 py-3 hover:border-accent transition-standard focus-visible:outline-accent">
+                      <span class="block text-sm font-medium text-accent group-hover:underline">{post.title}</span>
+                      <span class="block text-xs text-text-muted leading-relaxed mt-1 line-clamp-2">{post.description}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </section>
+      ))}
+    </div>
+
+    <slot />
+
+    <section aria-labelledby="hub-faq" class="mt-12 max-w-3xl">
+      <h2 id="hub-faq" class="text-xl font-bold text-text-primary mb-4">Frequently asked questions</h2>
+      <div class="space-y-3">
+        {hub.faqs.map((faq) => (
+          <details class="border border-border rounded-card overflow-hidden">
+            <summary class="px-5 py-3.5 cursor-pointer text-sm font-medium text-text-primary hover:bg-canvas transition-standard focus-visible:outline-accent">{faq.question}</summary>
+            <div class="px-5 pb-4 pt-2 text-sm text-text-muted leading-relaxed">{faq.answer}</div>
+          </details>
+        ))}
+      </div>
+    </section>
+
+  </div>
+</Layout>
