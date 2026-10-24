@@ -273,7 +273,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate House Rent Allowance tax exemption under India\'s Income Tax rules.',
     status: 'published',
-    dateModified: '2026-09-24',
+    dateModified: '2026-10-24',
   },
 
   // ── Business ───────────────────────────────────────────────────────────────
@@ -536,7 +536,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Calculate tax deducted at source for supported India income and payment scenarios.',
     status: 'published',
-    dateModified: '2026-09-24',
+    dateModified: '2026-10-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {
@@ -558,7 +558,7 @@ export const TOOLS: Tool[] = [
     region: 'IN',
     description: 'Estimate advance income-tax instalments under applicable Indian tax rules.',
     status: 'published',
-    dateModified: '2026-09-24',
+    dateModified: '2026-10-24',
     research: { status: 'verified', basis: 'google-data', checkedAt: '2026-09-22' },
   },
   {

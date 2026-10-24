@@ -38,7 +38,7 @@ export const HRA_LEAST_OF_THREE_POST: BlogPost = {
   category: 'Taxes',
   market: 'India-Only',
   publishDate: '2026-10-23',
-  dateModified: '2026-10-23',
+  dateModified: '2026-10-24',
   readTime: '7 min read',
   author: 'Dev',
   type: 'Evergreen',
@@ -73,7 +73,7 @@ export const HRA_LEAST_OF_THREE_POST: BlogPost = {
     },
     {
       question: 'Is Bengaluru a metro city for HRA?',
-      answer: 'No. The 50% limit applies only to houses in Mumbai, Kolkata, Delhi and Chennai. Bengaluru, Hyderabad, Pune and every other city use the 40% limit.',
+      answer: 'Not for FY 2025-26: under Rule 2A the 50% limit applies only to houses in Mumbai, Kolkata, Delhi and Chennai, and Bengaluru, Hyderabad, Pune and every other city use 40%. From tax year 2026-27, rule 279 of the Income-tax Rules, 2026 adds Bengaluru, Hyderabad, Pune and Ahmedabad to the 50% list.',
     },
     {
       question: 'Can I claim HRA exemption if I live in my own house?',
@@ -130,7 +130,7 @@ ${h2('Common mistakes students make')}
 ${bullets([
   'Using basic pay alone as salary when the question says DA forms part of retirement benefits.',
   'Including DA that does not form part of retirement benefits, which inflates limits 2 and 3.',
-  'Treating Bengaluru, Hyderabad or Pune as metro cities and applying 50% instead of 40%.',
+  'Treating Bengaluru, Hyderabad or Pune as 50% cities for FY 2025-26 (they qualify only from tax year 2026-27).',
   'Deducting 10% of HRA, or 10% of rent, instead of 10% of salary in limit 2.',
   'Mixing monthly and annual figures across the three limits.',
   'Claiming the exemption under the new tax regime, where section 115BAC does not allow it.',
