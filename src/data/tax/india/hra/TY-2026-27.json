@@ -1,0 +1,35 @@
+{
+  "jurisdiction": "IN",
+  "taxDomain": "hra",
+  "effectiveFrom": "2026-04-01",
+  "applicableTo": "2027-03-31",
+  "taxYear": "TY 2026-27",
+  "governingFramework": "Income-tax Act, 2025",
+  "framework": "Income-tax Act, 2025 (section 11 & Schedule III, Table Sl. No. 11) read with rule 279 of the Income-tax Rules, 2026",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometaxindia.gov.in/w/rule-279-1",
+  "sourceTitle": "Income-tax Rules, 2026 — rule 279 (limits for Schedule III, Table Sl. No. 11)",
+  "verifiedOn": "2026-10-24",
+  "notes": "From tax year 2026-27 the exempt HRA is the least of (1) actual HRA received, (2) rent paid minus 10% of salary, (3) 50% of salary in Mumbai, Kolkata, Delhi, Chennai, Hyderabad, Pune, Ahmedabad and Bengaluru, or 40% elsewhere (rule 279). Section 202(2)(a)(i) removes the exemption under the default new regime. FY 2025-26 stays under section 10(13A) and Rule 2A of the 1961 law, where only Delhi, Mumbai, Kolkata and Chennai got 50%.",
+  "assumptions": [
+    "Taxpayer is a salaried employee who has opted out of the default new regime under section 202 (the HRA exemption is not allowed under it).",
+    "Salary includes dearness allowance if provided for under the terms of employment, but excludes all other allowances and perquisites (rule 279(2)(b)).",
+    "Rule 279 gives 50% of salary for Mumbai, Kolkata, Delhi, Chennai, Hyderabad, Pune, Ahmedabad and Bengaluru; any other place receives 40%.",
+    "Assumes the employee actually paid rent for residential accommodation they occupied and do not own during the period."
+  ],
+  "limitations": [
+    "The HRA exemption cannot be claimed under the default new regime (section 202(2)(a)(i) of the Income-tax Act, 2025).",
+    "Does not calculate month-by-month variances if rent, salary, or city of residence changed during the tax year.",
+    "Does not verify landlord PAN requirements that employers apply when annual rent exceeds ₹1,00,000.",
+    "Cannot be claimed if the employee lives in their own house or pays no rent.",
+    "Estimated result for educational purposes; check official return instructions for specific claims."
+  ],
+  "disclaimer": "This calculator uses the rules/data published by the Income Tax Department (CBDT) for tax year 2026-27 (Income-tax Act, 2025 and Income-tax Rules, 2026). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
+  "values": {
+    "metroCities": ["mumbai", "kolkata", "delhi", "chennai", "hyderabad", "pune", "ahmedabad", "bengaluru"],
+    "metroBasicRatePct": 50,
+    "nonMetroBasicRatePct": 40,
+    "rentMinusBasicFraction": 0.10,
+    "regimeApplicability": "Not available under the default new regime (section 202)"
+  }
+}

@@ -18,6 +18,7 @@
 
 import Layout from '../layouts/Layout.astro';
 import { getPublishedTools, getToolsByCategory, CATEGORIES, getToolCount } from '../config/site';
+import { HUBS } from '../data/hubs';
 
 const allTools = getPublishedTools();
 const byCategory = getToolsByCategory();
@@ -183,9 +184,23 @@ const jsonld = {
         All Financial Calculators: Investments, Loans, Taxes &amp; Business
       </h1>
       <p data-currency-lock="INR" class="text-sm text-neutral-600 dark:text-neutral-300 max-w-3xl leading-relaxed mb-4">
-        Explore Calcumetrics’ full suite of precision financial calculators. Whether you are projecting wealth accumulation through mutual fund SIPs, calculating loan repayment schedules, applying India's GST 2.0 rationalized slabs (0%, 5%, 18%, 40%), or comparing the New and Old Income Tax regimes for FY 2025-27, every calculation runs instantly and entirely inside your browser. No sign-ups, no spam, and complete data privacy.
+        Explore Calcumetrics’ full suite of precision financial calculators. Whether you are projecting wealth accumulation through mutual fund SIPs, calculating loan repayment schedules, applying India's GST 2.0 rationalized slabs (0%, 5%, 18%, 40%), or comparing the New and Old Income Tax regimes for tax year 2026-27, every calculation runs instantly and entirely inside your browser. No sign-ups, no spam, and complete data privacy.
       </p>
     </header>
+
+    <!-- ── TOPIC HUBS ─────────────────────────────────────────────────────────── -->
+    <section aria-labelledby="topic-hubs-heading" class="mb-8">
+      <h2 id="topic-hubs-heading" class="text-xs sm:text-sm font-bold uppercase tracking-wider text-text-primary mb-3">Browse by topic</h2>
+      <ul class="flex flex-wrap gap-2">
+        {HUBS.map((hub) => (
+          <li>
+            <a href={hub.href} class="inline-flex items-center px-3 py-1.5 rounded-control border border-border bg-surface text-xs font-medium text-text-primary hover:border-accent hover:text-accent transition-standard focus-visible:outline-accent">
+              {hub.name} calculators &amp; guides
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
 
     <!-- ── MOST USED STRIP (Top 6 Flags) ──────────────────────────────────────── -->
     <section aria-labelledby="most-used-heading" class="mb-8 p-4 sm:p-5 rounded-card bg-surface border border-border/80 shadow-mac-subtle">

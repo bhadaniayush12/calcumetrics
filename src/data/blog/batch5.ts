@@ -350,6 +350,11 @@ export const BATCH_5_POSTS: BlogPost[] = [
         title: 'Debt-to-Income Ratio in the UK: What Lenders Actually Look At',
         description: 'UK-specific guide to mortgage affordability using LTI multiples and FCA stress tests.',
       },
+      {
+        slug: 'mortgage-rates-7-4-percent-buy-or-wait',
+        title: 'Should you wait for lower mortgage rates?',
+        description: 'Payment and total-interest comparison at today\'s rates versus a later, lower rate.',
+      },
     ],
     faqs: [
       {

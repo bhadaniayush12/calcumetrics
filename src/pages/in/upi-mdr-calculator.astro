@@ -9,6 +9,9 @@ import Alert from '../../components/ui/Alert.astro';
 import { calcUPIMDR } from '../../lib/calculators/upi-mdr';
 import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/upi-mdr-calculator')!;
 
 const DEFAULT = {
   monthlyVolume: 500000,
@@ -54,7 +57,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-10-19',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',

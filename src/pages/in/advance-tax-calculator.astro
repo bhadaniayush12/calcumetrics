@@ -8,6 +8,9 @@ import Alert from '../../components/ui/Alert.astro';
 import { calcAdvanceTax } from '../../lib/tax/india';
 import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/advance-tax-calculator')!;
 
 const DEFAULT_TAX = 100000;
 const initialResult = calcAdvanceTax(DEFAULT_TAX);
@@ -33,7 +36,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -61,7 +64,7 @@ const jsonld = {
           name: 'Who is required to pay advance tax in India?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'For FY 2026-27, section 404 of the Income-tax Act, 2025 requires every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the year (after deducting TDS and TCS) is ₹10,000 or more to pay advance tax.',
+            text: 'For tax year 2026-27, section 404 of the Income-tax Act, 2025 requires every individual, professional, freelancer, and corporate taxpayer whose estimated total tax liability for the year (after deducting TDS and TCS) is ₹10,000 or more to pay advance tax.',
           },
         },
         {
@@ -118,10 +121,7 @@ const jsonld = {
   >
     <Fragment slot="inputs">
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
-        <h1 class="text-2xl font-bold tracking-tight text-text-primary">Advance Tax Calculator: FY 2026-27 / AY 2027-28</h1>
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
-        </span>
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">Advance Tax Calculator: Tax Year 2026-27</h1>
       </div>
       <p class="text-xs text-text-muted mb-4">
         Statutory source: <a href="https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income-tax Act, 2025</a> (sections 404, 405, 408, 424, 425) · <a href="https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tax-payments" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">e-filing tax payments FAQ</a> · <a href="https://www.incometaxindia.gov.in/documents/81799/11848482/Updated-FQAs-on-Interplay%26Transitions.pdf/e10ad2b6-9495-de90-58d3-20606d8954ae?t=1775128640970" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">CBDT transition FAQs</a>.
@@ -204,7 +204,7 @@ const jsonld = {
       <section aria-labelledby="at-calculator-how">
         <h2 id="at-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Advance Tax Works in India (Pay-As-You-Earn Scheme)</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Advance tax for FY 2026-27 is governed by the Income-tax Act, 2025: section 404 (old section 208) sets who pays, section 405 computes the amount, section 408 (old section 211) sets the instalments, and sections 424 and 425 (old sections 234B and 234C) charge interest. Advance tax for FY 2025-26 (AY 2026-27) stays under the Income-tax Act, 1961. It is India's "pay-as-you-earn" direct taxation mechanism. Under this scheme, taxpayers must discharge their income tax liability in periodic quarterly installments throughout the financial year in which income is earned, rather than deferring the entire tax payment until the annual return filing date.
+          Advance tax for tax year 2026-27 is governed by the Income-tax Act, 2025: section 404 (old section 208) sets who pays, section 405 computes the amount, section 408 (old section 211) sets the instalments, and sections 424 and 425 (old sections 234B and 234C) charge interest. Advance tax for FY 2025-26 (AY 2026-27) stays under the Income-tax Act, 1961. It is India's "pay-as-you-earn" direct taxation mechanism. Under this scheme, taxpayers must discharge their income tax liability in periodic quarterly installments throughout the financial year in which income is earned, rather than deferring the entire tax payment until the annual return filing date.
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <p class="text-sm text-text-muted leading-relaxed font-mono">

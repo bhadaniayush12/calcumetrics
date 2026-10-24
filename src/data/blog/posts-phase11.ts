@@ -70,6 +70,16 @@ export const PHASE_11_POSTS: BlogPost[] = [
         title: 'The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money',
         description: 'Understand purchasing power erosion after factoring in inflation and personal income tax slabs.',
       },
+      {
+        slug: 'dhanteras-2026-gold-vs-sip',
+        title: 'Gold vs SIP returns, worked with CAGR',
+        description: 'A festive-season comparison of gold and equity SIP growth using the CAGR and XIRR maths.',
+      },
+      {
+        slug: 'jio-platforms-ipo-listing-gains-tax',
+        title: 'IPO listing gains and the tax you keep',
+        description: 'What remains of a listing-day gain after short-term capital gains tax.',
+      },
     ],
     faqs: [
       {
@@ -605,6 +615,11 @@ export const PHASE_11_POSTS: BlogPost[] = [
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
         description: 'Ensure your post-tax investment returns are accurately measured across lump-sum and SIP investments.',
       },
+      {
+        slug: 'section-87a-marginal-relief-new-regime-example',
+        title: 'Section 87A marginal relief: a worked example',
+        description: 'How the rebate and marginal relief work just above ₹12 lakh under the new regime.',
+      },
     ],
     faqs: [
       {
@@ -936,6 +951,11 @@ export const PHASE_11_POSTS: BlogPost[] = [
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
         description: 'Account for tax drag when computing post-tax geometric compound returns.',
       },
+      {
+        slug: 'jio-platforms-ipo-listing-gains-tax',
+        title: 'Tax on IPO listing gains: a worked example',
+        description: 'How listing-day gains on IPO shares are taxed as short-term capital gains, with numbers.',
+      },
     ],
     faqs: [
       {
@@ -1237,6 +1257,16 @@ export const PHASE_11_POSTS: BlogPost[] = [
         slug: 'cagr-vs-xirr',
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
         description: 'Understand geometric rates of return for reinvesting business profits into financial markets.',
+      },
+      {
+        slug: 'upi-mdr-above-2000-merchant-charges',
+        title: 'Payment fees and your margin: UPI MDR',
+        description: 'How a merchant discount rate on UPI payments above ₹2,000 eats into gross margin.',
+      },
+      {
+        slug: 'gst-input-tax-credit-rules',
+        title: 'How GST input credit affects your costs',
+        description: 'Which purchases qualify for input tax credit and how it changes your real cost.',
       },
     ],
     faqs: [
@@ -2084,6 +2114,16 @@ export const PHASE_11_POSTS: BlogPost[] = [
         title: 'NPV vs. IRR: How to Resolve Conflicting Signals in Capital Budgeting',
         description: 'Evaluate how working capital investments affect multi-year discounted project cash flows.',
       },
+      {
+        slug: 'current-ratio-vs-quick-ratio',
+        title: 'Current ratio vs quick ratio',
+        description: 'Which liquidity ratio to trust when inventory is slow to sell.',
+      },
+      {
+        slug: 'eoq-carrying-cost-percentage-solved-example',
+        title: 'EOQ solved example with carrying cost %',
+        description: 'How order size and holding cost trade off, worked with exam-style numbers.',
+      },
     ],
     faqs: [
       {
@@ -2391,6 +2431,16 @@ export const PHASE_11_POSTS: BlogPost[] = [
         title: 'Old vs. New Tax Regime: The Exact Breakeven Deduction Formula (FY 2025-26)',
         description: 'Determine your baseline annual tax liability before scheduling quarterly advance tax payments.',
       },
+      {
+        slug: 'itr-due-date-21-november-2026-late-fee-interest',
+        title: 'Missed the return deadline? Late fee and interest',
+        description: 'Late filing fee and monthly interest on unpaid tax when a return is filed after the extended due date.',
+      },
+      {
+        slug: 'advance-tax-due-dates-calculation-example',
+        title: 'Advance tax due dates with a full worked example',
+        description: 'Instalment-by-instalment calculation for tax year 2026-27, including interest for shortfalls.',
+      },
     ],
     faqs: [
       {
@@ -2644,6 +2694,11 @@ export const PHASE_11_POSTS: BlogPost[] = [
         slug: 'home-loan-prepayment-vs-sip',
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
         description: 'Compare guaranteed debt cost elimination against real post-inflation equity returns.',
+      },
+      {
+        slug: 'traditional-vs-roth-401k',
+        title: 'Roth or traditional 401(k)?',
+        description: 'How taxes now versus taxes in retirement change your real return.',
       },
     ],
     faqs: [

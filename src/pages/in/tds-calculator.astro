@@ -7,9 +7,12 @@ import Input from '../../components/ui/Input.astro';
 import Dropdown from '../../components/ui/Dropdown.astro';
 import Button from '../../components/ui/Button.astro';
 import Alert from '../../components/ui/Alert.astro';
-import { calcTDS, TDS_RATES, TDS_194A_SENIOR_THRESHOLD, type TDSSection } from '../../lib/tax/india';
+import { calcTDS, TDS_RATES, TDS_ACT_2025_REF, TDS_194A_SENIOR_THRESHOLD, type TDSSection } from '../../lib/tax/india';
 import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/tds-calculator')!;
 
 const DEFAULT_AMOUNT = 100000;
 const DEFAULT_SECTION: TDSSection = '194J';
@@ -19,6 +22,8 @@ const fmt = (n: number) => '₹' + formatIndian(n);
 // Short dropdown form: ₹50k, ₹6L, ₹50L — always derived from the engine table.
 const short = (n: number) => (n >= 100000 ? `₹${+(n / 100000).toFixed(2)}L` : `₹${+(n / 1000).toFixed(1)}k`);
 const R = TDS_RATES;
+// "s.393(1) Sl. 6(iii) [old 194J]" — new section first, old number once in brackets.
+const ref = (sec: TDSSection) => `s.${TDS_ACT_2025_REF[sec]} [old ${sec}]`;
 
 const related = TOOLS.filter(
   (t) => t.category === 'Taxes' && t.slug !== 'tds-calculator' && t.status === 'published'
@@ -32,14 +37,14 @@ const jsonld = {
       '@type': 'WebApplication',
       name: 'TDS Calculator India',
       url: canonicalUrl,
-      description: 'Free TDS calculator India to compute Tax Deducted at Source, net receivable amount, and exemption threshold under the Income-tax Act.',
+      description: 'Free TDS calculator India for tax year 2026-27: compute Tax Deducted at Source, net receivable amount and threshold under sections 392 and 393 of the Income-tax Act, 2025.',
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Any',
       browserRequirements: 'Requires JavaScript',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -67,7 +72,7 @@ const jsonld = {
           name: 'What happens if the payment is below the TDS threshold?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'If the aggregate or single payment does not exceed the statutory threshold specified under that section of the Income-tax Act, no TDS is deducted and the payee receives 100% of the gross invoice amount.',
+            text: 'If the aggregate or single payment does not exceed the threshold limit in column D of the section 393 Table of the Income-tax Act, 2025, no TDS is deducted and the payee receives 100% of the gross invoice amount. For purchase of goods [old 194Q], TDS applies only to the part above ₹50 lakh.',
           },
         },
         {
@@ -75,7 +80,7 @@ const jsonld = {
           name: 'What TDS rate applies if the payee does not furnish a PAN?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Under Section 206AA of the Income-tax Act, if the deductee fails to furnish a valid Permanent Account Number (PAN) to the deductor, TDS must be deducted at higher of the prescribed rate or 20%.',
+            text: 'Under section 397(2)(b) of the Income-tax Act, 2025 [old 206AA], if the deductee fails to furnish a valid Permanent Account Number (PAN) to the deductor, TDS is deducted at the higher of the prescribed rate, the rate in force, or 20% (5% for purchase of goods and e-commerce payments).',
           },
         },
         {
@@ -83,15 +88,15 @@ const jsonld = {
           name: 'Can TDS deducted be claimed back during income tax filing?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Yes. TDS is advance tax withheld on your behalf. When you file your annual Income Tax Return (ITR), the TDS reflected in your Form 26AS / Annual Information Statement (AIS) is adjusted against your final tax liability, and any excess is refunded directly to your bank account with interest.',
+            text: 'Yes. TDS is tax withheld on your behalf. When you file your return for the tax year, the TDS shown in your Annual Information Statement (AIS) is adjusted against your final tax liability, and any excess is refunded to your bank account with interest.',
           },
         },
         {
           '@type': 'Question',
-          name: 'What is the difference between Section 194J for professional vs technical services?',
+          name: 'What is the TDS rate on professional vs technical services in tax year 2026-27?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Under Section 194J, fees for professional services (such as legal, medical, engineering, accountancy) attract 10% TDS, whereas fees for purely technical services or call center operations attract a reduced rate of 2%, both sharing the ' + fmt(TDS_RATES['194J'].threshold) + ' threshold.',
+            text: 'Under section 393(1) Table Sl. 6(iii) of the Income-tax Act, 2025 [old 194J], fees for professional services (such as legal, medical, engineering, accountancy) attract 10% TDS, whereas fees for technical services, film royalties and call centre operators attract 2%, both sharing the ' + fmt(TDS_RATES['194J'].threshold) + ' threshold. Payments made up to 31 March 2026 (FY 2025-26) stay under the Income-tax Act, 1961.',
           },
         },
         {
@@ -99,7 +104,7 @@ const jsonld = {
           name: 'Do surcharge and Health & Education Cess apply to TDS on domestic payments?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'No, for domestic resident individuals and entities, TDS on non-salary payments is deducted at the flat rate specified by the Finance Act without adding surcharge or the 4% Health and Education Cess.',
+            text: 'No. For resident payees, TDS on non-salary payments is deducted at the flat rate in section 393 (or the rate in force under the Finance Act, 2026) without adding surcharge or the 4% Health and Education Cess.',
           },
         },
       ],
@@ -108,13 +113,13 @@ const jsonld = {
 };
 
 const SECTION_OPTIONS = [
-  { value: '194J', label: `Section 194J — Professional Services (${R['194J'].ratePct}%, threshold ${short(R['194J'].threshold)})` },
-  { value: '194C', label: `Section 194C — Contractor / Sub-contractor (${R['194C'].ratePct}%, threshold ${short(R['194C'].threshold)})` },
-  { value: '194I', label: `Section 194I — Rent on Land / Building (${R['194I'].ratePct}%, threshold ${short(R['194I'].threshold)} a year / ${short(R['194I'].threshold / 12)} a month)` },
-  { value: '194A', label: `Section 194A — Interest on Bank FDs / Deposits (${R['194A'].ratePct}%, threshold ${short(R['194A'].threshold)}; ${short(TDS_194A_SENIOR_THRESHOLD)} seniors)` },
-  { value: '194H', label: `Section 194H — Commission / Brokerage (${R['194H'].ratePct}%, threshold ${short(R['194H'].threshold)})` },
-  { value: '194',  label: `Section 194 — Dividend from Domestic Company (${R['194'].ratePct}%, threshold ${short(R['194'].threshold)})` },
-  { value: '194Q', label: `Section 194Q — Purchase of Goods > ₹50 Lakh (${R['194Q'].ratePct}%, threshold ${short(R['194Q'].threshold)})` },
+  { value: '194J', label: `${ref('194J')} — Professional Services (${R['194J'].ratePct}%, threshold ${short(R['194J'].threshold)})` },
+  { value: '194C', label: `${ref('194C')} — Contractor / Sub-contractor (${R['194C'].ratePct}%, threshold ${short(R['194C'].threshold)})` },
+  { value: '194I', label: `${ref('194I')} — Rent on Land / Building (${R['194I'].ratePct}%, threshold ${short(R['194I'].threshold / 12)} a month)` },
+  { value: '194A', label: `${ref('194A')} — Interest on Bank FDs / Deposits (${R['194A'].ratePct}%, threshold ${short(R['194A'].threshold)}; ${short(TDS_194A_SENIOR_THRESHOLD)} seniors)` },
+  { value: '194H', label: `${ref('194H')} — Commission / Brokerage (${R['194H'].ratePct}%, threshold ${short(R['194H'].threshold)})` },
+  { value: '194',  label: `${ref('194')} — Dividend from Domestic Company (${R['194'].ratePct}%, threshold ${short(R['194'].threshold)})` },
+  { value: '194Q', label: `${ref('194Q')} — Purchase of Goods > ₹50 Lakh (${R['194Q'].ratePct}% on the excess)` },
 ];
 ---
 
@@ -134,13 +139,10 @@ const SECTION_OPTIONS = [
   >
     <Fragment slot="inputs">
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
-        <h1 class="text-2xl font-bold tracking-tight text-text-primary">TDS Calculator: FY 2025-26</h1>
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
-        </span>
+        <h1 class="text-2xl font-bold tracking-tight text-text-primary">TDS Calculator: Tax Year 2026-27</h1>
       </div>
       <p class="text-xs text-text-muted mb-4">
-        Statutory source: <a href="https://www.incometax.gov.in" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income Tax Department (CBDT)</a> · Chapter XVII-B.
+        Statutory source: <a href="https://www.incometaxindia.gov.in/w/section-393-6" target="_blank" rel="noopener noreferrer" class="text-accent underline hover:text-accent-hover font-medium">Income-tax Act, 2025, sections 392–393</a> (as amended by the Finance Act, 2026). Payments up to 31 March 2026 (FY 2025-26) stay under the Income-tax Act, 1961.
       </p>
 
       <!-- Error alert -->
@@ -157,7 +159,7 @@ const SECTION_OPTIONS = [
           label="TDS Section & Payment Nature"
           options={SECTION_OPTIONS}
           value="194J"
-          helperText="Select the category of transaction under Income-tax Act"
+          helperText="Select the payment type under section 393 of the Income-tax Act, 2025"
         />
       </div>
 
@@ -185,7 +187,7 @@ const SECTION_OPTIONS = [
           <input type="checkbox" id="tds-senior" class="mt-1 w-4 h-4 accent-accent shrink-0" />
           <span>
             <span class="block text-sm font-medium text-text-primary">Senior citizen (60+)</span>
-            <span class="block text-xs text-text-muted">Raises the Section 194A threshold to ₹1,00,000. Other sections are unchanged.</span>
+            <span class="block text-xs text-text-muted">Raises the bank-interest threshold to ₹1,00,000 (s.393(1) Sl. 5(ii)). Other sections are unchanged.</span>
           </span>
         </label>
       </div>
@@ -243,14 +245,14 @@ const SECTION_OPTIONS = [
         </button>
       </div>
 
-      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes resident deductee with PAN furnished. Higher rate of 20% applies under Sec 206AA if PAN is missing.</p>
+      <p class="text-xs text-dark-muted mt-4 leading-relaxed">Assumes resident deductee with PAN furnished. A higher rate of 20% applies under s.397(2)(b) if PAN is missing.</p>
     </Fragment>
 
     <Fragment slot="below">
       <section aria-labelledby="tds-calculator-how">
         <h2 id="tds-calculator-how" class="text-xl font-bold text-text-primary mb-4">How Tax Deducted at Source (TDS) works in India</h2>
         <p class="text-sm text-text-muted leading-relaxed mb-4">
-          Tax Deducted at Source (TDS) is a direct taxation mechanism under the Indian Income-tax Act, 1961, designed to collect revenue at the very point of income generation. The paying entity (deductor) must withhold the prescribed percentage of tax before remitting the net proceeds to the recipient (deductee):
+          Tax Deducted at Source (TDS) is a direct taxation mechanism under sections 392 and 393 of the Income-tax Act, 2025 (Chapter XVII-B of the Income-tax Act, 1961 until 31 March 2026), designed to collect revenue at the very point of income generation. The paying entity (deductor) must withhold the prescribed percentage of tax before remitting the net proceeds to the recipient (deductee):
         </p>
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <p class="text-sm text-text-muted leading-relaxed font-mono">
@@ -258,13 +260,13 @@ const SECTION_OPTIONS = [
             <strong>2. TDS Deduction Formula:</strong> TDS Amount = [ Gross Base Payment &times; Section Withholding Rate (%) ] &divide; 100<br /><br />
             <strong>3. Below-Threshold Rule:</strong> If Aggregate Payment &le; Statutory Section Threshold &rarr; TDS = ₹0<br /><br />
             <strong>4. Net Receivable Payment:</strong> Net Payout = Gross Base Invoice &minus; TDS Amount<br /><br />
-            <strong>5. Non-PAN Penalty (Sec 206AA):</strong> If Deductee Lacks Valid/Linked PAN &rarr; Rate = Higher of Prescribed Rate or 20%
+            <strong>5. Non-PAN Penalty (s.397(2)(b)):</strong> If Deductee Lacks Valid/Linked PAN &rarr; Rate = Higher of Prescribed Rate or 20%
           </p>
         </div>
 
         <h3 class="text-lg font-bold text-text-primary mb-3">Step-by-Step Worked Example (Default Scenario)</h3>
         <p class="text-sm text-text-muted leading-relaxed mb-3">
-          Consider an independent professional or agency issuing an invoice of <strong>₹1,00,000</strong> for professional consulting services falling under <strong>Section 194J</strong> of the Income-tax Act:
+          Consider an independent professional or agency issuing an invoice of <strong>₹1,00,000</strong> for professional consulting services falling under <strong>section 393(1) Table Sl. 6(iii)</strong> of the Income-tax Act, 2025:
         </p>
 
         <div class="overflow-x-auto border border-border rounded-card mb-6">
@@ -286,13 +288,13 @@ const SECTION_OPTIONS = [
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Statutory Exemption Threshold</td>
-                <td class="py-2.5 px-4 font-mono">Section 194J Annual Limit</td>
+                <td class="py-2.5 px-4 font-mono">s.393(1) Sl. 6(iii) Annual Limit</td>
                 <td class="py-2.5 px-4 font-mono">{fmt(R['194J'].threshold)} / Year</td>
                 <td class="py-2.5 px-4">Since {fmt(DEFAULT_AMOUNT)} exceeds {fmt(R['194J'].threshold)}, statutory withholding is mandatory.</td>
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Applicable TDS Withholding Rate</td>
-                <td class="py-2.5 px-4 font-mono">Section 194J (Professional)</td>
+                <td class="py-2.5 px-4 font-mono">s.393(1) Sl. 6(iii) (Professional)</td>
                 <td class="py-2.5 px-4 font-mono text-accent font-bold">{initialResult.ratePct.toFixed(2)}%</td>
                 <td class="py-2.5 px-4">Statutory rate for professional services (2% for purely technical services).</td>
               </tr>
@@ -300,7 +302,7 @@ const SECTION_OPTIONS = [
                 <td class="py-2.5 px-4">Tax Deducted at Source (TDS)</td>
                 <td class="py-2.5 px-4 font-mono">{fmt(DEFAULT_AMOUNT)} &times; {initialResult.ratePct.toFixed(2)}%</td>
                 <td class="py-2.5 px-4 font-mono text-accent font-bold">{fmt(initialResult.tdsAmount)}</td>
-                <td class="py-2.5 px-4">Deposited by the client with Central Government via Challan ITNS 281.</td>
+                <td class="py-2.5 px-4">Deposited by the client with the Central Government by the prescribed due date.</td>
               </tr>
               <tr class="bg-surface font-semibold text-text-primary border-t-2 border-border">
                 <td class="py-3 px-4">Net Amount Disbursed to Payee</td>
@@ -310,7 +312,7 @@ const SECTION_OPTIONS = [
               </tr>
               <tr>
                 <td class="py-2.5 px-4 font-medium text-text-primary">Annual Tax Return Credit</td>
-                <td class="py-2.5 px-4 font-mono">Form 26AS / AIS Credit</td>
+                <td class="py-2.5 px-4 font-mono">AIS / Form 26AS Credit</td>
                 <td class="py-2.5 px-4 font-mono">{fmt(initialResult.tdsAmount)} Advance Credit</td>
                 <td class="py-2.5 px-4">Credited against annual income tax liability; refundable if total tax &lt; TDS.</td>
               </tr>
@@ -320,26 +322,27 @@ const SECTION_OPTIONS = [
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
           <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">Common TDS Sections &amp; Statutory Thresholds</h3>
+            <h3 class="text-base font-bold text-text-primary mb-2">Common TDS Provisions &amp; Thresholds (Tax Year 2026-27)</h3>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>Sec 194J (Professional / Technical):</strong> 10% for professional services; 2% for technical services. Annual threshold: <strong>{fmt(R['194J'].threshold)}</strong> (Finance Act 2025).</li>
-              <li><strong>Sec 194C (Contractors / Freelance Work):</strong> 1% for Individuals/HUFs; 2% for Corporate entities. Threshold: <strong>₹30,000 single / ₹1,00,000 aggregate</strong>.</li>
-              <li><strong>Sec 194I (Rent on Land &amp; Building):</strong> 10% for land/building (2% for plant/machinery). Threshold: <strong>{fmt(R['194I'].threshold / 12)} a month</strong> ({fmt(R['194I'].threshold)} a year, Finance Act 2025).</li>
-              <li><strong>Sec 194A (Bank Interest &amp; FDs):</strong> 10% standard. Threshold: <strong>₹50,000</strong> for general citizens (<strong>₹1,00,000</strong> for senior citizens &ge;60 years).</li>
-              <li><strong>Sec 194H (Commission &amp; Brokerage):</strong> {R['194H'].ratePct}% (from 1 Oct 2024, Finance (No.2) Act 2024). Annual threshold: <strong>{fmt(R['194H'].threshold)}</strong>.</li>
-              <li><strong>Sec 194Q (Purchase of Goods):</strong> 0.1% on purchase value exceeding <strong>₹50,00,000</strong> in a financial year.</li>
+              <li><strong>{ref('194J')} — Professional / Technical:</strong> 10% for professional services; 2% for technical services. Threshold: <strong>{fmt(R['194J'].threshold)}</strong> a year.</li>
+              <li><strong>{ref('194C')} — Contractors:</strong> 1% for individuals/HUFs; 2% for others. Threshold: <strong>₹30,000 single / ₹1,00,000 aggregate</strong>.</li>
+              <li><strong>{ref('194I')} — Rent:</strong> 10% for land/building (2% for plant/machinery). Threshold: <strong>{fmt(R['194I'].threshold / 12)} a month or part of a month</strong>.</li>
+              <li><strong>{ref('194A')} — Bank Interest &amp; FDs:</strong> 10%. Threshold: <strong>₹50,000</strong> (<strong>₹1,00,000</strong> for senior citizens); ₹10,000 for interest from other payers.</li>
+              <li><strong>{ref('194H')} — Commission &amp; Brokerage:</strong> {R['194H'].ratePct}%. Threshold: <strong>{fmt(R['194H'].threshold)}</strong>.</li>
+              <li><strong>{ref('194Q')} — Purchase of Goods:</strong> 0.1% on the part of purchases above <strong>₹50,00,000</strong> in a tax year.</li>
+              <li><strong>{ref('194N')} — Cash Withdrawal:</strong> 2% above <strong>₹1 crore</strong> a tax year (₹3 crore for co-operative societies).</li>
             </ul>
           </div>
 
           <div class="bg-surface border border-border rounded-card p-5">
-            <h3 class="text-base font-bold text-text-primary mb-2">Section 206AA &amp; PAN Compliance Mandate</h3>
+            <h3 class="text-base font-bold text-text-primary mb-2">Section 397(2) &amp; PAN Compliance</h3>
             <p class="text-xs text-text-muted leading-relaxed mb-3">
               Furnishing a valid Permanent Account Number (PAN) is critical under Indian tax laws:
             </p>
             <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-              <li><strong>The 20% Non-PAN Penalty:</strong> Under Section 206AA, if the deductee fails to provide a valid PAN, the deductor must deduct TDS at the higher of the statutory rate or <strong>20.00%</strong>.</li>
+              <li><strong>The 20% Non-PAN Rate:</strong> Under section 397(2)(b) [old 206AA], if the deductee fails to provide a valid PAN, the deductor must deduct TDS at the higher of the statutory rate, the rate in force, or <strong>20%</strong> (5% for purchase of goods and e-commerce payments).</li>
               <li><strong>Inoperative PAN Trap:</strong> Failure to link PAN with Aadhaar renders the PAN legally "inoperative," automatically triggering the punitive 20% deduction rate.</li>
-              <li><strong>Form 15G / 15H Exemption:</strong> Senior citizens (15H) and individuals with nil taxable income (15G) can submit self-declarations to receive interest without TDS deduction.</li>
+              <li><strong>No-deduction declarations:</strong> Individuals whose estimated tax is nil can give a self-declaration under section 393(6) [old Form 15G / 15H] to receive interest without TDS.</li>
             </ul>
           </div>
         </div>
@@ -347,9 +350,9 @@ const SECTION_OPTIONS = [
         <div class="bg-surface border border-border rounded-card p-5 mb-6">
           <h3 class="text-base font-bold text-text-primary mb-2">Assumptions &amp; Regulatory Nuances</h3>
           <ul class="text-xs text-text-muted space-y-2 list-disc pl-4 leading-relaxed">
-            <li><strong>Exclusion of Surcharge &amp; Cess:</strong> For domestic resident entities and individuals, TDS on commercial payments is deducted strictly at the flat rate prescribed by the Finance Act without adding surcharge or the 4% Health &amp; Education Cess.</li>
+            <li><strong>Exclusion of Surcharge &amp; Cess:</strong> For domestic resident entities and individuals, TDS on commercial payments is deducted at the flat rate in section 393 or the Finance Act, 2026 without adding surcharge or the 4% Health &amp; Education Cess.</li>
             <li><strong>GST Exclusion Rule:</strong> Per CBDT Circular No. 23/2017, when Goods and Services Tax (GST) is indicated separately on an invoice, TDS is deducted strictly on the basic value of services, excluding the GST component.</li>
-            <li><strong>Form 16A Compliance:</strong> Deductors must deposit withheld tax by the 7th of the following month (30th April for March) and issue quarterly TDS certificates (Form 16A) to payees within 15 days of filing Form 26Q.</li>
+            <li><strong>Deposit &amp; certificates:</strong> Deductors deposit withheld tax and file quarterly statements and TDS certificates within the time prescribed under section 397(3) of the Income-tax Act, 2025.</li>
           </ul>
         </div>
       </section>
@@ -385,12 +388,12 @@ const SECTION_OPTIONS = [
           <a href="/in/income-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
             <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Income Tax Calculator (India)</h3>
-            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compare Old vs New Tax Regime tax liability per Finance Act 2024-25.</p>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Compare old vs new regime tax for tax year 2026-27.</p>
           </a>
           <a href="/in/advance-tax-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
             <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">Advance Tax Calculator</h3>
-            <p class="text-xs text-text-muted mt-1 leading-relaxed">Calculate quarterly advance tax installments and Section 234B/234C interest liability.</p>
+            <p class="text-xs text-text-muted mt-1 leading-relaxed">Split advance tax into the four instalments and estimate interest for late payment.</p>
           </a>
           <a href="/in/salary-ctc-calculator" class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
             <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">Taxes</span>
@@ -552,7 +555,7 @@ const SECTION_OPTIONS = [
       const vAmt = validate(numAmt ?? '', { required: true, min: 100, label: 'Amount' });
       if (!vAmt.valid) return;
       const res = calcTDS(vAmt.value!, sec, { seniorCitizen: seniorBox?.checked ?? false });
-      const text = `TDS Deducted: ${fmtVal(res.tdsAmount)} under Section ${res.section} on gross payment of ${fmtVal(res.grossAmount)} (Net Payout: ${fmtVal(res.netAmount)}). ${location.href.split('#')[0]}`;
+      const text = `TDS Deducted: ${fmtVal(res.tdsAmount)} under ${secSelect.selectedOptions[0]?.text.split(' — ')[0] ?? 'section ' + res.section} on gross payment of ${fmtVal(res.grossAmount)} (Net Payout: ${fmtVal(res.netAmount)}). ${location.href.split('#')[0]}`;
       try {
         await navigator.clipboard.writeText(text);
       } catch {

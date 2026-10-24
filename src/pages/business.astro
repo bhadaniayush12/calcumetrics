@@ -1,45 +1,13 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { getPublishedTools } from '../config/site';
-const tools = getPublishedTools().filter((t) => t.category === 'Business');
-const count = tools.length;
-const noindex = count < 4;
-const jsonld = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': 'CollectionPage', name: 'Business Calculators', url: 'https://calcumetrics.com/business', description: `${count} free business calculators: break-even, profit margins, ROI, EOQ, depreciation, working capital, liquidity ratios, and DSCR.` },
-    { '@type': 'ItemList', itemListElement: tools.map((t, i) => ({ '@type': 'ListItem', position: i + 1, url: `https://calcumetrics.com${t.path}`, name: t.name })) },
-    { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: 'https://calcumetrics.com/' }, { '@type': 'ListItem', position: 2, name: 'Business', item: 'https://calcumetrics.com/business' }] },
-  ],
-};
+import HubPage from '../components/HubPage.astro';
 ---
-<Layout title={`Business Calculators: ${count} Free Tools | Calcumetrics`} description={`${count} free business calculators: break-even analysis, profit margins, ROI, EOQ, depreciation, working capital, liquidity ratios, and DSCR. 100% private.`} canonical="https://calcumetrics.com/business" robots={noindex ? 'noindex,follow' : 'index,follow,max-image-preview:large'} ogImage="/og/categories/business.png" ogImageAlt="Calcumetrics Business Finance Calculators — Break-even point, Profit Margins, and Working Capital suite preview card">
-  <Fragment slot="head"><script type="application/ld+json" set:html={JSON.stringify(jsonld)} /></Fragment>
-  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <nav aria-label="Breadcrumb" class="mb-6"><ol class="flex items-center gap-1.5 text-xs text-text-muted"><li><a href="/" class="hover:text-accent transition-standard">Home</a></li><li aria-hidden="true">›</li><li class="text-text-primary font-medium" aria-current="page">Business</li></ol></nav>
-    <h1 class="text-3xl font-bold tracking-tight text-text-primary mb-2">Business Calculators</h1>
-    <p class="text-sm text-text-muted mb-8 max-w-xl">Analyse profitability, pricing, and returns. From break-even analysis to ROI, these tools help you make informed business decisions.</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {tools.map((tool) => (
-        <a data-currency-lock={tool.path.startsWith('/in/') ? 'INR' : undefined} href={tool.path} class="group block bg-surface border border-border rounded-card p-4 hover:border-accent transition-standard focus-visible:outline-accent">
-          <span class="text-xs font-semibold text-accent uppercase tracking-wider block mb-1">{tool.region}</span>
-          <h2 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard mb-1">{tool.name}</h2>
-          <p class="text-xs text-text-muted leading-relaxed">{tool.description}</p>
-        </a>
-      ))}
-    </div>
-    <section aria-labelledby="hub-guide" class="mt-12 max-w-3xl">
-      <h2 id="hub-guide" class="text-xl font-bold text-text-primary mb-4">How to choose a business calculator</h2>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Start with pricing. The <a href="/profit-margin-calculator" class="text-accent hover:underline font-medium">profit margin calculator</a> gives gross, operating and net margin, and the <a href="/markup-vs-margin-calculator" class="text-accent hover:underline font-medium">markup vs margin calculator</a> converts between the two so a 50% markup is not mistaken for a 50% margin. The <a href="/break-even-calculator" class="text-accent hover:underline font-medium">break-even calculator</a> shows how many units you must sell to cover fixed costs, and <a href="/roi-calculator" class="text-accent hover:underline font-medium">ROI</a> measures the return on a single spend.</p>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">For stock, work out <a href="/cogs-calculator" class="text-accent hover:underline font-medium">COGS</a> first, then use <a href="/inventory-turnover-calculator" class="text-accent hover:underline font-medium">inventory turnover</a> and <a href="/eoq-calculator" class="text-accent hover:underline font-medium">EOQ</a> to see how fast it sells and how much to reorder. For cash, <a href="/working-capital-calculator" class="text-accent hover:underline font-medium">working capital</a>, <a href="/liquidity-ratios-calculator" class="text-accent hover:underline font-medium">liquidity ratios</a> and the <a href="/cash-conversion-cycle-calculator" class="text-accent hover:underline font-medium">cash conversion cycle</a> show whether you can pay short-term bills, while <a href="/dscr-calculator" class="text-accent hover:underline font-medium">DSCR</a> is the test a lender applies before a business loan.</p>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">Use <a href="/depreciation-calculator" class="text-accent hover:underline font-medium">depreciation</a> for fixed assets, and the <a href="/in/upi-mdr-calculator" class="text-accent hover:underline font-medium">UPI MDR calculator</a> if you take UPI payments in India.</p>
-      <p class="text-sm text-text-muted leading-relaxed mb-4">For a payment-cost budget, use the <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI MDR calculator for fees and net settlement</a> with the rate in your provider’s quote, then compare the settlement with your monthly collections.</p>
-      <h3 class="text-sm font-semibold text-text-primary mb-2 mt-6">Related guides</h3>
-      <ul class="list-disc pl-5 space-y-1 text-sm">
-        <li><a href="/blog/cogs-vs-opex-accounting" class="text-accent hover:underline font-medium">COGS vs OpEx: how to classify costs</a></li>
-        <li><a href="/blog/markup-vs-margin" class="text-accent hover:underline font-medium">Markup vs margin explained</a></li>
-        <li><a href="/blog/how-to-calculate-break-even-point" class="text-accent hover:underline font-medium">How to calculate the break-even point</a></li>
-      </ul>
-    </section>
-  </div>
-</Layout>
+<HubPage hubId="business">
+  <section aria-labelledby="hub-guide" class="mt-12 max-w-3xl">
+    <h2 id="hub-guide" class="text-xl font-bold text-text-primary mb-4">How to choose a business calculator</h2>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">Start with pricing. The <a href="/profit-margin-calculator" class="text-accent hover:underline font-medium">profit margin calculator</a> gives gross, operating and net margin, and the <a href="/markup-vs-margin-calculator" class="text-accent hover:underline font-medium">markup vs margin calculator</a> converts between the two so a 50% markup is not mistaken for a 50% margin. The <a href="/break-even-calculator" class="text-accent hover:underline font-medium">break-even calculator</a> shows how many units you must sell to cover fixed costs, and <a href="/roi-calculator" class="text-accent hover:underline font-medium">ROI</a> measures the return on a single spend.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">For stock, work out <a href="/cogs-calculator" class="text-accent hover:underline font-medium">COGS</a> first, then use <a href="/inventory-turnover-calculator" class="text-accent hover:underline font-medium">inventory turnover</a> and <a href="/eoq-calculator" class="text-accent hover:underline font-medium">EOQ</a> to see how fast it sells and how much to reorder. For cash, <a href="/working-capital-calculator" class="text-accent hover:underline font-medium">working capital</a>, <a href="/liquidity-ratios-calculator" class="text-accent hover:underline font-medium">liquidity ratios</a> and the <a href="/cash-conversion-cycle-calculator" class="text-accent hover:underline font-medium">cash conversion cycle</a> show whether you can pay short-term bills, while <a href="/dscr-calculator" class="text-accent hover:underline font-medium">DSCR</a> is the test a lender applies before a business loan.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">Use <a href="/depreciation-calculator" class="text-accent hover:underline font-medium">depreciation</a> for fixed assets, and the <a href="/in/upi-mdr-calculator" class="text-accent hover:underline font-medium">UPI MDR calculator</a> if you take UPI payments in India.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">For a payment-cost budget, use the <a href="/in/upi-mdr-calculator" class="text-accent font-medium hover:underline">UPI MDR calculator for fees and net settlement</a> with the rate in your provider’s quote, then compare the settlement with your monthly collections.</p>
+    <p class="text-sm text-text-muted leading-relaxed mb-4">If you only need a quick percentage, such as a margin, a markup or a return on a single purchase, start with the <a href="/everyday-math" class="text-accent hover:underline font-medium">everyday math calculators</a>.</p>
+  </section>
+</HubPage>

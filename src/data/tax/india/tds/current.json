@@ -1,54 +1,203 @@
 {
   "jurisdiction": "IN",
   "taxDomain": "tds",
-  "effectiveFrom": "2025-04-01",
-  "applicableTo": "2026-03-31",
-  "financialYear": "FY 2025-26",
-  "governingFramework": "Income-tax Act, 1961",
-  "framework": "Income-tax Act, 1961 (Transitioning to Income-tax Act, 2025)",
-  "source": "Income Tax Department",
-  "sourceUrl": "https://www.incometax.gov.in/iec/foportal/help/all-topics/e-filing-services/tds-compliance",
-  "sourceTitle": "Income Tax Department — TDS Compliance FAQs",
-  "verifiedOn": "2026-10-17",
+  "effectiveFrom": "2026-04-01",
+  "applicableTo": "2027-03-31",
+  "taxYear": "TY 2026-27",
+  "governingFramework": "Income-tax Act, 2025",
+  "framework": "Income-tax Act, 2025 (as amended by the Finance Act, 2026); payments up to 31 March 2026 stay under the Income-tax Act, 1961",
+  "source": "Income Tax Department (CBDT)",
+  "sourceUrl": "https://www.incometaxindia.gov.in/w/tds-rates",
+  "sourceTitle": "Income Tax Department — TDS rates for tax year 2026-27 (Income-tax Act, 2025 as amended by Finance Act, 2026)",
+  "verifiedOn": "2026-10-24",
   "thresholdSources": [
-    { "sections": ["194", "194LA", "194J", "194I", "194H", "194D", "194A"], "title": "ClearTax — TDS and TCS changes from April 2025 (Finance Act 2025 threshold table)", "url": "https://cleartax.in/s/tds-and-tcs-changes-from-april-2025", "verifiedOn": "2026-10-17" },
-    { "sections": ["194J"], "title": "ClearTax — Section 194J (10% professional, 2% technical; ₹50,000)", "url": "https://cleartax.in/s/section-194j", "verifiedOn": "2026-10-17" },
-    { "sections": ["194I"], "title": "ClearTax — Section 194I (₹50,000 a month / ₹6 lakh a year)", "url": "https://cleartax.in/s/section-194i-tds-on-rent", "verifiedOn": "2026-10-17" },
-    { "sections": ["194H"], "title": "ClearTax — Section 194H (2%; ₹20,000 from 1 April 2025)", "url": "https://cleartax.in/s/section-194h-tds-on-commission-brokerage", "verifiedOn": "2026-10-17" },
-    { "sections": ["194D"], "title": "ClearTax — Section 194D (2% for persons other than a company; ₹20,000)", "url": "https://cleartax.in/s/section-194d-tds", "verifiedOn": "2026-10-17" }
+    {
+      "sections": [
+        "193",
+        "194",
+        "194A",
+        "194C",
+        "194D",
+        "194H",
+        "194I",
+        "194J",
+        "194LA",
+        "194O",
+        "194Q"
+      ],
+      "title": "Income-tax Act, 2025 — section 393(1) Table (payments to residents) and section 393(4) Table (no deduction), as amended by Finance Act, 2026",
+      "url": "https://www.incometaxindia.gov.in/w/section-393-6",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "194B",
+        "194BB",
+        "194N"
+      ],
+      "title": "Income-tax Act, 2025 — section 393(3) Table (payments to any person)",
+      "url": "https://www.incometaxindia.gov.in/w/section-393-6",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "192",
+        "192A"
+      ],
+      "title": "Income-tax Act, 2025 — section 392 (salary; s.392(7) accumulated PF balance, 10% where ₹50,000 or more)",
+      "url": "https://www.incometaxindia.gov.in/w/section-392-6",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "193",
+        "194A",
+        "194B",
+        "194BB",
+        "194D"
+      ],
+      "title": "Finance Act, 2026 — First Schedule, Part II (rates in force for TDS under the Income-tax Act, 2025)",
+      "url": "https://www.incometaxindia.gov.in/w/first-schedule-104",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "206AA"
+      ],
+      "title": "Income-tax Act, 2025 — section 397(2)(b) (higher rate where PAN is not furnished)",
+      "url": "https://www.incometaxindia.gov.in/w/section-397-6",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "all"
+      ],
+      "title": "Income-tax Act, 2025 as amended by the Finance Act, 2026 (official text)",
+      "url": "https://www.incometaxindia.gov.in/documents/d/guest/income_tax_act_2025_as_amended_by_fa_act_2026-pdf",
+      "verifiedOn": "2026-10-24"
+    },
+    {
+      "sections": [
+        "all"
+      ],
+      "title": "CBDT — FAQs on interplay and transition to the Income-tax Act, 2025",
+      "url": "https://www.incometaxindia.gov.in/documents/81799/11848482/Updated-FQAs-on-Interplay%26Transitions.pdf/e10ad2b6-9495-de90-58d3-20606d8954ae?t=1775128640970",
+      "verifiedOn": "2026-10-24"
+    }
   ],
-  "notes": "Statutory TDS rates and thresholds for individual payees furnishing PAN. For payments or credits credited on or before 31 March 2026, legacy Chapter XVII-B sections apply. For payments or credits from 1 April 2026, consult the corresponding sections (e.g. sections 392/393) under the Income-tax Act, 2025.",
+  "notes": "Statutory TDS rates and thresholds for resident individual payees furnishing PAN, for tax year 2026-27 under sections 392 and 393 of the Income-tax Act, 2025. Payments or credits made on or before 31 March 2026 (FY 2025-26) stay under Chapter XVII-B of the Income-tax Act, 1961; the old section numbers are kept as keys and shown in brackets.",
   "assumptions": [
     "Payee is a resident individual who has furnished a valid Permanent Account Number (PAN) to the deductor.",
-    "Calculations reflect statutory base rates under Chapter XVII-B of the Income-tax Act, 1961 for payments or credits up to 31 March 2026.",
-    "Section-specific statutory threshold limits apply on an aggregate financial year basis per payer-payee relationship."
+    "Calculations reflect the rates and thresholds in sections 392 and 393 of the Income-tax Act, 2025 and Part II of the First Schedule to the Finance Act, 2026, for payments or credits from 1 April 2026.",
+    "Section-specific threshold limits apply on an aggregate tax-year basis per payer-payee relationship unless the Act states a single-transaction or monthly limit."
   ],
   "limitations": [
-    "A punitive higher tax rate of 20% applies under Section 206AA if a valid PAN is not furnished by the payee.",
-    "Higher withholding rates apply under Section 206AB for specified non-filers of income tax returns.",
-    "For payments or credits on or after 1 April 2026, corresponding provisions (such as sections 392/393) under the Income-tax Act, 2025 apply.",
-    "Does not process Lower or Nil Tax Deduction Certificates issued under Section 197 or self-declarations under Form 15G / 15H.",
-    "Educational calculator for compliance estimation; deductor must issue Form 16 / Form 16A as statutory proof of tax deducted."
+    "A higher rate of 20% (5% for purchase of goods and e-commerce payments) applies under section 397(2)(b) [old 206AA] if a valid PAN is not furnished by the payee.",
+    "Payments or credits on or before 31 March 2026 (FY 2025-26) are governed by the Income-tax Act, 1961.",
+    "Does not process lower or nil deduction certificates under section 395 [old 197] or self-declarations under section 393(6) [old Form 15G / 15H].",
+    "Educational calculator for compliance estimation; the deductor's TDS certificate is the statutory proof of tax deducted."
   ],
-  "disclaimer": "This calculator uses the rules/data published by Income Tax Department for FY 2025-26. Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
+  "disclaimer": "This calculator uses the rules/data published by the Income Tax Department for tax year 2026-27 (Income-tax Act, 2025). Estimated result based on the inputs and assumptions provided. Educational tool only; not legal or filing advice. Check official guidance for your specific situation.",
   "values": {
     "sections": {
-      "192": { "ratePct": 0, "threshold": 0, "description": "Salary — as per applicable slab rates" },
-      "192A": { "ratePct": 10, "threshold": 50000, "description": "Premature EPF withdrawal (< 5 years of service)" },
-      "193": { "ratePct": 10, "threshold": 10000, "description": "Interest on securities" },
-      "194": { "ratePct": 10, "threshold": 10000, "description": "Dividend from listed company" },
-      "194A": { "ratePct": 10, "threshold": 50000, "seniorCitizenThreshold": 100000, "description": "Interest other than securities (banks/post office); ₹1,00,000 for senior citizens" },
-      "194B": { "ratePct": 30, "threshold": 10000, "description": "Winnings from lotteries, crossword puzzles" },
-      "194BB": { "ratePct": 30, "threshold": 10000, "description": "Winnings from horse races" },
-      "194C": { "ratePct": 1, "threshold": 30000, "description": "Payments to contractors (individual/HUF)" },
-      "194D": { "ratePct": 2, "threshold": 20000, "description": "Insurance commission (payee other than a company); 2% from 1 April 2025" },
-      "194H": { "ratePct": 2, "threshold": 20000, "description": "Commission or brokerage; 2% from 1 October 2024" },
-      "194I": { "ratePct": 10, "threshold": 600000, "monthlyThreshold": 50000, "description": "Rent of land/building/furniture; ₹50,000 a month (₹6,00,000 a year)" },
-      "194J": { "ratePct": 10, "threshold": 50000, "description": "Fees for professional or technical services" },
-      "194LA": { "ratePct": 10, "threshold": 500000, "description": "Compensation on compulsory acquisition of immovable property" },
-      "194N": { "ratePct": 2, "threshold": 2000000, "description": "Cash withdrawal exceeding ₹20 lakh / ₹1 crore" },
-      "194O": { "ratePct": 0.1, "threshold": 500000, "description": "Payment by e-commerce operator to e-commerce participant" },
-      "194Q": { "ratePct": 0.1, "threshold": 5000000, "description": "Purchase of goods exceeding ₹50 lakh" }
+      "192": {
+        "ratePct": 0,
+        "threshold": 0,
+        "description": "Salary — as per applicable slab rates",
+        "act2025": "392(1)"
+      },
+      "192A": {
+        "ratePct": 10,
+        "threshold": 50000,
+        "description": "Premature EPF withdrawal (< 5 years of service)",
+        "act2025": "392(7)"
+      },
+      "193": {
+        "ratePct": 10,
+        "threshold": 10000,
+        "description": "Interest on securities",
+        "act2025": "393(1) Sl. 5(i)"
+      },
+      "194": {
+        "ratePct": 10,
+        "threshold": 10000,
+        "description": "Dividend from a domestic company (no TDS for an individual paid ₹10,000 or less other than in cash)",
+        "act2025": "393(1) Sl. 7"
+      },
+      "194A": {
+        "ratePct": 10,
+        "threshold": 50000,
+        "seniorCitizenThreshold": 100000,
+        "description": "Interest other than securities (banks/post office); ₹1,00,000 for senior citizens",
+        "act2025": "393(1) Sl. 5(ii)"
+      },
+      "194B": {
+        "ratePct": 30,
+        "threshold": 10000,
+        "description": "Winnings from lotteries, crossword puzzles",
+        "act2025": "393(3) Sl. 1"
+      },
+      "194BB": {
+        "ratePct": 30,
+        "threshold": 10000,
+        "description": "Winnings from horse races",
+        "act2025": "393(3) Sl. 3"
+      },
+      "194C": {
+        "ratePct": 1,
+        "threshold": 30000,
+        "description": "Payments to contractors (individual/HUF)",
+        "act2025": "393(1) Sl. 6(i)"
+      },
+      "194D": {
+        "ratePct": 2,
+        "threshold": 20000,
+        "description": "Insurance commission (payee other than a company); 2% rate in force (Finance Act, 2026)",
+        "act2025": "393(1) Sl. 1(i)"
+      },
+      "194H": {
+        "ratePct": 2,
+        "threshold": 20000,
+        "description": "Commission or brokerage",
+        "act2025": "393(1) Sl. 1(ii)"
+      },
+      "194I": {
+        "ratePct": 10,
+        "threshold": 600000,
+        "monthlyThreshold": 50000,
+        "description": "Rent of land/building/furniture; ₹50,000 a month (₹6,00,000 a year)",
+        "act2025": "393(1) Sl. 2(ii)"
+      },
+      "194J": {
+        "ratePct": 10,
+        "threshold": 50000,
+        "description": "Fees for professional or technical services",
+        "act2025": "393(1) Sl. 6(iii)"
+      },
+      "194LA": {
+        "ratePct": 10,
+        "threshold": 500000,
+        "description": "Compensation on compulsory acquisition of immovable property",
+        "act2025": "393(1) Sl. 3(iii)"
+      },
+      "194N": {
+        "ratePct": 2,
+        "threshold": 10000000,
+        "description": "Cash withdrawal exceeding ₹1 crore in a tax year (₹3 crore for a co-operative society)",
+        "act2025": "393(3) Sl. 5"
+      },
+      "194O": {
+        "ratePct": 0.1,
+        "threshold": 500000,
+        "description": "Payment by e-commerce operator to e-commerce participant (no TDS for an individual/HUF participant with PAN/Aadhaar and sales up to ₹5,00,000)",
+        "act2025": "393(1) Sl. 8(v)"
+      },
+      "194Q": {
+        "ratePct": 0.1,
+        "threshold": 5000000,
+        "description": "Purchase of goods exceeding ₹50 lakh",
+        "act2025": "393(1) Sl. 8(ii)"
+      }
     }
   }
 }

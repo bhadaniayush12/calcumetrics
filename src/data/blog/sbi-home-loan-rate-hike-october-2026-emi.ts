@@ -24,6 +24,11 @@ export const SBI_OCTOBER_POST: BlogPost = {
   relatedArticles: [
     { slug: 'rbi-repo-rate-hike-emi-impact', title: 'RBI Repo Rate Hike: EMI Impact', description: 'Read the broader explanation of benchmark transmission.' },
     { slug: 'home-loan-prepayment-vs-sip', title: 'Home Loan Prepayment vs SIP', description: 'Understand the different risks behind investing and repaying debt.' },
+    {
+      slug: 'rbi-repo-rate-5-50-fd-returns-october-2026',
+      title: 'The other side of the rate move: FD returns',
+      description: 'How depositors gain from the same rate cycle that raises loan EMIs.',
+    },
   ],
   faqs: [
     { question: 'How does a home loan EMI calculator work?', answer: 'It calculates a level monthly payment from principal, annual interest rate and term using reducing-balance interest. It assumes the entered rate stays constant and does not include lender fees unless separately modelled.' },

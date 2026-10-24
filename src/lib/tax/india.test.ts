@@ -7,7 +7,9 @@ import {
   calcAdvanceTax,
   calcSalaryCTC,
   METRO_CITIES,
+  METRO_CITIES_FY_2025_26,
   TDS_RATES,
+  TDS_ACT_2025_REF,
 } from '../../lib/tax/india';
 import { INDIA_TAX_DATA } from './schema';
 
@@ -70,7 +72,7 @@ describe('calcHRA', () => {
   });
 
   it('non-metro city uses 40% of basic', () => {
-    const res = calcHRA(600000, 240000, 180000, 'pune');
+    const res = calcHRA(600000, 240000, 180000, 'jaipur');
     expect(res.isMetro).toBe(false);
     expect(res.basicSalaryPct).toBeCloseTo(240000, 0); // 40% of 600000
   });
@@ -79,7 +81,7 @@ describe('calcHRA', () => {
     // basic=600000, hra=240000, rent=180000, non-metro
     // C1: 240000, C2: 180000 - 60000 = 120000, C3: 240000
     // Min = 120000
-    const res = calcHRA(600000, 240000, 180000, 'pune');
+    const res = calcHRA(600000, 240000, 180000, 'jaipur');
     expect(res.hraExemption).toBeCloseTo(120000, 0);
     expect(res.taxableHRA).toBeCloseTo(240000 - 120000, 0);
   });
@@ -90,10 +92,21 @@ describe('calcHRA', () => {
     expect(res.hraExemption).toBeLessThanOrEqual(100000);
   });
 
-  it('all 4 metro cities recognized', () => {
-    ['delhi', 'mumbai', 'kolkata', 'chennai'].forEach(city => {
+  it('all 8 rule 279 cities get 50% from tax year 2026-27', () => {
+    ['mumbai', 'kolkata', 'delhi', 'chennai', 'hyderabad', 'pune', 'ahmedabad', 'bengaluru'].forEach(city => {
       expect(METRO_CITIES.has(city)).toBe(true);
+      expect(calcHRA(600000, 400000, 400000, city).basicSalaryPct).toBeCloseTo(300000, 0);
     });
+    expect(METRO_CITIES.size).toBe(8);
+  });
+
+  it('FY 2025-26 list (old Rule 2A) keeps only the four original cities', () => {
+    expect([...METRO_CITIES_FY_2025_26].sort()).toEqual(['chennai', 'delhi', 'kolkata', 'mumbai']);
+  });
+
+  it('metro list matches hra/TY-2026-27.json', () => {
+    const cities = INDIA_TAX_DATA.hra['TY-2026-27'].values.metroCities as string[];
+    expect([...cities].sort()).toEqual([...METRO_CITIES].sort());
   });
 });
 
@@ -139,6 +152,27 @@ describe('calcTDS', () => {
     const res = calcTDS(1000000, '194O');
     expect(res.ratePct).toBe(0.1);
     expect(res.tdsAmount).toBeCloseTo(1000, 2);
+  });
+
+  it('194N cash withdrawal: ₹1 crore threshold under section 393(3) Sl. 5 (tax year 2026-27)', () => {
+    expect(TDS_RATES['194N'].threshold).toBe(10000000);
+    expect(calcTDS(10000000, '194N').tdsAmount).toBe(0);
+    expect(calcTDS(12000000, '194N').tdsAmount).toBeCloseTo(240000, 2);
+  });
+
+  it('194Q purchase of goods: 0.1% only on the sum exceeding ₹50 lakh (s.393(1) Sl. 8(ii) Note 1(b))', () => {
+    expect(calcTDS(5000000, '194Q').tdsAmount).toBe(0);
+    const res = calcTDS(7000000, '194Q');
+    expect(res.tdsAmount).toBeCloseTo(2000, 2); // 0.1% of ₹20,00,000
+    expect(res.netAmount).toBeCloseTo(6998000, 2);
+  });
+
+  it('every section has its Income-tax Act, 2025 reference, matching tds/current.json', () => {
+    const sections = INDIA_TAX_DATA.tds.current.values.sections as Record<string, { act2025?: string }>;
+    for (const sec of Object.keys(TDS_RATES)) {
+      expect(TDS_ACT_2025_REF[sec as keyof typeof TDS_ACT_2025_REF], sec).toMatch(/^39[23]\(/);
+      expect(sections[sec]?.act2025, sec).toBe(TDS_ACT_2025_REF[sec as keyof typeof TDS_ACT_2025_REF]);
+    }
   });
 
   it('engine rate table matches tds/current.json', () => {

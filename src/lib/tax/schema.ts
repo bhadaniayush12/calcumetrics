@@ -17,6 +17,7 @@ import incomeTaxTY2026_27 from '../../data/tax/india/income-tax/TY-2026-27.json'
 import gstCurrent from '../../data/tax/india/gst/current.json';
 import tdsCurrent from '../../data/tax/india/tds/current.json';
 import hraAY2026_27 from '../../data/tax/india/hra/AY-2026-27.json';
+import hraTY2026_27 from '../../data/tax/india/hra/TY-2026-27.json';
 import capitalGainsAY2025_26 from '../../data/tax/india/capital-gains/AY-2025-26.json';
 import capitalGainsFY2026_27 from '../../data/tax/india/capital-gains/FY-2026-27.json';
 import advanceTaxAY2026_27 from '../../data/tax/india/advance-tax/AY-2026-27.json';
@@ -349,6 +350,7 @@ export const INDIA_TAX_DATA = {
   },
   hra: {
     'AY-2026-27': hraAY2026_27 as unknown as TaxRecord,
+    'TY-2026-27': hraTY2026_27 as unknown as TaxRecord,
   },
   capitalGains: {
     'AY-2025-26': capitalGainsAY2025_26 as unknown as TaxRecord,
@@ -378,6 +380,7 @@ export function getAllIndiaTaxRecords(): TaxRecord[] {
     INDIA_TAX_DATA.gst.current,
     INDIA_TAX_DATA.tds.current,
     INDIA_TAX_DATA.hra['AY-2026-27'],
+    INDIA_TAX_DATA.hra['TY-2026-27'],
     INDIA_TAX_DATA.capitalGains['AY-2025-26'],
     INDIA_TAX_DATA.capitalGains['FY-2026-27'],
     INDIA_TAX_DATA.advanceTax['AY-2026-27'],
@@ -397,7 +400,7 @@ export function getAuthoritativeSources(): SourceEntry[] {
 const ROUTE_TAX_RECORD_MAP: Record<string, TaxRecord> = {
   '/in/income-tax-calculator': INDIA_TAX_DATA.incomeTax['TY-2026-27'],
   '/in/gst-calculator': INDIA_TAX_DATA.gst.current,
-  '/in/hra-calculator': INDIA_TAX_DATA.hra['AY-2026-27'],
+  '/in/hra-calculator': INDIA_TAX_DATA.hra['TY-2026-27'],
   '/in/tds-calculator': INDIA_TAX_DATA.tds.current,
   '/in/capital-gains-tax-calculator': INDIA_TAX_DATA.capitalGains['FY-2026-27'],
   '/in/advance-tax-calculator': INDIA_TAX_DATA.advanceTax['FY-2026-27'],

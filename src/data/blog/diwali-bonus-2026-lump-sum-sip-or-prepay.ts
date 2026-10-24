@@ -31,7 +31,13 @@ export const DIWALI_BONUS_POST: BlogPost = {
     { name: 'SIP Calculator', path: '/sip-calculator', description: 'Estimate a fixed number of monthly contributions.' },
     { name: 'Loan Prepayment Calculator', path: '/loan-prepayment-calculator', description: 'Estimate interest savings and the change in remaining tenure.', badge: 'Compare Debt' },
   ],
-  relatedArticles: [{ slug: 'home-loan-prepayment-vs-sip', title: 'Home Loan Prepayment vs SIP', description: 'Explore the broader long-term comparison after this one-bonus example.' }],
+  relatedArticles: [{ slug: 'home-loan-prepayment-vs-sip', title: 'Home Loan Prepayment vs SIP', description: 'Explore the broader long-term comparison after this one-bonus example.' },
+    {
+      slug: 'dhanteras-2026-gold-vs-sip',
+      title: 'Dhanteras 2026: gold coin or a SIP?',
+      description: 'How a festive gold purchase compares with putting the same money into a SIP over ten years.',
+    },
+  ],
   faqs: [
     { question: 'How does a SIP calculator work for a one-time bonus?', answer: 'Divide the bonus over a fixed number of contributions and stop when it is used. This example divides ₹1 lakh into 12 equal modelled contributions; it does not assume a fresh ₹1 lakh investment every month.' },
     { question: 'Why does the lump-sum example grow more than the SIP?', answer: 'In the smooth positive-return model, the whole lump sum earns from the beginning. The SIP leaves part of the bonus uninvested until later months. Actual market paths can produce a different result.' },

@@ -14,8 +14,11 @@ import Input from '../components/ui/Input.astro';
 import Dropdown from '../components/ui/Dropdown.astro';
 import Alert from '../components/ui/Alert.astro';
 import { calcFD, type FDCompoundFreq } from '../lib/calculators/fd';
-import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords } from '../lib/formatters';
+import { formatCurrency, formatIndian, formatIndianCompact, formatIndianWords, formatDisplayDate } from '../lib/formatters';
 import { TOOLS } from '../config/site';
+import { getFreshness } from '../data/page-freshness';
+
+const freshness = getFreshness('/fd-calculator')!;
 
 const DEFAULT = { principal: 100000, rate: 7.1, years: 5, freq: 'quarterly' as FDCompoundFreq };
 const result = calcFD(DEFAULT.principal, DEFAULT.rate, DEFAULT.years, DEFAULT.freq);
@@ -56,7 +59,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       inLanguage: 'en-IN',
-      dateModified: '2026-09-24',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -535,7 +538,7 @@ const jsonld = {
       <!-- 6. Authoritative Footer Review -->
       <div class="border-t border-border pt-6 pb-2 flex flex-col sm:flex-row items-center justify-between text-xs text-text-muted gap-2">
         <div>
-          <span>Last updated: <strong>September 2026</strong></span>
+          <span>Last reviewed: <strong><time datetime={freshness.lastReviewed}>{formatDisplayDate(freshness.lastReviewed)}</time></strong></span>
           <span class="mx-2">·</span>
           <span>Verified against standard banking compounding conventions</span>
         </div>

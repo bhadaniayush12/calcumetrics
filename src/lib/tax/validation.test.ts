@@ -159,8 +159,9 @@ describe('Framework & Temporal Coexistence (Section 2 & 10)', () => {
   it('documents TDS transition rules between 1961 Act and 2025 Act', () => {
     const tds = INDIA_TAX_DATA.tds.current;
     expect(tds.notes).toContain('31 March 2026');
-    expect(tds.notes).toContain('Income-tax Act, 2025');
-    expect(tds.governingFramework).toContain('Income-tax Act, 1961');
+    expect(tds.notes).toContain('Income-tax Act, 1961');
+    expect(tds.governingFramework).toBe('Income-tax Act, 2025');
+    expect(tds.taxYear).toBe('TY 2026-27');
   });
 });
 

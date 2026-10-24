@@ -67,6 +67,11 @@ export const BATCH_6_POSTS: BlogPost[] = [
         title: 'How Loan Amortization Works: The Complete Mathematical Guide',
         description: 'Understand how each monthly installment splits between interest and principal over the life of your loan.',
       },
+      {
+        slug: 'sbi-home-loan-rate-hike-october-2026-emi',
+        title: 'SBI home loan rate change: new EMI',
+        description: 'What the October 2026 SBI rate revision does to EMIs on common loan sizes.',
+      },
     ],
     faqs: [
       {
@@ -335,6 +340,11 @@ export const BATCH_6_POSTS: BlogPost[] = [
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
         description: 'Evaluate whether allocating extra cash flow to loan prepayment outperforms mutual fund SIP compounding.',
       },
+      {
+        slug: 'sbi-home-loan-rate-hike-october-2026-emi',
+        title: 'SBI borrowers: EMI after the rate revision',
+        description: 'Worked EMI and tenure figures for SBI home loans after the October 2026 change.',
+      },
     ],
     faqs: [
       {
@@ -602,6 +612,11 @@ export const BATCH_6_POSTS: BlogPost[] = [
         title: 'Fixed vs. Floating Interest Rate Loans: Which Should You Choose?',
         description: 'Weigh the stability of fixed-rate borrowing against the prospective reset risks of adjustable debt.',
       },
+      {
+        slug: 'debt-to-income-ratio-uk',
+        title: 'UK lenders and your DTI',
+        description: 'Income multiples and debt ratios UK lenders apply before offering a mortgage.',
+      },
     ],
     faqs: [
       {
@@ -837,6 +852,16 @@ export const BATCH_6_POSTS: BlogPost[] = [
         slug: 'rd-vs-sip',
         title: 'RD vs SIP: Which Monthly Savings Method Builds More Wealth?',
         description: 'Compare guaranteed fixed deposit recurring instruments against equity mutual fund systemic investment plans.',
+      },
+      {
+        slug: 'rbi-repo-rate-5-50-fd-returns-october-2026',
+        title: 'Repo rate at 5.50%: what it means for FD returns',
+        description: 'How the October 2026 repo decision feeds into fixed deposit rates and maturity values.',
+      },
+      {
+        slug: 'small-savings-rates-october-december-2026',
+        title: 'Post office schemes vs FDs this quarter',
+        description: 'Current small savings scheme rates to compare against bank FD offers.',
       },
     ],
     faqs: [

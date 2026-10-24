@@ -9,7 +9,8 @@ import Layout from '../layouts/Layout.astro';
 import WindowFrame from '../components/calculator/WindowFrame.astro';
 import { calcSIP } from '../lib/calculators/sip';
 import { formatIndian, formatIndianCompact, formatIndianWords } from '../lib/formatters';
-import { getPublishedTools, getToolCount, CATEGORIES } from '../config/site';
+import { getPublishedTools, getToolCount } from '../config/site';
+import { HUBS } from '../data/hubs';
 
 const initialMonthly = 25000;
 const initialRate = 12;
@@ -39,13 +40,14 @@ const popularTools = popularSlugs
   .map((s) => allTools.find((t) => t.slug === s))
   .filter(Boolean);
 
-// Category descriptions for richer cards
-const categoryDescriptions: Record<string, string> = {
-  Investments: 'SIP, compound interest, CAGR, XIRR, FD, PPF, 401(k) and more.',
-  Loans: 'EMI, home loan, car loan and prepayment impact calculators.',
-  Taxes: 'GST, HRA, and Old vs New income tax regime for India.',
-  Business: 'Break-even, profit margins, markup vs margin, ROI.',
-  'Corporate Finance': 'WACC, NPV, IRR, payback period, DCF — global formulas.',
+// Topic hub descriptions for richer cards
+const hubDescriptions: Record<string, string> = {
+  loans: 'EMI, home loan, car loan, mortgage, affordability and debt payoff.',
+  investing: 'SIP, lump sum, FD, RD, PPF, CAGR, XIRR, inflation and 401(k).',
+  'tax-india': 'Income tax, salary, HRA, TDS, advance tax, capital gains and GST.',
+  business: 'Break-even, margins, COGS, working capital, ratios and depreciation.',
+  'corporate-finance': 'WACC, NPV, IRR, payback period, DCF — global formulas.',
+  'everyday-math': 'Simple and compound interest, inflation, present and future value.',
 };
 
 const jsonld = {
@@ -320,21 +322,22 @@ const jsonld = {
   <!-- Browse by Category -->
   <section class="py-12 bg-surface border-b border-border" aria-labelledby="categories-heading">
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 id="categories-heading" class="text-2xl font-bold text-text-primary mb-2">Browse by category</h2>
-      <p class="text-sm text-text-muted mb-8">{totalCount} calculators across five categories: personal finance, business valuation, tax planning, loans, and corporate finance.</p>
+      <h2 id="categories-heading" class="text-2xl font-bold text-text-primary mb-2">Browse by topic</h2>
+      <p class="text-sm text-text-muted mb-8">{totalCount} calculators and guides grouped into six topic hubs: loans, investing, India tax, business and accounting, corporate finance, and everyday money math.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {CATEGORIES.map((cat) => {
-          const catTools = allTools.filter((t) => t.category === cat.name);
+        {HUBS.map((hub) => {
+          const hubPaths = new Set(hub.groups.flatMap((g) => g.tools));
+          const catTools = allTools.filter((t) => hubPaths.has(t.path));
           return (
             <a
-              href={cat.href}
+              href={hub.href}
               class="group block bg-canvas border border-border rounded-card p-5 hover:border-accent hover:shadow-sm transition-standard focus-visible:outline-accent"
             >
               <div class="flex items-center justify-between mb-2">
-                <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{cat.name}</h3>
+                <h3 class="font-bold text-sm text-text-primary group-hover:text-accent transition-standard">{hub.name}</h3>
                 <span class="text-xs text-text-muted">{catTools.length} tools</span>
               </div>
-              <p class="text-xs text-text-muted leading-relaxed mb-3">{categoryDescriptions[cat.name]}</p>
+              <p class="text-xs text-text-muted leading-relaxed mb-3">{hubDescriptions[hub.id]}</p>
               <ul class="space-y-1">
                 {catTools.slice(0, 3).map((tool) => (
                   <li class="text-xs text-text-muted truncate">· {tool.name}</li>

@@ -9,6 +9,9 @@ import Alert from '../../components/ui/Alert.astro';
 import { calcPPF } from '../../lib/calculators/ppf';
 import { formatIndian } from '../../lib/formatters';
 import { TOOLS } from '../../config/site';
+import { getFreshness } from '../../data/page-freshness';
+
+const freshness = getFreshness('/in/ppf-calculator')!;
 
 const DEFAULT = { annual: 150000, rate: 7.1, years: 15 };
 const result = calcPPF(DEFAULT.annual, DEFAULT.rate, DEFAULT.years);
@@ -37,7 +40,7 @@ const jsonld = {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR' },
       inLanguage: 'en',
-      dateModified: '2026-09-22',
+      dateModified: freshness.lastReviewed,
       publisher: {
         '@type': 'Organization',
         '@id': 'https://calcumetrics.com/#org',
@@ -124,9 +127,6 @@ const jsonld = {
     <Fragment slot="inputs">
       <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
         <h1 class="text-2xl font-bold tracking-tight text-text-primary">PPF Calculator</h1>
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/20">
-          Last verified: 24 Sept 2026
-        </span>
       </div>
       <p class="text-sm text-text-muted mb-2 leading-relaxed">Use this PPF calculator to project your Public Provident Fund maturity value and total interest earned at the current 7.1% rate.</p>
       <p class="text-xs text-text-muted mb-4">

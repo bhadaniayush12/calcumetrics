@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getPublishedTools } from '../config/site';
+import { getFreshness } from '../data/page-freshness';
 
 export const GET: APIRoute = async () => {
   const tools = getPublishedTools();
@@ -7,7 +8,7 @@ export const GET: APIRoute = async () => {
     .map(
       (tool) => `  <url>
     <loc>https://calcumetrics.com${tool.path}</loc>
-    <lastmod>${tool.dateModified}</lastmod>
+    <lastmod>${[tool.dateModified, getFreshness(tool.path)?.lastReviewed ?? ''].sort().reverse()[0]}</lastmod>
   </url>`
     )
     .join('\n');

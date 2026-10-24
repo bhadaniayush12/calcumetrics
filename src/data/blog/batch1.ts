@@ -70,6 +70,11 @@ export const BATCH_1_POSTS: BlogPost[] = [
         title: 'CAGR vs. XIRR: How to Accurately Measure Your Investment Returns',
         description: 'Learn the key differences between CAGR and XIRR, why SIPs require XIRR, how cash flow timing impacts returns, and how to avoid annualization traps.',
       },
+      {
+        slug: 'small-savings-rates-october-december-2026',
+        title: 'Small savings rates for October–December 2026',
+        description: 'The PPF, NSC, SCSS and Sukanya Samriddhi rates announced for the quarter.',
+      },
     ],
     faqs: [
       {
@@ -466,6 +471,16 @@ export const BATCH_1_POSTS: BlogPost[] = [
         slug: 'real-rate-of-return',
         title: 'The Real Rate of Return: Why Your 7% Fixed Deposit (FD) Might Be Losing Money',
         description: 'Understand purchasing power erosion after factoring in inflation and personal income tax slabs.',
+      },
+      {
+        slug: 'fd-rates-after-rbi-hike-lock-now-or-wait',
+        title: 'FD rates after the RBI move: lock in or wait',
+        description: 'Effective yield on a deposit locked now versus one opened after another rate change.',
+      },
+      {
+        slug: 'traditional-vs-roth-401k',
+        title: 'Traditional vs Roth 401(k)',
+        description: 'Pre-tax or after-tax contributions, and how your future tax rate decides it.',
       },
     ],
     faqs: [
@@ -881,6 +896,21 @@ export const BATCH_1_POSTS: BlogPost[] = [
         slug: 'home-loan-prepayment-vs-sip',
         title: 'Home Loan Prepayment vs. SIP: Which Builds More Wealth?',
         description: 'Compare guaranteed debt interest savings against volatile compounding equity market returns.',
+      },
+      {
+        slug: 'mortgage-rates-7-4-percent-buy-or-wait',
+        title: 'Mortgage rates near 7.4%: buy now or wait?',
+        description: 'What a rate move does to the monthly payment, and how to weigh buying now against waiting.',
+      },
+      {
+        slug: 'debt-avalanche-vs-snowball',
+        title: 'Paying down debt: avalanche or snowball?',
+        description: 'Which payoff order saves more interest, and when the snowball still makes sense.',
+      },
+      {
+        slug: 'debt-to-income-ratio-uk',
+        title: 'Debt-to-income ratio in the UK',
+        description: 'How UK lenders use DTI and loan-to-income limits on mortgage applications.',
       },
     ],
     faqs: [

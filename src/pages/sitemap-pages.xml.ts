@@ -11,7 +11,7 @@ export const GET: APIRoute = async () => {
     { path: '/privacy-policy',lastmod: '2026-10-11' },
     { path: '/cookie-policy', lastmod: '2026-10-11' },
     { path: '/widgets',       lastmod: '2026-10-11' },
-    { path: '/methodology',   lastmod: '2026-10-11' },
+    { path: '/methodology',   lastmod: '2026-10-24' },
     { path: '/contact',       lastmod: '2026-09-20' },
     { path: '/terms',         lastmod: '2026-10-11' },
     { path: '/disclaimer',    lastmod: '2026-10-11' },

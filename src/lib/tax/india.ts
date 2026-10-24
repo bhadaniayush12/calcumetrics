@@ -99,19 +99,25 @@ export interface HRAResult {
   isMetro: boolean;
 }
 
-/** Cities classified as metro for HRA exemption (Section 10(13A) of IT Act). */
-export const METRO_CITIES = new Set(['delhi', 'mumbai', 'kolkata', 'chennai']);
+/**
+ * Cities that get the 50% HRA limit from tax year 2026-27: rule 279 of the Income-tax Rules, 2026
+ * (Schedule III, Table Sl. No. 11 of the Income-tax Act, 2025). Must match data/tax/india/hra/TY-2026-27.json.
+ */
+export const METRO_CITIES = new Set(['mumbai', 'kolkata', 'delhi', 'chennai', 'hyderabad', 'pune', 'ahmedabad', 'bengaluru']);
+
+/** The four 50% cities under old Rule 2A (FY 2025-26 and earlier, Income-tax Act, 1961). */
+export const METRO_CITIES_FY_2025_26 = new Set(['delhi', 'mumbai', 'kolkata', 'chennai']);
 
 /**
- * Calculate HRA exemption under Section 10(13A) of the Income Tax Act.
+ * Calculate HRA exemption under Schedule III (Table Sl. No. 11) of the Income-tax Act, 2025.
  *
  * Exemption is the MINIMUM of:
  *   1. Actual HRA received
  *   2. Actual rent paid − 10% of Basic Salary
  *   3. 50% of Basic (metro) or 40% of Basic (non-metro)
  *
- * Source: Section 10(13A) & Rule 2A, Income Tax Act 1961.
- * Rates last verified: September 2026.
+ * Source: rule 279, Income-tax Rules, 2026 (old section 10(13A) & Rule 2A).
+ * Rates last verified: 24 October 2026.
  *
  * @param basicSalaryAnnual - Annual basic salary (₹).
  * @param hraReceivedAnnual - Annual HRA received from employer (₹).
@@ -146,10 +152,10 @@ export function calcHRA(
 // ── TDS ───────────────────────────────────────────────────────────────────────
 
 /**
- * TDS scenarios supported.
- * Rates per Finance (No.2) Act 2024 (194H/194D cut to 2%); thresholds per Finance Act 2025
- * (rationalised from 1 April 2025). Source recorded in data/tax/india/tds/current.json.
- * Rates last verified: October 2026.
+ * TDS scenarios supported, keyed by the old Income-tax Act, 1961 section number.
+ * Rates and thresholds are those of sections 392/393 of the Income-tax Act, 2025 for tax year 2026-27
+ * (rates in force per Part II of the First Schedule to the Finance Act, 2026).
+ * Source recorded in data/tax/india/tds/current.json. Rates last verified: 24 October 2026.
  */
 export type TDSSection =
   | '192'   // Salary
@@ -170,10 +176,9 @@ export type TDSSection =
   | '194Q'; // Purchase of goods (≥50 lakh)
 
 /**
- * TDS rate table for individuals (non-company, PAN-furnished).
- * Finance (No.2) Act 2024 rates, Finance Act 2025 thresholds. Higher rate applies when PAN not furnished.
+ * TDS rate table for individuals (non-company, PAN-furnished), tax year 2026-27.
+ * Higher rate applies when PAN not furnished (section 397(2)(b), old 206AA).
  * Must match data/tax/india/tds/current.json (enforced by india.test.ts).
- * Rates last verified: October 2026.
  */
 export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number; description: string }> = {
   '192':   { ratePct: 0, threshold: 0, description: 'Salary — as per income tax slab (computed separately)' },
@@ -189,14 +194,34 @@ export const TDS_RATES: Record<TDSSection, { ratePct: number; threshold: number;
   '194I':  { ratePct: 10, threshold: 600000, description: 'Rent (land/building) — ₹50,000 a month; 2% for plant/machinery' },
   '194J':  { ratePct: 10, threshold: 50000, description: 'Professional services; 2% for technical services' },
   '194LA': { ratePct: 10, threshold: 500000, description: 'Compensation on compulsory acquisition' },
-  '194N':  { ratePct: 2, threshold: 2000000, description: 'Cash withdrawal > ₹20 lakh' },
+  '194N':  { ratePct: 2, threshold: 10000000, description: 'Cash withdrawal > ₹1 crore (₹3 crore for co-operative societies)' },
   '194O':  { ratePct: 0.1, threshold: 500000, description: 'E-commerce operator payments (0.1% from 1 Oct 2024)' },
   '194Q':  { ratePct: 0.1, threshold: 5000000, description: 'Purchase of goods > ₹50 lakh' },
 };
 
+/** Income-tax Act, 2025 provision for each old section key (tax year 2026-27 onwards). */
+export const TDS_ACT_2025_REF: Record<TDSSection, string> = {
+  '192':   '392(1)',
+  '192A':  '392(7)',
+  '193':   '393(1) Sl. 5(i)',
+  '194':   '393(1) Sl. 7',
+  '194A':  '393(1) Sl. 5(ii)',
+  '194B':  '393(3) Sl. 1',
+  '194BB': '393(3) Sl. 3',
+  '194C':  '393(1) Sl. 6(i)',
+  '194D':  '393(1) Sl. 1(i)',
+  '194H':  '393(1) Sl. 1(ii)',
+  '194I':  '393(1) Sl. 2(ii)',
+  '194J':  '393(1) Sl. 6(iii)',
+  '194LA': '393(1) Sl. 3(iii)',
+  '194N':  '393(3) Sl. 5',
+  '194O':  '393(1) Sl. 8(v)',
+  '194Q':  '393(1) Sl. 8(ii)',
+};
+
 /**
- * Section 194A threshold for resident senior citizens (60+) on interest from banks,
- * co-operative banks and post offices, from 1 April 2025 (Finance Act 2025).
+ * Threshold for resident senior citizens (60+) on interest from banks, co-operative banks and
+ * post offices: ₹1,00,000 under section 393(1) Table Sl. 5(ii) (old 194A).
  */
 export const TDS_194A_SENIOR_THRESHOLD = 100000;
 
@@ -234,7 +259,10 @@ export function calcTDS(grossAmount: number, section: TDSSection, options: TDSOp
   const threshold =
     section === '194A' && options.seniorCitizen ? TDS_194A_SENIOR_THRESHOLD : TDS_RATES[section].threshold;
   const thresholdMet = grossAmount > threshold;
-  const tdsAmount = thresholdMet ? (grossAmount * ratePct) / 100 : 0;
+  // Purchase of goods: tax is deducted only on the sum exceeding ₹50 lakh
+  // (section 393(1) Table Sl. 8(ii), Note 1(b)); every other section taxes the whole amount.
+  const taxableBase = section === '194Q' ? grossAmount - threshold : grossAmount;
+  const tdsAmount = thresholdMet ? (taxableBase * ratePct) / 100 : 0;
 
   return {
     grossAmount,
