@@ -17,9 +17,9 @@ export interface PageFreshness {
 
 export const PAGE_FRESHNESS: Record<string, PageFreshness> = {
   '/in/income-tax-calculator': {
-    lastReviewed: '2026-10-17',
-    whatChanged: 'Surcharge with marginal relief added, and 4% cess now applied to tax plus surcharge.',
-    commit: '2cdc592',
+    lastReviewed: '2026-10-27',
+    whatChanged: 'Footer now refers to Tax year 2026-27 under the Income-tax Act, 2025.',
+    commit: 'e045351',
   },
   '/in/gst-calculator': {
     lastReviewed: '2026-10-19',
@@ -27,9 +27,9 @@ export const PAGE_FRESHNESS: Record<string, PageFreshness> = {
     commit: 'a8c5167',
   },
   '/in/hra-calculator': {
-    lastReviewed: '2026-10-24',
-    whatChanged: 'Moved to tax year 2026-27: rule 279 of the Income-tax Rules, 2026 gives the 50% limit to eight cities.',
-    commit: '4c12582',
+    lastReviewed: '2026-10-27',
+    whatChanged: 'Meta title and description now cite section 11 and Schedule III of the Income-tax Act, 2025.',
+    commit: 'e045351',
   },
   '/in/tds-calculator': {
     lastReviewed: '2026-10-24',
@@ -62,14 +62,14 @@ export const PAGE_FRESHNESS: Record<string, PageFreshness> = {
     commit: '69a91a4',
   },
   '/fd-calculator': {
-    lastReviewed: '2026-10-17',
-    whatChanged: 'Tax note: TDS on interest applies above ₹50,000 a year (₹1,00,000 for senior citizens).',
-    commit: 'd93ea7a',
+    lastReviewed: '2026-10-27',
+    whatChanged: 'Deposit-interest TDS note and FAQs now cite section 393(1) of the Income-tax Act, 2025.',
+    commit: 'e045351',
   },
   '/rd-calculator': {
-    lastReviewed: '2026-10-17',
-    whatChanged: 'Tax note: TDS on interest applies above ₹50,000 a year (₹1,00,000 for senior citizens).',
-    commit: 'd93ea7a',
+    lastReviewed: '2026-10-27',
+    whatChanged: 'Deposit-interest TDS note now cites section 393(1) of the Income-tax Act, 2025.',
+    commit: 'e045351',
   },
   '/home-loan-calculator': {
     lastReviewed: '2026-09-23',
